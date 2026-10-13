@@ -166,7 +166,7 @@ function simulateMatch(powerA,powerB,homeA,playersA=[],playersB=[],formationA="4
  const scorerFor=(xi,side)=>{
   const candidates=xi.filter(p=>p.pos==="ATT"||p.pos==="MID");
   const picked=weightedPick(candidates,candidates.map(p=>Math.max(1,p.rating-45)*(p.pos==="ATT"?1.6:p.pos==="MID"?0.85:0.2)));
-  if(picked)return {name:picked.name,id:p.id};
+  if(picked)return {name:picked.name,id:picked.id};
   return {name:side==="A"?"Angriper":"Spiss",id:null};
  };
  const assistantFor=(xi,scorerId)=>{
