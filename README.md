@@ -1,11 +1,14 @@
-# CM Mobile v0.3 — Touchline Edition
+# CM Mobile v0.4 — Touchline Edition
 
-## Changes in v0.3
-- Match scorecard consistently shows home team first and away team second, including away matches.
-- Goal events now include minute and scorer names in the match report.
-- Adds illustrative yellow-card and injury events.
-- Other round results preserve home-team-first ordering.
-- Match statistics are displayed in the same home-away order as the score.
+## Visual and match engine improvements
+- Football icon for goals, yellow and red card symbols, and injury icon.
+- Chronological unified match timeline instead of separate goal/incident lists.
+- Goal events are generated inside the match simulation and carry scorer and running score.
+- Scorers for the user's team are selected from the actual generated squad, weighted toward attackers and stronger players.
+- Opponent scorers use a fictional club player pool.
+- Home/away ordering remains consistent for the score and statistics.
 
-## Limitations
-This is a prototype with generated/fictitious player data and a simplified illustrative match engine. Scorers are assigned to simulated goal events from the squad/placeholder opponent pool; the event engine is not yet calibrated to a real football dataset. The 12-club schedule and local-only save remain prototype features.
+## Prototype limitations
+- Opponent squads and attributes are illustrative placeholders, not official rosters.
+- Match model remains simplified and needs balancing/testing.
+- Local-only saves; no cloud synchronization.
