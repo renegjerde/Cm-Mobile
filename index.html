@@ -47,6 +47,17 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .player-status.good{background:#1d392c;color:var(--green)}
 .player-status.bad{background:#42252b;color:#ffaaaa}
 
+
+.live-clock{display:flex;align-items:center;gap:9px;font-weight:850;letter-spacing:.08em;color:var(--green);font-size:12px}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 0 4px #ef444422;animation:livePulse 1.2s infinite}
+@keyframes livePulse{0%,100%{opacity:1}50%{opacity:.35}}
+.live-score{font-size:42px;font-weight:950;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.live-commentary{padding:12px 14px;border-radius:12px;background:#1b2b3e;border:1px solid #30465d;margin:12px 0;color:#d8e5f2;min-height:48px}
+.live-event-new{animation:eventArrive .35s ease-out}
+@keyframes eventArrive{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.live-progress{height:5px;background:#26364a;border-radius:99px;overflow:hidden;margin:8px 0 16px}
+.live-progress-fill{height:100%;width:0;background:var(--green);transition:width .15s linear}
+
 </style></head>
 <body>
 <header><div class="top"><div><div class="brand">CM <span>MOBILE</span></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
@@ -271,21 +282,135 @@ function playMatch(){
  save();
  showMatch(c,opp,our,their,home,resultText,userMatch.stats,roundResults,goalEvents,userEvents);
 }
+function matchCommentary(e,c,opp,home){
+ const club=e.side==="user"?c.name:opp.name;
+ const opponent=e.side==="user"?opp.name:c.name;
+ if(e.type==="goal"){
+  const lines=[
+   `${e.scorer} finner nettmaskene! ${club} jubler!`,
+   `MÅL! ${e.scorer} setter sjansen og sender ${club} til himmels.`,
+   `Der sitter den! ${e.scorer} scorer for ${club}.`,
+   `${e.scorer} dukker opp på rett sted til rett tid. Mål!`
+  ];
+  return lines[Math.floor(Math.random()*lines.length)];
+ }
+ if(e.type==="yellow")return `Gult kort til ${e.player||"en spiller"} fra ${club}. Dommeren setter ned foten.`;
+ if(e.type==="red")return `RØDT KORT! ${e.player||"En spiller"} fra ${club} må forlate banen.`;
+ if(e.type==="injury")return `Spillet stoppes. En spiller fra ${club} trenger behandling.`;
+ if(e.type==="chance")return `${club} kommer til avslutning, men ${opponent} holder stand.`;
+ return `Det skjer ting ute på banen mellom ${c.name} og ${opp.name}.`;
+}
 function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userEvents){
  const homeName=home?c.name:opp.name, awayName=home?opp.name:c.name;
  const homeCrest=home?c.crest:opp.crest, awayCrest=home?opp.crest:c.crest;
  const homeScore=home?our:their, awayScore=home?their:our;
  const allEvents=[...userEvents].sort((a,b)=>a.minute-b.minute);
- const eventRows=allEvents.map(e=>{
+ const goalCount=allEvents.filter(e=>e.type==="goal").length;
+ const openerLines=[
+  "Dommeren blåser i gang – nå gjelder det!",
+  "Vi er i gang! Begge lag prøver å finne rytmen.",
+  "Avspark! Publikum håper på en kamp å huske.",
+  "Kampen er i gang. Hvem tar initiativet?"
+ ];
+ const homeStat=(a,b)=>home?`${a} – ${b}`:`${b} – ${a}`;
+ document.getElementById("app").innerHTML=`
+ <div class="hero">
+  <div class="live-clock"><span class="live-dot"></span><span id="liveStatus">LIVE · 0'</span><span style="margin-left:auto">RUNDE ${appState.week-1}</span></div>
+  <h1 id="liveHeadline">Avspark!</h1>
+  <p id="liveSub">${home?"Hjemmekamp på eget gress":"På bortebane"} · Taktikk: ${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</p>
+  <div class="live-progress"><div id="liveProgressFill" class="live-progress-fill"></div></div>
+  <div id="liveCommentary" class="live-commentary">${openerLines[Math.floor(Math.random()*openerLines.length)]}</div>
+ </div>
+ <section class="card">
+  <div class="row" style="padding:10px 0 18px;align-items:center">
+   <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${homeCrest}</div><div style="margin-top:8px;font-weight:800">${homeName}</div><small style="color:var(--muted)">HJEMME</small></div>
+   <div id="liveScore" class="live-score">0 – 0</div>
+   <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${awayCrest}</div><div style="margin-top:8px;font-weight:800">${awayName}</div><small style="color:var(--muted)">BORTE</small></div>
+  </div>
+  <div class="fixture"><div class="team">Ballbesittelse</div><b id="livePossession">50% – 50%</b></div>
+  <div class="fixture"><div class="team">Avslutninger</div><b id="liveShots">0 – 0</b></div>
+  <div class="fixture"><div class="team">Skudd på mål</div><b id="liveOnTarget">0 – 0</b></div>
+  <div class="section-title"><h2>Kampens hendelser</h2><small id="liveGoalCount">0 mål</small></div>
+  <div id="liveEvents"><div class="muted" style="padding:10px 0">Vi venter på kampens første store øyeblikk …</div></div>
+  <div id="liveFinalSection" style="display:none">
+   <div class="section-title"><h2>Andre resultater</h2><small>Runde ${appState.week-1}</small></div>
+   ${roundResults.filter(r=>r.a!==appState.club&&r.b!==appState.club).map(r=>`<div class="fixture"><div class="team">${esc(CLUBS[r.a].name)}</div><div class="score">${r.ga}–${r.gb}</div><div class="team" style="text-align:right">${esc(CLUBS[r.b].name)}</div></div>`).join("")}
+   <p class="muted" style="margin-top:15px">${esc(text)}</p>
+   <button class="primary" style="width:100%" onclick="setPage('home')">Fortsett →</button>
+  </div>
+ </section>`;
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+ const app=document.getElementById("app");
+ const status=document.getElementById("liveStatus");
+ const headline=document.getElementById("liveHeadline");
+ const commentary=document.getElementById("liveCommentary");
+ const score=document.getElementById("liveScore");
+ const progress=document.getElementById("liveProgressFill");
+ const eventContainer=document.getElementById("liveEvents");
+ const goalLabel=document.getElementById("liveGoalCount");
+ const finalSection=document.getElementById("liveFinalSection");
+ const possession=document.getElementById("livePossession");
+ const shots=document.getElementById("liveShots");
+ const onTarget=document.getElementById("liveOnTarget");
+ const statsHome=home?stats.possession:100-stats.possession;
+ const statsAway=100-statsHome;
+ possession.textContent=`${statsHome}% – ${statsAway}%`;
+ let currentMinute=0, eventIndex=0, visibleGoals=0;
+ let currentHome=0,currentAway=0, shotsHome=0,shotsAway=0,onHome=0,onAway=0;
+ eventContainer.innerHTML="";
+ commentary.textContent=openerLines[Math.floor(Math.random()*openerLines.length)];
+ headline.textContent="Avspark!";
+ // 90 simulated minutes play out over about 16 seconds on mobile.
+ const timer=setInterval(()=>{
+  currentMinute++;
+  status.textContent=currentMinute<=45?`LIVE · ${currentMinute}'`:currentMinute<=90?`LIVE · ${currentMinute}'`:`FULL TIME`;
+  progress.style.width=Math.min(100,currentMinute/90*100)+"%";
+  // Release events only when the live clock reaches their minute.
+  while(eventIndex<allEvents.length&&allEvents[eventIndex].minute<=currentMinute){
+   const e=allEvents[eventIndex++];
    const teamName=e.side==="user"?c.name:opp.name;
    let icon=e.type==="goal"?"⚽":e.type==="yellow"?'<span class="card-yellow"></span>':e.type==="red"?'<span class="card-red"></span>':e.type==="injury"?"🩹":"🎯";
-   let title=e.type==="goal"?esc(e.scorer):esc(e.player|| (e.type==="chance"?"Avslutning":"Spiller"));
+   let title=e.type==="goal"?esc(e.scorer):esc(e.player||(e.type==="chance"?"Avslutning":"Spiller"));
    let sub=e.type==="goal"?(e.assist?"Mål · Assist: "+esc(e.assist):"Mål"):e.type==="yellow"?"Gult kort · "+esc(e.reason||"Forseelse"):e.type==="red"?"Rødt kort · "+esc(e.reason||"Utvist"):e.type==="injury"?"Skade":e.type==="chance"?(e.onTarget?"Skudd på mål":"Avslutning utenfor mål"):"Hendelse";
-   if(e.type==="chance"&&!e.onTarget)return "";
-   return `<div class="match-event"><div class="event-min">${e.minute}'</div><div class="event-symbol">${icon}</div><div class="event-detail"><strong>${title}</strong><small>${sub} · ${esc(teamName)}</small></div>${e.type==="goal"?`<div class="event-score">${e.score||""}</div>`:""}</div>`;
- }).filter(Boolean).join("");
- document.getElementById("app").innerHTML=`<div class="hero"><div class="eyebrow">Full time · Runde ${appState.week-1}</div><h1>${our>their?"Tre poeng!":our===their?"Delt poeng.":"Tap i dag."}</h1><p>${home?"Hjemme på eget gress":"På bortebane"} · Taktikk: ${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</p></div><section class="card"><div class="row" style="padding:10px 0 18px"><div style="text-align:center;flex:1"><div class="crest" style="margin:auto">${homeCrest}</div><div style="margin-top:8px;font-weight:800">${homeName}</div></div><div style="font-size:32px;font-weight:900;white-space:nowrap">${homeScore} – ${awayScore}</div><div style="text-align:center;flex:1"><div class="crest" style="margin:auto">${awayCrest}</div><div style="margin-top:8px;font-weight:800">${awayName}</div></div></div><div class="fixture"><div class="team">Ballbesittelse</div><b>${home?stats.possession:100-stats.possession}% – ${home?100-stats.possession:stats.possession}%</b></div><div class="fixture"><div class="team">Avslutninger</div><b>${home?stats.shots:stats.shotsAgainst} – ${home?stats.shotsAgainst:stats.shots}</b></div><div class="fixture"><div class="team">Skudd på mål</div><b>${home?stats.onTarget:stats.onTargetAgainst} – ${home?stats.onTargetAgainst:stats.onTarget}</b></div><div class="section-title"><h2>Kampens hendelser</h2><small>${goalEvents.length} mål</small></div>${eventRows||`<div class="muted" style="padding:10px 0">Ingen hendelser i kampen.</div>`}<div class="section-title"><h2>Andre resultater</h2><small>Runde ${appState.week-1}</small></div>${roundResults.filter(r=>r.a!==appState.club&&r.b!==appState.club).map(r=>`<div class="fixture"><div class="team">${esc(CLUBS[r.a].name)}</div><div class="score">${r.ga}–${r.gb}</div><div class="team" style="text-align:right">${esc(CLUBS[r.b].name)}</div></div>`).join("")}<p class="muted" style="margin-top:15px">${esc(text)}</p><button class="primary" style="width:100%" onclick="setPage('home')">Fortsett →</button></section>`;
- document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));save();
+   if(e.type==="goal"){
+    visibleGoals++;
+    if(e.side==="user"){if(home)currentHome++;else currentAway++}
+    else {if(home)currentAway++;else currentHome++}
+    headline.textContent=visibleGoals===1?"Målet er et faktum!":currentHome===currentAway?"Vi har en ny utligning!":(currentHome>currentAway?"Hjemmelaget tar ledelsen!":"Bortelaget tar ledelsen!");
+    score.textContent=`${currentHome} – ${currentAway}`;
+   }
+   if(e.type==="chance"&&!e.onTarget){commentary.textContent=matchCommentary(e,c,opp,home);continue}
+   const row=document.createElement("div");
+   row.className="match-event live-event-new";
+   row.innerHTML=`<div class="event-min">${e.minute}'</div><div class="event-symbol">${icon}</div><div class="event-detail"><strong>${title}</strong><small>${sub} · ${esc(teamName)}</small></div>${e.type==="goal"?`<div class="event-score">${e.score||""}</div>`:""}`;
+   eventContainer.appendChild(row);
+   commentary.textContent=matchCommentary(e,c,opp,home);
+   if(e.type==="goal")goalLabel.textContent=`${visibleGoals} ${visibleGoals===1?"mål":"mål"}`;
+   if(e.type==="chance"){if(e.side==="user"){if(home){shotsHome++;onHome++}else{shotsAway++;onAway++}}else{if(home){shotsAway++;onAway++}else{shotsHome++;onHome++}}}
+   shots.textContent=homeStat(stats.shots,stats.shotsAgainst);
+   onTarget.textContent=homeStat(stats.onTarget,stats.onTargetAgainst);
+  }
+  // Small narrative beats keep the clock alive between major events.
+  if(currentMinute===15)commentary.textContent="Et kvarter spilt. Lagene leter etter rom mellom leddene.";
+  if(currentMinute===30)commentary.textContent="En halvtime nærmer seg – hvem tør å ta mer risiko?";
+  if(currentMinute===45){headline.textContent="Pause";commentary.textContent=`Pause! ${currentHome}–${currentAway}. Manageren får sjansen til å samle laget.`}
+  if(currentMinute===46)commentary.textContent="Andre omgang er i gang. Nå skal kampen avgjøres.";
+  if(currentMinute===60)commentary.textContent="Siste halvtimen starter. Slitne bein kan gi nye muligheter.";
+  if(currentMinute===75)commentary.textContent="Et kvarter igjen. Nå kan hver eneste situasjon bli avgjørende.";
+  if(currentMinute>=90){
+   clearInterval(timer);
+   status.textContent="FULL TIME";
+   headline.textContent=our>their?"Tre poeng!":our===their?"Delt poeng.":"Tap i dag.";
+   commentary.textContent=`Sluttsignal! ${homeName} ${homeScore}–${awayScore} ${awayName}.`;
+   score.textContent=`${homeScore} – ${awayScore}`;
+   progress.style.width="100%";
+   shots.textContent=homeStat(stats.shots,stats.shotsAgainst);
+   onTarget.textContent=homeStat(stats.onTarget,stats.onTargetAgainst);
+   goalLabel.textContent=`${goalCount} mål`;
+   finalSection.style.display="block";
+   const btn=finalSection.querySelector("button");if(btn)btn.scrollIntoView({behavior:"smooth",block:"nearest"});
+  }
+ },160);
 }
 function setPage(p){appState.page=p;render()}
 function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · 2026/27 · RUNDE ${appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league};document.getElementById("app").innerHTML=pages[appState.page]();save()}
