@@ -365,6 +365,17 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   currentMinute++;
   status.textContent=currentMinute<=45?`LIVE · ${currentMinute}'`:currentMinute<=90?`LIVE · ${currentMinute}'`:`FULL TIME`;
   progress.style.width=Math.min(100,currentMinute/90*100)+"%";
+  // Reveal match statistics gradually instead of exposing the final totals at kickoff.
+  const progressRatio=Math.min(1,currentMinute/90);
+  const liveHomeShots=Math.round(stats.shots*progressRatio);
+  const liveAwayShots=Math.round(stats.shotsAgainst*progressRatio);
+  const liveHomeOnTarget=Math.min(liveHomeShots,Math.round(stats.onTarget*progressRatio));
+  const liveAwayOnTarget=Math.min(liveAwayShots,Math.round(stats.onTargetAgainst*progressRatio));
+  const possessionSwing=Math.round((statsHome-50)*progressRatio+(Math.random()*4-2));
+  const liveHomePossession=Math.max(30,Math.min(70,50+possessionSwing));
+  possession.textContent=`${liveHomePossession}% – ${100-liveHomePossession}%`;
+  shots.textContent=homeStat(liveHomeShots,liveAwayShots);
+  onTarget.textContent=homeStat(liveHomeOnTarget,liveAwayOnTarget);
   // Release events only when the live clock reaches their minute.
   while(eventIndex<allEvents.length&&allEvents[eventIndex].minute<=currentMinute){
    const e=allEvents[eventIndex++];
@@ -386,9 +397,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    eventContainer.appendChild(row);
    commentary.textContent=matchCommentary(e,c,opp,home);
    if(e.type==="goal")goalLabel.textContent=`${visibleGoals} ${visibleGoals===1?"mål":"mål"}`;
-   if(e.type==="chance"){if(e.side==="user"){if(home){shotsHome++;onHome++}else{shotsAway++;onAway++}}else{if(home){shotsAway++;onAway++}else{shotsHome++;onHome++}}}
-   shots.textContent=homeStat(stats.shots,stats.shotsAgainst);
-   onTarget.textContent=homeStat(stats.onTarget,stats.onTargetAgainst);
+   // The live stat counters above progress with the clock and converge to the final totals.
   }
   // Small narrative beats keep the clock alive between major events.
   if(currentMinute===15)commentary.textContent="Et kvarter spilt. Lagene leter etter rom mellom leddene.";
@@ -406,6 +415,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    progress.style.width="100%";
    shots.textContent=homeStat(stats.shots,stats.shotsAgainst);
    onTarget.textContent=homeStat(stats.onTarget,stats.onTargetAgainst);
+   possession.textContent=`${statsHome}% – ${statsAway}%`;
    goalLabel.textContent=`${goalCount} mål`;
    finalSection.style.display="block";
    const btn=finalSection.querySelector("button");if(btn)btn.scrollIntoView({behavior:"smooth",block:"nearest"});
