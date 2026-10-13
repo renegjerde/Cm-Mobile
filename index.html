@@ -35,6 +35,18 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .card-yellow{display:inline-block;width:12px;height:17px;border-radius:2px;background:#ffd32a;box-shadow:0 0 0 1px #e8b91c}
 .card-red{display:inline-block;width:12px;height:17px;border-radius:2px;background:#f04444;box-shadow:0 0 0 1px #c82727}
 
+
+.match-event{display:grid;grid-template-columns:42px 26px 1fr auto;align-items:start;gap:8px;padding:10px 0;border-bottom:1px solid #26364a}
+.match-event:last-child{border-bottom:0}
+.event-min{font-variant-numeric:tabular-nums;font-weight:800;color:var(--muted)}
+.event-symbol{font-size:18px;text-align:center;line-height:1.25}
+.event-detail{min-width:0}
+.event-detail strong{display:block;font-size:13px}
+.event-detail small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.player-status{display:inline-block;font-size:10px;border-radius:5px;padding:3px 6px;margin:3px 4px 0 0;background:#25394d;color:#c6d7e7}
+.player-status.good{background:#1d392c;color:var(--green)}
+.player-status.bad{background:#42252b;color:#ffaaaa}
+
 </style></head>
 <body>
 <header><div class="top"><div><div class="brand">CM <span>MOBILE</span></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
@@ -60,7 +72,7 @@ const CLUBS=[
 const names={GK:["E. Hartley","M. Kovac"],DEF:["L. Bennett","A. Silva","J. Mensah","T. Walker","P. Novak","R. Hughes"],MID:["D. Fletcher","M. Costa","A. Ibrahim","J. Clarke","S. Petrov","K. Walsh"],ATT:["A. Moreno","L. Okafor","J. Williams","N. Jensen"]};
 const positions=["GK","DEF","DEF","DEF","DEF","DEF","DEF","MID","MID","MID","MID","MID","MID","ATT","ATT","ATT","ATT"];
 const appState={page:"home",club:3,week:1,played:0,formation:"4-3-3",tactic:"Balanced",selectedXI:null,log:[],transferTab:"market",squad:[],table:[],budget:0,started:false};
-function makeSquad(clubIndex){let c=CLUBS[clubIndex];return positions.map((pos,i)=>{let base=c.strength+(Math.random()*12-6);return {id:clubIndex*100+i+1,name:names[pos][i%(names[pos].length)],pos,age:18+Math.floor(Math.random()*17),rating:Math.max(48,Math.min(94,Math.round(base+(pos==="ATT"?2:0)))),potential:Math.max(50,Math.min(96,Math.round(base+Math.random()*13))),value:Math.max(.4,+(Math.pow(Math.max(5,base-48),2)/90*(pos==="ATT"?1.15:1)).toFixed(1)),wage:Math.round(5+base*.65),fitness:90+Math.floor(Math.random()*11),morale:70+Math.floor(Math.random()*25),goals:0}})}
+function makeSquad(clubIndex){let c=CLUBS[clubIndex];return positions.map((pos,i)=>{let base=c.strength+(Math.random()*12-6);return {id:clubIndex*100+i+1,name:names[pos][i%(names[pos].length)],pos,age:18+Math.floor(Math.random()*17),rating:Math.max(48,Math.min(94,Math.round(base+(pos==="ATT"?2:0)))),potential:Math.max(50,Math.min(96,Math.round(base+Math.random()*13))),value:Math.max(.4,+(Math.pow(Math.max(5,base-48),2)/90*(pos==="ATT"?1.15:1)).toFixed(1)),wage:Math.round(5+base*.65),fitness:90+Math.floor(Math.random()*11),morale:70+Math.floor(Math.random()*25),goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0}})}
 function init(){appState.squad=makeSquad(appState.club);appState.budget=CLUBS[appState.club].budget;appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));appState.fixtures=[];ensureFixtures();appState.started=true;save();render()}
 function save(){try{localStorage.setItem("cmMobileSave",JSON.stringify(appState));}catch(e){}}
 function load(){try{let s=JSON.parse(localStorage.getItem("cmMobileSave"));if(s&&s.started){Object.assign(appState,s);if(!s.fixtures||!s.fixtures.length){appState.week=1;appState.played=0;appState.log=[];appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));appState.fixtures=[];}return true}}catch(e){}return false}
@@ -78,7 +90,7 @@ ${panel("Siste nytt",appState.log.length?appState.log.slice(-3).reverse().map(x=
 <div class="notice">Prototype v0.1: klubbene er ekte, men spillerstallen er foreløpig generert for å teste spillmekanikken. Den er ikke en offisiell eller oppdatert spillerdatabase.</div>`}
 function squad(){return `<div class="hero"><div class="eyebrow">First team</div><h1>Spillertropp</h1><p>${currentClub().name} · ${appState.squad.length} spillere · Gjennomsnitt ${Math.round(appState.squad.reduce((s,p)=>s+p.rating,0)/appState.squad.length)} i ferdighet</p></div>
 <div class="tabs"><button class="active">Alle spillere</button><button onclick="sortSquad('rating')">Sorter: ferdighet</button><button onclick="sortSquad('value')">Sorter: verdi</button></div><section class="card"><div class="row muted" style="font-size:10px"><span>SPILLER / POSISJON</span><span>FERDIGHET</span></div><div id="players">${appState.squad.map(playerRow).join("")}</div></section>`}
-function playerRow(p){return `<div class="player"><div><div class="player-name">${esc(p.name)} <span class="pill">${p.pos}</span></div><div class="player-meta">${p.age} år · Verdi ${money(p.value)} · Lønn ${money(p.wage/1000)} / uke</div><div class="attrs"><span class="attr">Form ${p.fitness}%</span><span class="attr">Moral ${p.morale}</span><span class="attr">Potensial ${p.potential}</span></div></div><div class="rating">${p.rating}</div></div>`}
+function playerRow(p){let status=p.injured>0?`<span class="player-status bad">Skadet ${p.injured} r.</span>`:p.suspended>0?`<span class="player-status bad">Suspendert</span>`:`<span class="player-status good">Tilgjengelig</span>`;return `<div class="player"><div><div class="player-name">${esc(p.name)} <span class="pill">${p.pos}</span></div><div class="player-meta">${p.age} år · Verdi ${money(p.value)} · Lønn ${money(p.wage/1000)} / uke</div><div class="attrs"><span class="attr">Form ${p.fitness}%</span><span class="attr">Moral ${p.morale}</span><span class="attr">Potensial ${p.potential}</span><span class="attr">Kampform ${Number(p.form||6.5).toFixed(1)}</span><span class="attr">${p.apps||0} kamper</span><span class="attr">${p.goals||0} mål</span><span class="attr">${p.assists||0} assist</span></div>${status}</div><div class="rating">${p.rating}</div></div>`}
 function sortSquad(key){appState.squad.sort((a,b)=>b[key]-a[key]);render()}
 function tactics(){
  const layouts={"4-4-2":[2,4,4,1],"4-3-3":[3,3,4,1],"4-2-3-1":[1,5,4,1],"3-5-2":[2,5,3,1]};
@@ -91,7 +103,7 @@ function tactics(){
  return `<div class="hero"><div class="eyebrow">Match preparation</div><h1>Taktikk</h1><p>Formasjonen bestemmer hvordan de elleve spillerne plasseres. Spillernes ferdigheter og mentaliteten påvirker kampen.</p></div><section class="card"><div class="field"><label>FORMASJON</label><select id="formation" onchange="appState.formation=this.value;save();render()">${["4-4-2","4-3-3","4-2-3-1","3-5-2"].map(f=>`<option ${appState.formation===f?"selected":""}>${f}</option>`).join("")}</select></div><div class="field"><label>MENTALITET</label><select id="tactic" onchange="appState.tactic=this.value;save()">${["Defensive","Balanced","Attacking","High press"].map(f=>`<option value="${f}" ${appState.tactic===f?"selected":""}>${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[f]}</option>`).join("")}</select></div><div class="section-title"><h2>Forventet startellever</h2><small>${selected.length} spillere</small></div><div style="background:linear-gradient(180deg,#17452f,#123622);border:1px solid #2b6848;border-radius:12px;padding:14px;text-align:center"><div style="font-size:11px;color:#b5e6bf;margin-bottom:10px">▲ ANGREP</div>${line(att)}${line(mid)}${line(def)}<div style="margin-top:12px">🧤 ${gk.length?esc(gk[0].name):"Ingen keeper"}</div></div><p class="muted" style="font-size:11px;margin-top:12px">Spillerne velges automatisk etter posisjon og ferdighet. Neste steg er å gjøre laguttaket redigerbart.</p><button class="primary" style="width:100%" onclick="playMatch()">Bruk taktikken og spill kamp</button></section>`;
 }
 function transfers(){let targets=[{name:"T. Adeyemi",pos:"ATT",age:21,rating:76,potential:88,value:27.5,wage:48},{name:"M. Laurent",pos:"MID",age:19,rating:67,potential:86,value:8.5,wage:18},{name:"J. van Dijk",pos:"DEF",age:24,rating:74,potential:79,value:16,wage:35},{name:"A. Costa",pos:"GK",age:22,rating:70,potential:84,value:7.2,wage:22},{name:"R. Mensah",pos:"MID",age:28,rating:78,potential:78,value:21,wage:62}];return `<div class="hero"><div class="eyebrow">Recruitment centre</div><h1>Overgangsmarked</h1><p>Finn forsterkninger, men pass på budsjettet. Alle spillerne i denne listen er fiktive prototypedata.</p><div class="hero-actions"><span class="pill green">Budsjett ${money(appState.budget)}</span><span class="pill">Lønnskostnader kommer senere</span></div></div><section class="card">${targets.map((p,i)=>`<div class="player"><div><div class="player-name">${p.name} <span class="pill">${p.pos}</span></div><div class="player-meta">${p.age} år · Potensial ${p.potential} · Lønn ${p.wage}k/uke</div><div class="attrs"><span class="attr">Verdi ${money(p.value)}</span></div></div><div style="text-align:right"><div class="rating">${p.rating}</div><button style="margin-top:6px;padding:7px 9px" onclick="buyPlayer(${i})" ${appState.budget<p.value?"disabled":""}>By ${money(p.value)}</button></div></div>`).join("")}</section><div class="notice">Overgangene er foreløpig direkte kjøp til markedsverdi. Bud, forhandlinger, AI-klubber og kontrakter kommer i neste iterasjon.</div>`}
-function buyPlayer(i){let targets=[{name:"T. Adeyemi",pos:"ATT",age:21,rating:76,potential:88,value:27.5,wage:48},{name:"M. Laurent",pos:"MID",age:19,rating:67,potential:86,value:8.5,wage:18},{name:"J. van Dijk",pos:"DEF",age:24,rating:74,potential:79,value:16,wage:35},{name:"A. Costa",pos:"GK",age:22,rating:70,potential:84,value:7.2,wage:22},{name:"R. Mensah",pos:"MID",age:28,rating:78,potential:78,value:21,wage:62}];let p={...targets[i],id:Date.now(),fitness:100,morale:80,goals:0};if(appState.budget<p.value)return;appState.budget=+(appState.budget-p.value).toFixed(1);appState.squad.push(p);appState.log.push(`${p.name} har signert for ${currentClub().name} for ${money(p.value)}.`);save();render()}
+function buyPlayer(i){let targets=[{name:"T. Adeyemi",pos:"ATT",age:21,rating:76,potential:88,value:27.5,wage:48},{name:"M. Laurent",pos:"MID",age:19,rating:67,potential:86,value:8.5,wage:18},{name:"J. van Dijk",pos:"DEF",age:24,rating:74,potential:79,value:16,wage:35},{name:"A. Costa",pos:"GK",age:22,rating:70,potential:84,value:7.2,wage:22},{name:"R. Mensah",pos:"MID",age:28,rating:78,potential:78,value:21,wage:62}];let p={...targets[i],id:Date.now(),fitness:100,morale:80,goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0};if(appState.budget<p.value)return;appState.budget=+(appState.budget-p.value).toFixed(1);appState.squad.push(p);appState.log.push(`${p.name} har signert for ${currentClub().name} for ${money(p.value)}.`);save();render()}
 function league(){let rows=sortedTable();return `<div class="hero"><div class="eyebrow">League centre</div><h1>Premier League</h1><p>Sesong 2026/27 · Runde ${appState.week} · ${appState.played} av 22 runder spilt</p></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>V</th><th>U</th><th>T</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${r.name===currentClub().name?"you":""}"><td>${i+1}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join("")}</tbody></table></div><div class="notice">Tabellen oppdateres når du spiller kamper. I denne prototypen er ligaen redusert til 12 klubber for å teste kjernen raskt.</div>`}
 
 function chooseClub(){let options=CLUBS.map((c,i)=>`${i+1}. ${c.name}`).join("\n");let answer=prompt("Velg klubb ved å skrive nummeret:\n"+options, String(appState.club+1));if(answer===null)return;let idx=Number(answer)-1;if(!Number.isInteger(idx)||idx<0||idx>=CLUBS.length){alert("Skriv et nummer fra 1 til "+CLUBS.length+".");return;}if(idx===appState.club)return;if(confirm("Bytte til "+CLUBS[idx].name+"? Dette starter en ny testkarriere.")){appState.club=idx;appState.week=1;appState.played=0;appState.log=[];init();}}
@@ -114,44 +126,87 @@ function teamPower(index){
  if(index===appState.club && appState.squad.length) return appState.squad.reduce((s,p)=>s+p.rating,0)/appState.squad.length;
  return CLUBS[index].strength;
 }
-function simulateMatch(powerA,powerB,homeA,playersA=[],playersB=[]){
- const diff=(powerA-powerB)/18+(homeA?0.24:-0.05);
- const lambdaA=Math.max(0.25,Math.min(3.1,1.25+diff));
- const lambdaB=Math.max(0.2,Math.min(2.8,1.15-diff*0.72));
- const poisson=lambda=>{let L=Math.exp(-lambda),k=0,p=1;do{k++;p*=Math.random()}while(p>L&&k<12);return k-1};
- const ga=poisson(lambdaA),gb=poisson(lambdaB),events=[];
- const minute=()=>1+Math.floor(Math.random()*90);
- const scorer=(players,team)=> {
-   const pool=players.filter(p=>p.pos==="ATT"||p.pos==="MID").sort((a,b)=>b.rating-a.rating);
-   if(!pool.length)return team==="A"?"Spiss":"Angriper";
-   const weights=pool.map(p=>Math.max(1,p.rating-45)*(p.pos==="ATT"?1.45:p.pos==="MID"?0.8:0.15));
-   let r=Math.random()*weights.reduce((a,b)=>a+b,0);
-   for(let i=0;i<pool.length;i++){r-=weights[i];if(r<=0)return pool[i].name}
-   return pool[0].name;
- };
- const opponentScorers=["A. Gordon","A. Isak","H. Barnes","B. Guimarães","S. Tonali","F. Schär"];
- const goalsA=[],goalsB=[];
- for(let i=0;i<ga;i++)goalsA.push({minute:minute(),side:"A",type:"goal",scorer:scorer(playersA,"A")});
- for(let i=0;i<gb;i++)goalsB.push({minute:minute(),side:"B",type:"goal",scorer:playersB.length?scorer(playersB,"B"):opponentScorers[Math.floor(Math.random()*opponentScorers.length)]});
- events.push(...goalsA,...goalsB);
- const randomPlayer=players=>players.length?players[Math.floor(Math.random()*players.length)].name:"Spiller";
- if(Math.random()<0.40)events.push({minute:minute(),side:"A",type:"yellow",player:randomPlayer(playersA),reason:["Forseelse","Protest","Holde igjen"][Math.floor(Math.random()*3)]});
- if(Math.random()<0.40)events.push({minute:minute(),side:"B",type:"yellow",player:randomPlayer(playersB),reason:["Forseelse","Protest","Holde igjen"][Math.floor(Math.random()*3)]});
- if(Math.random()<0.07)events.push({minute:minute(),side:Math.random()<.5?"A":"B",type:"red",player:randomPlayer(Math.random()<.5?playersA:playersB),reason:"Alvorlig forseelse"});
- if(Math.random()<0.12)events.push({minute:minute(),side:Math.random()<.5?"A":"B",type:"injury",player:randomPlayer(Math.random()<.5?playersA:playersB)});
- events.sort((a,b)=>a.minute-b.minute);
- let scoreA=0,scoreB=0;
- for(const e of events){if(e.type==="goal"){if(e.side==="A")scoreA++;else scoreB++;e.score=`${scoreA}–${scoreB}`}}
- return {ga,gb,events,lambdaA,lambdaB};
+function eligibleSquad(players){
+ return players.filter(p=>(p.injured||0)<=0&&(p.suspended||0)<=0).sort((a,b)=>{
+  const posOrder={GK:0,DEF:1,MID:2,ATT:3};
+  return (posOrder[a.pos]??4)-(posOrder[b.pos]??4)||b.rating-a.rating;
+ });
 }
-function makeMatchStats(powerA,powerB,homeA,ga,gb){
- const diff=powerA-powerB;
- const shotsA=Math.max(2,Math.round(8+diff/3+Math.random()*5));
- const shotsB=Math.max(2,Math.round(8-diff/3+Math.random()*5));
- const targetA=Math.min(shotsA,Math.max(ga,Math.round(ga*1.4+Math.random()*2)));
- const targetB=Math.min(shotsB,Math.max(gb,Math.round(gb*1.4+Math.random()*2)));
- const possessionA=Math.max(30,Math.min(70,Math.round(50+diff*.65+(homeA?3:-3))));
- return {shots:shotsA,shotsAgainst:shotsB,onTarget:targetA,onTargetAgainst:targetB,possession:possessionA};
+function weightedPick(players,weights){
+ if(!players.length)return null;
+ let total=weights.reduce((s,w)=>s+w,0),r=Math.random()*total;
+ for(let i=0;i<players.length;i++){r-=weights[i];if(r<=0)return players[i]}
+ return players[players.length-1];
+}
+function createMatchLineup(players,formation,teamName){
+ const p=eligibleSquad(players);
+ const counts=({"4-4-2":{ATT:2,MID:4,DEF:4,GK:1},"4-3-3":{ATT:3,MID:3,DEF:4,GK:1},"4-2-3-1":{ATT:1,MID:5,DEF:4,GK:1},"3-5-2":{ATT:2,MID:5,DEF:3,GK:1}})[formation]||{"ATT":3,"MID":3,"DEF":4,"GK":1};
+ const xi=[];
+ for(const pos of ["GK","DEF","MID","ATT"]){
+  const n=counts[pos]||0;
+  const pool=p.filter(x=>x.pos===pos&&!xi.some(y=>y.id===x.id));
+  xi.push(...pool.slice(0,n));
+ }
+ while(xi.length<11){const next=p.find(x=>!xi.some(y=>y.id===x.id));if(!next)break;xi.push(next)}
+ return xi.slice(0,11);
+}
+function simulateMatch(powerA,powerB,homeA,playersA=[],playersB=[],formationA="4-3-3",formationB="4-3-3",mentalityA="Balanced",mentalityB="Balanced"){
+ const xiA=createMatchLineup(playersA,formationA,"A"),xiB=createMatchLineup(playersB,formationB,"B");
+ const tactical={Defensive:-1.6,Balanced:0,Attacking:1.6,"High press":1.1};
+ const mentalA=tactical[mentalityA]||0, mentalB=tactical[mentalityB]||0;
+ const avg=xi=>xi.length?xi.reduce((s,p)=>s+p.rating,0)/xi.length:65;
+ const gkA=xiA.find(p=>p.pos==="GK")?.rating||65,gkB=xiB.find(p=>p.pos==="GK")?.rating||65;
+ const attackA=avg(xiA.filter(p=>p.pos==="ATT"||p.pos==="MID"))+mentalA+(homeA?1.8:0);
+ const attackB=avg(xiB.filter(p=>p.pos==="ATT"||p.pos==="MID"))+mentalB+(homeA?0:1.8);
+ const defenseA=avg(xiA.filter(p=>p.pos==="DEF"))+gkA*.22;
+ const defenseB=avg(xiB.filter(p=>p.pos==="DEF"))+gkB*.22;
+ const events=[],stats={shotsA:0,shotsB:0,onA:0,onB:0,possessionA:50,bigA:0,bigB:0};
+ let scoreA=0,scoreB=0;
+ const minute=()=>1+Math.floor(Math.random()*90);
+ const scorerFor=(xi,side)=>{
+  const candidates=xi.filter(p=>p.pos==="ATT"||p.pos==="MID");
+  const picked=weightedPick(candidates,candidates.map(p=>Math.max(1,p.rating-45)*(p.pos==="ATT"?1.6:p.pos==="MID"?0.85:0.2)));
+  if(picked)return {name:picked.name,id:p.id};
+  return {name:side==="A"?"Angriper":"Spiss",id:null};
+ };
+ const assistantFor=(xi,scorerId)=>{
+  const candidates=xi.filter(p=>p.id!==scorerId&&(p.pos==="MID"||p.pos==="ATT"));
+  const picked=weightedPick(candidates,candidates.map(p=>Math.max(1,p.rating-45)));
+  return picked?picked.name:null;
+ };
+ const chanceList=[];
+ // Minute-by-minute chance generation. Goal probability depends on chance quality, finishing,
+ // relative attack/defence and goalkeeper strength.
+ for(let m=1;m<=90;m++){
+  const chancesThisMinute=(Math.random()<0.19?1:0)+(Math.random()<0.018?1:0);
+  for(let k=0;k<chancesThisMinute;k++){
+   const side=Math.random()<Math.max(.22,Math.min(.78,.5+(attackA-defenseB-(attackB-defenseA))*.012))?"A":"B";
+   const xi=side==="A"?xiA:xiB, attack=side==="A"?attackA:attackB, defence=side==="A"?defenseB:defenseA, keeper=side==="A"?gkB:gkA;
+   const attackers=xi.filter(p=>p.pos==="ATT"||p.pos==="MID");
+   const shooter=weightedPick(attackers,attackers.map(p=>Math.max(1,p.rating-45)*(p.pos==="ATT"?1.6:p.pos==="MID"?.75:0.15)));
+   const finishing=shooter?shooter.rating:65;
+   const quality=Math.max(.025,Math.min(.85,.12+(attack-defence)*.009+(finishing-65)*.006+(Math.random()*.22)));
+   const onTarget=Math.random()<Math.max(.12,Math.min(.82,.28+(finishing-60)*.012));
+   if(side==="A"){stats.shotsA++;if(onTarget)stats.onA++}else{stats.shotsB++;if(onTarget)stats.onB++}
+   const savedByKeeper=Math.max(.05,Math.min(.75,.32+(keeper-65)*.012));
+   const scored=onTarget&&Math.random()<quality*(1-savedByKeeper)*2.5;
+   let event={minute:m,side,type:"chance",player:shooter?.name||"Angriper",onTarget,quality:+quality.toFixed(2)};
+   if(scored){
+    scoreA+=side==="A"?1:0;scoreB+=side==="B"?1:0;
+    const scorer=scorerFor(xi,side);
+    const scorerObj=shooter?{name:shooter.name,id:shooter.id}:scorer;
+    const assist=assistantFor(xi,scorerObj.id);
+    event={minute:m,side,type:"goal",scorer:scorerObj.name,scorerId:scorerObj.id,assist,score:`${scoreA}–${scoreB}`,onTarget:true,quality:+quality.toFixed(2)};
+   }
+   chanceList.push(event);
+  }
+  if(Math.random()<.006)events.push({minute:m,side:Math.random()<.5?"A":"B",type:"yellow",reason:"Forseelse"});
+  if(Math.random()<.0015)events.push({minute:m,side:Math.random()<.5?"A":"B",type:"red",reason:"Alvorlig forseelse"});
+  if(Math.random()<.0018)events.push({minute:m,side:Math.random()<.5?"A":"B",type:"injury",reason:"Skade"});
+ }
+ events.push(...chanceList.filter(e=>e.type==="goal"));
+ stats.possessionA=Math.max(30,Math.min(70,Math.round(50+(attackA-attackB)*.6+(homeA?3:-3))));
+ return {ga:scoreA,gb:scoreB,events,stats,xiA,xiB,attackA,attackB,defenseA,defenseB};
 }
 function playMatch(){
  ensureFixtures();
@@ -171,24 +226,43 @@ function playMatch(){
   let pa=teamPower(a),pb=teamPower(b);
   if(a===userIndex)pa=myPower;
   if(b===userIndex)pb=myPower;
-  const opponentPool=Array.from({length:18},(_,i)=>({name:["A. Gordon","A. Isak","H. Barnes","B. Guimarães","S. Tonali","F. Schär","A. Murphy","J. Willock","L. Hall","N. Pope","D. Burn","K. Trippier","S. Botman","J. Murphy","M. Almirón","E. Anderson","C. Wilson","M. Targett"][i],pos:i<2?"ATT":i<9?"MID":"DEF",rating:CLUBS[b].strength+(Math.random()*10-5)}));
-  const playersA=a===userIndex?appState.squad:opponentPool;
-  const playersB=b===userIndex?appState.squad:opponentPool;
-  const sim=simulateMatch(pa,pb,true,playersA,playersB);
+  const fakeNames=["A. Gordon","A. Isak","H. Barnes","B. Guimarães","S. Tonali","A. Murphy","J. Willock","L. Hall","N. Pope","D. Burn","K. Trippier","S. Botman","J. Murphy","M. Almirón","C. Wilson","M. Targett","R. Young","T. Doyle"];
+  const makeOpponentSquad=(clubIndex)=>fakeNames.map((name,i)=>({id:`opp-${clubIndex}-${i}`,name,pos:i===8?"GK":i<2||i===14?"ATT":i<7?"MID":"DEF",rating:Math.max(45,Math.min(92,Math.round(CLUBS[clubIndex].strength+(Math.random()*12-6)))),fitness:80+Math.floor(Math.random()*20),morale:75,form:6.5,injured:0,suspended:0}));
+  const playersA=a===userIndex?appState.squad:makeOpponentSquad(a);
+  const playersB=b===userIndex?appState.squad:makeOpponentSquad(b);
+  const sim=simulateMatch(pa,pb,true,playersA,playersB,a===userIndex?appState.formation:"4-3-3",b===userIndex?appState.formation:"4-3-3",a===userIndex?appState.tactic:"Balanced",b===userIndex?"Balanced":"Balanced");
   const [ga,gb]=[sim.ga,sim.gb];
   roundResults.push({a,b,ga,gb,events:sim.events});
   const ta=appState.table.find(x=>x.name===CLUBS[a].name),tb=appState.table.find(x=>x.name===CLUBS[b].name);
   ta.p++;tb.p++;ta.gf+=ga;ta.ga+=gb;tb.gf+=gb;tb.ga+=ga;
   if(ga>gb){ta.w++;ta.pts+=3;tb.l++}else if(ga<gb){tb.w++;tb.pts+=3;ta.l++}else{ta.d++;tb.d++;ta.pts++;tb.pts++}
   if(a===userIndex||b===userIndex){
-   const stats=makeMatchStats(pa,pb,a===userIndex,ga,gb);
-   userMatch={a,b,ga,gb,events:sim.events,stats,pa,pb};
+   const userIsA=a===userIndex;
+   const s=sim.stats;
+   const stats={shots:userIsA?s.shotsA:s.shotsB,shotsAgainst:userIsA?s.shotsB:s.shotsA,onTarget:userIsA?s.onA:s.onB,onTargetAgainst:userIsA?s.onB:s.onA,possession:userIsA?s.possessionA:100-s.possessionA};
+   userMatch={a,b,ga,gb,events:sim.events,stats,pa,pb,xiA:sim.xiA,xiB:sim.xiB};
+   // Apply real match events to the user's own squad only.
+   for(const ev of sim.events){
+    if(ev.type==="goal"&&ev.scorerId&&String(ev.scorerId).includes("opp-")===false){
+     const p=appState.squad.find(x=>x.id===ev.scorerId);if(p){p.goals=(p.goals||0)+1}
+     if(ev.assist){const aPlayer=appState.squad.find(x=>x.name===ev.assist);if(aPlayer)aPlayer.assists=(aPlayer.assists||0)+1}
+    }
+    if(ev.side===(userIsA?"A":"B")&&ev.type==="injury"){let p=appState.squad.filter(x=>x.pos!=="GK").sort((x,y)=>x.fitness-y.fitness)[0];if(p)p.injured=1+Math.floor(Math.random()*3)}
+    if(ev.side===(userIsA?"A":"B")&&ev.type==="red"){let p=appState.squad.filter(x=>x.pos!=="GK").sort((x,y)=>y.rating-x.rating)[0];if(p)p.suspended=1}
+   }
   }
  }
  round.played=true;
  appState.week++;
  appState.played++;
- appState.squad.forEach(p=>{p.fitness=Math.max(55,p.fitness-5-Math.floor(Math.random()*6));if(Math.random()<.1&&p.rating<p.potential)p.rating++});
+ appState.squad.forEach(p=>{
+  p.fitness=Math.max(45,p.fitness-5-Math.floor(Math.random()*6));
+  if((p.injured||0)>0)p.injured=Math.max(0,p.injured-1);
+  if((p.suspended||0)>0)p.suspended=Math.max(0,p.suspended-1);
+  const played=(userMatch.xiA||[]).concat(userMatch.xiB||[]).some(x=>x.id===p.id);
+  if(played){p.apps=(p.apps||0)+1;p.minutes=(p.minutes||0)+90;p.form=Math.max(4,Math.min(10,(p.form||6.5)+(Math.random()*.5-.2)))}
+  if(p.age<=23&&p.rating<p.potential&&Math.random()<.08){p.rating++;appState.log.push(`${p.name} har utviklet seg og økt ferdigheten til ${p.rating}.`)}
+ });
  const our=home?userMatch.ga:userMatch.gb, their=home?userMatch.gb:userMatch.ga;
  const userEvents=userMatch.events.map(e=>({...e,side:(e.side==="A"?(userMatch.a===userIndex?"user":"opp"):(userMatch.b===userIndex?"user":"opp"))}));
  const goalEvents=userEvents.filter(e=>e.type==="goal").map(e=>({...e,teamName:e.side==="user"?c.name:opp.name})).sort((a,b)=>a.minute-b.minute);
@@ -204,11 +278,12 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  const allEvents=[...userEvents].sort((a,b)=>a.minute-b.minute);
  const eventRows=allEvents.map(e=>{
    const teamName=e.side==="user"?c.name:opp.name;
-   let icon=e.type==="goal"?"⚽":e.type==="yellow"?'<span class="card-yellow"></span>':e.type==="red"?'<span class="card-red"></span>':e.type==="injury"?"🩹":"🔄";
-   let title=e.type==="goal"?esc(e.scorer):esc(e.player||"Spiller");
-   let sub=e.type==="goal"?"Mål":e.type==="yellow"?"Gult kort · "+esc(e.reason||"Forseelse"):e.type==="red"?"Rødt kort · "+esc(e.reason||"Utvist"):e.type==="injury"?"Skade":"Hendelse";
-   return `<div class="event-line"><div class="event-minute">${e.minute}${e.minute>90?"": "'"}</div><div class="event-icon">${icon}</div><div class="event-copy"><div class="event-title">${title}</div><div class="event-sub">${sub} · ${esc(teamName)}</div></div>${e.type==="goal"?`<div class="event-score">${e.score||""}</div>`:""}</div>`;
- }).join("");
+   let icon=e.type==="goal"?"⚽":e.type==="yellow"?'<span class="card-yellow"></span>':e.type==="red"?'<span class="card-red"></span>':e.type==="injury"?"🩹":"🎯";
+   let title=e.type==="goal"?esc(e.scorer):esc(e.player|| (e.type==="chance"?"Avslutning":"Spiller"));
+   let sub=e.type==="goal"?(e.assist?"Mål · Assist: "+esc(e.assist):"Mål"):e.type==="yellow"?"Gult kort · "+esc(e.reason||"Forseelse"):e.type==="red"?"Rødt kort · "+esc(e.reason||"Utvist"):e.type==="injury"?"Skade":e.type==="chance"?(e.onTarget?"Skudd på mål":"Avslutning utenfor mål"):"Hendelse";
+   if(e.type==="chance"&&!e.onTarget)return "";
+   return `<div class="match-event"><div class="event-min">${e.minute}'</div><div class="event-symbol">${icon}</div><div class="event-detail"><strong>${title}</strong><small>${sub} · ${esc(teamName)}</small></div>${e.type==="goal"?`<div class="event-score">${e.score||""}</div>`:""}</div>`;
+ }).filter(Boolean).join("");
  document.getElementById("app").innerHTML=`<div class="hero"><div class="eyebrow">Full time · Runde ${appState.week-1}</div><h1>${our>their?"Tre poeng!":our===their?"Delt poeng.":"Tap i dag."}</h1><p>${home?"Hjemme på eget gress":"På bortebane"} · Taktikk: ${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</p></div><section class="card"><div class="row" style="padding:10px 0 18px"><div style="text-align:center;flex:1"><div class="crest" style="margin:auto">${homeCrest}</div><div style="margin-top:8px;font-weight:800">${homeName}</div></div><div style="font-size:32px;font-weight:900;white-space:nowrap">${homeScore} – ${awayScore}</div><div style="text-align:center;flex:1"><div class="crest" style="margin:auto">${awayCrest}</div><div style="margin-top:8px;font-weight:800">${awayName}</div></div></div><div class="fixture"><div class="team">Ballbesittelse</div><b>${home?stats.possession:100-stats.possession}% – ${home?100-stats.possession:stats.possession}%</b></div><div class="fixture"><div class="team">Avslutninger</div><b>${home?stats.shots:stats.shotsAgainst} – ${home?stats.shotsAgainst:stats.shots}</b></div><div class="fixture"><div class="team">Skudd på mål</div><b>${home?stats.onTarget:stats.onTargetAgainst} – ${home?stats.onTargetAgainst:stats.onTarget}</b></div><div class="section-title"><h2>Kampens hendelser</h2><small>${goalEvents.length} mål</small></div>${eventRows||`<div class="muted" style="padding:10px 0">Ingen hendelser i kampen.</div>`}<div class="section-title"><h2>Andre resultater</h2><small>Runde ${appState.week-1}</small></div>${roundResults.filter(r=>r.a!==appState.club&&r.b!==appState.club).map(r=>`<div class="fixture"><div class="team">${esc(CLUBS[r.a].name)}</div><div class="score">${r.ga}–${r.gb}</div><div class="team" style="text-align:right">${esc(CLUBS[r.b].name)}</div></div>`).join("")}<p class="muted" style="margin-top:15px">${esc(text)}</p><button class="primary" style="width:100%" onclick="setPage('home')">Fortsett →</button></section>`;
  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));save();
 }
