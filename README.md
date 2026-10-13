@@ -1,32 +1,20 @@
-# CM Mobile v0.1 — Touchline Edition
+# CM Mobile v0.2 — Touchline Edition
 
-A small mobile-first football management prototype inspired by the feel of classic 1990s management games.
+Mobile-first football management prototype.
 
-## Run locally
-Open `index.html` in a modern browser. For the best PWA-like mobile experience, host it over HTTPS (for example with GitHub Pages).
+## v0.2 improvements
+- Formation layouts now show exactly 11 players (where the squad has the required positions).
+- A 12-club double round-robin fixture schedule (22 rounds).
+- Each round simulates all league fixtures and updates the full table.
+- Match summaries include the other results from the round.
+- Match scores are influenced by relative team strength, home advantage, and the manager's mentality.
+- Match statistics are calculated from the relative strength and match score rather than being entirely independent random numbers.
 
-## Included in v0.1
-- Mobile-first navigation and compact retro-inspired UI
-- Club selection represented by a simple club roster? (currently starts with Manchester United)
-- Premier League-style table with a reduced 12-club test league
-- Squad screen with generated placeholder players
-- Formation and mentality selection
-- Simple match simulation and match summary
-- Prototype transfer market and budget
-- Local save in the browser
+## Prototype limitations
+- Real club names, but fictional generated player names/attributes.
+- Club strength values and the match engine are illustrative, not an official database or realistic calibrated football model.
+- Squad selection remains automatic; no injuries, contracts, AI transfers, cups, promotion/relegation, or cloud sync yet.
+- Saves are local to the browser/device. Existing v0.1 saves may not contain the new fixture schedule; the game creates it when missing.
 
-## Important prototype limitations
-- Real club names are used, but player names and attributes are generated/fictitious and are not an official current database.
-- The league is reduced to 12 clubs for rapid prototyping.
-- Match stats and results are simulated with simple placeholder logic, not a validated football model.
-- Save data is local to the browser/device; it is not cloud-synced.
-- No club logos, player photos, or licensed assets are included.
-
-## Next development priorities
-1. Add a real new-career club selector.
-2. Replace placeholder squad with a properly sourced/licensed dataset.
-3. Build a more consistent fixture generator and deterministic match engine.
-4. Make starting XI and tactical instructions editable.
-5. Add transfer bids, contracts, wages, AI transfers, injuries, suspensions and player development.
-6. Add full league format, cups, promotion/relegation, and export/import of saves.
-7. Test on iPhone Safari and after publishing.
+## Run
+Open `index.html` in a browser, or publish it on GitHub Pages.
