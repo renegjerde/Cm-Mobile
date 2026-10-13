@@ -65,6 +65,9 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .table-position .rank-number{display:inline-flex;min-width:19px;height:19px;align-items:center;justify-content:center;border-radius:6px;background:#26384d;color:#e4edf7;font-size:10px}
 .table-position.user-rank .rank-number{background:#24452f;color:#9be27d}
 
+
+.headline-team{display:inline-flex;vertical-align:middle;align-items:center;margin:7px 0 0 0;padding:5px 9px;border:1px solid rgba(157,224,125,.28);border-radius:999px;background:rgba(157,224,125,.10);color:#a4e684;font-size:12px;line-height:1.35;font-weight:800;letter-spacing:.02em}
+
 </style></head>
 <body>
 <header><div class="top"><div><div class="brand">CM <span>MOBILE</span></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
@@ -398,7 +401,8 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
     visibleGoals++;
     if(e.side==="user"){if(home)currentHome++;else currentAway++}
     else {if(home)currentAway++;else currentHome++}
-    headline.textContent=visibleGoals===1?"Målet er et faktum!":currentHome===currentAway?"Vi har en ny utligning!":(currentHome>currentAway?"Hjemmelaget tar ledelsen!":"Bortelaget tar ledelsen!");
+    const scorerName=e.scorer||"Ukjent målscorer";
+    headline.innerHTML=`${esc(scorerName)} scorer!<br><span class="headline-team">${esc(teamName)}</span>`;
     score.textContent=`${currentHome} – ${currentAway}`;
    }
    if(e.type==="chance"&&!e.onTarget){commentary.textContent=matchCommentary(e,c,opp,home);continue}
