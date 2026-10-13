@@ -68,6 +68,13 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 .headline-team{display:inline-flex;vertical-align:middle;align-items:center;margin:7px 0 0 0;padding:5px 9px;border:1px solid rgba(157,224,125,.28);border-radius:999px;background:rgba(157,224,125,.10);color:#a4e684;font-size:12px;line-height:1.35;font-weight:800;letter-spacing:.02em}
 
+
+.table-position{display:flex;width:max-content;align-items:center;gap:5px;margin:5px auto;line-height:1.2}
+.table-position .rank-change{font-size:12px;font-weight:900}
+.table-position .rank-change.up,.rank-movement.up{color:#9be27d}
+.table-position .rank-change.down,.rank-movement.down{color:#ff8888}
+.table-position .rank-change.same,.rank-movement.same{color:#8193a8}
+.rank-movement{font-size:11px;font-weight:900;margin-left:5px;white-space:nowrap}
 </style></head>
 <body>
 <header><div class="top"><div><div class="brand">CM <span>MOBILE</span></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
@@ -102,6 +109,14 @@ function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",
 function currentClub(){return CLUBS[appState.club]}
 function sortedTable(){return [...appState.table].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf)}
 function tablePositionMap(){return new Map(sortedTable().map((team,index)=>[team.name,index+1]))}
+function positionChangeMarkup(change){
+ if(change==null||change===0)return '<span class="rank-change same">→</span>';
+ return change>0?`<span class="rank-change up">↑${change}</span>`:`<span class="rank-change down">↓${Math.abs(change)}</span>`;
+}
+function movementMarkup(change){
+ if(change==null||change===0)return '<span class="rank-movement same">→ 0</span>';
+ return change>0?`<span class="rank-movement up">↑ ${change}</span>`:`<span class="rank-movement down">↓ ${Math.abs(change)}</span>`;
+}
 function panel(title,body,right=""){return `<div class="section-title"><h2>${title}</h2>${right}</div><section class="card">${body}</section>`}
 function getNextOpponentIndex(){ensureFixtures();let r=appState.fixtures.find(f=>f.round===appState.week&&!f.played);if(!r)return (appState.club+1)%CLUBS.length;let g=r.games.find(x=>x.includes(appState.club));return g?(g[0]===appState.club?g[1]:g[0]):(appState.club+1)%CLUBS.length}
 function home(){let c=currentClub(),t=appState.table.find(x=>x.name===c.name),next=CLUBS[getNextOpponentIndex()];return `
@@ -126,7 +141,7 @@ function tactics(){
 }
 function transfers(){let targets=[{name:"T. Adeyemi",pos:"ATT",age:21,rating:76,potential:88,value:27.5,wage:48},{name:"M. Laurent",pos:"MID",age:19,rating:67,potential:86,value:8.5,wage:18},{name:"J. van Dijk",pos:"DEF",age:24,rating:74,potential:79,value:16,wage:35},{name:"A. Costa",pos:"GK",age:22,rating:70,potential:84,value:7.2,wage:22},{name:"R. Mensah",pos:"MID",age:28,rating:78,potential:78,value:21,wage:62}];return `<div class="hero"><div class="eyebrow">Recruitment centre</div><h1>Overgangsmarked</h1><p>Finn forsterkninger, men pass på budsjettet. Alle spillerne i denne listen er fiktive prototypedata.</p><div class="hero-actions"><span class="pill green">Budsjett ${money(appState.budget)}</span><span class="pill">Lønnskostnader kommer senere</span></div></div><section class="card">${targets.map((p,i)=>`<div class="player"><div><div class="player-name">${p.name} <span class="pill">${p.pos}</span></div><div class="player-meta">${p.age} år · Potensial ${p.potential} · Lønn ${p.wage}k/uke</div><div class="attrs"><span class="attr">Verdi ${money(p.value)}</span></div></div><div style="text-align:right"><div class="rating">${p.rating}</div><button style="margin-top:6px;padding:7px 9px" onclick="buyPlayer(${i})" ${appState.budget<p.value?"disabled":""}>By ${money(p.value)}</button></div></div>`).join("")}</section><div class="notice">Overgangene er foreløpig direkte kjøp til markedsverdi. Bud, forhandlinger, AI-klubber og kontrakter kommer i neste iterasjon.</div>`}
 function buyPlayer(i){let targets=[{name:"T. Adeyemi",pos:"ATT",age:21,rating:76,potential:88,value:27.5,wage:48},{name:"M. Laurent",pos:"MID",age:19,rating:67,potential:86,value:8.5,wage:18},{name:"J. van Dijk",pos:"DEF",age:24,rating:74,potential:79,value:16,wage:35},{name:"A. Costa",pos:"GK",age:22,rating:70,potential:84,value:7.2,wage:22},{name:"R. Mensah",pos:"MID",age:28,rating:78,potential:78,value:21,wage:62}];let p={...targets[i],id:Date.now(),fitness:100,morale:80,goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0};if(appState.budget<p.value)return;appState.budget=+(appState.budget-p.value).toFixed(1);appState.squad.push(p);appState.log.push(`${p.name} har signert for ${currentClub().name} for ${money(p.value)}.`);save();render()}
-function league(){let rows=sortedTable();return `<div class="hero"><div class="eyebrow">League centre</div><h1>Premier League</h1><p>Sesong 2026/27 · Runde ${appState.week} · ${appState.played} av 22 runder spilt</p></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>V</th><th>U</th><th>T</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${r.name===currentClub().name?"you":""}"><td>${i+1}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join("")}</tbody></table></div><div class="notice">Tabellen oppdateres når du spiller kamper. I denne prototypen er ligaen redusert til 12 klubber for å teste kjernen raskt.</div>`}
+function league(){let rows=sortedTable();return `<div class="hero"><div class="eyebrow">League centre</div><h1>Premier League</h1><p>Sesong 2026/27 · Runde ${appState.week} · ${appState.played} av 22 runder spilt</p></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>V</th><th>U</th><th>T</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${r.name===currentClub().name?"you":""}"><td>${i+1}${movementMarkup((appState.positionChanges||{})[r.name]||0)}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join("")}</tbody></table></div><div class="notice">Tabellen oppdateres når du spiller kamper. I denne prototypen er ligaen redusert til 12 klubber for å teste kjernen raskt.</div>`}
 
 function chooseClub(){let options=CLUBS.map((c,i)=>`${i+1}. ${c.name}`).join("\n");let answer=prompt("Velg klubb ved å skrive nummeret:\n"+options, String(appState.club+1));if(answer===null)return;let idx=Number(answer)-1;if(!Number.isInteger(idx)||idx<0||idx>=CLUBS.length){alert("Skriv et nummer fra 1 til "+CLUBS.length+".");return;}if(idx===appState.club)return;if(confirm("Bytte til "+CLUBS[idx].name+"? Dette starter en ny testkarriere.")){appState.club=idx;appState.week=1;appState.played=0;appState.log=[];init();}}
 
@@ -242,6 +257,7 @@ function playMatch(){
  const mental=({Defensive:-2,Balanced:0,Attacking:2,"High press":1.4})[appState.tactic]||0;
  const formBonus=appState.squad.reduce((s,p)=>s+(p.fitness-80)*0.025,0)/Math.max(1,appState.squad.length);
  myPower+=mental+formBonus;
+ const previousPositions=new Map(sortedTable().map((team,index)=>[team.name,index+1]));
  const roundResults=[];
  let userMatch=null;
  for(const [a,b] of round.games){
@@ -275,6 +291,12 @@ function playMatch(){
   }
  }
  round.played=true;
+ const positionsAfterRound=new Map(sortedTable().map((team,index)=>[team.name,index+1]));
+ appState.positionChanges={};
+ for(const team of appState.table){
+  const oldPos=previousPositions.get(team.name),newPos=positionsAfterRound.get(team.name);
+  appState.positionChanges[team.name]=oldPos==null?0:oldPos-newPos;
+ }
  appState.week++;
  appState.played++;
  appState.squad.forEach(p=>{
@@ -291,7 +313,7 @@ function playMatch(){
  const resultText=`Runde ${round.round}: ${c.name} ${our}–${their} ${opp.name} (${home?"hjemme":"borte"}).`;
  appState.log.push(resultText);
  save();
- showMatch(c,opp,our,their,home,resultText,userMatch.stats,roundResults,goalEvents,userEvents);
+ showMatch(c,opp,our,their,home,resultText,userMatch.stats,roundResults,goalEvents,userEvents,appState.positionChanges||{});
 }
 function matchCommentary(e,c,opp,home){
  const club=e.side==="user"?c.name:opp.name;
@@ -311,12 +333,12 @@ function matchCommentary(e,c,opp,home){
  if(e.type==="chance")return `${club} kommer til avslutning, men ${opponent} holder stand.`;
  return `Det skjer ting ute på banen mellom ${c.name} og ${opp.name}.`;
 }
-function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userEvents){
+function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userEvents,positionChanges={}){
  const homeName=home?c.name:opp.name, awayName=home?opp.name:c.name;
  const homeCrest=home?c.crest:opp.crest, awayCrest=home?opp.crest:c.crest;
  const positions=tablePositionMap();
  const homePosition=positions.get(homeName)||"–", awayPosition=positions.get(awayName)||"–";
- const rankLabel=(rank,isUser=false)=>`<span class="table-position ${isUser?"user-rank":""}"><span class="rank-number">${rank}.</span> PLASS</span>`;
+ const rankLabel=(rank,isUser=false,change=0)=>`<span class="table-position ${isUser?"user-rank":""}"><span class="rank-number">${rank}.</span><span>PLASS</span>${positionChangeMarkup(change)}</span>`;
  const homeScore=home?our:their, awayScore=home?their:our;
  const allEvents=[...userEvents].sort((a,b)=>a.minute-b.minute);
  const goalCount=allEvents.filter(e=>e.type==="goal").length;
@@ -337,9 +359,9 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  </div>
  <section class="card">
   <div class="row" style="padding:10px 0 18px;align-items:center">
-   <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${homeCrest}</div><div style="margin-top:8px;font-weight:800">${homeName}</div>${rankLabel(homePosition,homeName===c.name)}<small style="color:var(--muted)">HJEMME</small></div>
+   <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${homeCrest}</div><div style="margin-top:8px;font-weight:800">${homeName}</div>${rankLabel(homePosition,homeName===c.name,positionChanges[homeName]||0)}<small style="color:var(--muted);display:block;margin-top:2px">HJEMME</small></div>
    <div id="liveScore" class="live-score">0 – 0</div>
-   <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${awayCrest}</div><div style="margin-top:8px;font-weight:800">${awayName}</div>${rankLabel(awayPosition,awayName===c.name)}<small style="color:var(--muted)">BORTE</small></div>
+   <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${awayCrest}</div><div style="margin-top:8px;font-weight:800">${awayName}</div>${rankLabel(awayPosition,awayName===c.name,positionChanges[awayName]||0)}<small style="color:var(--muted);display:block;margin-top:2px">BORTE</small></div>
   </div>
   <div class="fixture"><div class="team">Ballbesittelse</div><b id="livePossession">50% – 50%</b></div>
   <div class="fixture"><div class="team">Avslutninger</div><b id="liveShots">0 – 0</b></div>
@@ -348,7 +370,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   <div id="liveEvents"><div class="muted" style="padding:10px 0">Vi venter på kampens første store øyeblikk …</div></div>
   <div id="liveFinalSection" style="display:none">
    <div class="section-title"><h2>Andre resultater</h2><small>Runde ${appState.week-1}</small></div>
-   ${roundResults.filter(r=>r.a!==appState.club&&r.b!==appState.club).map(r=>{const nameA=CLUBS[r.a].name,nameB=CLUBS[r.b].name;return `<div class="fixture"><div class="team"><div class="result-team-wrap"><span>${esc(nameA)}</span>${rankLabel(positions.get(nameA)||"–",nameA===c.name)}</div></div><div class="score">${r.ga}–${r.gb}</div><div class="team" style="text-align:right"><div class="result-team-wrap right"><span>${esc(nameB)}</span>${rankLabel(positions.get(nameB)||"–",nameB===c.name)}</div></div></div>`}).join("")}
+   ${roundResults.filter(r=>r.a!==appState.club&&r.b!==appState.club).map(r=>{const nameA=CLUBS[r.a].name,nameB=CLUBS[r.b].name;return `<div class="fixture"><div class="team"><div class="result-team-wrap"><span>${esc(nameA)}</span>${rankLabel(positions.get(nameA)||"–",nameA===c.name,positionChanges[nameA]||0)}</div></div><div class="score">${r.ga}–${r.gb}</div><div class="team" style="text-align:right"><div class="result-team-wrap right"><span>${esc(nameB)}</span>${rankLabel(positions.get(nameB)||"–",nameB===c.name,positionChanges[nameB]||0)}</div></div></div>`}).join("")}
    <p class="muted" style="margin-top:15px">${esc(text)}</p>
    <button class="primary" style="width:100%" onclick="setPage('home')">Fortsett →</button>
   </div>
@@ -424,7 +446,29 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   if(currentMinute>=90){
    clearInterval(timer);
    status.textContent="FULL TIME";
-   headline.textContent=our>their?"Tre poeng!":our===their?"Delt poeng.":"Tap i dag.";
+   const goalDifference=our-their;
+   const totalGoals=our+their;
+   const userPossession=home?statsHome:statsAway;
+   const headlines=goalDifference>0
+    ? (goalDifference>=3
+       ? ["En maktdemonstrasjon!","Full kontroll – for en seier!","Motstanderen ble satt på plass!"]
+       : totalGoals>=4
+        ? ["Målfest og tre poeng!","For en fotballkamp – og for en seier!","Angrepsfotball som betaler seg!"]
+        : their===0
+         ? ["Tett bakover – tre poeng!","Solid jobb og null baklengs!","Seier med kontroll!"]
+         : ["Tre poeng!","Seier med marginer!","Jobben er gjort!"])
+    : goalDifference===0
+     ? (totalGoals>=4
+        ? ["For en målrik thriller!","Målene rant inn – poengene deles.","En vill kamp ender uavgjort!"]
+        : userPossession>=60
+         ? ["Vi hadde ballen, men ikke seieren.","Poengene deles etter en jevn kamp.","Nære på – men det ender likt."]
+         : ["Delt poeng.","En jevn kamp ender uavgjort.","Ingen klarte å vippe det i sin favør."])
+     : (goalDifference<=-3
+        ? ["En tung kveld.","Vi ble straffet hardt i dag.","Dette må vi legge bak oss."]
+        : totalGoals>=4
+         ? ["Målfest – men ikke for oss.","Vi scoret, men det holdt ikke.","En åpen kamp glapp."]
+         : ["Tap i dag.","Det glapp på små marginer.","Vi må slå tilbake neste kamp."]);
+   headline.textContent=headlines[Math.floor(Math.random()*headlines.length)];
    commentary.textContent=`Sluttsignal! ${homeName} ${homeScore}–${awayScore} ${awayName}.`;
    score.textContent=`${homeScore} – ${awayScore}`;
    progress.style.width="100%";

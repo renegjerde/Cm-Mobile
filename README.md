@@ -1,12 +1,10 @@
-# CM Mobile v0.9 — Player-led goal headlines
+# CM Mobile v1.0 — Matchday polish
 
-## New in v0.9
-- Goal headlines now name the actual scorer.
-- A clear club badge below the headline identifies the scorer's team.
-- The score still updates live as each goal is revealed.
-- The existing event list continues to show scorer, assist, minute, team and score.
-- Retains the league-position labels introduced in v0.8.
+## Included
+1. League-position labels now have clear spacing; `PLASS` and `HJEMME/BORTE` no longer run together.
+2. Green up-arrows and red down-arrows show movement in league position after the round; unchanged teams get a neutral arrow. Movement is shown in match results and the league table.
+3. Full-time headlines vary according to win/draw/loss, score margin, total goals, clean sheet, and possession, instead of repeating the same three phrases.
 
-## Example
-`J. Williams scorer!`
-`MANCHESTER UNITED` (shown as a club badge)
+## Notes
+- Table movement compares the league positions before the round with the positions after all round results have been applied.
+- Match result and stats remain simulated by the current prototype engine.
