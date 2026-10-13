@@ -102,12 +102,35 @@ function teamPower(index){
  if(index===appState.club && appState.squad.length) return appState.squad.reduce((s,p)=>s+p.rating,0)/appState.squad.length;
  return CLUBS[index].strength;
 }
-function simulateScore(powerA,powerB,homeA){
+function simulateMatch(powerA,powerB,homeA){
  const diff=(powerA-powerB)/18+(homeA?0.24:-0.05);
  const lambdaA=Math.max(0.25,Math.min(3.1,1.25+diff));
  const lambdaB=Math.max(0.2,Math.min(2.8,1.15-diff*0.72));
  const poisson=lambda=>{let L=Math.exp(-lambda),k=0,p=1;do{k++;p*=Math.random()}while(p>L&&k<12);return k-1};
- return [poisson(lambdaA),poisson(lambdaB)];
+ const ga=poisson(lambdaA),gb=poisson(lambdaB);
+ const events=[];
+ function minute(){return 1+Math.floor(Math.random()*90)}
+ const goalMinutesA=[],goalMinutesB=[];
+ for(let i=0;i<ga;i++)goalMinutesA.push(minute());
+ for(let i=0;i<gb;i++)goalMinutesB.push(minute());
+ goalMinutesA.sort((a,b)=>a-b);goalMinutesB.sort((a,b)=>a-b);
+ goalMinutesA.forEach(m=>events.push({minute:m,side:"A",type:"goal"}));
+ goalMinutesB.forEach(m=>events.push({minute:m,side:"B",type:"goal"}));
+ // Add non-scoring incidents for a more match-like report.
+ if(Math.random()<0.30)events.push({minute:minute(),side:"A",type:"yellow"});
+ if(Math.random()<0.30)events.push({minute:minute(),side:"B",type:"yellow"});
+ if(Math.random()<0.08)events.push({minute:minute(),side:Math.random()<.5?"A":"B",type:"injury"});
+ events.sort((a,b)=>a.minute-b.minute);
+ return {ga,gb,events,goalMinutesA,goalMinutesB,lambdaA,lambdaB};
+}
+function makeMatchStats(powerA,powerB,homeA,ga,gb){
+ const diff=powerA-powerB;
+ const shotsA=Math.max(2,Math.round(8+diff/3+Math.random()*5));
+ const shotsB=Math.max(2,Math.round(8-diff/3+Math.random()*5));
+ const targetA=Math.min(shotsA,Math.max(ga,Math.round(ga*1.4+Math.random()*2)));
+ const targetB=Math.min(shotsB,Math.max(gb,Math.round(gb*1.4+Math.random()*2)));
+ const possessionA=Math.max(30,Math.min(70,Math.round(50+diff*.65+(homeA?3:-3))));
+ return {shots:shotsA,shotsAgainst:shotsB,onTarget:targetA,onTargetAgainst:targetB,possession:possessionA};
 }
 function playMatch(){
  ensureFixtures();
@@ -121,38 +144,51 @@ function playMatch(){
  const mental=({Defensive:-2,Balanced:0,Attacking:2,"High press":1.4})[appState.tactic]||0;
  const formBonus=appState.squad.reduce((s,p)=>s+(p.fitness-80)*0.025,0)/Math.max(1,appState.squad.length);
  myPower+=mental+formBonus;
- let our,their,stats={shots:0,shotsAgainst:0,onTarget:0,onTargetAgainst:0,possession:50};
  const roundResults=[];
+ let userMatch=null;
  for(const [a,b] of round.games){
   let pa=teamPower(a),pb=teamPower(b);
   if(a===userIndex)pa=myPower;
   if(b===userIndex)pb=myPower;
-  const [ga,gb]=simulateScore(pa,pb,true);
-  roundResults.push({a,b,ga,gb});
+  const sim=simulateMatch(pa,pb,true);
+  const [ga,gb]=[sim.ga,sim.gb];
+  roundResults.push({a,b,ga,gb,events:sim.events});
   const ta=appState.table.find(x=>x.name===CLUBS[a].name),tb=appState.table.find(x=>x.name===CLUBS[b].name);
   ta.p++;tb.p++;ta.gf+=ga;ta.ga+=gb;tb.gf+=gb;tb.ga+=ga;
   if(ga>gb){ta.w++;ta.pts+=3;tb.l++}else if(ga<gb){tb.w++;tb.pts+=3;ta.l++}else{ta.d++;tb.d++;ta.pts++;tb.pts++}
   if(a===userIndex||b===userIndex){
-   our=a===userIndex?ga:gb;their=a===userIndex?gb:ga;
-   const strengthDiff=pa-pb;
-   stats.shots=Math.max(2,Math.round(8+(strengthDiff/3)+Math.random()*7));
-   stats.shotsAgainst=Math.max(2,Math.round(8-(strengthDiff/3)+Math.random()*7));
-   stats.onTarget=Math.min(stats.shots,Math.max(1,Math.round(our*1.8+Math.random()*3)));
-   stats.onTargetAgainst=Math.min(stats.shotsAgainst,Math.max(1,Math.round(their*1.8+Math.random()*3)));
-   stats.possession=Math.max(30,Math.min(70,Math.round(50+strengthDiff*0.8+(home?3:-3))));
+   const stats=makeMatchStats(pa,pb,a===userIndex,ga,gb);
+   userMatch={a,b,ga,gb,events:sim.events,stats,pa,pb};
   }
  }
  round.played=true;
  appState.week++;
  appState.played++;
  appState.squad.forEach(p=>{p.fitness=Math.max(55,p.fitness-5-Math.floor(Math.random()*6));if(Math.random()<.1&&p.rating<p.potential)p.rating++});
+ const our=home?userMatch.ga:userMatch.gb, their=home?userMatch.gb:userMatch.ga;
+ const userEvents=userMatch.events.map(e=>({...e,side:(e.side==="A"?(userMatch.a===userIndex?"user":"opp"):(userMatch.b===userIndex?"user":"opp"))}));
+ const goalScorers=[];
+ const scorerPool=appState.squad.filter(p=>p.pos==="ATT"||p.pos==="MID").sort((a,b)=>b.rating-a.rating);
+ const oppScorers=["A. Gordon","A. Isak","H. Barnes","B. Guimarães","S. Tonali","F. Schär"];
+ let us=0,them=0;
+ const goalEvents=userEvents.filter(e=>e.type==="goal").sort((a,b)=>a.minute-b.minute).map(e=>{
+  let scorer;
+  if(e.side==="user"){scorer=scorerPool[us%Math.max(1,scorerPool.length)]?.name||"Ukjent spiller";us++}
+  else{scorer=oppScorers[them%oppScorers.length];them++}
+  return {...e,scorer};
+ });
  const resultText=`Runde ${round.round}: ${c.name} ${our}–${their} ${opp.name} (${home?"hjemme":"borte"}).`;
  appState.log.push(resultText);
  save();
- showMatch(c,opp,our,their,home,resultText,stats,roundResults);
+ showMatch(c,opp,our,their,home,resultText,userMatch.stats,roundResults,goalEvents,userEvents);
 }
-function showMatch(c,opp,our,their,home,text,stats,roundResults){
- document.getElementById("app").innerHTML=`<div class="hero"><div class="eyebrow">Full time · Runde ${appState.week-1}</div><h1>${our>their?"Tre poeng!":our===their?"Delt poeng.":"Tap i dag."}</h1><p>${home?"Hjemme på eget gress":"På bortebane"} · Taktikk: ${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</p></div><section class="card"><div class="row" style="padding:10px 0 18px"><div style="text-align:center;flex:1"><div class="crest" style="margin:auto">${c.crest}</div><div style="margin-top:8px;font-weight:800">${c.name}</div></div><div style="font-size:32px;font-weight:900">${our} – ${their}</div><div style="text-align:center;flex:1"><div class="crest" style="margin:auto">${opp.crest}</div><div style="margin-top:8px;font-weight:800">${opp.name}</div></div></div><div class="fixture"><div class="team">Ballbesittelse</div><b>${stats.possession}% – ${100-stats.possession}%</b></div><div class="fixture"><div class="team">Avslutninger</div><b>${stats.shots} – ${stats.shotsAgainst}</b></div><div class="fixture"><div class="team">Skudd på mål</div><b>${stats.onTarget} – ${stats.onTargetAgainst}</b></div><div class="section-title"><h2>Andre resultater</h2><small>Runde ${appState.week-1}</small></div>${roundResults.filter(r=>r.a!==appState.club&&r.b!==appState.club).map(r=>`<div class="fixture"><div class="team">${CLUBS[r.a].name}</div><div class="score">${r.ga}–${r.gb}</div><div class="team" style="text-align:right">${CLUBS[r.b].name}</div></div>`).join("")}<p class="muted" style="margin-top:15px">${esc(text)}</p><button class="primary" style="width:100%" onclick="setPage('home')">Fortsett →</button></section>`;
+function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userEvents){
+ const homeName=home?c.name:opp.name, awayName=home?opp.name:c.name;
+ const homeCrest=home?c.crest:opp.crest, awayCrest=home?opp.crest:c.crest;
+ const homeScore=home?our:their, awayScore=home?their:our;
+ const eventRows=goalEvents.map(e=>`<div class="fixture"><div class="team"><b>${e.minute}'</b> ${esc(e.scorer)}</div><span class="pill ${e.side==="user"?"green":""}">${e.side==="user"?esc(c.name):esc(opp.name)} · MÅL</span></div>`).join("");
+ const incidentRows=userEvents.filter(e=>e.type!=="goal").sort((a,b)=>a.minute-b.minute).map(e=>`<div class="fixture"><div class="team">${e.minute}' · ${e.type==="yellow"?"Gult kort":"Skade"}</div><span class="pill">${e.side==="user"?esc(c.name):esc(opp.name)}</span></div>`).join("");
+ document.getElementById("app").innerHTML=`<div class="hero"><div class="eyebrow">Full time · Runde ${appState.week-1}</div><h1>${our>their?"Tre poeng!":our===their?"Delt poeng.":"Tap i dag."}</h1><p>${home?"Hjemme på eget gress":"På bortebane"} · Taktikk: ${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</p></div><section class="card"><div class="row" style="padding:10px 0 18px"><div style="text-align:center;flex:1"><div class="crest" style="margin:auto">${homeCrest}</div><div style="margin-top:8px;font-weight:800">${homeName}</div></div><div style="font-size:32px;font-weight:900;white-space:nowrap">${homeScore} – ${awayScore}</div><div style="text-align:center;flex:1"><div class="crest" style="margin:auto">${awayCrest}</div><div style="margin-top:8px;font-weight:800">${awayName}</div></div></div><div class="fixture"><div class="team">Ballbesittelse</div><b>${home?stats.possession:100-stats.possession}% – ${home?100-stats.possession:stats.possession}%</b></div><div class="fixture"><div class="team">Avslutninger</div><b>${home?stats.shots:stats.shotsAgainst} – ${home?stats.shotsAgainst:stats.shots}</b></div><div class="fixture"><div class="team">Skudd på mål</div><b>${home?stats.onTarget:stats.onTargetAgainst} – ${home?stats.onTargetAgainst:stats.onTarget}</b></div><div class="section-title"><h2>Mål og hendelser</h2><small>${goalEvents.length} mål</small></div>${eventRows||`<div class="muted" style="padding:10px 0">Ingen mål i kampen.</div>`}${incidentRows}<div class="section-title"><h2>Andre resultater</h2><small>Runde ${appState.week-1}</small></div>${roundResults.filter(r=>r.a!==appState.club&&r.b!==appState.club).map(r=>`<div class="fixture"><div class="team">${esc(CLUBS[r.a].name)}</div><div class="score">${r.ga}–${r.gb}</div><div class="team" style="text-align:right">${esc(CLUBS[r.b].name)}</div></div>`).join("")}<p class="muted" style="margin-top:15px">${esc(text)}</p><button class="primary" style="width:100%" onclick="setPage('home')">Fortsett →</button></section>`;
  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));save();
 }
 function setPage(p){appState.page=p;render()}

@@ -1,20 +1,11 @@
-# CM Mobile v0.2 — Touchline Edition
+# CM Mobile v0.3 — Touchline Edition
 
-Mobile-first football management prototype.
+## Changes in v0.3
+- Match scorecard consistently shows home team first and away team second, including away matches.
+- Goal events now include minute and scorer names in the match report.
+- Adds illustrative yellow-card and injury events.
+- Other round results preserve home-team-first ordering.
+- Match statistics are displayed in the same home-away order as the score.
 
-## v0.2 improvements
-- Formation layouts now show exactly 11 players (where the squad has the required positions).
-- A 12-club double round-robin fixture schedule (22 rounds).
-- Each round simulates all league fixtures and updates the full table.
-- Match summaries include the other results from the round.
-- Match scores are influenced by relative team strength, home advantage, and the manager's mentality.
-- Match statistics are calculated from the relative strength and match score rather than being entirely independent random numbers.
-
-## Prototype limitations
-- Real club names, but fictional generated player names/attributes.
-- Club strength values and the match engine are illustrative, not an official database or realistic calibrated football model.
-- Squad selection remains automatic; no injuries, contracts, AI transfers, cups, promotion/relegation, or cloud sync yet.
-- Saves are local to the browser/device. Existing v0.1 saves may not contain the new fixture schedule; the game creates it when missing.
-
-## Run
-Open `index.html` in a browser, or publish it on GitHub Pages.
+## Limitations
+This is a prototype with generated/fictitious player data and a simplified illustrative match engine. Scorers are assigned to simulated goal events from the squad/placeholder opponent pool; the event engine is not yet calibrated to a real football dataset. The 12-club schedule and local-only save remain prototype features.
