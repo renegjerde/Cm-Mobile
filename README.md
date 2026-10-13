@@ -1,10 +1,11 @@
-# CM Mobile v0.7 — Live Statistics
+# CM Mobile v0.8 — League Positions in Match Centre
 
-## New in v0.7
-- Possession begins at 50–50 and changes gradually as the match clock advances.
-- Shots and shots on target start at zero and increase throughout the match.
-- At full time, the displayed values converge exactly to the match's final statistics.
-- Existing live clock, commentary, goals, cards, injuries, and event timeline remain.
+## New in v0.8
+- Current league position is shown for both teams in the match header.
+- Every other result row shows each club's league position.
+- Positions are calculated from the table after all results from the round have been applied.
+- The user's club remains highlighted in green.
+- Existing live-match presentation and statistics remain.
 
 ## Prototype note
-The match result and final statistical totals are still simulated before kickoff; the interface reveals those totals progressively during the match. The next step would be to generate every chance and possession shift dynamically from the match engine itself.
+League ranking uses the same points, goal-difference, and goals-scored ordering as the league table.

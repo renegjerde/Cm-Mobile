@@ -58,6 +58,13 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .live-progress{height:5px;background:#26364a;border-radius:99px;overflow:hidden;margin:8px 0 16px}
 .live-progress-fill{height:100%;width:0;background:var(--green);transition:width .15s linear}
 
+
+.result-team-wrap{display:flex;flex-direction:column;gap:3px;min-width:0}
+.result-team-wrap.right{align-items:flex-end;text-align:right}
+.table-position{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;letter-spacing:.04em;color:#9fb0c4}
+.table-position .rank-number{display:inline-flex;min-width:19px;height:19px;align-items:center;justify-content:center;border-radius:6px;background:#26384d;color:#e4edf7;font-size:10px}
+.table-position.user-rank .rank-number{background:#24452f;color:#9be27d}
+
 </style></head>
 <body>
 <header><div class="top"><div><div class="brand">CM <span>MOBILE</span></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
@@ -91,6 +98,7 @@ function money(n){return "£"+(n<1?Math.round(n*1000)+"k":n.toFixed(1)+"m")}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function currentClub(){return CLUBS[appState.club]}
 function sortedTable(){return [...appState.table].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf)}
+function tablePositionMap(){return new Map(sortedTable().map((team,index)=>[team.name,index+1]))}
 function panel(title,body,right=""){return `<div class="section-title"><h2>${title}</h2>${right}</div><section class="card">${body}</section>`}
 function getNextOpponentIndex(){ensureFixtures();let r=appState.fixtures.find(f=>f.round===appState.week&&!f.played);if(!r)return (appState.club+1)%CLUBS.length;let g=r.games.find(x=>x.includes(appState.club));return g?(g[0]===appState.club?g[1]:g[0]):(appState.club+1)%CLUBS.length}
 function home(){let c=currentClub(),t=appState.table.find(x=>x.name===c.name),next=CLUBS[getNextOpponentIndex()];return `
@@ -303,6 +311,9 @@ function matchCommentary(e,c,opp,home){
 function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userEvents){
  const homeName=home?c.name:opp.name, awayName=home?opp.name:c.name;
  const homeCrest=home?c.crest:opp.crest, awayCrest=home?opp.crest:c.crest;
+ const positions=tablePositionMap();
+ const homePosition=positions.get(homeName)||"–", awayPosition=positions.get(awayName)||"–";
+ const rankLabel=(rank,isUser=false)=>`<span class="table-position ${isUser?"user-rank":""}"><span class="rank-number">${rank}.</span> PLASS</span>`;
  const homeScore=home?our:their, awayScore=home?their:our;
  const allEvents=[...userEvents].sort((a,b)=>a.minute-b.minute);
  const goalCount=allEvents.filter(e=>e.type==="goal").length;
@@ -323,9 +334,9 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  </div>
  <section class="card">
   <div class="row" style="padding:10px 0 18px;align-items:center">
-   <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${homeCrest}</div><div style="margin-top:8px;font-weight:800">${homeName}</div><small style="color:var(--muted)">HJEMME</small></div>
+   <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${homeCrest}</div><div style="margin-top:8px;font-weight:800">${homeName}</div>${rankLabel(homePosition,homeName===c.name)}<small style="color:var(--muted)">HJEMME</small></div>
    <div id="liveScore" class="live-score">0 – 0</div>
-   <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${awayCrest}</div><div style="margin-top:8px;font-weight:800">${awayName}</div><small style="color:var(--muted)">BORTE</small></div>
+   <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${awayCrest}</div><div style="margin-top:8px;font-weight:800">${awayName}</div>${rankLabel(awayPosition,awayName===c.name)}<small style="color:var(--muted)">BORTE</small></div>
   </div>
   <div class="fixture"><div class="team">Ballbesittelse</div><b id="livePossession">50% – 50%</b></div>
   <div class="fixture"><div class="team">Avslutninger</div><b id="liveShots">0 – 0</b></div>
@@ -334,7 +345,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   <div id="liveEvents"><div class="muted" style="padding:10px 0">Vi venter på kampens første store øyeblikk …</div></div>
   <div id="liveFinalSection" style="display:none">
    <div class="section-title"><h2>Andre resultater</h2><small>Runde ${appState.week-1}</small></div>
-   ${roundResults.filter(r=>r.a!==appState.club&&r.b!==appState.club).map(r=>`<div class="fixture"><div class="team">${esc(CLUBS[r.a].name)}</div><div class="score">${r.ga}–${r.gb}</div><div class="team" style="text-align:right">${esc(CLUBS[r.b].name)}</div></div>`).join("")}
+   ${roundResults.filter(r=>r.a!==appState.club&&r.b!==appState.club).map(r=>{const nameA=CLUBS[r.a].name,nameB=CLUBS[r.b].name;return `<div class="fixture"><div class="team"><div class="result-team-wrap"><span>${esc(nameA)}</span>${rankLabel(positions.get(nameA)||"–",nameA===c.name)}</div></div><div class="score">${r.ga}–${r.gb}</div><div class="team" style="text-align:right"><div class="result-team-wrap right"><span>${esc(nameB)}</span>${rankLabel(positions.get(nameB)||"–",nameB===c.name)}</div></div></div>`}).join("")}
    <p class="muted" style="margin-top:15px">${esc(text)}</p>
    <button class="primary" style="width:100%" onclick="setPage('home')">Fortsett →</button>
   </div>
