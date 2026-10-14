@@ -122,6 +122,10 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .lineup-player-meta{font-size:10px;color:var(--muted);margin:3px 0 6px}.lineup-player-meta strong{color:var(--green);font-size:12px}.lineup-player-side{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:42px}.lineup-player-side strong{font-size:15px;color:var(--green)}.lineup-player-side span{font-size:11px;color:var(--muted)}
 .lineup-player{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #26364a}
 .lineup-player:last-child{border-bottom:0}
+.lineup-player.pick-out{cursor:pointer;border-radius:8px;padding-left:8px;padding-right:8px}
+.lineup-player.pick-out:active,.lineup-player.pick-out.selected-out{background:#20364c;box-shadow:inset 0 0 0 1px #6b8aa7}
+.lineup-player.pick-out .lineup-player-name:after{content:" · velg for bytte";font-size:9px;color:var(--muted);font-weight:500}
+.lineup-bench-note{font-size:10px;color:var(--muted);margin:4px 0 8px}
 .lineup-player-name{font-weight:800;font-size:13px}
 .fitness-track{height:6px;background:#29394c;border-radius:99px;overflow:hidden;margin-top:6px;max-width:230px}
 .fitness-fill{height:100%;border-radius:99px;background:var(--green)}
@@ -132,7 +136,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(max-width:380px){.live-score-hero .live-score{font-size:31px}.live-score-hero .score-club{font-size:11px}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.9</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.10</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
@@ -433,16 +437,31 @@ function refreshSubOptions(engine){
 function renderLiveLineup(engine,minute,scoreText){
  const holder=document.getElementById('lineupPlayers');if(!holder||!engine)return;
  const xi=engine.userIsA?engine.xiA:engine.xiB;
+ const onPitch=new Set(xi.map(p=>String(p.id)));
+ const unavailableAfterSub=new Set((engine.subbedOutIds||[]).map(String));
+ const bench=appState.squad.filter(p=>!onPitch.has(String(p.id))&&!unavailableAfterSub.has(String(p.id))&&(p.injured||0)<=0&&(p.suspended||0)<=0);
  const posOrder={GK:'KEEPER',DEF:'FORSVAR',MID:'MIDTBANE',ATT:'ANGREP'};
- holder.innerHTML=['GK','DEF','MID','ATT'].map(pos=>{
+ const selectedOut=document.getElementById('subOut')?.value;
+ const onPitchMarkup=['GK','DEF','MID','ATT'].map(pos=>{
   const players=xi.filter(p=>p.pos===pos);
   if(!players.length)return '';
   return `<div class="lineup-section-title">${posOrder[pos]}</div>`+players.map(p=>{
    const stamina=Math.round(matchStamina(engine,p));
    const color=stamina<50?'#f08080':stamina<70?'#f3ca72':'var(--green)';
-   return `<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span></div><div class="lineup-player-meta">Ferdighet <strong>${Math.round(effectivePlayerRating(engine,p))}</strong> · Grunnferdighet ${p.rating}</div><div class="fitness-track"><div class="fitness-fill" style="width:${stamina}%;background:${color}"></div></div></div><div class="lineup-player-side"><strong>${Math.round(effectivePlayerRating(engine,p))}</strong><span>${stamina}%</span></div></div>`;
+   const selected=String(p.id)===String(selectedOut);
+   return `<div class="lineup-player pick-out ${selected?'selected-out':''}" role="button" tabindex="0" data-player-out="${esc(String(p.id))}" aria-label="Velg ${esc(p.name)} for bytte"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span></div><div class="lineup-player-meta">Ferdighet <strong>${Math.round(effectivePlayerRating(engine,p))}</strong> · Grunnferdighet ${p.rating}</div><div class="fitness-track"><div class="fitness-fill" style="width:${stamina}%;background:${color}"></div></div></div><div class="lineup-player-side"><strong>${Math.round(effectivePlayerRating(engine,p))}</strong><span>${stamina}%</span></div></div>`;
   }).join('');
  }).join('');
+ const benchMarkup=`<div class="lineup-section-title">INNBYTTERE</div><div class="lineup-bench-note">Reserver vises nederst. Trykk på en spiller på banen for å velge hvem som skal ut.</div>`+(bench.length?bench.map(p=>{
+  const stamina=Math.round(playerFitnessValue(p));
+  const color=stamina<50?'#f08080':stamina<70?'#f3ca72':'var(--green)';
+  return `<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span></div><div class="lineup-player-meta">Ferdighet <strong>${Math.round(p.rating)}</strong> · Grunnferdighet ${p.rating}</div><div class="fitness-track"><div class="fitness-fill" style="width:${stamina}%;background:${color}"></div></div></div><div class="lineup-player-side"><strong>${Math.round(p.rating)}</strong><span>${stamina}%</span></div></div>`;
+ }).join(''):`<div class="muted" style="padding:8px 0">Ingen tilgjengelige reserver.</div>`);
+ holder.innerHTML=onPitchMarkup+benchMarkup;
+ holder.querySelectorAll('[data-player-out]').forEach(el=>{
+  const choose=()=>{const out=document.getElementById('subOut');if(!out)return;out.value=el.dataset.playerOut;refreshSubOptions(engine);renderLiveLineup(engine,minute,scoreText);const incoming=document.getElementById('subIn');if(incoming&&incoming.options.length)incoming.focus();};
+  el.addEventListener('click',choose);el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();}});
+ });
  const score=document.getElementById('lineupScoreText');if(score)score.textContent=scoreText||`${engine.ga} – ${engine.gb}`;
  const clock=document.getElementById('lineupMinuteText');if(clock)clock.textContent=minute>=90?'FULL TIME':`${engine.paused?'PAUSE':'LIVE'} · ${minute}'`;
 }
@@ -488,6 +507,7 @@ function makeLiveSubstitution(engine,minute){
  const commentary=document.getElementById('liveCommentary');if(commentary)commentary.textContent=`Bytte: ${incoming.name} kommer inn for ${outgoing.name}. Nå får vi se om det gir effekt.`;
  const headline=document.getElementById('liveHeadline');if(headline)headline.textContent='Manageren gjør grep';
  refreshSubOptions(engine);
+ renderLiveLineup(engine,minute,document.getElementById('liveScore')?.textContent||`${engine.ga} – ${engine.gb}`);
 }
 
 function advanceLiveEngine(engine,minute){
@@ -856,7 +876,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.9 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.10 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}

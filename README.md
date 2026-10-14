@@ -1,8 +1,8 @@
-CM Mobile v1.9
+CM Mobile v1.10
+- Refreshes the live lineup immediately after a substitution.
+- Shows available substitutes at the bottom of the lineup list.
+- Tap/click a player on the pitch to select them as the player to replace; the reserve dropdown updates to matching-position options.
+- Replaced players remain unavailable for re-entry for the rest of the match.
+- Version labels updated to v1.10.
 
-Endringer:
-- Spillere som er byttet ut, kan ikke settes inn igjen i samme kamp.
-- Innbyttere starter med høy kamputholdenhet basert på generell form, ikke med en kunstig lav startverdi.
-- Lagoppstillingen viser både effektiv ferdighet og grunnferdighet i tillegg til utholdenhet.
-
-Publisering: Erstatt index.html i GitHub Pages-repoet med denne filen.
+JavaScript syntax checked with Node.js. Browser playtesting not performed.
