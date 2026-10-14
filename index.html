@@ -830,18 +830,29 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   const sub=document.getElementById('liveSub');if(sub)sub.textContent=`${home?'Hjemmekamp på eget gress':'På bortebane'} · Taktikk: ${labels[appState.tactic]||appState.tactic}`;
   commentary.textContent=`Taktikken endres til ${labels[appState.tactic]||appState.tactic}. Laget justerer seg.`;
  });
+ const openLineupNow=()=>{
+  const modal=document.getElementById('lineupModal');if(!modal||matchFinished)return;
+  if(!paused){paused=true;if(timer)clearInterval(timer);timer=null;pauseBtn.textContent='▶ Fortsett';pauseBtn.classList.add('live-paused');status.textContent=`PAUSE · ${currentMinute}'`;}
+  modal.classList.add('open');
+  renderLiveLineup(engine,currentMinute,score.textContent);
+  refreshSubOptions(engine);
+ };
+ const closeLineupNow=()=>{
+  const modal=document.getElementById('lineupModal');if(modal)modal.classList.remove('open');
+  if(!matchFinished&&paused){paused=false;pauseBtn.textContent='Ⅱ Pause';pauseBtn.classList.remove('live-paused');status.textContent=`LIVE · ${currentMinute}'`;timer=setInterval(clockTick,tickMs);}
+ };
  const makeSubBtn=document.getElementById('makeSubBtn');
  if(makeSubBtn)makeSubBtn.addEventListener('click',()=>makeLiveSubstitution(engine,currentMinute));
  const subOutSelect=document.getElementById('subOut');if(subOutSelect)subOutSelect.addEventListener('change',()=>refreshSubOptions(engine));
- const openLineupBtn=document.getElementById('openLineupBtn');if(openLineupBtn)openLineupBtn.addEventListener('click',()=>openLineup(engine,currentMinute));
- const closeLineupBtn=document.getElementById('closeLineupBtn');if(closeLineupBtn)closeLineupBtn.addEventListener('click',closeLineup);
- const closeLineupContinue=document.getElementById('closeLineupContinue');if(closeLineupContinue)closeLineupContinue.addEventListener('click',closeLineup);
+ const openLineupBtn=document.getElementById('openLineupBtn');if(openLineupBtn)openLineupBtn.addEventListener('click',openLineupNow);
+ const closeLineupBtn=document.getElementById('closeLineupBtn');if(closeLineupBtn)closeLineupBtn.addEventListener('click',closeLineupNow);
+ const closeLineupContinue=document.getElementById('closeLineupContinue');if(closeLineupContinue)closeLineupContinue.addEventListener('click',closeLineupNow);
  refreshSubOptions(engine);
  renderLiveLineup(engine,currentMinute,score.textContent);
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.8 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.8.1 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}
