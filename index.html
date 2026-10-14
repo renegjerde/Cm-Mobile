@@ -136,7 +136,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .lineup-footer button{flex:1}
 @media(max-width:380px){.live-score-hero .live-score{font-size:31px}.live-score-hero .score-club{font-size:11px}}
 
-/* v1.20 squad browser */
+/* v1.22 squad browser */
 .squad-toolbar{display:grid;grid-template-columns:1fr auto;gap:8px;margin:12px 0}
 .squad-search{width:100%;min-width:0;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:#17263a;color:var(--text)}
 .squad-filter{display:flex;gap:6px;overflow-x:auto;padding:2px 0 9px;margin-bottom:4px}
@@ -169,7 +169,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.20</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.24</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
@@ -181,17 +181,35 @@ const CLUBS=[
 {name:"Liverpool",short:"LIV",strength:86,budget:95,crest:"🔴",city:"Liverpool"},
 {name:"Manchester United",short:"MUN",strength:81,budget:78,crest:"🔴",city:"Manchester"},
 {name:"Chelsea",short:"CHE",strength:82,budget:90,crest:"🔵",city:"London"},
-{name:"Tottenham",short:"TOT",strength:80,budget:72,crest:"⚪",city:"London"},
+{name:"Tottenham Hotspur",short:"TOT",strength:80,budget:72,crest:"⚪",city:"London"},
 {name:"Newcastle United",short:"NEW",strength:80,budget:70,crest:"⚫",city:"Newcastle"},
 {name:"Aston Villa",short:"AVL",strength:79,budget:62,crest:"🟣",city:"Birmingham"},
-{name:"Brighton",short:"BHA",strength:76,budget:48,crest:"🔵",city:"Brighton"},
-{name:"West Ham",short:"WHU",strength:75,budget:45,crest:"🍷",city:"London"},
+{name:"Brighton & Hove Albion",short:"BHA",strength:76,budget:48,crest:"🔵",city:"Brighton"},
+{name:"AFC Bournemouth",short:"BOU",strength:73,budget:38,crest:"🔴",city:"Bournemouth"},
 {name:"Crystal Palace",short:"CRY",strength:73,budget:38,crest:"🦅",city:"London"},
-{name:"Everton",short:"EVE",strength:71,budget:28,crest:"🔵",city:"Liverpool"}
+{name:"Everton",short:"EVE",strength:71,budget:28,crest:"🔵",city:"Liverpool"},
+{name:"Brentford",short:"BRE",strength:74,budget:42,crest:"🐝",city:"London"},
+{name:"Coventry City",short:"COV",strength:70,budget:32,crest:"🔵",city:"Coventry"},
+{name:"Fulham",short:"FUL",strength:73,budget:39,crest:"⚪",city:"London"},
+{name:"Hull City",short:"HUL",strength:67,budget:25,crest:"🟠",city:"Hull"},
+{name:"Ipswich Town",short:"IPS",strength:69,budget:29,crest:"🔵",city:"Ipswich"},
+{name:"Leeds United",short:"LEE",strength:72,budget:36,crest:"⚪",city:"Leeds"},
+{name:"Nottingham Forest",short:"NFO",strength:74,budget:40,crest:"🌳",city:"Nottingham"},
+{name:"Sunderland",short:"SUN",strength:68,budget:27,crest:"🔴",city:"Sunderland"}
 ];
 const names={GK:["E. Hartley","M. Kovac"],DEF:["L. Bennett","A. Silva","J. Mensah","T. Walker","P. Novak","R. Hughes"],MID:["D. Fletcher","M. Costa","A. Ibrahim","J. Clarke","S. Petrov","K. Walsh"],ATT:["A. Moreno","L. Okafor","J. Williams","N. Jensen"]};
 const positions=["GK","GK","DEF","DEF","DEF","DEF","DEF","DEF","MID","MID","MID","MID","MID","MID","ATT","ATT","ATT","ATT"];
-const appState={page:"home",club:3,week:1,played:0,seasonYear:2026,formation:"4-3-3",tactic:"Balanced",selectedXI:null,log:[],transferTab:"market",squad:[],table:[],budget:0,started:false,positionChanges:{},lastSeasonSummary:null,lastRecoveryRound:null,formationExperience:{"4-3-3":20,"4-4-2":20,"4-2-3-1":20,"3-5-2":20},teamCohesion:25,lastStartingXI:[],injuryReport:[]};
+const REAL_ROSTERS = {"Arsenal":{"GK":"David Raya|Kepa Arrizabalaga|Tommy Setford","DEF":"William Saliba|Gabriel Magalhaes|Ben White|Jurrien Timber|Riccardo Calafiori|Piero Hincapie|Cristhian Mosquera|Myles Lewis-Skelly","MID":"Martin Odegaard|Declan Rice|Martin Zubimendi|Mikel Merino|Eberechi Eze|Bruno Guimaraes|Ethan Nwaneri|Max Dowman","ATT":"Bukayo Saka|Viktor Gyokeres|Kai Havertz|Noni Madueke|Christos Tzolis|Gabriel Jesus"},"Manchester City":{"GK":"Gianluigi Donnarumma|Geronimo Rulli|Marcus Bettinelli","DEF":"Ruben Dias|Josko Gvardiol|Marc Guehi|Rayan Ait-Nouri|Rico Lewis|Abdukodir Khusanov|Vitor Reis|Nathan Ake","MID":"Rodri|Elliot Anderson|Enzo Fernandez|Mateo Kovacic|Matheus Nunes|Phil Foden|Rayan Cherki|Ayyoub Bouaddi","ATT":"Erling Haaland|Jeremy Doku|Antoine Semenyo|Iliman Ndiaye|Allan|Claudio Echeverri"},"Liverpool":{"GK":"Alisson Becker|Giorgi Mamardashvili|Freddie Woodman","DEF":"Virgil van Dijk|Ibrahima Konate|Joe Gomez|Jeremie Frimpong|Milos Kerkez|Conor Bradley|Giovanni Leoni|Jeremy Jacquet","MID":"Ryan Gravenberch|Alexis Mac Allister|Dominik Szoboszlai|Florian Wirtz|Wataru Endo|Trey Nyoni|James McConnell|Harvey Elliott","ATT":"Alexander Isak|Hugo Ekitike|Cody Gakpo|Bradley Barcola|Federico Chiesa|Rio Ngumoha"},"Manchester United":{"GK":"Senne Lammens|Karl Darlow|Tom Heaton","DEF":"Matthijs de Ligt|Lisandro Martinez|Harry Maguire|Luke Shaw|Diogo Dalot|Noussair Mazraoui|Leny Yoro|Ayden Heaven","MID":"Bruno Fernandes|Kobbie Mainoo|Manuel Ugarte|Mason Mount|Andrey Santos|Carlos Baleba|Youri Tielemans|Patrick Dorgu","ATT":"Marcus Rashford|Matheus Cunha|Bryan Mbeumo|Benjamin Sesko|Joshua Zirkzee|Amad Diallo"},"Chelsea":{"GK":"Emiliano Martinez|Mike Penders|Gabriel Slonina","DEF":"Reece James|Levi Colwill|Wesley Fofana|Malo Gusto|Jorrel Hato|Maxence Lacroix|Valentin Barco|Aaron Anselmino","MID":"Moises Caicedo|Romeo Lavia|Jordan Henderson|Cole Palmer|Morgan Rogers|Geovany Quenda|Estevao|Mahdi Nicoll-Jazuli","ATT":"Joao Pedro|Pedro Neto|Jamie Gittens|Emmanuel Emegha|Danny Welbeck|Pep Chavarria"},"Tottenham Hotspur":{"GK":"Guglielmo Vicario|Antonin Kinsky|Brandon Austin","DEF":"Pedro Porro|Micky van de Ven|Cristian Romero|Destiny Udogie|Jan Paul van Hecke|Andrew Robertson|Marcos Senesi|Ben Davies","MID":"James Maddison|Rodrigo Bentancur|Sandro Tonali|Conor Gallagher|Dejan Kulusevski|Xavi Simons|Lucas Bergvall|Mohammed Kudus","ATT":"Dominic Solanke|Omar Marmoush|Savio|Wilson Odobert|Mykhailo Mudryk|Mateus Fernandes"},"Newcastle United":{"GK":"Nick Pope|Lukas Hornicek|Mark Gillespie","DEF":"Sven Botman|Fabian Schar|Dan Burn|Tino Livramento|Lewis Hall|Malick Thiaw|Amar Dedic|Leo Shahar","MID":"Bruno Guimaraes|Sandro Tonali|Joelinton|Joe Willock|Jacob Ramsey|Sean Steur|Nico Gonzalez|Matias Fernandez-Pardo","ATT":"Yoane Wissa|Anthony Elanga|Harvey Barnes|William Osula|Bazoumana Toure|Aladji Bamba"},"Aston Villa":{"GK":"Zion Suzuki|Marco Bizot|James Wright","DEF":"Matty Cash|Pau Torres|Tyrone Mings|Victor Lindelof|Ian Maatsen|Aaron Wan-Bissaka|Taylor Harwood-Bellis|Matteo Ruggeri","MID":"Amadou Onana|Boubacar Kamara|John McGinn|Ross Barkley|Leon Goretzka|Emiliano Buendia|Lamare Bogarde|Joao Gomes","ATT":"Nicolas Jackson|Alejandro Garnacho|Tammy Abraham|Ibrahim Mbaye|Brian Madjo|Alysson"},"Brighton & Hove Albion":{"GK":"Bart Verbruggen|Jason Steele|Tom McGill","DEF":"Lewis Dunk|Pascal Struijk|Olivier Boscagli|Maxim De Cuyper|Ferdi Kadioglu|Jaouen Hadjam|Michael Svoboda|Luka Vuskovic","MID":"Yasin Ayari|Mats Wieffer|Jack Hinshelwood|Pascal Gross|Matt O Riley|Diego Gomez|Chema Andres|Costinha","ATT":"Kaoru Mitoma|Yankuba Minteh|Georginio Rutter|Evan Ferguson|Stefanos Tzimas|Promise David"},"AFC Bournemouth":{"GK":"Djordje Petrovic|Michele Di Gregorio|Fraser Forster","DEF":"Adrien Truffert|Bafode Diakite|Antonio Silva|Julian Araujo|James Hill|Adam Smith|Juanlu Sanchez|Max Aarons","MID":"Tyler Adams|Alex Scott|Lewis Cook|Ryan Christie|Marcus Tavernier|David Brooks|Alex Toth|Veljko Milosavljevic","ATT":"Evanilson|Justin Kluivert|Amine Adli|Junior Kroupi|Rayan|Ben Gannon-Doak"},"Crystal Palace":{"GK":"Dean Henderson|Walter Benitez|Remi Matthews","DEF":"Marc Guehi|Chris Richards|Tyrick Mitchell|Ben Chilwell|Axel Disasi|Takehiro Tomiyasu|Oscar Mingueza|Quinten Timber","MID":"Adam Wharton|Cheick Doucoure|Jefferson Lerma|Daichi Kamada|William Hughes|Dwight McNeil|Yeremy Pino|Matheus Franca","ATT":"Jean-Philippe Mateta|Jorgen Strand Larsen|Eddie Nketiah|Ismaila Sarr|Evann Guessand|Anan Khalaili"},"Everton":{"GK":"Jordan Pickford|Mark Travers|Fraser Barnsley","DEF":"Jarrad Branthwaite|James Tarkowski|Vitalii Mykolenko|Michael Keane|Jake O Brien|Ainsley Maitland-Niles|Adam Aznou|Thomas King","MID":"Kiernan Dewsbury-Hall|James Garner|Hayden Hackney|Merlin Rohl|Jack Grealish|Brennan Johnson|Carlos Alcaraz|Christian Barsøe Nørgaard","ATT":"Thierno Barry|Dominic Calvert-Lewin|Tyrique George|Thomas Cannon|George Pickford|Harrison Armstrong"},"Brentford":{"GK":"Caoimhin Kelleher|Hakon Valdimarsson|Ellery Balcombe","DEF":"Nathan Collins|Sepp van den Berg|Kristoffer Ajer|Rico Henry|Aaron Hickey|Michael Kayode|El Hadji Malick Diouf|Kim Ji-Soo","MID":"Mathias Jensen|Vitaly Janelt|Mikkel Damsgaard|Yehor Yarmoliuk|Antoni Milambo|Fabio Carvalho|Mamadou Sangare|Josh Dasilva","ATT":"Igor Thiago|Kevin Schade|Dango Ouattara|Callum Wilson|Keane Lewis-Potter|Jaidon Anthony"},"Coventry City":{"GK":"Carl Rushworth|Daniel Bentley|Oliver Dovin","DEF":"Bobby Thomas|Joel Latibeaudiere|Ethan Pinnock|Aurele Amenda|Milan van Ewijk|Jay Dasilva|Luke Woolfenden|Ben Wilson","MID":"Jack Rudoni|Gustavo Hamer|Victor Torp|Matt Grimes|Josh Eccles|Ogochukwu Onyeka|Kaine Kesler-Hayden|Tatsuhiro Sakamoto","ATT":"Haji Wright|Ellis Simms|Taiwo Awoniyi|Solomon Thomas-Asante|Loum Tchaouna|Ephron Mason-Clark"},"Fulham":{"GK":"Bernd Leno|Steven Benda|Benjamin Lecomte","DEF":"Calvin Bassey|Joachim Andersen|Antonee Robinson|Kenny Tete|Timothy Castagne|Issa Diop|Jorge Cuenca|Ryan Sessegnon","MID":"Sasa Lukic|Sander Berge|Alex Iwobi|Emile Smith Rowe|Tom Cairney|Harry Wilson|Josh King|Harrison Reed","ATT":"Raul Jimenez|Rodrigo Muniz|Adama Traore|Samuel Chukwueze|Kevin|Oscar Bobb"},"Hull City":{"GK":"Jack Butland|Konstantinos Tzolakis|Dillon Phillips","DEF":"Semi Ajayi|Charlie Hughes|John Egan|Brooke Norton-Cuffy|Ryan Giles|Matt Targett|Paddy McNair|Nobel Mendy","MID":"Hidemasa Morita|Lucas Gourna-Douath|Eliot Matazo|Regan Slater|Tim Iroegbunam|Matt Crooks|Jens Hjerto-Dahl|Elliot Stroud","ATT":"Oliver McBurnie|Mohamed-Ali Cho|Joe Gelhardt|Ilyas Ansah|Mohamed Belloumi|Sorba Thomas"},"Ipswich Town":{"GK":"Alex Palmer|Christian Walton|Kjell Scherpen","DEF":"Leif Davis|Dara O Shea|Jacob Greaves|Cedric Kipre|Issa Diop|Darnell Furlong|Sindre Egeli|Jack Clarke","MID":"Azor Matusiwa|Florentino|Sasa Lukic|Exequiel Palacios|Marcelino Nunez|Jack Taylor|Anis Mehmeti|Kasey McAteer","ATT":"Julio Enciso|Abdul Fatawu|Zian Flemming|Daizen Maeda|Chuba Akpom|Emersonn"},"Leeds United":{"GK":"James Trafford|Michael Zetterer|Alex Cairns","DEF":"Joe Rodon|Jaka Bijol|Ethan Ampadu|Jayden Bogle|Gabriel Gudmundsson|James Justin|Melvin Bard|Nico Elvedi","MID":"Anton Stach|Ao Tanaka|Sean Longstaff|Ilia Gruev|Brenden Aaronson|Harry Wilson|Lukas Nmecha|Jean-Matteo Bahoya","ATT":"Dominic Calvert-Lewin|Noah Okafor|Daniel James|Mateo Joseph|Rory Mahady|Alfie Cresswell"},"Nottingham Forest":{"GK":"Matz Sels|John Victor|Steven Benda","DEF":"Murillo|Nikola Milenkovic|Ousmane Diomande|Neco Williams|Ola Aina|Daniel Munoz|Nicolo Savona|Luca Netz","MID":"Morgan Gibbs-White|Ibrahim Sangare|Nicolas Dominguez|Xaver Schlager|Ryan Yates|James McAtee|Dan Ndoye|Felipe","ATT":"Chris Wood|Igor Jesus|Liam Delap|Arnaud Kalimuendo|Callum Hudson-Odoi|Jair Cunha"},"Sunderland":{"GK":"Robin Roefs|Anthony Patterson|Simon Moore","DEF":"Dan Ballard|Omar Alderete|Trai Hume|Dennis Cirkin|Reinildo|Luke O Nien|Nordi Mukiele|Ajibola Alese","MID":"Granit Xhaka|Noah Sadiki|Habib Diarra|Enzo Le Fee|Chris Rigg|Chemsdine Talbi|Jobe Bellingham|Dan Neil","ATT":"Brian Brobbey|Wilson Isidor|Eliezer Mayenda|Romaine Mundle|Simon Adingra|Jack Clarke"}};
+
+const PLAYER_DB_VERSION=1;
+const POSITION_COUNTS={GK:3,DEF:8,MID:8,ATT:6};
+const KNOWN_PLAYER_DATA = {"Erling Haaland":{"rating":92,"potential":95,"age":26},"Bukayo Saka":{"rating":90,"potential":94,"age":25},"Declan Rice":{"rating":89,"potential":91,"age":27},"Martin Odegaard":{"rating":89,"potential":92,"age":27},"William Saliba":{"rating":89,"potential":94,"age":25},"David Raya":{"rating":87,"potential":89,"age":31},"Viktor Gyokeres":{"rating":88,"potential":90,"age":28},"Kai Havertz":{"rating":86,"potential":89,"age":27},"Phil Foden":{"rating":90,"potential":93,"age":26},"Gianluigi Donnarumma":{"rating":90,"potential":92,"age":27},"Ruben Dias":{"rating":89,"potential":90,"age":29},"Josko Gvardiol":{"rating":88,"potential":93,"age":24},"Rodri":{"rating":91,"potential":91,"age":30},"Jeremy Doku":{"rating":86,"potential":91,"age":24},"Rayan Cherki":{"rating":87,"potential":93,"age":23},"Alexander Isak":{"rating":90,"potential":93,"age":27},"Virgil van Dijk":{"rating":89,"potential":89,"age":35},"Alisson Becker":{"rating":90,"potential":91,"age":34},"Florian Wirtz":{"rating":90,"potential":95,"age":23},"Dominik Szoboszlai":{"rating":87,"potential":90,"age":25},"Alexis Mac Allister":{"rating":88,"potential":90,"age":27},"Bruno Fernandes":{"rating":89,"potential":89,"age":32},"Matthijs de Ligt":{"rating":86,"potential":89,"age":27},"Kobbie Mainoo":{"rating":82,"potential":92,"age":21},"Benjamin Sesko":{"rating":83,"potential":91,"age":23},"Cole Palmer":{"rating":90,"potential":94,"age":24},"Moises Caicedo":{"rating":88,"potential":91,"age":24},"Reece James":{"rating":86,"potential":89,"age":26},"Joao Pedro":{"rating":86,"potential":90,"age":25},"Pedro Neto":{"rating":85,"potential":88,"age":26},"Morgan Rogers":{"rating":86,"potential":91,"age":24},"Sandro Tonali":{"rating":87,"potential":90,"age":26},"Xavi Simons":{"rating":87,"potential":92,"age":23},"Mohammed Kudus":{"rating":86,"potential":89,"age":26},"Anthony Gordon":{"rating":85,"potential":89,"age":25},"Bruno Guimaraes":{"rating":88,"potential":90,"age":28},"Nicolas Jackson":{"rating":84,"potential":89,"age":25},"John McGinn":{"rating":84,"potential":84,"age":31},"Amadou Onana":{"rating":84,"potential":90,"age":25},"Kaoru Mitoma":{"rating":85,"potential":87,"age":29},"Bart Verbruggen":{"rating":83,"potential":90,"age":24},"Evan Ferguson":{"rating":79,"potential":88,"age":21},"Alex Scott":{"rating":81,"potential":88,"age":23},"Evanilson":{"rating":83,"potential":87,"age":26},"Justin Kluivert":{"rating":82,"potential":84,"age":27},"Adam Wharton":{"rating":83,"potential":92,"age":22},"Jean-Philippe Mateta":{"rating":84,"potential":85,"age":29},"Jordan Pickford":{"rating":85,"potential":85,"age":32},"Jack Grealish":{"rating":84,"potential":85,"age":31},"Kiernan Dewsbury-Hall":{"rating":82,"potential":85,"age":27},"Caoimhin Kelleher":{"rating":83,"potential":87,"age":27},"Igor Thiago":{"rating":83,"potential":88,"age":25},"Kevin Schade":{"rating":82,"potential":87,"age":24},"Haji Wright":{"rating":79,"potential":83,"age":28},"Ellis Simms":{"rating":76,"potential":82,"age":25},"Jack Butland":{"rating":76,"potential":76,"age":33},"Mohamed-Ali Cho":{"rating":77,"potential":86,"age":22},"Abdul Fatawu":{"rating":80,"potential":88,"age":22},"Julio Enciso":{"rating":81,"potential":89,"age":22},"Dominic Calvert-Lewin":{"rating":82,"potential":82,"age":29},"Daniel James":{"rating":80,"potential":82,"age":28},"Morgan Gibbs-White":{"rating":85,"potential":88,"age":26},"Chris Wood":{"rating":82,"potential":82,"age":34},"Igor Jesus":{"rating":80,"potential":86,"age":25},"Brian Brobbey":{"rating":82,"potential":87,"age":24},"Granit Xhaka":{"rating":85,"potential":85,"age":34},"Chris Rigg":{"rating":74,"potential":90,"age":19}};
+function stableSeed(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function seededRandom(seed){let x=seed>>>0;return ()=>{x+=0x6D2B79F5;let t=x;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296}}
+function makeRealPlayer(name,pos,clubIndex,slot){const club=CLUBS[clubIndex],known=KNOWN_PLAYER_DATA[name]||{},rng=seededRandom(stableSeed(name+'|'+club.short));const age=known.age||((rng()*17)|0)+19;const roleOffset=pos==='GK'?1:pos==='DEF'?0:pos==='MID'?1:2;const rating=known.rating||Math.max(54,Math.min(90,Math.round(club.strength-5+roleOffset+(rng()*13-6))));const potential=known.potential||Math.max(rating,Math.min(96,Math.round(rating+(age<=21?8:age<=24?5:age<=27?2:0)+(rng()*7-2))));const attrR=(base,spread,key)=>Math.max(25,Math.min(99,Math.round(base+(rng()*spread*2-spread))));let attributes={pace:attrR(rating,9,'pace'),stamina:attrR(rating,8,'stamina'),strength:attrR(rating,8,'strength'),technique:attrR(rating,8,'technique'),creativity:attrR(rating,10,'creativity'),finishing:attrR(rating-9,11,'finishing'),defending:attrR(rating-7,11,'defending'),passing:attrR(rating,8,'passing'),handling:attrR(28,4,'handling'),reflexes:attrR(28,4,'reflexes'),positioning:attrR(rating,8,'positioning')};if(pos==='GK'){attributes={...attributes,handling:attrR(rating,7,'handling'),reflexes:attrR(rating+1,7,'reflexes'),positioning:attrR(rating,7,'positioning'),finishing:attrR(25,2,'finishing'),defending:attrR(35,5,'defending')}}if(pos==='DEF'){attributes.defending=attrR(rating+6,7,'defending');attributes.strength=attrR(rating+3,8,'strength');attributes.finishing=attrR(rating-20,8,'finishing')}if(pos==='MID'){attributes.passing=attrR(rating+4,7,'passing');attributes.creativity=attrR(rating+3,8,'creativity')}if(pos==='ATT'){attributes.finishing=attrR(rating+5,7,'finishing');attributes.pace=attrR(rating+3,8,'pace')}return {id:clubIndex*1000+slot+1,name,pos,age,rating,attributes,potential,value:Math.max(.2,+((Math.max(5,rating-45)**2)/100*(age<23?1.35:age>30?.65:1)).toFixed(1)),wage:Math.max(2,Math.round((rating-45)*1.15+(club.strength-65)*.5)),fitness:100,morale:75+Math.round(rng()*15),goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0,clubIndex,source:'PL 2026/27 squad list; attributes estimated'}}
+function buildRealSquad(clubIndex){const club=CLUBS[clubIndex],groups=REAL_ROSTERS[club.name]||{};const out=[];for(const pos of ['GK','DEF','MID','ATT']){const list=(groups[pos]||'').split('|').filter(Boolean);for(const name of list){if(out.some(p=>p.name===name))continue;out.push(makeRealPlayer(name,pos,clubIndex,out.length));}}if(out.length!==25)console.warn('Expected 25 players for',club.name,'got',out.length);return out.slice(0,25)}
+function buildWorldDatabase(){return CLUBS.map((c,i)=>buildRealSquad(i))}
+const appState={page:"home",club:3,week:1,played:0,seasonYear:2026,formation:"4-3-3",tactic:"Balanced",selectedXI:null,log:[],transferTab:"market",squad:[],table:[],budget:0,started:false,positionChanges:{},lastSeasonSummary:null,lastRecoveryRound:null,formationExperience:{"4-3-3":20,"4-4-2":20,"4-2-3-1":20,"3-5-2":20},teamCohesion:25,lastStartingXI:[],injuryReport:[],discipline:{},medicalHistory:[]};
 
 function generateAttributes(pos,base){
  const r=(center,spread=10)=>Math.max(25,Math.min(99,Math.round(center+(Math.random()*spread*2-spread))));
@@ -213,10 +231,23 @@ function attributeMarkup(p){
  return `<div class="attrs">${keys.map(k=>`<span class="attr">${ATTRIBUTE_LABELS[k]} ${a[k]}</span>`).join("")}</div>`;
 }
 
-function makeSquad(clubIndex){let c=CLUBS[clubIndex];return positions.map((pos,i)=>{let base=c.strength+(Math.random()*12-6);return {id:clubIndex*100+i+1,name:names[pos][i%(names[pos].length)],pos,age:18+Math.floor(Math.random()*17),rating:Math.max(48,Math.min(94,Math.round(base+(pos==="ATT"?2:0)))),attributes:generateAttributes(pos,Math.round(base+(pos==="ATT"?2:0))),potential:Math.max(50,Math.min(96,Math.round(base+Math.random()*13))),value:Math.max(.4,+(Math.pow(Math.max(5,base-48),2)/90*(pos==="ATT"?1.15:1)).toFixed(1)),wage:Math.round(5+base*.65),fitness:90+Math.floor(Math.random()*11),morale:70+Math.floor(Math.random()*25),goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0}})}
-function init(){appState.squad=makeSquad(appState.club);appState.budget=CLUBS[appState.club].budget;appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));appState.fixtures=[];ensureFixtures();appState.started=true;save();render()}
+function makeSquad(clubIndex){return (appState.worldSquads?.[clubIndex]||buildRealSquad(clubIndex)).map(p=>({...p,attributes:{...p.attributes}}))}
+function init(){if(!Array.isArray(appState.worldSquads)||appState.worldDatabaseVersion!==PLAYER_DB_VERSION){appState.worldSquads=buildWorldDatabase();appState.worldDatabaseVersion=PLAYER_DB_VERSION;}appState.squad=makeSquad(appState.club);appState.budget=CLUBS[appState.club].budget;appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));appState.fixtures=[];appState.leagueFormatVersion=2;ensureFixtures();appState.started=true;save();render()}
 function save(){try{localStorage.setItem("cmMobileSave",JSON.stringify(appState));}catch(e){}}
-function load(){try{let s=JSON.parse(localStorage.getItem("cmMobileSave"));if(s&&s.started){Object.assign(appState,s);if(appState.lastRecoveryRound===undefined)appState.lastRecoveryRound=null;if(appState.recommendationRound===undefined)appState.recommendationRound=null;appState.squad.forEach(ensurePlayerAttributes);if(!appState.squad.some(p=>p.pos==="GK"&&p.id!==appState.squad.find(x=>x.pos==="GK")?.id)){const club=CLUBS[appState.club]||CLUBS[3];const nextId=Math.max(0,...appState.squad.map(p=>Number(p.id)||0))+1;appState.squad.push({id:nextId,name:"M. Kovac",pos:"GK",age:25,rating:Math.max(55,club.strength-3),attributes:generateAttributes("GK",Math.max(55,club.strength-3)),potential:Math.max(60,club.strength+3),value:5,wage:18,fitness:90,morale:75,goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0});}if(!Number.isFinite(appState.seasonYear))appState.seasonYear=2026;if(!appState.positionChanges)appState.positionChanges={};if(!s.fixtures||!s.fixtures.length){appState.week=1;appState.played=0;appState.log=[];appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));appState.fixtures=[];}return true}}catch(e){}return false}
+function load(){try{let s=JSON.parse(localStorage.getItem("cmMobileSave"));if(s&&s.started){Object.assign(appState,s);
+ if(!Array.isArray(appState.worldSquads)||appState.worldDatabaseVersion!==PLAYER_DB_VERSION){appState.worldSquads=buildWorldDatabase();appState.worldDatabaseVersion=PLAYER_DB_VERSION;const looksSynthetic=(appState.squad||[]).some(p=>/Hartley|Kovac|Bennett|Moreno|Okafor|Fletcher/.test(p.name||''));if(looksSynthetic||!(appState.squad||[]).length){appState.squad=makeSquad(appState.club);appState.log=[...(appState.log||[]),'Spillerdatabasen er oppgradert til ekte PL-spillere for 2026/27.'];}}
+ // Migration from the 12-club test league to the 20-club 2026/27 Premier League.
+ if(Number(s.leagueFormatVersion||1)<2){
+  const legacyNames=["Arsenal","Manchester City","Liverpool","Manchester United","Chelsea","Tottenham","Newcastle United","Aston Villa","Brighton","West Ham","Crystal Palace","Everton"];
+  const oldName=legacyNames[Number(s.club)||0]||"Manchester United";
+  const aliases={"Tottenham":"Tottenham Hotspur","Brighton":"Brighton & Hove Albion","West Ham":"AFC Bournemouth"};
+  const desired=aliases[oldName]||oldName;
+  appState.club=Math.max(0,CLUBS.findIndex(c=>c.name===desired));
+  appState.week=1;appState.played=0;appState.log=["Ligaen er utvidet til 20 klubber for 2026/27. Sesongens kampprogram og tabell er startet på nytt; klubb og tropp er beholdt."];
+  appState.positionChanges={};appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
+  appState.fixtures=[];appState.leagueFormatVersion=2;
+ }
+ if(appState.lastRecoveryRound===undefined)appState.lastRecoveryRound=null;if(appState.recommendationRound===undefined)appState.recommendationRound=null;appState.squad.forEach(ensurePlayerAttributes);if(!appState.squad.some(p=>p.pos==="GK"&&p.id!==appState.squad.find(x=>x.pos==="GK")?.id)){const club=CLUBS[appState.club]||CLUBS[3];const nextId=Math.max(0,...appState.squad.map(p=>Number(p.id)||0))+1;appState.squad.push({id:nextId,name:"M. Kovac",pos:"GK",age:25,rating:Math.max(55,club.strength-3),attributes:generateAttributes("GK",Math.max(55,club.strength-3)),potential:Math.max(60,club.strength+3),value:5,wage:18,fitness:90,morale:75,goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0});}if(!Number.isFinite(appState.seasonYear))appState.seasonYear=2026;if(!appState.positionChanges)appState.positionChanges={};if(!appState.discipline)appState.discipline={};if(!appState.fixtures||!s.fixtures.length){appState.week=1;appState.played=0;appState.log=[];appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));appState.fixtures=[];}appState.leagueFormatVersion=2;return true}}catch(e){}return false}
 function money(n){return "£"+(n<1?Math.round(n*1000)+"k":n.toFixed(1)+"m")}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function currentClub(){return CLUBS[appState.club]}
@@ -302,22 +333,89 @@ function setStartingPlayer(slot,id){
  const duplicate=xi.findIndex((x,i)=>i!==slot&&String(x.id)===String(p.id));if(duplicate>=0){xi[duplicate]=old;}
  xi[slot]=p;appState.selectedXI=xi.map(x=>x.id);save();render();
 }
+function disciplineRecord(p){
+ appState.discipline=appState.discipline||{};
+ const key=String(p.id);
+ if(!appState.discipline[key])appState.discipline[key]={yellow:0,ban:0,sanctions:[],banIssuedRound:0};
+ const d=appState.discipline[key];
+ if(!Array.isArray(d.sanctions))d.sanctions=[];
+ if(!Number.isFinite(d.yellow))d.yellow=0;
+ if(!Number.isFinite(d.ban))d.ban=0;
+ if(!Number.isFinite(d.banIssuedRound))d.banIssuedRound=0;
+ return d;
+}
+function playerAvailabilityText(p){
+ if((p.injured||0)>0){
+  const injury=appState.injuryReport.filter(x=>String(x.playerId)===String(p.id)).slice(-1)[0];
+  return `Skadet · ${p.injured} kamp(er) igjen${injury&&injury.returnDate?` · Forventet retur ${injury.returnDate}`:""}`;
+ }
+ if((p.suspended||0)>0)return `Suspendert · ${p.suspended} kamp(er) igjen`;
+ return "Tilgjengelig";
+}
+function matchFitnessRisk(p){
+ const fitness=Number(p.fitness??85);
+ const stamina=Number(p.attributes?.stamina??p.rating??60);
+ const workload=Number(p.minutes||0);
+ return Math.max(0,Math.min(.09,.012+Math.max(0,75-fitness)*.00055+Math.max(0,65-stamina)*.00035+(workload%270>180?.006:0)));
+}
+function chooseInjuryDuration(p){
+ const fitness=Number(p.fitness??85), stamina=Number(p.attributes?.stamina??p.rating??60);
+ const r=Math.random();
+ if(r<.72)return {rounds:1,type:"Lett strekk",detail:"Lett muskelstrekk etter belastning."};
+ if(r<.94)return {rounds:2,type:"Muskelskade",detail:"Muskelskade som krever ekstra hvile."};
+ return {rounds:3+(fitness<65||stamina<55?1:0),type:"Kraftigere strekk",detail:"En mer alvorlig strekk krever flere kampers hvile."};
+}
+function recordInjury(p,round){
+ const injury=chooseInjuryDuration(p);
+ p.injured=Math.max(p.injured||0,injury.rounds);
+ const report={round,playerId:p.id,type:"injury",duration:injury.rounds,injuryType:injury.type,detail:injury.detail,returnDate:`Runde ${round+injury.rounds}`};
+ appState.injuryReport.push(report);
+ appState.medicalHistory.push({...report,playerName:p.name});
+ appState.log.push(`Skade: ${p.name} – ${injury.type}. Forventet retur: ${report.returnDate}.`);
+}
+function registerYellowCard(p,round){
+ const d=disciplineRecord(p);
+ d.yellow=(d.yellow||0)+1;
+ appState.log.push(`Gult kort: ${p.name} (${d.yellow} gule kort i sesongen).`);
+ // Premier League thresholds: 5 before the 19th match (1-game ban),
+ // 10 by the 32nd match (2-game ban), and 15 before season end (3-game ban).
+ const thresholds=[{cards:5,lastRound:19,ban:1},{cards:10,lastRound:32,ban:2},{cards:15,lastRound:38,ban:3}];
+ for(const t of thresholds){
+  if(d.yellow>=t.cards&&round<=t.lastRound&&!d.sanctions.includes(t.cards)){
+   d.sanctions.push(t.cards);
+   p.suspended=Math.max(p.suspended||0,t.ban);
+   d.ban=Math.max(d.ban||0,t.ban);
+   d.banIssuedRound=round;
+   appState.log.push(`${p.name} har nådd ${t.cards} gule kort og får ${t.ban} kamp${t.ban===1?"":"er"} karantene (Premier League-regler).`);
+  }
+ }
+}
 function availabilityStatus(p){
- if((p.injured||0)>0)return `Skadet · ${p.injured} runde(r) igjen`;
+ if((p.injured||0)>0)return playerAvailabilityText(p);
  if((p.suspended||0)>0)return `Suspendert · ${p.suspended} kamp(er) igjen`;
  return "Tilgjengelig";
 }
 function canPlay(p){return !(p.injured>0)&&!(p.suspended>0);}
 function disciplinarySummary(){
  const unavailable=appState.squad.filter(p=>!canPlay(p));
- if(!unavailable.length)return `<div class="notice"><strong>Skader og suspensjoner</strong><p style="margin:6px 0">Alle spillere er tilgjengelige.</p></div>`;
- return `<div class="notice"><strong>Skader og suspensjoner</strong>${unavailable.map(p=>`<p style="margin:6px 0">${esc(p.name)} · ${esc(p.pos)} — ${availabilityStatus(p)}</p>`).join("")}</div>`;
+ const recent=(appState.medicalHistory||[]).slice(-3).reverse();
+ const cards=appState.squad.map(p=>({p,d:disciplineRecord(p)})).filter(x=>x.d.yellow>0||x.d.ban>0);
+ return `<div class="notice"><strong>Skader og suspensjoner</strong>${unavailable.length?unavailable.map(p=>`<p style="margin:6px 0">${esc(p.name)} · ${esc(p.pos)} — ${esc(playerAvailabilityText(p))}</p>`).join(""):'<p style="margin:6px 0">Alle spillere er tilgjengelige.</p>'}${cards.length?`<div style="border-top:1px solid #574c31;margin-top:8px;padding-top:6px"><strong>Kortoversikt</strong>${cards.map(({p,d})=>`<p style="margin:4px 0">${esc(p.name)} · ${d.yellow} gule kort${d.yellow<5?` · ${5-d.yellow} til første grense`:d.yellow<10?` · ${10-d.yellow} til 10-kortsgrensen`:d.yellow<15?` · ${15-d.yellow} til 15-kortsgrensen`:" · sesonggrense nådd"}${d.ban?` · Karantene ${d.ban} kamp(er)`:""}</p>`).join("")}</div>`:""}${recent.length?`<div style="border-top:1px solid #574c31;margin-top:8px;padding-top:6px"><strong>Siste skader</strong>${recent.map(x=>`<p style="margin:4px 0">${esc(x.playerName||appState.squad.find(p=>String(p.id)===String(x.playerId))?.name||"Spiller")} · ${esc(x.injuryType||"Skade")} · Retur ${esc(x.returnDate||"ukjent")}</p>`).join("")}</div>`:""}</div>`;
 }
 function recoverSquadBeforeRound(){
  if(appState.lastRecoveryRound===appState.week)return;
- // League rounds are spaced one week apart. Give every player a full recovery window
- // before the next match; a full week restores match fitness to 100%.
- appState.squad.forEach(p=>{p.fitness=100;});
+ // Advance injury and ban durations once when entering a new round.
+ if(appState.lastRecoveryRound!==null){
+  appState.squad.forEach(p=>{
+   if((p.injured||0)>0)p.injured=Math.max(0,p.injured-1);
+   const d=disciplineRecord(p);
+   // A ban issued in the immediately preceding round must still apply to this round.
+   if((p.suspended||0)>0&&d.banIssuedRound<appState.week-1)p.suspended=Math.max(0,p.suspended-1);
+   if((d.ban||0)>0&&d.banIssuedRound<appState.week-1)d.ban=Math.max(0,d.ban-1);
+  });
+ }
+ // A week between matches restores physical fitness; injuries/bans still keep players unavailable.
+ appState.squad.forEach(p=>{if(!(p.injured>0))p.fitness=100;});
  appState.lastRecoveryRound=appState.week;
 }
 function getOpponentFormation(opponentIndex, roundNumber=appState.week){
@@ -396,7 +494,7 @@ function tactics(){
 }
 function transfers(){let targets=[{name:"T. Adeyemi",pos:"ATT",age:21,rating:76,potential:88,value:27.5,wage:48},{name:"M. Laurent",pos:"MID",age:19,rating:67,potential:86,value:8.5,wage:18},{name:"J. van Dijk",pos:"DEF",age:24,rating:74,potential:79,value:16,wage:35},{name:"A. Costa",pos:"GK",age:22,rating:70,potential:84,value:7.2,wage:22},{name:"R. Mensah",pos:"MID",age:28,rating:78,potential:78,value:21,wage:62}];return `<div class="hero"><div class="eyebrow">Recruitment centre</div><h1>Overgangsmarked</h1><p>Finn forsterkninger, men pass på budsjettet. Alle spillerne i denne listen er fiktive prototypedata.</p><div class="hero-actions"><span class="pill green">Budsjett ${money(appState.budget)}</span><span class="pill">Lønnskostnader kommer senere</span></div></div><section class="card">${targets.map((p,i)=>`<div class="player"><div><div class="player-name">${p.name} <span class="pill">${p.pos}</span></div><div class="player-meta">${p.age} år · Potensial ${p.potential} · Lønn ${p.wage}k/uke</div><div class="attrs"><span class="attr">Verdi ${money(p.value)}</span></div></div><div style="text-align:right"><div class="rating">${p.rating}</div><button style="margin-top:6px;padding:7px 9px" onclick="buyPlayer(${i})" ${appState.budget<p.value?"disabled":""}>By ${money(p.value)}</button></div></div>`).join("")}</section><div class="notice">Overgangene er foreløpig direkte kjøp til markedsverdi. Bud, forhandlinger, AI-klubber og kontrakter kommer i neste iterasjon.</div>`}
 function buyPlayer(i){let targets=[{name:"T. Adeyemi",pos:"ATT",age:21,rating:76,potential:88,value:27.5,wage:48},{name:"M. Laurent",pos:"MID",age:19,rating:67,potential:86,value:8.5,wage:18},{name:"J. van Dijk",pos:"DEF",age:24,rating:74,potential:79,value:16,wage:35},{name:"A. Costa",pos:"GK",age:22,rating:70,potential:84,value:7.2,wage:22},{name:"R. Mensah",pos:"MID",age:28,rating:78,potential:78,value:21,wage:62}];let p={...targets[i],id:Date.now(),attributes:generateAttributes(targets[i].pos,targets[i].rating),fitness:100,morale:80,goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0};if(appState.budget<p.value)return;appState.budget=+(appState.budget-p.value).toFixed(1);appState.squad.push(p);appState.log.push(`${p.name} har signert for ${currentClub().name} for ${money(p.value)}.`);save();render()}
-function league(){let rows=sortedTable(),done=seasonCompleted();return `<div class="hero"><div class="eyebrow">League centre</div><h1>Premier League</h1><p>Sesong ${seasonLabel()} · ${done?"Sesongen er ferdig":`Runde ${appState.week} · ${appState.played} av ${appState.fixtures.length} runder spilt`}</p>${done?`<button class="primary" onclick="setPage('season')">Se sesongoppsummering →</button>`:""}</div><div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>V</th><th>U</th><th>T</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${r.name===currentClub().name?"you":""}"><td>${i+1}${done?"":movementMarkup((appState.positionChanges||{})[r.name]||0)}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join("")}</tbody></table></div><div class="notice">${done?"Endelig tabell for sesongen. Plasseringene er låst frem til du starter neste sesong.":"Tabellen oppdateres når du spiller kamper. I denne prototypen er ligaen redusert til 12 klubber for å teste kjernen raskt."}</div>`}
+function league(){let rows=sortedTable(),done=seasonCompleted();return `<div class="hero"><div class="eyebrow">League centre</div><h1>Premier League</h1><p>Sesong ${seasonLabel()} · ${done?"Sesongen er ferdig":`Runde ${appState.week} · ${appState.played} av ${appState.fixtures.length} runder spilt`}</p>${done?`<button class="primary" onclick="setPage('season')">Se sesongoppsummering →</button>`:""}</div><div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>V</th><th>U</th><th>T</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${r.name===currentClub().name?"you":""}"><td>${i+1}${done?"":movementMarkup((appState.positionChanges||{})[r.name]||0)}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join("")}</tbody></table></div><div class="notice">${done?"Endelig tabell for sesongen. Plasseringene er låst frem til du starter neste sesong.":"Tabellen oppdateres når du spiller kamper. Premier League består av 20 klubber. Alle møter hverandre hjemme og borte – 38 runder og 380 kamper totalt."}</div>`}
 
 
 function seasonSummary(){
@@ -420,7 +518,7 @@ function startNewSeason(){
  appState.seasonYear=(Number(appState.seasonYear)||2026)+1;
  appState.week=1;appState.played=0;appState.log=[`Ny sesong ${seasonLabel()} er i gang. ${currentClub().name} fortsetter med samme tropp.`];
  appState.positionChanges={};appState.page="home";
- appState.squad.forEach(p=>{p.age=(p.age||18)+1;p.goals=0;p.assists=0;p.apps=0;p.minutes=0;p.injured=0;p.suspended=0;p.fitness=Math.max(85,p.fitness||90);p.form=6.5;p.morale=Math.max(60,Math.min(95,(p.morale||75)+Math.round(Math.random()*6-3)))});
+ appState.discipline={};appState.squad.forEach(p=>{p.age=(p.age||18)+1;p.goals=0;p.assists=0;p.apps=0;p.minutes=0;p.injured=0;p.suspended=0;p.fitness=Math.max(85,p.fitness||90);p.form=6.5;p.morale=Math.max(60,Math.min(95,(p.morale||75)+Math.round(Math.random()*6-3)))});
  appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
  appState.fixtures=[];ensureFixtures();save();render();
 }
@@ -428,7 +526,8 @@ function startNewSeason(){
 function chooseClub(){let options=CLUBS.map((c,i)=>`${i+1}. ${c.name}`).join("\n");let answer=prompt("Velg klubb ved å skrive nummeret:\n"+options, String(appState.club+1));if(answer===null)return;let idx=Number(answer)-1;if(!Number.isInteger(idx)||idx<0||idx>=CLUBS.length){alert("Skriv et nummer fra 1 til "+CLUBS.length+".");return;}if(idx===appState.club)return;if(confirm("Bytte til "+CLUBS[idx].name+"? Dette starter en ny testkarriere.")){appState.club=idx;appState.week=1;appState.played=0;appState.seasonYear=2026;appState.positionChanges={};appState.lastSeasonSummary=null;appState.log=[];init();}}
 
 function ensureFixtures(){
- if(appState.fixtures && appState.fixtures.length) return;
+ if(appState.fixtures && appState.fixtures.length && appState.fixtures.length===38) return;
+ if(appState.fixtures && appState.fixtures.length && appState.fixtures.length!==38) appState.fixtures=[];
  const n=CLUBS.length, teams=CLUBS.map((_,i)=>i), rounds=[];
  // Circle method, one round-robin; even team count.
  let arr=[...teams];
@@ -443,6 +542,7 @@ function ensureFixtures(){
 }
 function teamPower(index){
  if(index===appState.club && appState.squad.length) return appState.squad.reduce((s,p)=>s+p.rating,0)/appState.squad.length;
+ const roster=appState.worldSquads?.[index];if(roster?.length)return roster.reduce((sum,p)=>sum+p.rating,0)/roster.length;
  return CLUBS[index].strength;
 }
 function eligibleSquad(players){
@@ -800,8 +900,7 @@ function playMatch(){
  const c=currentClub(),opp=CLUBS[oppIndex],home=fixture[0]===userIndex;
  const previousPositions=new Map(sortedTable().map((team,index)=>[team.name,index+1]));
  const roundResults=[];
- const fakeNames=['A. Gordon','A. Isak','H. Barnes','B. Guimarães','S. Tonali','A. Murphy','J. Willock','L. Hall','N. Pope','D. Burn','K. Trippier','S. Botman','J. Murphy','M. Almirón','C. Wilson','M. Targett','R. Young','T. Doyle'];
- const makeOpponentSquad=(clubIndex)=>fakeNames.map((name,i)=>({id:`opp-${clubIndex}-${i}`,name,pos:i===8?'GK':i<2||i===14?'ATT':i<7?'MID':'DEF',rating:Math.max(45,Math.min(92,Math.round(CLUBS[clubIndex].strength+(Math.random()*12-6)))),fitness:80+Math.floor(Math.random()*20),morale:75,form:6.5,injured:0,suspended:0}));
+ const makeOpponentSquad=(clubIndex)=>((appState.worldSquads&&appState.worldSquads[clubIndex])||buildRealSquad(clubIndex)).map(p=>({...p,attributes:{...p.attributes},id:`opp-${clubIndex}-${p.id}`,fitness:100,injured:0,suspended:0}));
  let userMatch=null;
  for(const [a,b] of round.games){
   const playersA=a===userIndex?appState.squad:makeOpponentSquad(a);
@@ -996,22 +1095,29 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    appState.log.push(resultText);
    // Match incidents: injuries are uncommon; bookings can accumulate into suspensions.
    const activePlayers=appState.squad.filter(p=>engine.appearances[String(p.id)]&&engine.appearances[String(p.id)].start<90);
-   if(activePlayers.length&&Math.random()<0.075){
-    const hurt=activePlayers[Math.floor(Math.random()*activePlayers.length)];
-    const duration=1+(Math.random()<0.35?1:0)+(Math.random()<0.12?2:0);
-    hurt.injured=Math.max(hurt.injured||0,duration);
-    appState.injuryReport.push({round:appState.week,playerId:hurt.id,type:"injury",duration});
-    appState.log.push(`Skade: ${hurt.name} må stå over ${duration} kommende kamp(er).`);
+   if(activePlayers.length){
+    const injuryChance=activePlayers.reduce((sum,p)=>sum+matchFitnessRisk(p),0)/activePlayers.length;
+    if(Math.random()<injuryChance){
+     const hurt=weightedPick(activePlayers,activePlayers.map(p=>Math.max(.01,matchFitnessRisk(p))));
+     if(hurt)recordInjury(hurt,appState.week);
+    }
    }
-   // A red card suspends the player for one match; yellow-card accumulation is tracked separately.
-   if(engine.events.some(e=>e.type==="red"&&e.scorerId)){
-    const sentOff=appState.squad.find(p=>String(p.id)===String(engine.events.find(e=>e.type==="red").scorerId));
-    if(sentOff){sentOff.suspended=Math.max(sentOff.suspended||0,1);appState.log.push(`${sentOff.name} er suspendert i neste kamp etter rødt kort.`);}
+   // Discipline is player-specific: yellows accumulate, five bring a one-match ban; red cards cause a ban too.
+   for(const e of engine.events.filter(e=>e.type==="yellow"||e.type==="red")){
+    if(!e.playerId)continue;
+    const carded=appState.squad.find(p=>String(p.id)===String(e.playerId));
+    if(!carded)continue;
+    if(e.type==="yellow")registerYellowCard(carded,appState.week);
+    else{
+     carded.suspended=Math.max(carded.suspended||0,1);
+     disciplineRecord(carded).ban=Math.max(disciplineRecord(carded).ban||0,1);
+     disciplineRecord(carded).banIssuedRound=appState.week;
+     appState.log.push(`${carded.name} er suspendert i neste kamp etter rødt kort.`);
+    }
    }
    recordTeamContinuity();appState.week++;appState.played++;appState.recommendationRound=null;appState.recommendationInfo=null;
    appState.squad.forEach(p=>{
-    if((p.injured||0)>0)p.injured=Math.max(0,p.injured-1);
-    if((p.suspended||0)>0)p.suspended=Math.max(0,p.suspended-1);
+    // Availability counters are decremented at the next round's team-selection entry, not immediately after the incident.
     const appearance=engine.appearances[String(p.id)];
     const playedMinutes=appearance?Math.max(0,Math.min(90,Math.min(90,currentMinute)-appearance.start,appearance.end-appearance.start)):0;
     if(playedMinutes>0){
@@ -1105,7 +1211,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.20 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.24 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}
