@@ -107,9 +107,31 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 .match-engine-note{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);margin-top:5px}
 
+
+.live-score-hero{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 10px;padding:12px 14px;border:1px solid #405670;border-radius:13px;background:#101c2d}
+.live-score-hero .score-club{flex:1;min-width:0;font-size:12px;font-weight:800;color:#cbd8e6}
+.live-score-hero .score-club:last-child{text-align:right}
+.live-score-hero .live-score{font-size:38px;white-space:nowrap;line-height:1}
+.lineup-open{width:100%;margin:8px 0 2px;padding:12px 14px;font-weight:850;background:#243a51;border-color:#49617a}
+.lineup-modal{position:fixed;inset:0;z-index:20;background:#09111ef7;backdrop-filter:blur(12px);overflow:auto;padding:calc(12px + env(safe-area-inset-top)) 12px calc(20px + env(safe-area-inset-bottom));display:none}
+.lineup-modal.open{display:block}
+.lineup-sheet{max-width:720px;margin:0 auto;border:1px solid #3a5068;border-radius:16px;background:#111e30;padding:15px}
+.lineup-sticky{position:sticky;top:0;background:#111e30;padding:4px 0 10px;z-index:2;border-bottom:1px solid var(--line);margin-bottom:10px}
+.lineup-mini-score{display:flex;justify-content:space-between;align-items:center;font-size:22px;font-weight:950;margin:5px 0}
+.lineup-mini-score small{font-size:11px;color:var(--muted);font-weight:700}
+.lineup-player{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #26364a}
+.lineup-player:last-child{border-bottom:0}
+.lineup-player-name{font-weight:800;font-size:13px}
+.fitness-track{height:6px;background:#29394c;border-radius:99px;overflow:hidden;margin-top:6px;max-width:230px}
+.fitness-fill{height:100%;border-radius:99px;background:var(--green)}
+.fitness-number{font-size:11px;color:var(--muted);font-weight:800}
+.lineup-section-title{font-size:12px;color:var(--green);letter-spacing:.08em;font-weight:900;margin:15px 0 5px}
+.lineup-footer{display:flex;gap:8px;position:sticky;bottom:0;background:#111e30;padding-top:12px;margin-top:12px}
+.lineup-footer button{flex:1}
+@media(max-width:380px){.live-score-hero .live-score{font-size:31px}.live-score-hero .score-club{font-size:11px}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.7</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.8</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
@@ -406,6 +428,33 @@ function refreshSubOptions(engine){
  const btn=document.getElementById('makeSubBtn');if(btn)btn.disabled=disabled;
  if(hint){hint.textContent=engine.userSubs>=5?'Alle fem bytter er brukt.':engine.userSubWindows>=3?'Alle tre byttevinduene er brukt.':bench.length===0?'Ingen tilgjengelige reserver i samme posisjon.':`${5-engine.userSubs} bytter igjen · ${3-engine.userSubWindows} byttevinduer igjen.`;}
 }
+function renderLiveLineup(engine,minute,scoreText){
+ const holder=document.getElementById('lineupPlayers');if(!holder||!engine)return;
+ const xi=engine.userIsA?engine.xiA:engine.xiB;
+ const posOrder={GK:'KEEPER',DEF:'FORSVAR',MID:'MIDTBANE',ATT:'ANGREP'};
+ holder.innerHTML=['GK','DEF','MID','ATT'].map(pos=>{
+  const players=xi.filter(p=>p.pos===pos);
+  if(!players.length)return '';
+  return `<div class="lineup-section-title">${posOrder[pos]}</div>`+players.map(p=>{
+   const stamina=Math.round(matchStamina(engine,p));
+   const color=stamina<50?'#f08080':stamina<70?'#f3ca72':'var(--green)';
+   return `<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span></div><div class="fitness-track"><div class="fitness-fill" style="width:${stamina}%;background:${color}"></div></div></div><div class="fitness-number">${stamina}%</div></div>`;
+  }).join('');
+ }).join('');
+ const score=document.getElementById('lineupScoreText');if(score)score.textContent=scoreText||`${engine.ga} – ${engine.gb}`;
+ const clock=document.getElementById('lineupMinuteText');if(clock)clock.textContent=minute>=90?'FULL TIME':`${engine.paused?'PAUSE':'LIVE'} · ${minute}'`;
+}
+function openLineup(engine,minute){
+ const modal=document.getElementById('lineupModal');if(!modal||matchFinished)return;
+ if(!paused){paused=true;if(timer)clearInterval(timer);timer=null;pauseBtn.textContent='▶ Fortsett';pauseBtn.classList.add('live-paused');status.textContent=`PAUSE · ${minute}'`;}
+ modal.classList.add('open');
+ renderLiveLineup(engine,minute,score.textContent);
+ refreshSubOptions(engine);
+}
+function closeLineup(){
+ const modal=document.getElementById('lineupModal');if(modal)modal.classList.remove('open');
+ if(!matchFinished&&paused){paused=false;pauseBtn.textContent='Ⅱ Pause';pauseBtn.classList.remove('live-paused');status.textContent=`LIVE · ${currentMinute}'`;timer=setInterval(clockTick,tickMs);}
+}
 function makeLiveSubstitution(engine,minute){
  if(!engine||minute>=90)return;
  if(engine.userSubs>=5||engine.userSubWindows>=3){refreshSubOptions(engine);return;}
@@ -586,20 +635,15 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    <button type="button" data-speed="600" aria-pressed="false">1×</button>
    <button type="button" data-speed="300" aria-pressed="true">2×</button>
    <button type="button" data-speed="150" aria-pressed="false">4×</button>
-   <span class="speed-label" id="liveSpeedLabel">Tempo · 2×</span><label class="tactic-label" for="liveTacticSelect">Taktikk</label><select id="liveTacticSelect"><option value="Defensive">Defensiv</option><option value="Balanced">Balansert</option><option value="Attacking">Offensiv</option><option value="High press">Høyt press</option></select>
+   <span class="speed-label" id="liveSpeedLabel">Tempo · 2×</span>
   </div>
-  <div class="sub-panel" id="subPanel">
-   <h3>🔁 Innbyttere</h3>
-   <p>Gjør endringer mens kampen pågår. Maks fem bytter fordelt på tre byttevinduer.</p>
-   <div class="sub-grid"><div><label for="subOut">Spiller ut</label><select id="subOut"></select></div><div><label for="subIn">Spiller inn</label><select id="subIn"></select></div></div>
-   <div class="sub-actions"><button type="button" id="makeSubBtn" class="primary-control">Gjennomfør bytte</button><span id="subHint" class="sub-count">5 bytter igjen</span></div>
-  </div>
+  <div class="live-score-hero"><div class="score-club">${homeName}</div><div id="liveScore" class="live-score">0 – 0</div><div class="score-club">${awayName}</div></div>
+  <button type="button" class="lineup-open" id="openLineupBtn">♟ Bytter / taktikk · Lagoppstilling</button>
   <div id="liveCommentary" class="live-commentary">${openerLines[Math.floor(Math.random()*openerLines.length)]}</div>
  </div>
  <section class="card">
   <div class="row" style="padding:10px 0 18px;align-items:center">
    <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${homeCrest}</div><div style="margin-top:8px;font-weight:800">${homeName}</div>${rankLabel(homePosition,homeName===c.name,positionChanges[homeName]||0)}<small style="color:var(--muted);display:block;margin-top:2px">HJEMME</small></div>
-   <div id="liveScore" class="live-score">0 – 0</div>
    <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${awayCrest}</div><div style="margin-top:8px;font-weight:800">${awayName}</div>${rankLabel(awayPosition,awayName===c.name,positionChanges[awayName]||0)}<small style="color:var(--muted);display:block;margin-top:2px">BORTE</small></div>
   </div>
   <div class="fixture"><div class="team">Ballbesittelse</div><b id="livePossession">50% – 50%</b></div>
@@ -614,7 +658,18 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    <p class="muted" style="margin-top:15px">${esc(text)}</p>
    <button class="primary" style="width:100%" onclick="setPage('${seasonCompleted()?"season":"home"}')">${seasonCompleted()?"Se sesongoppsummering →":"Fortsett →"}</button>
   </div>
- </section>`;
+ </section>
+ <div class="lineup-modal" id="lineupModal" role="dialog" aria-modal="true" aria-label="Lagoppstilling og bytter">
+  <div class="lineup-sheet">
+   <div class="lineup-sticky"><div class="row"><strong>♟ Lagoppstilling</strong><button type="button" id="closeLineupBtn">Lukk ×</button></div><div class="lineup-mini-score"><span id="lineupScoreText">0 – 0</span><small id="lineupMinuteText">LIVE · 0'</small></div><div class="muted" style="font-size:11px">Spillernes utholdenhet oppdateres mens kampen pågår. Du kan gjøre flere bytter i samme stopp.</div></div>
+   <div class="lineup-section-title">PÅ BANEN · UTHOLDENHET</div><div id="lineupPlayers"></div>
+   <div class="lineup-section-title">GJØR BYTTER</div>
+   <div class="sub-grid"><div><label for="subOut">Spiller ut</label><select id="subOut"></select></div><div><label for="subIn">Spiller inn</label><select id="subIn"></select></div></div>
+   <div class="sub-actions"><button type="button" id="makeSubBtn" class="primary-control">Gjennomfør bytte</button><span id="subHint" class="sub-count">5 bytter igjen</span></div>
+   <div class="lineup-section-title">MENTALITET</div><div class="field"><label for="liveTacticSelect">KAMPTAKTIKK</label><select id="liveTacticSelect"><option value="Defensive">Defensiv</option><option value="Balanced">Balansert</option><option value="Attacking">Offensiv</option><option value="High press">Høyt press</option></select></div>
+   <div class="lineup-footer"><button type="button" id="closeLineupContinue" class="primary">Ferdig – fortsett kampen</button></div>
+  </div>
+ </div>`;
  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
  const app=document.getElementById("app");
  const saveButton=document.getElementById("saveBtn");if(saveButton)saveButton.disabled=true;
@@ -645,6 +700,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   currentMinute++;
   status.textContent=currentMinute<=45?`LIVE · ${currentMinute}'`:currentMinute<=90?`LIVE · ${currentMinute}'`:`FULL TIME`;
   progress.style.width=Math.min(100,currentMinute/90*100)+"%";
+  const lineupModalLive=document.getElementById('lineupModal');if(lineupModalLive?.classList.contains('open'))renderLiveLineup(engine,currentMinute,score.textContent);
   // Generate the match itself one minute at a time: shots, cards, injuries and goals do not exist until this tick.
   const newEvents=advanceLiveEngine(engine,currentMinute);
   const liveHomeShots=engine.stats.shotsA;
@@ -694,7 +750,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   if(currentMinute===60)commentary.textContent="Siste halvtimen starter. Slitne bein kan gi nye muligheter.";
   if(currentMinute===75)commentary.textContent="Et kvarter igjen. Nå kan hver eneste situasjon bli avgjørende.";
   if(currentMinute>=90){
-   matchFinished=true;clearInterval(timer);status.textContent='FULL TIME';controls.style.display='none';const subPanel=document.getElementById('subPanel');if(subPanel)subPanel.style.display='none';
+   matchFinished=true;clearInterval(timer);status.textContent='FULL TIME';controls.style.display='none';const lineupModal=document.getElementById('lineupModal');if(lineupModal)lineupModal.classList.remove('open');
    const ga=engine.ga,gb=engine.gb;
    applyTableResult(engine.a,engine.b,ga,gb);
    const fixtureRound=round||appState.fixtures.find(f=>f.round===appState.week&&!f.played);
@@ -777,11 +833,15 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  const makeSubBtn=document.getElementById('makeSubBtn');
  if(makeSubBtn)makeSubBtn.addEventListener('click',()=>makeLiveSubstitution(engine,currentMinute));
  const subOutSelect=document.getElementById('subOut');if(subOutSelect)subOutSelect.addEventListener('change',()=>refreshSubOptions(engine));
+ const openLineupBtn=document.getElementById('openLineupBtn');if(openLineupBtn)openLineupBtn.addEventListener('click',()=>openLineup(engine,currentMinute));
+ const closeLineupBtn=document.getElementById('closeLineupBtn');if(closeLineupBtn)closeLineupBtn.addEventListener('click',closeLineup);
+ const closeLineupContinue=document.getElementById('closeLineupContinue');if(closeLineupContinue)closeLineupContinue.addEventListener('click',closeLineup);
  refreshSubOptions(engine);
+ renderLiveLineup(engine,currentMinute,score.textContent);
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.7 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.8 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}

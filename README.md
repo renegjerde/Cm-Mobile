@@ -1,5 +1,9 @@
-# CM Mobile v1.7
+# CM Mobile v1.8 — Matchday layout
 
-Fixes substitution dropdown initialization: the outgoing player is selected first, then the reserve list is filtered to the exact same position. The substitution validation remains as a second safeguard. Match event feed continues to show only goals, cards, and injuries while shots remain in statistics.
+- Resultat og kampklokke er løftet opp i kampskjermen.
+- Bytter/taktikk åpner en egen lagoppstillingsvisning med spillernes løpende utholdenhet.
+- Kampen pauses mens lagoppstillingen er åpen, og fortsetter når du lukker visningen.
+- Flere bytter kan utføres i samme stopp; samme minutt teller som ett byttevindu.
+- Hendelseslisten viser mål, kort og skader, mens avslutninger fortsatt telles i statistikken.
 
-JavaScript syntax checked with Node.js. Browser gameplay has not been fully tested.
+Prototype. JavaScript-syntaks kontrollert; ikke fulltestet i mobilnettleser.
