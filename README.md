@@ -1,12 +1,16 @@
-# CM Mobile v1.3 — Dynamic Live Match Engine
+# CM Mobile v1.4 — Live Substitutions
 
-## Changes
-- Match chances, shots, goals, cards and injuries are generated as the match clock advances.
-- The live score is no longer predetermined at kickoff.
-- Match statistics accumulate as the match is played.
-- The manager can change between Defensive, Balanced, Attacking and High press during the match; the change affects future chance generation.
-- League table result, player appearance/stat updates, round progression and match log are committed at full time.
-- Pause/resume and 1×/2×/4× speed from v1.2 remain.
+Denne versjonen bygger videre på v1.3 med innbyttere mens kampen pågår.
 
-## Testing note
-Please test a complete match through 90 minutes and verify the final score, league table, round progression and player stats. This is the first dynamic simulation pass; substitutions and deeper tactical instructions are still a separate next step.
+## Nytt i v1.4
+- Innbytterpanel i live-kampen.
+- Maks fem bytter fordelt på tre byttevinduer. Flere bytter kan utføres i samme minutt/vindu.
+- Innbyttere oppdaterer lagoppstillingen og beregnet angreps-/forsvarsstyrke for resten av kampen.
+- Byttehendelser vises i kampens hendelseslogg.
+- Spillerens spilte minutter beregnes ut fra når vedkommende går inn eller ut.
+
+## Oppdatering
+Erstatt `index.html` i GitHub-repositoriet med filen i denne mappen og commit endringen til `main`.
+
+## Begrensninger
+Dette er fortsatt en prototypemotor. Bytter er kun tilgjengelige for spillerens klubb, og det er ingen egen spillerinstruksjons-/rolle-editor ennå. Lagre karrieren etter kamp som vanlig.
