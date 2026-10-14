@@ -109,7 +109,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.6</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.7</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
@@ -394,15 +394,17 @@ function refreshSubOptions(engine){
  const userXI=engine.userIsA?engine.xiA:engine.xiB;
  const onPitch=new Set(userXI.map(p=>String(p.id)));
  const oldOut=out.value,oldIn=inc.value;
- const outgoing=userXI.find(p=>String(p.id)===String(oldOut));
- const bench=appState.squad.filter(p=>!onPitch.has(String(p.id))&&(p.injured||0)<=0&&(p.suspended||0)<=0&&(!outgoing||p.pos===outgoing.pos));
  out.innerHTML=userXI.map(p=>`<option value="${String(p.id)}">${esc(p.name)} · ${p.pos}</option>`).join('');
- inc.innerHTML=bench.map(p=>`<option value="${String(p.id)}">${esc(p.name)} · ${p.pos}</option>`).join('');
  if([...out.options].some(o=>o.value===oldOut))out.value=oldOut;
+ else if(out.options.length)out.selectedIndex=0;
+ const outgoing=userXI.find(p=>String(p.id)===String(out.value));
+ const bench=appState.squad.filter(p=>!onPitch.has(String(p.id))&&(p.injured||0)<=0&&(p.suspended||0)<=0&&outgoing&&p.pos===outgoing.pos);
+ inc.innerHTML=bench.map(p=>`<option value="${String(p.id)}">${esc(p.name)} · ${p.pos}</option>`).join('');
  if([...inc.options].some(o=>o.value===oldIn))inc.value=oldIn;
+ else if(inc.options.length)inc.selectedIndex=0;
  const disabled=engine.userSubs>=5||engine.userSubWindows>=3||bench.length===0;
  const btn=document.getElementById('makeSubBtn');if(btn)btn.disabled=disabled;
- if(hint){hint.textContent=engine.userSubs>=5?'Alle fem bytter er brukt.':engine.userSubWindows>=3?'Alle tre byttevinduene er brukt.':bench.length===0?'Ingen tilgjengelige reserver.':`${5-engine.userSubs} bytter igjen · ${3-engine.userSubWindows} byttevinduer igjen.`;}
+ if(hint){hint.textContent=engine.userSubs>=5?'Alle fem bytter er brukt.':engine.userSubWindows>=3?'Alle tre byttevinduene er brukt.':bench.length===0?'Ingen tilgjengelige reserver i samme posisjon.':`${5-engine.userSubs} bytter igjen · ${3-engine.userSubWindows} byttevinduer igjen.`;}
 }
 function makeLiveSubstitution(engine,minute){
  if(!engine||minute>=90)return;
@@ -779,7 +781,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.6 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.7 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}

@@ -1,8 +1,5 @@
-# CM Mobile v1.6
+# CM Mobile v1.7
 
-Oppdatering fra v1.5:
-- Versjonsnummeret vises nå som v1.6 i toppfeltet og sesonglinjen.
-- Kampens hendelsesliste viser bare mål, gule/røde kort og skader. Skudd og bommer teller fortsatt i kampstatistikken.
-- Innbytterlisten begrenses til reserver i samme posisjon som spilleren som går ut. Validering skjer også når byttet gjennomføres.
+Fixes substitution dropdown initialization: the outgoing player is selected first, then the reserve list is filtered to the exact same position. The substitution validation remains as a second safeguard. Match event feed continues to show only goals, cards, and injuries while shots remain in statistics.
 
-Dette er fortsatt en prototype med genererte spillerstall og forenklet kampmotor. Kontroller spillet i nettleseren etter opplasting til GitHub Pages.
+JavaScript syntax checked with Node.js. Browser gameplay has not been fully tested.
