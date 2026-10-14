@@ -1,14 +1,8 @@
-# CM Mobile v1.5 — Player Impact Match Engine
+# CM Mobile v1.6
 
-## What's new
-- Player effectiveness now uses rating, current form, morale, pre-match fitness, and live match stamina.
-- Position and formation affect each player's contribution to attack and defence.
-- Match stamina declines minute by minute; high press and attacking mentalities consume more energy.
-- Shots, goals, assists, and disciplinary events are weighted by relevant player attributes.
-- Substitutions refresh the team's effective strength and bring in a player with fresh stamina.
-- End-of-match player fitness, form, and morale reflect minutes played and individual contributions.
+Oppdatering fra v1.5:
+- Versjonsnummeret vises nå som v1.6 i toppfeltet og sesonglinjen.
+- Kampens hendelsesliste viser bare mål, gule/røde kort og skader. Skudd og bommer teller fortsatt i kampstatistikken.
+- Innbytterlisten begrenses til reserver i samme posisjon som spilleren som går ut. Validering skjer også når byttet gjennomføres.
 
-## Prototype notes
-- The model is still simplified and requires balance testing over many matches.
-- Player position is used as the available role proxy; more granular roles/instructions can be added later.
-- Opponent squads remain fictional placeholder data.
+Dette er fortsatt en prototype med genererte spillerstall og forenklet kampmotor. Kontroller spillet i nettleseren etter opplasting til GitHub Pages.
