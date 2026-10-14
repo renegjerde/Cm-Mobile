@@ -1,10 +1,13 @@
-# CM Mobile v1.0 — Matchday polish
+# CM Mobile v1.1 — Season Review
 
-## Included
-1. League-position labels now have clear spacing; `PLASS` and `HJEMME/BORTE` no longer run together.
-2. Green up-arrows and red down-arrows show movement in league position after the round; unchanged teams get a neutral arrow. Movement is shown in match results and the league table.
-3. Full-time headlines vary according to win/draw/loss, score margin, total goals, clean sheet, and possession, instead of repeating the same three phrases.
+## Added
+- End-of-season summary page with club finish, points, W-D-L, goal difference, champion, club top scorer, and final table.
+- Final league table no longer shows round-to-round movement arrows.
+- At the end of the final match, the Continue button opens the season review.
+- Home and league pages recognize season completion and link to the review.
+- Start New Season advances the season year and resets league/season stats while preserving the selected club, squad, player ratings, transfer budget, and career.
+- Players age by one year; injuries and suspensions clear for the new season.
+- Existing v1.0 local saves remain supported.
 
-## Notes
-- Table movement compares the league positions before the round with the positions after all round results have been applied.
-- Match result and stats remain simulated by the current prototype engine.
+## Test
+JavaScript syntax checked with Node.js. Please test the end-of-season flow in the published mobile app.
