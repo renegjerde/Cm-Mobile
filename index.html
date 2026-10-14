@@ -104,6 +104,9 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .sub-event{border-color:#42634b;background:#182e28}
 @media(max-width:370px){.sub-grid{grid-template-columns:1fr}}
 
+
+.match-engine-note{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);margin-top:5px}
+
 </style></head>
 <body>
 <header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.4</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
@@ -315,20 +318,64 @@ function applyTableResult(a,b,ga,gb){
  ta.p++;tb.p++;ta.gf+=ga;ta.ga+=gb;tb.gf+=gb;tb.ga+=ga;
  if(ga>gb){ta.w++;ta.pts+=3;tb.l++}else if(ga<gb){tb.w++;tb.pts+=3;ta.l++}else{ta.d++;tb.d++;ta.pts++;tb.pts++}
 }
+function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
+function playerFormValue(p){return clamp(Number(p.form??6.5),4,10)}
+function playerMoraleValue(p){return clamp(Number(p.morale??75),0,100)}
+function playerFitnessValue(p){return clamp(Number(p.fitness??85),35,100)}
+function matchStamina(engine,p){
+ const start=engine.stamina[String(p.id)]??playerFitnessValue(p);
+ return clamp(start,35,100);
+}
+function effectivePlayerRating(engine,p){
+ const form=(playerFormValue(p)-6.5)*1.15;
+ const morale=(playerMoraleValue(p)-70)*0.045;
+ const fitness=(playerFitnessValue(p)-80)*0.035;
+ const stamina=(matchStamina(engine,p)-75)*0.055;
+ return clamp(p.rating+form+morale+fitness+stamina,35,100);
+}
+function roleWeight(p,kind,formation){
+ const pos=p.pos;
+ if(kind==="attack"){
+  let w=pos==="ATT"?1.28:pos==="MID"?0.88:pos==="DEF"?0.20:0.03;
+  if(formation==="4-4-2"&&pos==="ATT")w=1.36;
+  if(formation==="4-3-3"&&pos==="ATT")w=1.42;
+  if(formation==="3-5-2"&&pos==="MID")w=1.0;
+  if(formation==="4-2-3-1"&&pos==="MID")w=1.0;
+  return w;
+ }
+ if(kind==="defense")return pos==="GK"?1.15:pos==="DEF"?1.2:pos==="MID"?.58:.18;
+ return 1;
+}
+function weightedTeamRating(engine,side,kind){
+ const xi=side==="A"?engine.xiA:engine.xiB;
+ const formation=side==="A"?engine.formationA:engine.formationB;
+ let total=0,weights=0;
+ for(const p of xi){
+  const w=roleWeight(p,kind,formation);
+  total+=effectivePlayerRating(engine,p)*w;weights+=w;
+ }
+ return weights?total/weights:65;
+}
+function tacticalShapeBonus(engine,side,kind){
+ const formation=side==="A"?engine.formationA:engine.formationB;
+ if(kind==="attack")return formation==="4-3-3"?1.1:formation==="3-5-2"?.45:formation==="4-2-3-1"?.65:0;
+ if(kind==="defense")return formation==="3-5-2"?.9:formation==="4-2-3-1"?.45:formation==="4-4-2"?.2:0;
+ return 0;
+}
 function averageRating(players,filter){const list=players.filter(filter);return list.length?list.reduce((s,p)=>s+p.rating,0)/list.length:65}
-function createLiveEngine(a,b,homeUser,playersA,playersB,xiA,xiB){
+function createLiveEngine(a,b,homeUser,playersA,playersB,xiA,xiB,formationA="4-3-3",formationB="4-3-3"){
  const userIsA=a===appState.club;
- return {
-  a,b,homeUser,userIsA,playersA,playersB,xiA,xiB,ga:0,gb:0,events:[],
+ const stamina={};
+ [...xiA,...xiB].forEach(p=>{stamina[String(p.id)]=clamp(playerFitnessValue(p)*.65+35,55,100)});
+ const engine={
+  a,b,homeUser,userIsA,playersA,playersB,xiA,xiB,formationA,formationB,ga:0,gb:0,events:[],
   stats:{shotsA:0,shotsB:0,onA:0,onB:0,possessionA:50},
-  baseAttackA:averageRating(xiA,p=>p.pos==='ATT'||p.pos==='MID')+(a===appState.club?0:0)+(a===appState.club&&homeUser?1.8:0)+(a!==appState.club&&!homeUser?1.8:0),
-  baseAttackB:averageRating(xiB,p=>p.pos==='ATT'||p.pos==='MID'),
-  defenseA:averageRating(xiA,p=>p.pos==='DEF')+(xiA.find(p=>p.pos==='GK')?.rating||65)*.22,
-  defenseB:averageRating(xiB,p=>p.pos==='DEF')+(xiB.find(p=>p.pos==='GK')?.rating||65)*.22,
-  lastPossession:50,
-  userSubs:0,userSubWindows:0,lastSubMinute:-1,
-  appearances:Object.fromEntries([...xiA,...xiB].filter(p=>p.id!=null).map(p=>[String(p.id),{player:p,start:0,end:90,started:true}]))
+  stamina,lastPossession:50,userSubs:0,userSubWindows:0,lastSubMinute:-1,minute:0,
+  appearances:Object.fromEntries([...xiA,...xiB].filter(p=>p.id!=null).map(p=>[String(p.id),{player:p,start:0,end:90,started:true}])),
+  performance:Object.fromEntries([...xiA,...xiB].filter(p=>p.id!=null).map(p=>[String(p.id),{influence:0,events:0,shots:0,goals:0,assists:0}]))
  };
+ recomputeLiveTeam(engine,"A");recomputeLiveTeam(engine,"B");
+ return engine;
 }
 function liveTacticDelta(engine,side){
  const isUser=(side==='A'?engine.a:engine.b)===appState.club;
@@ -336,16 +383,10 @@ function liveTacticDelta(engine,side){
  return ({Defensive:-2.2,Balanced:0,Attacking:2.2,'High press':1.5})[appState.tactic]||0;
 }
 function recomputeLiveTeam(engine,side){
- const isA=side==='A';
- const xi=isA?engine.xiA:engine.xiB;
- const avgAttack=averageRating(xi,p=>p.pos==='ATT'||p.pos==='MID');
- const avgDef=averageRating(xi,p=>p.pos==='DEF');
- const gk=xi.find(p=>p.pos==='GK')?.rating||65;
- const teamIndex=isA?engine.a:engine.b;
- const isHome=(teamIndex===appState.club)?engine.homeUser:!engine.homeUser;
- const base=avgAttack+(isHome?1.8:0);
- if(isA){engine.baseAttackA=base;engine.defenseA=avgDef+gk*.22;}
- else{engine.baseAttackB=base;engine.defenseB=avgDef+gk*.22;}
+ const attack=weightedTeamRating(engine,side,"attack")+tacticalShapeBonus(engine,side,"attack");
+ const defense=weightedTeamRating(engine,side,"defense")+tacticalShapeBonus(engine,side,"defense");
+ if(side==="A"){engine.baseAttackA=attack;engine.defenseA=defense}
+ else{engine.baseAttackB=attack;engine.defenseB=defense}
 }
 function refreshSubOptions(engine){
  const out=document.getElementById('subOut'),inc=document.getElementById('subIn'),hint=document.getElementById('subHint');
@@ -377,6 +418,8 @@ function makeLiveSubstitution(engine,minute){
  if(!wasWindow&&engine.userSubWindows>=3){alert('Du har brukt alle tre byttevinduene.');return;}
  const idx=xi.findIndex(p=>String(p.id)===String(outId));
  xi[idx]=incoming;
+ engine.stamina[String(incoming.id)]=clamp(playerFitnessValue(incoming)*.65+35,55,100);
+ if(!engine.performance[String(incoming.id)])engine.performance[String(incoming.id)]={influence:0,events:0,shots:0,goals:0,assists:0};
  engine.userSubs++;
  if(!wasWindow){engine.userSubWindows++;engine.lastSubMinute=minute;}
  const appearance=engine.appearances[String(outgoing.id)];if(appearance)appearance.end=minute;
@@ -392,43 +435,78 @@ function makeLiveSubstitution(engine,minute){
 }
 
 function advanceLiveEngine(engine,minute){
- const events=[];
- const attackA=engine.baseAttackA+liveTacticDelta(engine,'A');
- const attackB=engine.baseAttackB+liveTacticDelta(engine,'B');
+ const events=[];engine.minute=minute;
+ // Match stamina falls gradually; pressing and high-tempo tactics cost more energy.
+ for(const side of ["A","B"]){
+  const xi=side==="A"?engine.xiA:engine.xiB;
+  const isUser=(side==="A"?engine.a:engine.b)===appState.club;
+  const tactic=isUser?appState.tactic:"Balanced";
+  const pressCost=tactic==="High press"?.19:tactic==="Attacking"?.13:tactic==="Defensive"?.07:.10;
+  for(const p of xi){
+   const id=String(p.id);
+   const posCost=p.pos==="MID"?.10:p.pos==="ATT"?.085:p.pos==="DEF"?.075:.045;
+   engine.stamina[id]=clamp((engine.stamina[id]??playerFitnessValue(p))-pressCost-posCost-(Math.random()*.035),35,100);
+   const perf=engine.performance[id];if(perf)perf.influence+=effectivePlayerRating(engine,p)/100;
+  }
+ }
+ // Recalculate ratings every minute so fatigue, morale, form and substitutions alter the balance.
+ recomputeLiveTeam(engine,"A");recomputeLiveTeam(engine,"B");
+ const attackA=engine.baseAttackA+liveTacticDelta(engine,"A");
+ const attackB=engine.baseAttackB+liveTacticDelta(engine,"B");
  const diff=(attackA-engine.defenseB)-(attackB-engine.defenseA);
- const probA=Math.max(.2,Math.min(.8,.5+diff*.012));
+ const probA=clamp(.5+diff*.012,.2,.8);
  const chances=(Math.random()<.22?1:0)+(Math.random()<.025?1:0);
- const scorerFor=(xi)=>{
-  const candidates=xi.filter(p=>p.pos==='ATT'||p.pos==='MID');
-  if(!candidates.length)return {name:'Spiller',id:null};
-  const chosen=weightedPick(candidates,candidates.map(p=>Math.max(1,p.rating-45)*(p.pos==='ATT'?1.65:.85)));
-  return chosen?{name:chosen.name,id:chosen.id}:{name:'Spiller',id:null};
+ const scorerFor=(xi,side)=>{
+  const candidates=xi.filter(p=>p.pos==="ATT"||p.pos==="MID");
+  if(!candidates.length)return {name:"Spiller",id:null};
+  const weights=candidates.map(p=>Math.max(1,effectivePlayerRating(engine,p)-42)*roleWeight(p,"attack",side==="A"?engine.formationA:engine.formationB));
+  const chosen=weightedPick(candidates,weights);
+  return chosen?{name:chosen.name,id:chosen.id}:{name:"Spiller",id:null};
  };
- const assistFor=(xi,id)=>{const candidates=xi.filter(p=>p.id!==id&&(p.pos==='MID'||p.pos==='ATT'));const p=weightedPick(candidates,candidates.map(x=>Math.max(1,x.rating-45)));return p?.name||null};
+ const assistFor=(xi,id,side)=>{const candidates=xi.filter(p=>p.id!==id&&(p.pos==="MID"||p.pos==="ATT"));const p=weightedPick(candidates,candidates.map(x=>Math.max(1,effectivePlayerRating(engine,x)-42)));return p?.name||null};
  for(let i=0;i<chances;i++){
-  const side=Math.random()<probA?'A':'B';
-  const xi=side==='A'?engine.xiA:engine.xiB;
-  const keeper=(side==='A'?engine.xiB:engine.xiA).find(p=>p.pos==='GK')?.rating||65;
-  const attackers=xi.filter(p=>p.pos==='ATT'||p.pos==='MID');
-  const shooter=weightedPick(attackers,attackers.map(p=>Math.max(1,p.rating-45)*(p.pos==='ATT'?1.65:.8)));
-  const finishing=shooter?.rating||65;
-  const teamAttack=side==='A'?attackA:attackB, opponentDefense=side==='A'?engine.defenseB:engine.defenseA;
-  const quality=Math.max(.04,Math.min(.72,.20+(teamAttack-opponentDefense)*.008+(finishing-65)*.004+Math.random()*.18));
-  const onTarget=Math.random()<Math.max(.16,Math.min(.78,.31+(finishing-60)*.012));
-  if(side==='A'){engine.stats.shotsA++;if(onTarget)engine.stats.onA++}else{engine.stats.shotsB++;if(onTarget)engine.stats.onB++}
-  const event={minute,side,type:'chance',player:shooter?.name||'Angriper',playerId:shooter?.id||null,onTarget,quality:+quality.toFixed(2)};
-  if(onTarget&&Math.random()<quality*(1-Math.max(.08,Math.min(.72,.32+(keeper-65)*.012)))*1.85){
-   const scorer=shooter?{name:shooter.name,id:shooter.id}:scorerFor(xi);
-   if(side==='A')engine.ga++;else engine.gb++;
-   event.type='goal';event.scorer=scorer.name;event.scorerId=scorer.id;event.assist=assistFor(xi,scorer.id);event.score=`${engine.ga}–${engine.gb}`;
+  const side=Math.random()<probA?"A":"B";
+  const xi=side==="A"?engine.xiA:engine.xiB;
+  const opponentXi=side==="A"?engine.xiB:engine.xiA;
+  const keeper=opponentXi.find(p=>p.pos==="GK");
+  const keeperRating=keeper?effectivePlayerRating(engine,keeper):65;
+  const attackers=xi.filter(p=>p.pos==="ATT"||p.pos==="MID");
+  const formation=side==="A"?engine.formationA:engine.formationB;
+  const shooter=weightedPick(attackers,attackers.map(p=>Math.max(1,effectivePlayerRating(engine,p)-42)*roleWeight(p,"attack",formation)));
+  const finishing=shooter?effectivePlayerRating(engine,shooter):65;
+  const teamAttack=side==="A"?attackA:attackB, opponentDefense=side==="A"?engine.defenseB:engine.defenseA;
+  const quality=clamp(.20+(teamAttack-opponentDefense)*.008+(finishing-65)*.004+Math.random()*.18,.04,.72);
+  const onTarget=Math.random()<clamp(.31+(finishing-60)*.012,.16,.82);
+  if(side==="A"){engine.stats.shotsA++;if(onTarget)engine.stats.onA++}else{engine.stats.shotsB++;if(onTarget)engine.stats.onB++}
+  const event={minute,side,type:"chance",player:shooter?.name||"Angriper",playerId:shooter?.id||null,onTarget,quality:+quality.toFixed(2)};
+  if(shooter&&engine.performance[String(shooter.id)])engine.performance[String(shooter.id)].shots++;
+  const keeperSave=clamp(.32+(keeperRating-65)*.012,.08,.72);
+  if(onTarget&&Math.random()<quality*(1-keeperSave)*1.85){
+   const scorer=shooter?{name:shooter.name,id:shooter.id}:scorerFor(xi,side);
+   if(side==="A")engine.ga++;else engine.gb++;
+   event.type="goal";event.scorer=scorer.name;event.scorerId=scorer.id;event.assist=assistFor(xi,scorer.id,side);event.score=`${engine.ga}–${engine.gb}`;
+   if(scorer.id!=null&&engine.performance[String(scorer.id)])engine.performance[String(scorer.id)].goals++;
+   if(event.assist){const assister=xi.find(p=>p.name===event.assist);if(assister&&engine.performance[String(assister.id)])engine.performance[String(assister.id)].assists++}
   }
   engine.events.push(event);events.push(event);
  }
- if(Math.random()<.008){const side=Math.random()<probA?'A':'B';const xi=side==='A'?engine.xiA:engine.xiB;const p=weightedPick(xi.filter(x=>x.pos!=='GK'),xi.filter(x=>x.pos!=='GK').map(x=>Math.max(1,100-x.rating)));const e={minute,side,type:'yellow',player:p?.name||'Spiller',playerId:p?.id||null,reason:'Forseelse'};engine.events.push(e);events.push(e)}
- if(Math.random()<.0007){const side=Math.random()<probA?'A':'B';const xi=side==='A'?engine.xiA:engine.xiB;const p=weightedPick(xi.filter(x=>x.pos!=='GK'),xi.filter(x=>x.pos!=='GK').map(x=>Math.max(1,100-x.rating)));const e={minute,side,type:'red',player:p?.name||'Spiller',playerId:p?.id||null,reason:'Alvorlig forseelse'};engine.events.push(e);events.push(e)}
- if(Math.random()<.002){const side=Math.random()<probA?'A':'B';const xi=side==='A'?engine.xiA:engine.xiB;const p=weightedPick(xi.filter(x=>x.pos!=='GK'),xi.filter(x=>x.pos!=='GK').map(x=>Math.max(1,100-x.rating)));const e={minute,side,type:'injury',player:p?.name||'Spiller',playerId:p?.id||null,reason:'Skade'};engine.events.push(e);events.push(e)}
- const targetPoss=Math.max(30,Math.min(70,50+(attackA-attackB)*.6));
- engine.stats.possessionA=Math.max(30,Math.min(70,Math.round(engine.stats.possessionA*.72+targetPoss*.28+(Math.random()*4-2))));
+ if(Math.random()<.008){
+  const side=Math.random()<probA?"A":"B",xi=side==="A"?engine.xiA:engine.xiB;
+  const candidates=xi.filter(p=>p.pos!=="GK"),p=weightedPick(candidates,candidates.map(x=>Math.max(1,100-effectivePlayerRating(engine,x))));
+  const e={minute,side,type:"yellow",player:p?.name||"Spiller",playerId:p?.id||null,reason:"Forseelse"};engine.events.push(e);events.push(e);
+ }
+ if(Math.random()<.0007){
+  const side=Math.random()<probA?"A":"B",xi=side==="A"?engine.xiA:engine.xiB;
+  const candidates=xi.filter(p=>p.pos!=="GK"),p=weightedPick(candidates,candidates.map(x=>Math.max(1,100-effectivePlayerRating(engine,x))));
+  const e={minute,side,type:"red",player:p?.name||"Spiller",playerId:p?.id||null,reason:"Alvorlig forseelse"};engine.events.push(e);events.push(e);
+ }
+ if(Math.random()<.002){
+  const side=Math.random()<probA?"A":"B",xi=side==="A"?engine.xiA:engine.xiB;
+  const candidates=xi.filter(p=>p.pos!=="GK"),p=weightedPick(candidates,candidates.map(x=>Math.max(1,100-effectivePlayerRating(engine,x))));
+  const e={minute,side,type:"injury",player:p?.name||"Spiller",playerId:p?.id||null,reason:"Skade"};engine.events.push(e);events.push(e);
+ }
+ const targetPoss=clamp(50+(attackA-attackB)*.6,30,70);
+ engine.stats.possessionA=clamp(Math.round(engine.stats.possessionA*.72+targetPoss*.28+(Math.random()*4-2)),30,70);
  return events;
 }
 function playMatch(){
@@ -450,7 +528,7 @@ function playMatch(){
   if(a===userIndex||b===userIndex){
    const xiA=createMatchLineup(playersA,a===userIndex?appState.formation:'4-3-3',CLUBS[a].name);
    const xiB=createMatchLineup(playersB,b===userIndex?appState.formation:'4-3-3',CLUBS[b].name);
-   userMatch=createLiveEngine(a,b,home,playersA,playersB,xiA,xiB);
+   userMatch=createLiveEngine(a,b,home,playersA,playersB,xiA,xiB,a===userIndex?appState.formation:'4-3-3',b===userIndex?appState.formation:'4-3-3');
    continue;
   }
   const sim=simulateMatch(teamPower(a),teamPower(b),true,playersA,playersB,'4-3-3','4-3-3','Balanced','Balanced');
@@ -524,6 +602,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   <div class="fixture"><div class="team">Ballbesittelse</div><b id="livePossession">50% – 50%</b></div>
   <div class="fixture"><div class="team">Avslutninger</div><b id="liveShots">0 – 0</b></div>
   <div class="fixture"><div class="team">Skudd på mål</div><b id="liveOnTarget">0 – 0</b></div>
+  <div class="match-engine-note">ℹ Ferdigheter, kampform, moral og utholdenhet påvirker prestasjonene.</div>
   <div class="section-title"><h2>Kampens hendelser</h2><small id="liveGoalCount">0 mål</small></div>
   <div id="liveEvents"><div class="muted" style="padding:10px 0">Vi venter på kampens første store øyeblikk …</div></div>
   <div id="liveFinalSection" style="display:none">
@@ -623,6 +702,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    for(const team of appState.table){const oldPos=positionsBefore.get(team.name),newPos=positionsAfter.get(team.name);appState.positionChanges[team.name]=oldPos==null?0:oldPos-newPos;}
    const userIsA=engine.a===appState.club;
    const userGoals=userIsA?ga:gb, opponentGoals=userIsA?gb:ga;
+   const margin=userGoals-opponentGoals;
    const resultText=`Runde ${appState.week}: ${c.name} ${userGoals}–${opponentGoals} ${opp.name} (${home?'hjemme':'borte'}).`;
    appState.log.push(resultText);
    appState.week++;appState.played++;
@@ -632,7 +712,17 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
     if((p.suspended||0)>0)p.suspended=Math.max(0,p.suspended-1);
     const appearance=engine.appearances[String(p.id)];
     const playedMinutes=appearance?Math.max(0,Math.min(90,Math.min(90,currentMinute)-appearance.start,appearance.end-appearance.start)):0;
-    if(playedMinutes>0){p.apps=(p.apps||0)+1;p.minutes=(p.minutes||0)+playedMinutes;p.fitness=Math.max(40,p.fitness-Math.round(playedMinutes/90*4));p.form=Math.max(4,Math.min(10,(p.form||6.5)+(Math.random()*.5-.2)));}
+    if(playedMinutes>0){
+     p.apps=(p.apps||0)+1;p.minutes=(p.minutes||0)+playedMinutes;
+     const matchLoad=playedMinutes/90;
+     const finalStamina=engine.stamina[String(p.id)]??75;
+     p.fitness=Math.max(35,Math.min(100,p.fitness-Math.round(matchLoad*(100-finalStamina)*.16+matchLoad*2)));
+     const perf=engine.performance[String(p.id)];
+     const impact=perf?Math.min(.35,perf.goals*.22+perf.assists*.14+perf.shots*.015):0;
+     const resultMood=margin>0?.18:margin<0?-.20:.02;
+     p.form=Math.max(4,Math.min(10,(p.form||6.5)+resultMood+impact+(Math.random()*.18-.09)));
+     p.morale=Math.max(0,Math.min(100,(p.morale??75)+(margin>0?2:margin<0?-2:0)+(perf&&perf.goals>0?1:0)));
+    }
     if(p.age<=23&&p.rating<p.potential&&Math.random()<.08){p.rating++;appState.log.push(`${p.name} har utviklet seg og økt ferdigheten til ${p.rating}.`)}
    });
    for(const e of engine.events){
@@ -641,7 +731,6 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
     if(own&&e.type==='injury'){const p=appState.squad.find(x=>x.id===e.playerId);if(p)p.injured=1+Math.floor(Math.random()*3)}
     if(own&&e.type==='red'){const p=appState.squad.find(x=>x.id===e.playerId);if(p)p.suspended=1}
    }
-   const margin=userGoals-opponentGoals;
    const lines=margin>0?['Tre poeng!','En sterk lagprestasjon!','Jobben er gjort!']:margin===0?['Delt poeng.','En jevn kamp ender uavgjort.','Ingen klarte å vippe det i sin favør.']:['Tap i dag.','Det glapp på små marginer.','Vi må slå tilbake neste kamp.'];
    headline.textContent=lines[Math.floor(Math.random()*lines.length)];
    commentary.textContent=`Sluttsignal! ${homeName} ${currentHome}–${currentAway} ${awayName}.`;

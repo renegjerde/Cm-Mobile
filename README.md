@@ -1,16 +1,14 @@
-# CM Mobile v1.4 — Live Substitutions
+# CM Mobile v1.5 — Player Impact Match Engine
 
-Denne versjonen bygger videre på v1.3 med innbyttere mens kampen pågår.
+## What's new
+- Player effectiveness now uses rating, current form, morale, pre-match fitness, and live match stamina.
+- Position and formation affect each player's contribution to attack and defence.
+- Match stamina declines minute by minute; high press and attacking mentalities consume more energy.
+- Shots, goals, assists, and disciplinary events are weighted by relevant player attributes.
+- Substitutions refresh the team's effective strength and bring in a player with fresh stamina.
+- End-of-match player fitness, form, and morale reflect minutes played and individual contributions.
 
-## Nytt i v1.4
-- Innbytterpanel i live-kampen.
-- Maks fem bytter fordelt på tre byttevinduer. Flere bytter kan utføres i samme minutt/vindu.
-- Innbyttere oppdaterer lagoppstillingen og beregnet angreps-/forsvarsstyrke for resten av kampen.
-- Byttehendelser vises i kampens hendelseslogg.
-- Spillerens spilte minutter beregnes ut fra når vedkommende går inn eller ut.
-
-## Oppdatering
-Erstatt `index.html` i GitHub-repositoriet med filen i denne mappen og commit endringen til `main`.
-
-## Begrensninger
-Dette er fortsatt en prototypemotor. Bytter er kun tilgjengelige for spillerens klubb, og det er ingen egen spillerinstruksjons-/rolle-editor ennå. Lagre karrieren etter kamp som vanlig.
+## Prototype notes
+- The model is still simplified and requires balance testing over many matches.
+- Player position is used as the available role proxy; more granular roles/instructions can be added later.
+- Opponent squads remain fictional placeholder data.
