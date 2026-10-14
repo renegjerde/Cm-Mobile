@@ -75,6 +75,20 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .table-position .rank-change.down,.rank-movement.down{color:#ff8888}
 .table-position .rank-change.same,.rank-movement.same{color:#8193a8}
 .rank-movement{font-size:11px;font-weight:900;margin-left:5px;white-space:nowrap}
+
+.live-match-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0 4px}
+.live-match-controls button{border:1px solid var(--line);background:#203149;color:var(--text);border-radius:10px;padding:9px 12px;font-weight:800;font-size:13px}
+.live-match-controls button.primary-control{background:var(--green);color:#102016;border-color:var(--green)}
+.live-match-controls button[aria-pressed="true"]{border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}
+.live-match-controls .speed-label{color:var(--muted);font-size:12px;margin-left:auto}
+@keyframes goalFlashHome{0%,100%{box-shadow:inset 0 0 0 0 rgba(0,0,0,0)}15%,55%{box-shadow:inset 0 0 0 999px rgba(190,35,45,.26)}}
+@keyframes goalFlashAway{0%,100%{box-shadow:inset 0 0 0 0 rgba(0,0,0,0)}15%,55%{box-shadow:inset 0 0 0 999px rgba(48,83,170,.30)}}
+.goal-flash-home{animation:goalFlashHome .95s ease-out}
+.goal-flash-away{animation:goalFlashAway .95s ease-out}
+.live-goal-score{animation:scorePop .42s ease-out}
+@keyframes scorePop{0%{transform:scale(1)}45%{transform:scale(1.16);color:var(--green)}100%{transform:scale(1)}}
+.live-paused{color:#ffd27d!important}
+
 </style></head>
 <body>
 <header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.1.1</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
@@ -391,6 +405,13 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   <h1 id="liveHeadline">Avspark!</h1>
   <p id="liveSub">${home?"Hjemmekamp på eget gress":"På bortebane"} · Taktikk: ${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</p>
   <div class="live-progress"><div id="liveProgressFill" class="live-progress-fill"></div></div>
+  <div class="live-match-controls" id="liveMatchControls">
+   <button class="primary-control" id="livePauseBtn" type="button">Ⅱ Pause</button>
+   <button type="button" data-speed="600" aria-pressed="false">1×</button>
+   <button type="button" data-speed="300" aria-pressed="true">2×</button>
+   <button type="button" data-speed="150" aria-pressed="false">4×</button>
+   <span class="speed-label" id="liveSpeedLabel">Tempo · 2×</span>
+  </div>
   <div id="liveCommentary" class="live-commentary">${openerLines[Math.floor(Math.random()*openerLines.length)]}</div>
  </div>
  <section class="card">
@@ -429,11 +450,15 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  possession.textContent=`${statsHome}% – ${statsAway}%`;
  let currentMinute=0, eventIndex=0, visibleGoals=0;
  let currentHome=0,currentAway=0, shotsHome=0,shotsAway=0,onHome=0,onAway=0;
+ let paused=false, matchFinished=false, timer=null, tickMs=300;
  eventContainer.innerHTML="";
  commentary.textContent=openerLines[Math.floor(Math.random()*openerLines.length)];
  headline.textContent="Avspark!";
- // 90 simulated minutes play out over about 16 seconds on mobile.
- const timer=setInterval(()=>{
+ const pauseBtn=document.getElementById("livePauseBtn");
+ const speedLabel=document.getElementById("liveSpeedLabel");
+ const controls=document.getElementById("liveMatchControls");
+ const clockTick=()=>{
+  if(paused||matchFinished)return;
   currentMinute++;
   status.textContent=currentMinute<=45?`LIVE · ${currentMinute}'`:currentMinute<=90?`LIVE · ${currentMinute}'`:`FULL TIME`;
   progress.style.width=Math.min(100,currentMinute/90*100)+"%";
@@ -462,6 +487,13 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
     const scorerName=e.scorer||"Ukjent målscorer";
     headline.innerHTML=`${esc(scorerName)} scorer!<br><span class="headline-team">${esc(teamName)}</span>`;
     score.textContent=`${currentHome} – ${currentAway}`;
+    const matchCard=score.closest(".card");
+    if(matchCard){
+     matchCard.classList.remove("goal-flash-home","goal-flash-away");
+     void matchCard.offsetWidth;
+     matchCard.classList.add((e.side==="user"?(home?"goal-flash-home":"goal-flash-away"):(home?"goal-flash-away":"goal-flash-home")));
+     score.classList.remove("live-goal-score");void score.offsetWidth;score.classList.add("live-goal-score");
+    }
    }
    if(e.type==="chance"&&!e.onTarget){commentary.textContent=matchCommentary(e,c,opp,home);continue}
    const row=document.createElement("div");
@@ -480,8 +512,10 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   if(currentMinute===60)commentary.textContent="Siste halvtimen starter. Slitne bein kan gi nye muligheter.";
   if(currentMinute===75)commentary.textContent="Et kvarter igjen. Nå kan hver eneste situasjon bli avgjørende.";
   if(currentMinute>=90){
+   matchFinished=true;
    clearInterval(timer);
    status.textContent="FULL TIME";
+   controls.style.display="none";
    const goalDifference=our-their;
    const totalGoals=our+their;
    const userPossession=home?statsHome:statsAway;
@@ -515,10 +549,28 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    finalSection.style.display="block";
    const btn=finalSection.querySelector("button");if(btn)btn.scrollIntoView({behavior:"smooth",block:"nearest"});
   }
- },160);
+ };
+ pauseBtn.addEventListener("click",()=>{
+  if(matchFinished)return;
+  paused=!paused;
+  pauseBtn.textContent=paused?"▶ Fortsett":"Ⅱ Pause";
+  pauseBtn.classList.toggle("live-paused",paused);
+  status.textContent=paused?`PAUSE · ${currentMinute}'`:`LIVE · ${currentMinute}'`;
+  if(paused){if(timer)clearInterval(timer);timer=null;}
+  else{timer=setInterval(clockTick,tickMs);}
+ });
+ controls.querySelectorAll("button[data-speed]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+   tickMs=Number(btn.dataset.speed)||300;
+   controls.querySelectorAll("button[data-speed]").forEach(b=>b.setAttribute("aria-pressed",String(b===btn)));
+   speedLabel.textContent=`Tempo · ${{600:"1×",300:"2×",150:"4×"}[tickMs]||"2×"}`;
+   if(!paused&&!matchFinished){if(timer)clearInterval(timer);timer=setInterval(clockTick,tickMs);}
+  });
+ });
+ timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.2 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}
