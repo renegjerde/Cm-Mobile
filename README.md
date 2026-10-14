@@ -1,9 +1,8 @@
-# CM Mobile v1.8 — Matchday layout
+CM Mobile v1.9
 
-- Resultat og kampklokke er løftet opp i kampskjermen.
-- Bytter/taktikk åpner en egen lagoppstillingsvisning med spillernes løpende utholdenhet.
-- Kampen pauses mens lagoppstillingen er åpen, og fortsetter når du lukker visningen.
-- Flere bytter kan utføres i samme stopp; samme minutt teller som ett byttevindu.
-- Hendelseslisten viser mål, kort og skader, mens avslutninger fortsatt telles i statistikken.
+Endringer:
+- Spillere som er byttet ut, kan ikke settes inn igjen i samme kamp.
+- Innbyttere starter med høy kamputholdenhet basert på generell form, ikke med en kunstig lav startverdi.
+- Lagoppstillingen viser både effektiv ferdighet og grunnferdighet i tillegg til utholdenhet.
 
-Prototype. JavaScript-syntaks kontrollert; ikke fulltestet i mobilnettleser.
+Publisering: Erstatt index.html i GitHub Pages-repoet med denne filen.
