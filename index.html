@@ -136,7 +136,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(max-width:380px){.live-score-hero .live-score{font-size:31px}.live-score-hero .score-club{font-size:11px}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.10</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.11</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
@@ -393,7 +393,7 @@ function averageRating(players,filter){const list=players.filter(filter);return 
 function createLiveEngine(a,b,homeUser,playersA,playersB,xiA,xiB,formationA="4-3-3",formationB="4-3-3"){
  const userIsA=a===appState.club;
  const stamina={};
- [...xiA,...xiB].forEach(p=>{stamina[String(p.id)]=clamp(playerFitnessValue(p)*.65+35,55,100)});
+ [...xiA,...xiB].forEach(p=>{stamina[String(p.id)]=clamp(92+(playerFitnessValue(p)-85)*.25,75,100)});
  const engine={
   a,b,homeUser,userIsA,playersA,playersB,xiA,xiB,formationA,formationB,ga:0,gb:0,events:[],
   stats:{shotsA:0,shotsB:0,onA:0,onB:0,possessionA:50},
@@ -790,7 +790,6 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    appState.log.push(resultText);
    appState.week++;appState.played++;
    appState.squad.forEach(p=>{
-    p.fitness=Math.max(45,p.fitness-3-Math.floor(Math.random()*5));
     if((p.injured||0)>0)p.injured=Math.max(0,p.injured-1);
     if((p.suspended||0)>0)p.suspended=Math.max(0,p.suspended-1);
     const appearance=engine.appearances[String(p.id)];
@@ -799,12 +798,16 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
      p.apps=(p.apps||0)+1;p.minutes=(p.minutes||0)+playedMinutes;
      const matchLoad=playedMinutes/90;
      const finalStamina=engine.stamina[String(p.id)]??75;
-     p.fitness=Math.max(35,Math.min(100,p.fitness-Math.round(matchLoad*(100-finalStamina)*.16+matchLoad*2)));
+     const fatigue=Math.max(1,Math.round(matchLoad*(100-finalStamina)*.16+matchLoad*2));
+     p.fitness=Math.max(35,Math.min(100,p.fitness-fatigue));
      const perf=engine.performance[String(p.id)];
      const impact=perf?Math.min(.35,perf.goals*.22+perf.assists*.14+perf.shots*.015):0;
      const resultMood=margin>0?.18:margin<0?-.20:.02;
      p.form=Math.max(4,Math.min(10,(p.form||6.5)+resultMood+impact+(Math.random()*.18-.09)));
      p.morale=Math.max(0,Math.min(100,(p.morale??75)+(margin>0?2:margin<0?-2:0)+(perf&&perf.goals>0?1:0)));
+    }else{
+     // Players who did not feature recover between matches instead of losing fitness.
+     p.fitness=Math.min(100,playerFitnessValue(p)+5);
     }
     if(p.age<=23&&p.rating<p.potential&&Math.random()<.08){p.rating++;appState.log.push(`${p.name} har utviklet seg og økt ferdigheten til ${p.rating}.`)}
    });
@@ -876,7 +879,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.10 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.11 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}
