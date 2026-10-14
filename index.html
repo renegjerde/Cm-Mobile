@@ -9,7 +9,7 @@
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
 button,select{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:9px;padding:10px 12px;background:#20324a;color:var(--text)}button.primary{background:var(--green);border-color:var(--green);color:#102014;font-weight:800}button.ghost{background:transparent}button:disabled{opacity:.45;cursor:not-allowed}
 header{position:sticky;top:0;z-index:5;background:#101b2bf2;backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:env(safe-area-inset-top) 14px 12px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:10px}.brand{font-weight:900;letter-spacing:.12em;font-size:13px}.brand span{color:var(--green)}.season{font-size:11px;color:var(--muted)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}.brand{font-weight:900;letter-spacing:.12em;font-size:13px}.brand span{color:var(--green)} .version-tag{display:inline-block;margin-left:7px;padding:2px 5px;border:1px solid #34475e;border-radius:5px;color:#a9bacd;font-size:9px;font-weight:800;letter-spacing:.04em;vertical-align:2px;background:#172538}.season{font-size:11px;color:var(--muted)}
 main{max-width:760px;margin:auto;padding:14px 12px 92px}.hero{border:1px solid #31465f;background:linear-gradient(135deg,#1d344a,#142236 65%,#1b382c);border-radius:16px;padding:17px;margin-bottom:13px;position:relative;overflow:hidden}.eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);font-weight:800}.hero h1{font-size:25px;line-height:1.1;margin:8px 0}.hero p{color:#c2d0df;margin:0 0 14px;max-width:460px}.hero-actions{display:flex;gap:8px;flex-wrap:wrap}.hero-mark{position:absolute;right:-10px;top:12px;font-size:94px;opacity:.10}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:13px}.stat,.card{border:1px solid var(--line);background:var(--panel);border-radius:13px;padding:13px}.stat small,.muted{color:var(--muted)}.stat strong{display:block;font-size:22px;margin-top:3px}.stat .positive{color:var(--green)}.stat .warning{color:var(--gold)}
 .section-title{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 9px}.section-title h2{font-size:15px;margin:0}.section-title small{color:var(--muted)}
@@ -77,7 +77,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .rank-movement{font-size:11px;font-weight:900;margin-left:5px;white-space:nowrap}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.1.1</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
