@@ -1,9 +1,9 @@
-# CM Mobile v1.11
+# CM Mobile v1.13
 
-## Endurance / fitness corrections
-- Match stamina starts at a realistic level based on pre-match fitness rather than dropping immediately to the minimum for tired career squads.
-- Only players who actually played minutes lose fitness after the match.
-- Players who did not play recover fitness between matches.
-- Version labels updated to v1.11.
+## Match-statistics and substitution UI fixes
+- Match statistics use the same home-away order as the score, including when the user's team plays away.
+- Final statistics enforce the invariant: goals cannot exceed shots on target, and shots on target cannot exceed total shots.
+- The inline substitution curtain lists all available substitutes in the outgoing player's exact position, sorted by rating.
+- Tapping an on-pitch player opens/keeps the substitute curtain directly below that player.
 
-The JavaScript syntax should be checked before publishing. This build has not been fully tested in a mobile browser.
+JavaScript syntax check passed. The full match flow still needs testing in the mobile browser.

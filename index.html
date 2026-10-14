@@ -125,6 +125,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .lineup-player.pick-out{cursor:pointer;border-radius:8px;padding-left:8px;padding-right:8px}
 .lineup-player.pick-out:active,.lineup-player.pick-out.selected-out{background:#20364c;box-shadow:inset 0 0 0 1px #6b8aa7}
 .lineup-player.pick-out .lineup-player-name:after{content:" · velg for bytte";font-size:9px;color:var(--muted);font-weight:500}
+.inline-sub-curtain{grid-column:1/-1;background:#0d1929;border:1px solid #49617a;border-radius:10px;padding:10px;margin:4px 0 8px;box-shadow:0 8px 20px #0003}.inline-sub-curtain strong{display:block;font-size:11px;color:var(--green);margin-bottom:7px}.inline-sub-options{display:flex;flex-direction:column;gap:6px}.inline-sub-option{display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;width:100%;padding:9px 10px;border-radius:8px;background:#22334a;border:1px solid #405670;color:var(--text)}.inline-sub-option small{color:var(--muted)}.inline-sub-option:disabled{opacity:.45}.inline-sub-empty{font-size:11px;color:var(--muted)}
 .lineup-bench-note{font-size:10px;color:var(--muted);margin:4px 0 8px}
 .lineup-player-name{font-weight:800;font-size:13px}
 .fitness-track{height:6px;background:#29394c;border-radius:99px;overflow:hidden;margin-top:6px;max-width:230px}
@@ -136,7 +137,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(max-width:380px){.live-score-hero .live-score{font-size:31px}.live-score-hero .score-club{font-size:11px}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.11</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.13</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
@@ -449,7 +450,9 @@ function renderLiveLineup(engine,minute,scoreText){
    const stamina=Math.round(matchStamina(engine,p));
    const color=stamina<50?'#f08080':stamina<70?'#f3ca72':'var(--green)';
    const selected=String(p.id)===String(selectedOut);
-   return `<div class="lineup-player pick-out ${selected?'selected-out':''}" role="button" tabindex="0" data-player-out="${esc(String(p.id))}" aria-label="Velg ${esc(p.name)} for bytte"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span></div><div class="lineup-player-meta">Ferdighet <strong>${Math.round(effectivePlayerRating(engine,p))}</strong> · Grunnferdighet ${p.rating}</div><div class="fitness-track"><div class="fitness-fill" style="width:${stamina}%;background:${color}"></div></div></div><div class="lineup-player-side"><strong>${Math.round(effectivePlayerRating(engine,p))}</strong><span>${stamina}%</span></div></div>`;
+   const options=selected?bench.filter(b=>b.pos===p.pos).sort((a,b)=>b.rating-a.rating):[];
+   const curtain=selected?`<div class="inline-sub-curtain"><strong>VELG INNBYTTER · ${p.pos}</strong><div class="inline-sub-options">${options.length?options.map(b=>`<button type="button" class="inline-sub-option" data-player-in="${esc(String(b.id))}" data-player-out-target="${esc(String(p.id))}"><span>${esc(b.name)} <small>· ${b.pos}</small></span><span>${Math.round(b.rating)} ferdighet · ${Math.round(playerFitnessValue(b))}% form</span></button>`).join(''):`<div class="inline-sub-empty">Ingen tilgjengelige reserver i samme posisjon.</div>`}</div></div>`:'';
+   return `<div class="lineup-player pick-out ${selected?'selected-out':''}" role="button" tabindex="0" data-player-out="${esc(String(p.id))}" aria-label="Velg ${esc(p.name)} for bytte"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span></div><div class="lineup-player-meta">Ferdighet <strong>${Math.round(effectivePlayerRating(engine,p))}</strong> · Grunnferdighet ${p.rating}</div><div class="fitness-track"><div class="fitness-fill" style="width:${stamina}%;background:${color}"></div></div></div><div class="lineup-player-side"><strong>${Math.round(effectivePlayerRating(engine,p))}</strong><span>${stamina}%</span></div></div>${curtain}`;
   }).join('');
  }).join('');
  const benchMarkup=`<div class="lineup-section-title">INNBYTTERE</div><div class="lineup-bench-note">Reserver vises nederst. Trykk på en spiller på banen for å velge hvem som skal ut.</div>`+(bench.length?bench.map(p=>{
@@ -459,9 +462,14 @@ function renderLiveLineup(engine,minute,scoreText){
  }).join(''):`<div class="muted" style="padding:8px 0">Ingen tilgjengelige reserver.</div>`);
  holder.innerHTML=onPitchMarkup+benchMarkup;
  holder.querySelectorAll('[data-player-out]').forEach(el=>{
-  const choose=()=>{const out=document.getElementById('subOut');if(!out)return;out.value=el.dataset.playerOut;refreshSubOptions(engine);renderLiveLineup(engine,minute,scoreText);const incoming=document.getElementById('subIn');if(incoming&&incoming.options.length)incoming.focus();};
+  const choose=()=>{const out=document.getElementById('subOut');if(!out)return;out.value=el.dataset.playerOut;refreshSubOptions(engine);renderLiveLineup(engine,minute,scoreText);};
   el.addEventListener('click',choose);el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();}});
  });
+ holder.querySelectorAll('[data-player-in]').forEach(el=>el.addEventListener('click',()=>{
+  const out=document.getElementById('subOut'),inc=document.getElementById('subIn');
+  if(out)out.value=el.dataset.playerOutTarget;if(inc)inc.value=el.dataset.playerIn;
+  makeLiveSubstitution(engine,minute);
+ }));
  const score=document.getElementById('lineupScoreText');if(score)score.textContent=scoreText||`${engine.ga} – ${engine.gb}`;
  const clock=document.getElementById('lineupMinuteText');if(clock)clock.textContent=minute>=90?'FULL TIME':`${engine.paused?'PAUSE':'LIVE'} · ${minute}'`;
 }
@@ -551,13 +559,13 @@ function advanceLiveEngine(engine,minute){
   const shooter=weightedPick(attackers,attackers.map(p=>Math.max(1,effectivePlayerRating(engine,p)-42)*roleWeight(p,"attack",formation)));
   const finishing=shooter?effectivePlayerRating(engine,shooter):65;
   const teamAttack=side==="A"?attackA:attackB, opponentDefense=side==="A"?engine.defenseB:engine.defenseA;
-  const quality=clamp(.20+(teamAttack-opponentDefense)*.008+(finishing-65)*.004+Math.random()*.18,.04,.72);
+  const quality=clamp(.14+(teamAttack-opponentDefense)*.005+(finishing-65)*.003+Math.random()*.14,.035,.52);
   const onTarget=Math.random()<clamp(.31+(finishing-60)*.012,.16,.82);
   if(side==="A"){engine.stats.shotsA++;if(onTarget)engine.stats.onA++}else{engine.stats.shotsB++;if(onTarget)engine.stats.onB++}
   const event={minute,side,type:"chance",player:shooter?.name||"Angriper",playerId:shooter?.id||null,onTarget,quality:+quality.toFixed(2)};
   if(shooter&&engine.performance[String(shooter.id)])engine.performance[String(shooter.id)].shots++;
   const keeperSave=clamp(.32+(keeperRating-65)*.012,.08,.72);
-  if(onTarget&&Math.random()<quality*(1-keeperSave)*1.85){
+  if(onTarget&&Math.random()<quality*(1-keeperSave)*1.35){
    const scorer=shooter?{name:shooter.name,id:shooter.id}:scorerFor(xi,side);
    if(side==="A")engine.ga++;else engine.gb++;
    event.type="goal";event.scorer=scorer.name;event.scorerId=scorer.id;event.assist=assistFor(xi,scorer.id,side);event.score=`${engine.ga}–${engine.gb}`;
@@ -647,7 +655,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   "Avspark! Publikum håper på en kamp å huske.",
   "Kampen er i gang. Hvem tar initiativet?"
  ];
- const homeStat=(a,b)=>home?`${a} – ${b}`:`${b} – ${a}`;
+ const homeStat=(a,b)=>`${a} – ${b}`;
  document.getElementById("app").innerHTML=`
  <div class="hero">
   <div class="live-clock"><span class="live-dot"></span><span id="liveStatus">LIVE · 0'</span><span style="margin-left:auto">RUNDE ${appState.week}</span></div>
@@ -688,7 +696,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    <div class="lineup-sticky"><div class="row"><strong>♟ Lagoppstilling</strong><button type="button" id="closeLineupBtn">Lukk ×</button></div><div class="lineup-mini-score"><span id="lineupScoreText">0 – 0</span><small id="lineupMinuteText">LIVE · 0'</small></div><div class="muted" style="font-size:11px">Spillernes utholdenhet oppdateres mens kampen pågår. Du kan gjøre flere bytter i samme stopp.</div></div>
    <div class="lineup-section-title">PÅ BANEN · FERDIGHET / UTHOLDENHET</div><div id="lineupPlayers"></div>
    <div class="lineup-section-title">GJØR BYTTER</div>
-   <div class="sub-grid"><div><label for="subOut">Spiller ut</label><select id="subOut"></select></div><div><label for="subIn">Spiller inn</label><select id="subIn"></select></div></div>
+   <div class="sub-grid" style="display:none" aria-hidden="true"><div><label for="subOut">Spiller ut</label><select id="subOut"></select></div><div><label for="subIn">Spiller inn</label><select id="subIn"></select></div></div>
    <div class="sub-actions"><button type="button" id="makeSubBtn" class="primary-control">Gjennomfør bytte</button><span id="subHint" class="sub-count">5 bytter igjen</span></div>
    <div class="lineup-section-title">MENTALITET</div><div class="field"><label for="liveTacticSelect">KAMPTAKTIKK</label><select id="liveTacticSelect"><option value="Defensive">Defensiv</option><option value="Balanced">Balansert</option><option value="Attacking">Offensiv</option><option value="High press">Høyt press</option></select></div>
    <div class="lineup-footer"><button type="button" id="closeLineupContinue" class="primary">Ferdig – fortsett kampen</button></div>
@@ -821,6 +829,12 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    headline.textContent=lines[Math.floor(Math.random()*lines.length)];
    commentary.textContent=`Sluttsignal! ${homeName} ${currentHome}–${currentAway} ${awayName}.`;
    score.textContent=`${currentHome} – ${currentAway}`;progress.style.width='100%';
+   // Keep final statistics in the same home-away order as the score, and enforce
+   // the match invariant that goals cannot exceed shots on target or total shots.
+   engine.stats.onA=Math.max(engine.stats.onA,engine.ga);
+   engine.stats.onB=Math.max(engine.stats.onB,engine.gb);
+   engine.stats.shotsA=Math.max(engine.stats.shotsA,engine.stats.onA);
+   engine.stats.shotsB=Math.max(engine.stats.shotsB,engine.stats.onB);
    shots.textContent=`${engine.stats.shotsA} – ${engine.stats.shotsB}`;
    onTarget.textContent=`${engine.stats.onA} – ${engine.stats.onB}`;
    possession.textContent=`${Math.round(engine.stats.possessionA)}% – ${100-Math.round(engine.stats.possessionA)}%`;
@@ -879,7 +893,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.11 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.13 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}
