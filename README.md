@@ -1,9 +1,8 @@
-# CM Mobile v1.13
+# CM Mobile v1.14
 
-## Match-statistics and substitution UI fixes
-- Match statistics use the same home-away order as the score, including when the user's team plays away.
-- Final statistics enforce the invariant: goals cannot exceed shots on target, and shots on target cannot exceed total shots.
-- The inline substitution curtain lists all available substitutes in the outgoing player's exact position, sorted by rating.
-- Tapping an on-pitch player opens/keeps the substitute curtain directly below that player.
+- Reserves in the live lineup are sorted by position (GK, DEF, MID, ATT), then rating.
+- Added editable pre-match starting XI on the Tactics tab. Pick each starter from eligible players in the same position.
+- Formation changes reset the lineup to an automatic selection for that formation.
+- Selected starting XI is saved and passed into the live match engine.
 
-JavaScript syntax check passed. The full match flow still needs testing in the mobile browser.
+JavaScript syntax check passed; full gameplay should still be tested in the mobile browser.
