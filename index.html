@@ -107,62 +107,6 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 .match-engine-note{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);margin-top:5px}
 
-
-
-/* Match view redesign: compact, score-first and thumb-friendly */
-.match-card{padding:12px;margin-bottom:12px;overflow:hidden}
-.match-topline{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 0 10px;border-bottom:1px solid var(--line)}
-.match-topline .live-clock{font-size:12px}
-.match-round{font-size:10px;letter-spacing:.1em;color:var(--muted);font-weight:850}
-.match-score-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;padding:14px 0 10px}
-.match-team{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;text-align:center}
-.match-team .crest{width:38px;height:38px;border-radius:10px;font-size:19px}
-.match-team strong{font-size:12px;line-height:1.25;overflow-wrap:anywhere}
-.match-team small{font-size:9px;letter-spacing:.08em;color:var(--muted)}
-.match-team .table-position{margin:0;font-size:9px;gap:3px}
-.match-team .table-position .rank-number{min-width:17px;height:17px}
-.match-score-wrap{display:flex;flex-direction:column;align-items:center;min-width:72px}
-.match-score-wrap .live-score{font-size:36px;line-height:1;font-weight:950;white-space:nowrap}
-.match-vs{font-size:8px;letter-spacing:.09em;color:var(--muted);margin-top:7px;white-space:nowrap}
-.match-card .live-progress{margin:5px 0 11px}
-.match-headline-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px}
-.match-headline-row h1{font-size:19px;line-height:1.15;margin:0}
-.match-headline-row p{font-size:11px;color:var(--muted);margin:4px 0 0}
-.match-card .live-match-controls{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;margin:8px 0 10px}
-.match-card .live-match-controls button{padding:8px 10px;font-size:12px;border-radius:9px;min-width:0}
-.match-card .live-match-controls button.primary-control{flex:1.2}
-.match-card .live-match-controls button[data-speed]{flex:0 0 auto;min-width:40px}
-.match-card .live-match-controls .speed-label{display:none}
-.match-card .live-match-controls select{min-width:0;width:auto;max-width:112px;flex:1;padding:8px 7px;font-size:11px}
-.match-card .sub-panel{margin:0 0 10px;padding:0;background:#132238;border-radius:10px;overflow:hidden}
-.match-card .sub-panel summary,.match-stats-details summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 12px;font-weight:800;font-size:12px;cursor:pointer}
-.match-card .sub-panel summary::-webkit-details-marker,.match-stats-details summary::-webkit-details-marker{display:none}
-.match-card .sub-panel summary::after,.match-stats-details summary::after{content:'＋';color:var(--green);font-size:16px;margin-left:auto}
-.match-card .sub-panel[open] summary::after,.match-stats-details[open] summary::after{content:'−'}
-.match-card .sub-count{font-size:10px;font-weight:600;text-align:right;line-height:1.3}
-.match-card .sub-content{padding:0 12px 12px}
-.match-card .sub-content p{font-size:11px;color:var(--muted);margin:0 0 9px}
-.match-card .sub-grid{gap:7px}
-.match-card .sub-grid label{font-size:10px}
-.match-card .sub-grid select{font-size:11px;padding:9px 7px}
-.match-card .sub-actions{margin-top:8px}
-.match-card .sub-actions button{width:100%;padding:9px}
-.match-card .live-commentary{padding:10px 12px;margin:0 0 10px;min-height:0;font-size:12px;line-height:1.4;border-radius:10px}
-.match-stats-details{border:1px solid var(--line);border-radius:10px;margin:0 0 12px;overflow:hidden}
-.match-stats-details summary{background:#17263a}
-.match-stats-details summary span{font-size:10px;font-weight:600;color:var(--muted);margin-left:auto}
-.match-stats-details .fixture{padding:9px 12px;margin:0 10px}
-.match-stats-details .match-engine-note{margin:8px 12px 11px;font-size:10px}
-.match-events-heading{margin-top:8px}
-.match-card .match-event{grid-template-columns:35px 22px minmax(0,1fr) auto;gap:7px;padding:9px 0}
-.match-card .event-detail strong{font-size:12px}
-.match-card .event-detail small{font-size:10px}
-.match-card .event-min{font-size:11px}
-.match-card .event-symbol{font-size:16px}
-.match-card .fixture:last-child{border-bottom:0}
-@media(min-width:600px){.match-card{padding:18px}.match-team strong{font-size:14px}.match-score-wrap .live-score{font-size:44px}.match-headline-row h1{font-size:22px}.match-card .live-match-controls .speed-label{display:inline;font-size:11px}.match-card .live-match-controls select{max-width:150px}}
-@media(max-width:370px){.match-card .live-match-controls{gap:4px}.match-card .live-match-controls button{padding:8px 7px}.match-card .live-match-controls button[data-speed]{min-width:34px}.match-card .live-match-controls select{max-width:96px}.match-team .table-position span:nth-child(2){display:none}.match-score-wrap{min-width:60px}.match-score-wrap .live-score{font-size:31px}}
-
 </style></head>
 <body>
 <header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.4</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
@@ -629,51 +573,37 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  ];
  const homeStat=(a,b)=>home?`${a} – ${b}`:`${b} – ${a}`;
  document.getElementById("app").innerHTML=`
- <section class="card match-card">
-  <div class="match-topline">
-   <div class="live-clock"><span class="live-dot"></span><span id="liveStatus">LIVE · 0'</span></div>
-   <span class="match-round">RUNDE ${appState.week}</span>
-  </div>
-  <div class="match-score-row">
-   <div class="match-team ${homeName===c.name?'is-user':''}">
-    <div class="crest">${homeCrest}</div><strong>${homeName}</strong>
-    ${rankLabel(homePosition,homeName===c.name,positionChanges[homeName]||0)}
-    <small>HJEMME</small>
-   </div>
-   <div class="match-score-wrap"><div id="liveScore" class="live-score">0–0</div><span class="match-vs">KAMPSTILLING</span></div>
-   <div class="match-team ${awayName===c.name?'is-user':''}">
-    <div class="crest">${awayCrest}</div><strong>${awayName}</strong>
-    ${rankLabel(awayPosition,awayName===c.name,positionChanges[awayName]||0)}
-    <small>BORTE</small>
-   </div>
-  </div>
+ <div class="hero">
+  <div class="live-clock"><span class="live-dot"></span><span id="liveStatus">LIVE · 0'</span><span style="margin-left:auto">RUNDE ${appState.week}</span></div>
+  <h1 id="liveHeadline">Avspark!</h1>
+  <p id="liveSub">${home?"Hjemmekamp på eget gress":"På bortebane"} · Taktikk: ${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</p>
   <div class="live-progress"><div id="liveProgressFill" class="live-progress-fill"></div></div>
-  <div class="match-headline-row"><div><h1 id="liveHeadline">Avspark!</h1><p id="liveSub">${home?"Hjemmekamp":"Bortekamp"} · ${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</p></div></div>
   <div class="live-match-controls" id="liveMatchControls">
    <button class="primary-control" id="livePauseBtn" type="button">Ⅱ Pause</button>
    <button type="button" data-speed="600" aria-pressed="false">1×</button>
    <button type="button" data-speed="300" aria-pressed="true">2×</button>
    <button type="button" data-speed="150" aria-pressed="false">4×</button>
-   <span class="speed-label" id="liveSpeedLabel">Tempo · 2×</span>
-   <select id="liveTacticSelect" aria-label="Taktikk"><option value="Defensive">Defensiv</option><option value="Balanced">Balansert</option><option value="Attacking">Offensiv</option><option value="High press">Høyt press</option></select>
+   <span class="speed-label" id="liveSpeedLabel">Tempo · 2×</span><label class="tactic-label" for="liveTacticSelect">Taktikk</label><select id="liveTacticSelect"><option value="Defensive">Defensiv</option><option value="Balanced">Balansert</option><option value="Attacking">Offensiv</option><option value="High press">Høyt press</option></select>
   </div>
-  <details class="sub-panel" id="subPanel">
-   <summary><span>🔁 Bytter og innbyttere</span><span id="subHint" class="sub-count">5 bytter igjen · 3 byttevinduer igjen</span></summary>
-   <div class="sub-content">
-    <p>Gjør endringer mens kampen pågår. Maks fem bytter fordelt på tre byttevinduer.</p>
-    <div class="sub-grid"><div><label for="subOut">Spiller ut</label><select id="subOut"></select></div><div><label for="subIn">Spiller inn</label><select id="subIn"></select></div></div>
-    <div class="sub-actions"><button type="button" id="makeSubBtn" class="primary-control">Gjennomfør bytte</button></div>
-   </div>
-  </details>
+  <div class="sub-panel" id="subPanel">
+   <h3>🔁 Innbyttere</h3>
+   <p>Gjør endringer mens kampen pågår. Maks fem bytter fordelt på tre byttevinduer.</p>
+   <div class="sub-grid"><div><label for="subOut">Spiller ut</label><select id="subOut"></select></div><div><label for="subIn">Spiller inn</label><select id="subIn"></select></div></div>
+   <div class="sub-actions"><button type="button" id="makeSubBtn" class="primary-control">Gjennomfør bytte</button><span id="subHint" class="sub-count">5 bytter igjen</span></div>
+  </div>
   <div id="liveCommentary" class="live-commentary">${openerLines[Math.floor(Math.random()*openerLines.length)]}</div>
-  <details class="match-stats-details">
-   <summary>📊 Kampstatistikk <span>Live</span></summary>
-   <div class="fixture"><div class="team">Ballbesittelse</div><b id="livePossession">50% – 50%</b></div>
-   <div class="fixture"><div class="team">Avslutninger</div><b id="liveShots">0 – 0</b></div>
-   <div class="fixture"><div class="team">Skudd på mål</div><b id="liveOnTarget">0 – 0</b></div>
-   <div class="match-engine-note">ℹ Ferdigheter, kampform, moral og utholdenhet påvirker prestasjonene.</div>
-  </details>
-  <div class="section-title match-events-heading"><h2>Kampens hendelser</h2><small id="liveGoalCount">0 mål</small></div>
+ </div>
+ <section class="card">
+  <div class="row" style="padding:10px 0 18px;align-items:center">
+   <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${homeCrest}</div><div style="margin-top:8px;font-weight:800">${homeName}</div>${rankLabel(homePosition,homeName===c.name,positionChanges[homeName]||0)}<small style="color:var(--muted);display:block;margin-top:2px">HJEMME</small></div>
+   <div id="liveScore" class="live-score">0 – 0</div>
+   <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${awayCrest}</div><div style="margin-top:8px;font-weight:800">${awayName}</div>${rankLabel(awayPosition,awayName===c.name,positionChanges[awayName]||0)}<small style="color:var(--muted);display:block;margin-top:2px">BORTE</small></div>
+  </div>
+  <div class="fixture"><div class="team">Ballbesittelse</div><b id="livePossession">50% – 50%</b></div>
+  <div class="fixture"><div class="team">Avslutninger</div><b id="liveShots">0 – 0</b></div>
+  <div class="fixture"><div class="team">Skudd på mål</div><b id="liveOnTarget">0 – 0</b></div>
+  <div class="match-engine-note">ℹ Ferdigheter, kampform, moral og utholdenhet påvirker prestasjonene.</div>
+  <div class="section-title"><h2>Kampens hendelser</h2><small id="liveGoalCount">0 mål</small></div>
   <div id="liveEvents"><div class="muted" style="padding:10px 0">Vi venter på kampens første store øyeblikk …</div></div>
   <div id="liveFinalSection" style="display:none">
    <div class="section-title"><h2>Andre resultater</h2><small>Runde ${appState.week}</small></div>
@@ -741,8 +671,8 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
     const matchCard=score.closest('.card');
     if(matchCard){matchCard.classList.remove('goal-flash-home','goal-flash-away');void matchCard.offsetWidth;matchCard.classList.add(homeScorer?'goal-flash-home':'goal-flash-away');score.classList.remove('live-goal-score');void score.offsetWidth;score.classList.add('live-goal-score')}
    }
-   // Only notable attempts are listed; misses still affect the live shot counter.
-   if(e.type==='chance'&&!e.onTarget){commentary.textContent=matchCommentary(displayEvent,c,opp,home);continue}
+   // Shots remain in match statistics, but the event feed only shows goals, cards and injuries.
+   if(e.type==='chance'){commentary.textContent=matchCommentary(displayEvent,c,opp,home);continue}
    const row=document.createElement('div');row.className='match-event live-event-new';
    row.innerHTML=`<div class="event-min">${e.minute}'</div><div class="event-symbol">${icon}</div><div class="event-detail"><strong>${title}</strong><small>${sub} · ${esc(teamName)}</small></div>${e.type==='goal'?`<div class="event-score">${e.score||''}</div>`:''}`;
    eventContainer.appendChild(row);
