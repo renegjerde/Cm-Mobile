@@ -20,7 +20,6 @@ main{max-width:760px;margin:auto;padding:14px 12px 92px}.hero{border:1px solid #
 .player{display:grid;grid-template-columns:1fr auto;gap:8px;padding:11px 0;border-bottom:1px solid #26364a}.player:last-child{border-bottom:0}.player-name{font-weight:750}.player-meta{font-size:11px;color:var(--muted);margin-top:3px}.rating{font-weight:900;color:var(--green);font-size:16px}.attrs{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}.attr{font-size:10px;background:#1e3045;padding:3px 6px;border-radius:5px;color:#bfd0e1}
 select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding:10px;border-radius:9px;max-width:100%}.field{display:flex;flex-direction:column;gap:6px;margin:10px 0}.field label{font-size:11px;color:var(--muted)}.field select{width:100%}
 .fixture{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 0;border-bottom:1px solid #26364a}.fixture:last-child{border-bottom:0}.fixture .team{flex:1}.fixture .team:last-child{text-align:right}.score{font-weight:900;font-size:17px;min-width:58px;text-align:center}.result{font-size:10px;color:var(--muted);display:block}
-.other-match{display:block;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid #26364a;border-radius:0;padding:0;color:inherit}.other-match:active{background:#1a2b40}.other-match-detail{padding:8px 10px 12px;margin:0 0 8px;background:#0e1928;border:1px solid #2c4056;border-radius:0 0 10px 10px;font-size:12px}.other-match-event{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #26364a}.other-match-event:last-child{border-bottom:0}.injury-cross{display:inline-flex;width:17px;height:17px;align-items:center;justify-content:center;background:#f04444;color:#fff;font-size:15px;font-weight:900;line-height:1;border-radius:3px;flex:0 0 17px}.event-minute{color:var(--muted);font-variant-numeric:tabular-nums;min-width:27px}.other-match-hint{font-size:10px;color:var(--muted);text-align:center;margin-top:4px}
 .notice{border:1px solid #574c31;background:#30291b;color:#f3d99b;border-radius:10px;padding:10px 12px;font-size:12px;margin:12px 0}
 .empty{padding:24px;text-align:center;color:var(--muted)}.footer-note{text-align:center;color:#72869c;font-size:10px;margin:22px 0}
 @media(min-width:600px){main{padding:20px 18px 95px}.hero{padding:23px}.hero h1{font-size:31px}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -170,7 +169,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.30</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.29</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
@@ -715,10 +714,9 @@ function simulateMatch(powerA,powerB,homeA,playersA=[],playersB=[],formationA="4
    }
    chanceList.push(event);
   }
-  const incident=(type,prob,reason)=>{if(Math.random()>=prob)return;const side=Math.random()<.5?"A":"B",xi=side==="A"?xiA:xiB;const candidates=xi.filter(p=>p.pos!=="GK");const player=weightedPick(candidates,candidates.map(p=>Math.max(1,(p.attributes?.defending||p.rating||60)-35)));events.push({minute:m,side,type,player:player?.name||"Spiller",playerId:player?.id??null,reason});};
-  incident("yellow",.006,"Gult kort");
-  incident("red",.0015,"Rødt kort");
-  incident("injury",.0018,"Skade");
+  if(Math.random()<.006)events.push({minute:m,side:Math.random()<.5?"A":"B",type:"yellow",reason:"Forseelse"});
+  if(Math.random()<.0015)events.push({minute:m,side:Math.random()<.5?"A":"B",type:"red",reason:"Alvorlig forseelse"});
+  if(Math.random()<.0018)events.push({minute:m,side:Math.random()<.5?"A":"B",type:"injury",reason:"Skade"});
  }
  events.push(...chanceList.filter(e=>e.type==="goal"));
  stats.possessionA=Math.max(30,Math.min(70,Math.round(50+(attackA-attackB)*.6+(homeA?3:-3))));
@@ -1133,7 +1131,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   <div id="liveEvents"><div class="muted" style="padding:10px 0">Vi venter på kampens første store øyeblikk …</div></div>
   <div id="liveFinalSection" style="display:none">
    <div class="section-title"><h2>Andre resultater</h2><small>Runde ${appState.week}</small></div>
-   ${roundResults.filter(r=>r.a!==appState.club&&r.b!==appState.club).map((r,i)=>{const nameA=CLUBS[r.a].name,nameB=CLUBS[r.b].name;const events=(r.events||[]).filter(e=>["goal","yellow","red","injury"].includes(e.type)).sort((x,y)=>(x.minute||0)-(y.minute||0));const detail=events.length?events.map(e=>{const icon=e.type==="goal"?"⚽":e.type==="yellow"?'<span class="card-yellow"></span>':e.type==="red"?'<span class="card-red"></span>':'<span class="injury-cross" aria-label="Skade">✚</span>';let desc=e.type==="goal"?`<strong>${esc(e.scorer||e.player||"Mål")}</strong>${e.assist?` <span class="muted">(assist: ${esc(e.assist)})</span>`:""}`:e.type==="yellow"?`Gult kort · ${esc(e.player||"Ukjent spiller")}`:e.type==="red"?`Rødt kort · ${esc(e.player||"Ukjent spiller")}`:`Skade · ${esc(e.player||"Ukjent spiller")}`;return `<div class="other-match-event"><span class="event-minute">${Number(e.minute)||"–"}'</span><span style="min-width:17px;display:inline-flex;justify-content:center">${icon}</span><span>${desc}</span></div>`}).join(""):`<div class="muted">Ingen mål, kort eller skader registrert i simuleringen.</div>`;return `<button type="button" class="other-match" onclick="const d=this.nextElementSibling;d.hidden=!d.hidden;this.setAttribute('aria-expanded',String(!d.hidden))" aria-expanded="false"><div class="fixture"><div class="team"><div class="result-team-wrap"><span>${esc(nameA)}</span>${rankLabel(positions.get(nameA)||"–",nameA===c.name,positionChanges[nameA]||0)}</div></div><div class="score">${r.ga}–${r.gb}</div><div class="team" style="text-align:right"><div class="result-team-wrap right"><span>${esc(nameB)}</span>${rankLabel(positions.get(nameB)||"–",nameB===c.name,positionChanges[nameB]||0)}</div></div></div><div class="other-match-hint">Trykk for mål, kort og skader ▾</div></button><div class="other-match-detail" hidden>${detail}</div>`}).join("")}
+   ${roundResults.filter(r=>r.a!==appState.club&&r.b!==appState.club).map(r=>{const nameA=CLUBS[r.a].name,nameB=CLUBS[r.b].name;return `<div class="fixture"><div class="team"><div class="result-team-wrap"><span>${esc(nameA)}</span>${rankLabel(positions.get(nameA)||"–",nameA===c.name,positionChanges[nameA]||0)}</div></div><div class="score">${r.ga}–${r.gb}</div><div class="team" style="text-align:right"><div class="result-team-wrap right"><span>${esc(nameB)}</span>${rankLabel(positions.get(nameB)||"–",nameB===c.name,positionChanges[nameB]||0)}</div></div></div>`}).join("")}
    <p class="muted" style="margin-top:15px">${esc(text)}</p>
    <button class="primary" style="width:100%" onclick="setPage('${seasonCompleted()?"season":"home"}')">${seasonCompleted()?"Se sesongoppsummering →":"Fortsett →"}</button>
   </div>
@@ -1198,7 +1196,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    const teamName=isUser?c.name:opp.name;
    const displayEvent={...e,side:displaySide};
    allEvents.push(displayEvent);
-   let icon=e.type==='goal'?'⚽':e.type==='yellow'?'<span class="card-yellow"></span>':e.type==='red'?'<span class="card-red"></span>':e.type==='injury'?'<span class=\"injury-cross\" aria-label=\"Skade\">✚</span>':'🎯';
+   let icon=e.type==='goal'?'⚽':e.type==='yellow'?'<span class="card-yellow"></span>':e.type==='red'?'<span class="card-red"></span>':e.type==='injury'?'🩹':'🎯';
    let title=e.type==='goal'?esc(e.scorer):esc(e.player||(e.type==='chance'?'Avslutning':'Spiller'));
    let sub=e.type==='goal'?(e.assist?'Mål · Assist: '+esc(e.assist):'Mål'):e.type==='yellow'?'Gult kort · '+esc(e.reason||'Forseelse'):e.type==='red'?'Rødt kort · '+esc(e.reason||'Utvist'):e.type==='injury'?'Skade':e.type==='chance'?(e.onTarget?'Skudd på mål':'Avslutning utenfor mål'):'Hendelse';
    if(e.type==='goal'){
@@ -1364,7 +1362,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.30 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.29 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}
