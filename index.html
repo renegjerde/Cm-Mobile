@@ -170,7 +170,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.34</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.35</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
@@ -574,6 +574,7 @@ function tactics(){
  const xi=currentStartingXI();
  const gk=xi.filter(p=>p.assignedRole==='GK');
  const roleLabels={GK:"Keeper",LB:"Venstreback",LCB:"Venstre midtstopper",CB:"Midtstopper",RCB:"Høyre midtstopper",RB:"Høyreback",LWB:"Venstre vingback",RWB:"Høyre vingback",DM:"Defensiv midtbane",CM:"Sentral midtbane",LM:"Venstre midtbane",RM:"Høyre midtbane",LW:"Venstre ving",AM:"Offensiv midtbane",RW:"Høyre ving",ST:"Spiss"};
+ const posLabels={GK:"Keepere",DEF:"Forsvar",MID:"Midtbane",ATT:"Angrep"};
  const slotControls=(players)=>players.map(p=>{const slot=xi.findIndex(x=>String(x.id)===String(p.id));const targetRole=p.assignedRole||'CM';const pool=eligibleSquad(appState.squad).filter(x=>canPlay(x)&&(targetRole==='GK'?x.pos==='GK':x.pos!=='GK')).sort((a,b)=>roleCandidateScore(b,targetRole)-roleCandidateScore(a,targetRole));return `<div class="field" style="margin:6px 0"><label>${roleLabels[targetRole]||targetRole}</label><select aria-label="Velg spiller til ${esc((roleLabels[targetRole]||targetRole).toLowerCase())}" onchange="setStartingPlayer(${slot},this.value)">${pool.map(x=>`<option value="${esc(String(x.id))}" ${String(x.id)===String(p.id)?"selected":""}>${esc(x.name)} · ${x.rating} · ${ROLE_BY_SIDE[x.role]||x.role||x.pos} · ${positionAdjustedRating(x,targetRole)} i rolle</option>`).join("")}</select>${playerDetail(p)}<div style="margin-top:6px;font-size:12px;color:${canPlay(p)?'var(--muted)':'var(--red)'}">${availabilityStatus(p)} · Naturlig tilpasning: ${Math.max(30,100-rolePenalty(p,targetRole)*5)}%</div></div>`}).join('');
  const roleOrder={
   '4-2-3-1':[['ST'],['LW','AM','RW'],['DM','DM'],['LB','LCB','RCB','RB']],
@@ -1384,7 +1385,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.34 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.35 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}

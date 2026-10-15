@@ -1,11 +1,13 @@
-# CM Mobile v1.34 – Role-based XI selection
+# CM Mobile v1.35
 
-Denne versjonen retter laguttak og taktikk slik at elleveren velges etter formasjonens elleve faste roller. 4-2-3-1 får alltid keeper, fire forsvarere, to defensive/sentrale midtbaneroller, venstreving, offensiv midtbane, høyreving og spiss. Spillere velges fra hele den tilgjengelige troppen etter posisjonstilpasning, relevante attributter, rating, form og fysisk form.
+## Rettelse
+- Rettet feil i taktikkvisningen som gjorde at «Sett opp laget» ikke åpnet laguttaket.
+- Årsak: `posLabels` ble brukt til å gruppere reserver, men var ikke definert. Dette utløste en JavaScript-feil ved rendering av taktikk-siden.
+- Definert posisjonsgruppene for keepere, forsvar, midtbane og angrep.
 
-Spillerbytte i laguttaket er nå knyttet til en konkret taktisk rolle; listen viser også spillerens naturlige rolle og beregnet rating i den valgte rollen. Motstandernes laguttak bruker samme rollebaserte algoritme. Eldre lagrede ellevere bygges om én gang ved oppgradering, mens øvrige karrieredata bevares.
+## Test
+- JavaScript-syntaks kontrollert med `node --check`.
+- Testet i Chromium med mobil viewport: «Sett opp laget» åpner nå «Laguttak og taktikk» og viser 11/11 valgt og 14 reserver.
 
-## Oppdatering
-Erstatt `index.html` i GitHub Pages-repoets `main`-rot med filen fra denne pakken.
-
-## Teststatus
-JavaScript-syntaks er kontrollert. Dette er ikke en full ende-til-ende-test i mobilnettleser.
+## Publisering
+Pakk ut ZIP-en og bruk `CM_Mobile_v1.35/index.html` til å erstatte rotfilen `index.html` i GitHub-repoet som publiseres fra `main`-branchens rot.
