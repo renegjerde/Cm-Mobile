@@ -1,13 +1,13 @@
-# CM Mobile v1.35
+# CM Mobile v1.36
 
-## Rettelse
-- Rettet feil i taktikkvisningen som gjorde at «Sett opp laget» ikke åpnet laguttaket.
-- Årsak: `posLabels` ble brukt til å gruppere reserver, men var ikke definert. Dette utløste en JavaScript-feil ved rendering av taktikk-siden.
-- Definert posisjonsgruppene for keepere, forsvar, midtbane og angrep.
+## Endringer
+- Kampdetaljer for de øvrige kampene viser nå hvilket lag hver målscorer, assistent, kortmottaker eller skadet spiller tilhører.
+- Lagtilhørighet vises som en tydelig etikett på hver hendelse, basert på hjemme-/bortelagets side i kampdataene.
+- Beholder den utvidbare kampoversikten og eksisterende hendelsesdetaljer.
 
-## Test
+## Kontroll
 - JavaScript-syntaks kontrollert med `node --check`.
-- Testet i Chromium med mobil viewport: «Sett opp laget» åpner nå «Laguttak og taktikk» og viser 11/11 valgt og 14 reserver.
+- Ingen full mobilnettlesertest gjennomført i denne leveransen.
 
 ## Publisering
-Pakk ut ZIP-en og bruk `CM_Mobile_v1.35/index.html` til å erstatte rotfilen `index.html` i GitHub-repoet som publiseres fra `main`-branchens rot.
+Pakk ut ZIP-en og bruk `CM_Mobile_v1.36/index.html` til å erstatte rotfilen `index.html` i GitHub-repoet som publiseres fra `main`-branchens rot.
