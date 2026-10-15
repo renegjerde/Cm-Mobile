@@ -1,14 +1,9 @@
-# CM Mobile v1.29 — Natural Positions & Positional Fit
+# CM Mobile v1.31
 
-## Changes
-- Added natural-position lists for players, including secondary positions for selected real players.
-- Tactical roles are assigned according to the selected formation (4-2-3-1, 4-3-3, 4-4-2, 3-5-2).
-- Players receive a position-fit penalty in effective match rating when used outside their natural role; related roles incur a smaller penalty than unfamiliar roles.
-- Assistant/player selection scoring considers positional suitability.
-- Squad player detail view displays natural positions.
-- Opposition lineups use the same role-assignment and positional-fit mechanism for the user’s featured match.
+## Fixed formation roles and pitch layout
+- Formation slots are explicitly defined for 4-2-3-1, 4-3-3, 4-4-2 and 3-5-2.
+- Tactical roles are assigned against each player's natural-position suitability, rather than by the broad roster group alone.
+- Pitch layout is rendered from the assigned tactical roles, so the role label and location agree.
+- Displayed rating on the pitch is adjusted for positional suitability.
 
-## Notes
-- Many secondary positions are football-model estimates and should be refined during database QA.
-- JavaScript syntax was checked with Node.js. This is not a full browser/mobile integration test.
-- This is a single-file HTML app; replace the existing `index.html` on GitHub Pages.
+JavaScript syntax checked with Node.js. Full mobile-browser gameplay testing has not been performed.
