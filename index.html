@@ -170,7 +170,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.31</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.32</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
@@ -260,16 +260,22 @@ function assignTacticalRoles(xi,formation){
   '4-4-2':['GK','LB','LCB','RCB','RB','LM','CM','CM','RM','ST','ST'],
   '3-5-2':['GK','LCB','CB','RCB','LWB','DM','CM','CM','RWB','ST','ST']
  };
+ // Strict position families: a defender can never be assigned an attacking role.
+ const eligibleFamily={
+  GK:['GK'],
+  DEF:['LB','LCB','CB','RCB','RB','LWB','RWB'],
+  MID:['DM','CM','LM','RM','AM'],
+  ATT:['LW','RW','ST']
+ };
  const slots=roleSlots[formation]||roleSlots['4-3-3'];
  xi.forEach(p=>{p.assignedRole=null;});
  const remaining=new Set(xi.map(p=>String(p.id)));
- // Assign keeper first, then repeatedly choose the player best suited to each fixed tactical slot.
+ // Fill each tactical slot only from its valid position family. Never force an out-of-position fallback.
  for(const target of slots){
   let best=null,bestScore=Infinity;
   for(const p of xi){
    if(!remaining.has(String(p.id)))continue;
-   if(target==='GK'&&p.pos!=='GK')continue;
-   if(target!=='GK'&&p.pos==='GK')continue;
+   if(!(eligibleFamily[p.pos]||[]).includes(target))continue;
    const penalty=rolePenalty(p,target);
    const score=penalty*10-Number(p.rating||50)*0.03;
    if(score<bestScore){best=p;bestScore=score;}
@@ -1384,7 +1390,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.31 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.32 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}
