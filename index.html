@@ -39,7 +39,6 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 .match-event{display:grid;grid-template-columns:42px 26px 1fr auto;align-items:start;gap:8px;padding:10px 0;border-bottom:1px solid #26364a}
 .match-event:last-child{border-bottom:0}
-.event-team-badge{display:inline-block;font-size:9px;font-weight:900;letter-spacing:.05em;padding:2px 5px;border-radius:4px;margin-right:3px;vertical-align:1px}.event-team-home{background:#244a39;color:#a8e8c4;border:1px solid #347451}.event-team-away{background:#3b304a;color:#d8b9ff;border:1px solid #685184}
 .event-min{font-variant-numeric:tabular-nums;font-weight:800;color:var(--muted)}
 .event-symbol{font-size:18px;text-align:center;line-height:1.25}
 .event-detail{min-width:0}
@@ -171,7 +170,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.33</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.34</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
@@ -254,38 +253,50 @@ function rolePenalty(p,targetRole){
  return 15;
 }
 function positionAdjustedRating(p,targetRole){return Math.max(30,Number(p.rating||60)-rolePenalty(p,targetRole));}
-function assignTacticalRoles(xi,formation){
- const roleSlots={
+function roleSlotsForFormation(formation){
+ const slots={
   '4-2-3-1':['GK','LB','LCB','RCB','RB','DM','DM','LW','AM','RW','ST'],
   '4-3-3':['GK','LB','LCB','RCB','RB','DM','CM','CM','LW','ST','RW'],
   '4-4-2':['GK','LB','LCB','RCB','RB','LM','CM','CM','RM','ST','ST'],
   '3-5-2':['GK','LCB','CB','RCB','LWB','DM','CM','CM','RWB','ST','ST']
  };
- // Strict position families: a defender can never be assigned an attacking role.
- const eligibleFamily={
-  GK:['GK'],
-  DEF:['LB','LCB','CB','RCB','RB','LWB','RWB'],
-  MID:['DM','CM','LM','RM','AM'],
-  ATT:['LW','RW','ST']
- };
- const slots=roleSlots[formation]||roleSlots['4-3-3'];
- xi.forEach(p=>{p.assignedRole=null;});
- const remaining=new Set(xi.map(p=>String(p.id)));
- // Fill each tactical slot only from its valid position family. Never force an out-of-position fallback.
- for(const target of slots){
-  let best=null,bestScore=Infinity;
-  for(const p of xi){
-   if(!remaining.has(String(p.id)))continue;
-   if(!(eligibleFamily[p.pos]||[]).includes(target))continue;
-   const penalty=rolePenalty(p,target);
-   const score=penalty*10-Number(p.rating||50)*0.03;
-   if(score<bestScore){best=p;bestScore=score;}
-  }
-  if(best){best.assignedRole=target;remaining.delete(String(best.id));}
- }
+ return slots[formation]||slots['4-3-3'];
+}
+function roleSkillScore(p,targetRole){
+ const a=p.attributes||{};
+ if(targetRole==='GK')return (a.handling||50)*.34+(a.reflexes||50)*.36+(a.positioning||50)*.30;
+ if(['LB','RB','LWB','RWB'].includes(targetRole))return (a.defending||50)*.30+(a.pace||50)*.24+(a.stamina||50)*.20+(a.passing||50)*.14+(a.strength||50)*.12;
+ if(['LCB','RCB','CB'].includes(targetRole))return (a.defending||50)*.38+(a.strength||50)*.24+(a.positioning||50)*.16+(a.passing||50)*.12+(a.pace||50)*.10;
+ if(targetRole==='DM')return (a.defending||50)*.24+(a.passing||50)*.24+(a.stamina||50)*.20+(a.strength||50)*.12+(a.technique||50)*.10+(a.creativity||50)*.10;
+ if(['CM','LM','RM'].includes(targetRole))return (a.passing||50)*.23+(a.technique||50)*.18+(a.creativity||50)*.18+(a.stamina||50)*.17+(a.pace||50)*.12+(a.defending||50)*.12;
+ if(targetRole==='AM')return (a.creativity||50)*.27+(a.passing||50)*.22+(a.technique||50)*.20+(a.finishing||50)*.16+(a.pace||50)*.15;
+ if(['LW','RW'].includes(targetRole))return (a.pace||50)*.24+(a.technique||50)*.22+(a.creativity||50)*.17+(a.finishing||50)*.18+(a.passing||50)*.10+(a.stamina||50)*.09;
+ if(targetRole==='ST')return (a.finishing||50)*.34+(a.pace||50)*.18+(a.strength||50)*.16+(a.technique||50)*.14+(a.positioning||p.rating||50)*.18;
+ return Number(p.rating||50);
+}
+function roleCandidateScore(p,targetRole){
+ const penalty=rolePenalty(p,targetRole);
+ // Positional fit is deliberately weighted much more heavily than a small rating advantage.
+ return positionAdjustedRating(p,targetRole)*.46+roleSkillScore(p,targetRole)*.34+Number(p.fitness??80)*.10+Number(p.morale??70)*.04+(Number(p.form??6.5)-6.5)*1.2-penalty*1.8;
+}
+function assignTacticalRoles(xi,formation){
+ const slots=roleSlotsForFormation(formation);
+ xi.forEach((p,i)=>{p.assignedRole=slots[i]||p.role||defaultRoleFor(p.name,p.pos,i);});
  return xi;
 }
-
+function buildRoleBasedXI(players,formation){
+ const available=eligibleSquad(players).slice();
+ const chosen=[];
+ for(const targetRole of roleSlotsForFormation(formation)){
+  let pool=available.filter(p=>!chosen.some(q=>String(q.id)===String(p.id)));
+  if(targetRole==='GK')pool=pool.filter(p=>p.pos==='GK');
+  else pool=pool.filter(p=>p.pos!=='GK');
+  if(!pool.length)continue;
+  pool.sort((a,b)=>roleCandidateScore(b,targetRole)-roleCandidateScore(a,targetRole));
+  const best=pool[0];best.assignedRole=targetRole;chosen.push(best);
+ }
+ return assignTacticalRoles(chosen,formation);
+}
 
 function stableSeed(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 function seededRandom(seed){let x=seed>>>0;return ()=>{x+=0x6D2B79F5;let t=x;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296}}
@@ -293,7 +304,7 @@ function defaultRoleFor(name,pos,slot){if(pos==='GK')return 'GK';if(pos==='ATT')
 function makeRealPlayer(name,pos,clubIndex,slot){const club=CLUBS[clubIndex],known=KNOWN_PLAYER_DATA[name]||{},rng=seededRandom(stableSeed(name+'|'+club.short));const dob=PLAYER_DOBS[name]||null;const age=ageAtSeasonStart(dob)??known.age??(18+(stableSeed('age|'+name)%17));const role=PLAYER_ROLES[name]||defaultRoleFor(name,pos,slot);const roleOffset=pos==='GK'?1:pos==='DEF'?0:pos==='MID'?1:2;let rating=known.rating||Math.max(54,Math.min(90,Math.round(club.strength-5+roleOffset+(rng()*13-6))));if(name==='Senne Lammens')rating=82;if(name==='Karl Darlow')rating=73;if(name==='Tom Heaton')rating=66;const potential=known.potential||Math.max(rating,Math.min(96,Math.round(rating+(age<=21?8:age<=24?5:age<=27?2:0)+(rng()*7-2))));const attrR=(base,spread,key)=>Math.max(25,Math.min(99,Math.round(base+(rng()*spread*2-spread))));let attributes={pace:attrR(rating,9,'pace'),stamina:attrR(rating,8,'stamina'),strength:attrR(rating,8,'strength'),technique:attrR(rating,8,'technique'),creativity:attrR(rating,10,'creativity'),finishing:attrR(rating-9,11,'finishing'),defending:attrR(rating-7,11,'defending'),passing:attrR(rating,8,'passing'),handling:attrR(28,4,'handling'),reflexes:attrR(28,4,'reflexes'),positioning:attrR(rating,8,'positioning')};if(pos==='GK'){attributes={...attributes,handling:attrR(rating,7,'handling'),reflexes:attrR(rating+1,7,'reflexes'),positioning:attrR(rating,7,'positioning'),finishing:attrR(25,2,'finishing'),defending:attrR(35,5,'defending')}}if(pos==='DEF'){attributes.defending=attrR(rating+6,7,'defending');attributes.strength=attrR(rating+3,8,'strength');attributes.finishing=attrR(rating-20,8,'finishing')}if(pos==='MID'){attributes.passing=attrR(rating+4,7,'passing');attributes.creativity=attrR(rating+3,8,'creativity')}if(pos==='ATT'){attributes.finishing=attrR(rating+5,7,'finishing');attributes.pace=attrR(rating+3,8,'pace')}return {id:clubIndex*1000+slot+1,name,pos,role,naturalPositions:naturalPositionsFor(name,pos,role),assignedRole:null,age,dob,ageSource:dob?'birth-date':'estimated',rating,attributes,potential,value:Math.max(.2,+((Math.max(5,rating-45)**2)/100*(age<23?1.35:age>30?.65:1)).toFixed(1)),wage:Math.max(2,Math.round((rating-45)*1.15+(club.strength-65)*.5)),fitness:100,morale:75+Math.round(rng()*15),goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,form:6.5,injured:0,suspended:0,clubIndex,source:'PL 2026/27 squad list; attributes estimated'}}
 function buildRealSquad(clubIndex){const club=CLUBS[clubIndex],groups=REAL_ROSTERS[club.name]||{};const out=[];for(const pos of ['GK','DEF','MID','ATT']){const list=(groups[pos]||'').split('|').filter(Boolean);for(const name of list){if(out.some(p=>p.name===name))continue;out.push(makeRealPlayer(name,pos,clubIndex,out.length));}}if(out.length!==25)console.warn('Expected 25 players for',club.name,'got',out.length);return out.slice(0,25)}
 function buildWorldDatabase(){return CLUBS.map((c,i)=>buildRealSquad(i))}
-const appState={page:"home",club:3,week:1,played:0,seasonYear:2026,formation:"4-3-3",tactic:"Balanced",selectedXI:null,log:[],transferTab:"market",squad:[],table:[],budget:0,started:false,positionChanges:{},lastSeasonSummary:null,lastRecoveryRound:null,formationExperience:{"4-3-3":20,"4-4-2":20,"4-2-3-1":20,"3-5-2":20},teamCohesion:25,lastStartingXI:[],injuryReport:[],discipline:{},medicalHistory:[]};
+const appState={page:"home",club:3,week:1,played:0,seasonYear:2026,formation:"4-3-3",tactic:"Balanced",selectedXI:null,log:[],transferTab:"market",squad:[],table:[],budget:0,started:false,positionChanges:{},lastSeasonSummary:null,lastRecoveryRound:null,formationExperience:{"4-3-3":20,"4-4-2":20,"4-2-3-1":20,"3-5-2":20},teamCohesion:25,lastStartingXI:[],injuryReport:[],discipline:{},medicalHistory:[],lineupRoleVersion:2};
 
 function generateAttributes(pos,base){
  const r=(center,spread=10)=>Math.max(25,Math.min(99,Math.round(center+(Math.random()*spread*2-spread))));
@@ -331,7 +342,7 @@ function load(){try{let s=JSON.parse(localStorage.getItem("cmMobileSave"));if(s&
   appState.positionChanges={};appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
   appState.fixtures=[];appState.leagueFormatVersion=2;
  }
- if(appState.lastRecoveryRound===undefined)appState.lastRecoveryRound=null;if(appState.recommendationRound===undefined)appState.recommendationRound=null;appState.squad.forEach(p=>{ensurePlayerAttributes(p);if(!Array.isArray(p.naturalPositions)||!p.naturalPositions.length)p.naturalPositions=naturalPositionsFor(p.name,p.pos,p.role);});if(!appState.squad.some(p=>p.pos==="GK"&&p.id!==appState.squad.find(x=>x.pos==="GK")?.id)){const club=CLUBS[appState.club]||CLUBS[3];const nextId=Math.max(0,...appState.squad.map(p=>Number(p.id)||0))+1;appState.squad.push({id:nextId,name:"M. Kovac",pos:"GK",age:25,rating:Math.max(55,club.strength-3),attributes:generateAttributes("GK",Math.max(55,club.strength-3)),potential:Math.max(60,club.strength+3),value:5,wage:18,fitness:90,morale:75,goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0});}if(!Number.isFinite(appState.seasonYear))appState.seasonYear=2026;if(!appState.positionChanges)appState.positionChanges={};if(!appState.leagueView)appState.leagueView="table";if(!appState.playerStatMetric)appState.playerStatMetric="goals";if(!appState.discipline)appState.discipline={};if(typeof appState.autoSubs!=="boolean")appState.autoSubs=false;if(!appState.fixtures||!s.fixtures.length){appState.week=1;appState.played=0;appState.log=[];appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));appState.fixtures=[];}appState.leagueFormatVersion=2;return true}}catch(e){}return false}
+ if(appState.lastRecoveryRound===undefined)appState.lastRecoveryRound=null;if(appState.recommendationRound===undefined)appState.recommendationRound=null;if(!Number(s.lineupRoleVersion||0)||Number(s.lineupRoleVersion)<2){appState.selectedXI=null;appState.recommendationRound=null;appState.lineupRoleVersion=2;} appState.squad.forEach(p=>{ensurePlayerAttributes(p);if(!Array.isArray(p.naturalPositions)||!p.naturalPositions.length)p.naturalPositions=naturalPositionsFor(p.name,p.pos,p.role);});if(!appState.squad.some(p=>p.pos==="GK"&&p.id!==appState.squad.find(x=>x.pos==="GK")?.id)){const club=CLUBS[appState.club]||CLUBS[3];const nextId=Math.max(0,...appState.squad.map(p=>Number(p.id)||0))+1;appState.squad.push({id:nextId,name:"M. Kovac",pos:"GK",age:25,rating:Math.max(55,club.strength-3),attributes:generateAttributes("GK",Math.max(55,club.strength-3)),potential:Math.max(60,club.strength+3),value:5,wage:18,fitness:90,morale:75,goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0});}if(!Number.isFinite(appState.seasonYear))appState.seasonYear=2026;if(!appState.positionChanges)appState.positionChanges={};if(!appState.leagueView)appState.leagueView="table";if(!appState.playerStatMetric)appState.playerStatMetric="goals";if(!appState.discipline)appState.discipline={};if(typeof appState.autoSubs!=="boolean")appState.autoSubs=false;if(!appState.fixtures||!s.fixtures.length){appState.week=1;appState.played=0;appState.log=[];appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));appState.fixtures=[];}appState.leagueFormatVersion=2;return true}}catch(e){}return false}
 function money(n){return "£"+(n<1?Math.round(n*1000)+"k":n.toFixed(1)+"m")}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function currentClub(){return CLUBS[appState.club]}
@@ -402,20 +413,25 @@ function squadPlayerRow(p){
  return `<article class="squad-row"><div class="squad-row-main" role="button" tabindex="0" aria-expanded="${expanded}" onclick="toggleSquadPlayer('${String(p.id).replace(/'/g,"\\'")}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleSquadPlayer('${String(p.id).replace(/'/g,"\\'")}')}"><div class="squad-person"><div class="squad-name-line"><span class="squad-name">${esc(p.name)}</span><span class="pill">${p.role&&ROLE_BY_SIDE[p.role]?ROLE_BY_SIDE[p.role]:p.pos}</span>${p.injured>0?'<span class="player-status bad">Skadet</span>':p.suspended>0?'<span class="player-status bad">Suspendert</span>':''}</div><div class="squad-subline">${p.age} år${p.ageSource==='estimated'?' · alder estimert':''} · ${money(p.value)} · ${p.wage?money(p.wage/1000)+"/uke":"—"}</div><div class="squad-mini-stats">${skillKeys.map(k=>`<span class="attr">${labels[k]} ${p.attributes?.[k]??"—"}</span>`).join("")}</div><div class="squad-fitness"><span style="width:${Math.max(0,Math.min(100,p.fitness||0))}%;background:${barColor}"></span></div></div><div class="squad-rating"><strong>${p.rating}</strong><small>⚡ ${p.fitness}%</small><small>${expanded?"▲":"▼ Detaljer"}</small></div></div>${expanded?`<div class="squad-details"><div class="squad-detail-heading">ALLE FERDIGHETER</div>${attributeMarkup(p)}<div class="squad-mini-stats"><span class="attr">Naturlige posisjoner ${(p.naturalPositions||[p.role||p.pos]).map(r=>ROLE_BY_SIDE[r]||r).join(', ')}</span><span class="attr">Potensial ${p.potential}</span><span class="attr">Moral ${p.morale}</span><span class="attr">Kampform ${Number(p.form||6.5).toFixed(1)}</span><span class="attr">${p.apps||0} kamper</span><span class="attr">${p.goals||0} mål</span><span class="attr">${p.assists||0} assist</span></div><div style="margin-top:8px">${status}</div></div>`:""}</article>`;
 }
 function defaultStartingXI(){
- const counts=({"4-4-2":{ATT:2,MID:4,DEF:4,GK:1},"4-3-3":{ATT:3,MID:3,DEF:4,GK:1},"4-2-3-1":{ATT:1,MID:5,DEF:4,GK:1},"3-5-2":{ATT:2,MID:5,DEF:3,GK:1}})[appState.formation]||{"ATT":3,"MID":3,"DEF":4,"GK":1};
- const xi=[]; for(const pos of ["GK","DEF","MID","ATT"]){const pool=eligibleSquad(appState.squad).filter(p=>p.pos===pos);xi.push(...pool.slice(0,counts[pos]||0));}
- while(xi.length<11){const next=eligibleSquad(appState.squad).find(p=>!xi.some(q=>q.id===p.id));if(!next)break;xi.push(next)} return xi.slice(0,11);
+ return buildRoleBasedXI(appState.squad,appState.formation);
 }
 function currentStartingXI(){
  const eligible=eligibleSquad(appState.squad);const ids=Array.isArray(appState.selectedXI)?appState.selectedXI:[];
- if(ids.length===11){const chosen=ids.map(id=>eligible.find(p=>String(p.id)===String(id)));if(chosen.every(Boolean)&&new Set(chosen.map(p=>String(p.id))).size===11)return assignTacticalRoles(chosen,appState.formation);}
- return assignTacticalRoles(defaultStartingXI(),appState.formation);
+ if(ids.length===11){
+  const chosen=ids.map(id=>eligible.find(p=>String(p.id)===String(id)));
+  if(chosen.every(Boolean)&&new Set(chosen.map(p=>String(p.id))).size===11){
+   // Rebind every saved slot to the current formation's explicit role order.
+   return assignTacticalRoles(chosen,appState.formation);
+  }
+ }
+ const xi=defaultStartingXI();appState.selectedXI=xi.map(p=>p.id);return xi;
 }
 function setStartingPlayer(slot,id){
  const xi=currentStartingXI();const p=eligibleSquad(appState.squad).find(x=>String(x.id)===String(id));if(!p)return;
- const old=xi[slot];if(!old||old.pos!==p.pos)return;
- const duplicate=xi.findIndex((x,i)=>i!==slot&&String(x.id)===String(p.id));if(duplicate>=0){xi[duplicate]=old;}
- xi[slot]=p;appState.selectedXI=xi.map(x=>x.id);save();render();
+ const old=xi[slot];if(!old)return;
+ const duplicate=xi.findIndex((x,i)=>i!==slot&&String(x.id)===String(p.id));
+ if(duplicate>=0)xi[duplicate]=old;
+ xi[slot]=p;appState.selectedXI=assignTacticalRoles(xi,appState.formation).map(x=>x.id);save();render();
 }
 function disciplineRecord(p){
  appState.discipline=appState.discipline||{};
@@ -512,24 +528,10 @@ function recommendFormation(opponentFormation){
  return ({"4-3-3":"4-4-2","4-4-2":"4-2-3-1","4-2-3-1":"3-5-2","3-5-2":"4-3-3"})[opponentFormation]||"4-3-3";
 }
 function selectionScore(p){
- const a=p.attributes||{};
- const role=p.pos==="GK"?(a.handling*.34+a.reflexes*.34+a.positioning*.32)
-  :p.pos==="DEF"?(a.defending*.42+a.strength*.18+a.pace*.12+a.stamina*.14+a.passing*.14)
-  :p.pos==="MID"?(a.passing*.25+a.creativity*.24+a.technique*.18+a.stamina*.20+a.pace*.08+a.defending*.05)
-  :(a.finishing*.32+a.pace*.22+a.technique*.18+a.creativity*.10+a.stamina*.10+a.strength*.08);
- const fitness=Number(p.fitness??80);
- const positional=rolePenalty(p,p.assignedRole||p.role||defaultRoleFor(p.name,p.pos,0));
- return p.rating*.42+role*.43+fitness*.15+Number(p.morale??70)*.025+(Number(p.form??6.5)-6.5)*1.2-positional*.65;
+ return roleCandidateScore(p,p.assignedRole||p.role||defaultRoleFor(p.name,p.pos,0));
 }
 function buildRecommendedXI(formation){
- const counts=({"4-4-2":{ATT:2,MID:4,DEF:4,GK:1},"4-3-3":{ATT:3,MID:3,DEF:4,GK:1},"4-2-3-1":{ATT:1,MID:5,DEF:4,GK:1},"3-5-2":{ATT:2,MID:5,DEF:3,GK:1}})[formation]||{"ATT":3,"MID":3,"DEF":4,"GK":1};
- const available=eligibleSquad(appState.squad);const xi=[];
- for(const pos of ["GK","DEF","MID","ATT"]){
-  const pool=available.filter(p=>p.pos===pos&&!xi.some(q=>String(q.id)===String(p.id))).sort((a,b)=>selectionScore(b)-selectionScore(a));
-  xi.push(...pool.slice(0,counts[pos]||0));
- }
- while(xi.length<11){const p=available.filter(x=>!xi.some(q=>String(q.id)===String(x.id))).sort((a,b)=>selectionScore(b)-selectionScore(a))[0];if(!p)break;xi.push(p)}
- return xi.slice(0,11);
+ return buildRoleBasedXI(appState.squad,formation);
 }
 function applyPreMatchRecommendation(force=false){
  const opponentIndex=getNextOpponentIndex();
@@ -570,9 +572,9 @@ function tactics(){
  recoverSquadBeforeRound();
  applyPreMatchRecommendation();
  const xi=currentStartingXI();
- const att=xi.filter(p=>p.pos==="ATT"),mid=xi.filter(p=>p.pos==="MID"),def=xi.filter(p=>p.pos==="DEF"),gk=xi.filter(p=>p.pos==="GK");
- const posLabels={GK:"KEEPER",DEF:"FORSVAR",MID:"MIDTBANE",ATT:"ANGREP"};
- const slotControls=(players,pos)=>players.map(p=>{const slot=xi.findIndex(x=>String(x.id)===String(p.id));const pool=eligibleSquad(appState.squad).filter(x=>x.pos===pos&&canPlay(x));return `<div class="field" style="margin:6px 0"><label>${posLabels[pos]} ${players.indexOf(p)+1}</label><select aria-label="Velg ${posLabels[pos].toLowerCase()} spiller" onchange="setStartingPlayer(${slot},this.value)">${pool.map(x=>`<option value="${esc(String(x.id))}" ${String(x.id)===String(p.id)?"selected":""}>${esc(x.name)} · ${x.rating} total · ${x.fitness}% fysisk form</option>`).join("")}</select>${playerDetail(p)}<div style="margin-top:6px;font-size:12px;color:${canPlay(p)?'var(--muted)':'var(--red)'}">${availabilityStatus(p)}</div></div>`}).join('');
+ const gk=xi.filter(p=>p.assignedRole==='GK');
+ const roleLabels={GK:"Keeper",LB:"Venstreback",LCB:"Venstre midtstopper",CB:"Midtstopper",RCB:"Høyre midtstopper",RB:"Høyreback",LWB:"Venstre vingback",RWB:"Høyre vingback",DM:"Defensiv midtbane",CM:"Sentral midtbane",LM:"Venstre midtbane",RM:"Høyre midtbane",LW:"Venstre ving",AM:"Offensiv midtbane",RW:"Høyre ving",ST:"Spiss"};
+ const slotControls=(players)=>players.map(p=>{const slot=xi.findIndex(x=>String(x.id)===String(p.id));const targetRole=p.assignedRole||'CM';const pool=eligibleSquad(appState.squad).filter(x=>canPlay(x)&&(targetRole==='GK'?x.pos==='GK':x.pos!=='GK')).sort((a,b)=>roleCandidateScore(b,targetRole)-roleCandidateScore(a,targetRole));return `<div class="field" style="margin:6px 0"><label>${roleLabels[targetRole]||targetRole}</label><select aria-label="Velg spiller til ${esc((roleLabels[targetRole]||targetRole).toLowerCase())}" onchange="setStartingPlayer(${slot},this.value)">${pool.map(x=>`<option value="${esc(String(x.id))}" ${String(x.id)===String(p.id)?"selected":""}>${esc(x.name)} · ${x.rating} · ${ROLE_BY_SIDE[x.role]||x.role||x.pos} · ${positionAdjustedRating(x,targetRole)} i rolle</option>`).join("")}</select>${playerDetail(p)}<div style="margin-top:6px;font-size:12px;color:${canPlay(p)?'var(--muted)':'var(--red)'}">${availabilityStatus(p)} · Naturlig tilpasning: ${Math.max(30,100-rolePenalty(p,targetRole)*5)}%</div></div>`}).join('');
  const roleOrder={
   '4-2-3-1':[['ST'],['LW','AM','RW'],['DM','DM'],['LB','LCB','RCB','RB']],
   '4-3-3':[['LW','ST','RW'],['DM','CM','CM'],['LB','LCB','RCB','RB']],
@@ -592,7 +594,7 @@ function tactics(){
  const pitch=()=>`${stablePitchRows.map(row=>pitchLine(row)).join('')}<div style="margin-top:8px;text-align:center">🧤 ${gk.map(p=>`${esc(p.name)} · ${p.rating}`).join(', ')||'Ingen keeper'}</div>`;
  const playerDetail=(p)=>`<div class="player-meta">${p.pos==="GK"?`Keepergrep ${p.attributes.handling} · Reflekser ${p.attributes.reflexes} · Posisjonering ${p.attributes.positioning}`:p.pos==="DEF"?`Forsvar ${p.attributes.defending} · Styrke ${p.attributes.strength} · Hurtighet ${p.attributes.pace}`:p.pos==="MID"?`Pasninger ${p.attributes.passing} · Kreativitet ${p.attributes.creativity} · Utholdenhet ${p.attributes.stamina}`:`Avslutninger ${p.attributes.finishing} · Hurtighet ${p.attributes.pace} · Teknikk ${p.attributes.technique}`}</div><div class="fitness-track"><div class="fitness-fill" style="width:${p.fitness}%;background:${p.fitness<60?'#e48787':p.fitness<78?'#e8c875':'var(--green)'}"></div></div>`;
  const bench=eligibleSquad(appState.squad).filter(p=>!xi.some(q=>String(q.id)===String(p.id)));
- return `<div class="hero"><div class="eyebrow">Match preparation</div><h1>Laguttak og taktikk</h1><p>Velg startelleveren før avspark. Form og utholdenhet vises for hver spiller. Utholdenhet er en egen ferdighet og påvirker hvor raskt spilleren blir sliten i kampen.</p><div class="hero-actions"><span class="pill green">${xi.length}/11 valgt</span><span class="pill">Reserver: ${bench.length}</span></div></div><section class="card"><div class="notice" style="margin-top:0"><strong>🤖 Assistentens anbefaling</strong><p style="margin:6px 0">Motstander: ${esc(CLUBS[getNextOpponentIndex()].name)} · forventet formasjon <strong>${getOpponentFormation(getNextOpponentIndex(),appState.week)}</strong>.</p><p style="margin:6px 0">Foreslått oppsett: <strong>${appState.formation}</strong> · mentalitet <strong>${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</strong>. Elleveren er valgt ut fra posisjon, ferdigheter, form og fysisk tilstand.</p><button type="button" onclick="applyPreMatchRecommendation(true);render()">Bruk anbefalingen på nytt</button></div>${disciplinarySummary()}<div class="notice"><strong>🤝 Samspill og formasjonserfaring</strong><p style="margin:6px 0">Erfaring med ${esc(appState.formation)}: <strong>${formationFamiliarity()}%</strong> · Samspill i laget: <strong>${Number(appState.teamCohesion??25)}%</strong></p><div style="height:7px;background:var(--line);border-radius:8px;overflow:hidden;margin:5px 0 10px"><div style="height:100%;width:${formationFamiliarity()}%;background:var(--green)"></div></div><p style="margin:6px 0;font-size:12px">Erfaring bygges ved å bruke samme formasjon. Samspill øker når mange av de samme spillerne starter sammen. Store endringer og formasjonsskifter svekker fordelen.</p></div><div class="field"><label>FORMASJON</label><select id="formation" onchange="appState.formation=this.value;appState.selectedXI=null;save();render()">${["4-4-2","4-3-3","4-2-3-1","3-5-2"].map(f=>`<option ${appState.formation===f?"selected":""}>${f}</option>`).join("")}</select></div><div class="field"><label>MENTALITET</label><select id="tactic" onchange="appState.tactic=this.value;save()">${["Defensive","Balanced","Attacking","High press"].map(f=>`<option value="${f}" ${appState.tactic===f?"selected":""}>${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[f]}</option>`).join("")}</select></div><div class="section-title"><h2>Startellever</h2><small>${xi.length}/11 spillere</small></div><div style="background:linear-gradient(180deg,#17452f,#123622);border:1px solid #2b6848;border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:#b5e6bf">▲ ANGREP</div>${pitch()}</div><div class="section-title"><h2>Velg spillere</h2><small>sortert etter posisjon</small></div><p class="muted" style="font-size:11px">Trykk på listene for å velge hvem som starter. Skadde og suspenderte spillere kan ikke velges.</p><div class="section-title"><h2>Keeper</h2></div>${slotControls(gk,"GK")}<div class="section-title"><h2>Forsvar</h2></div>${slotControls(def,"DEF")}<div class="section-title"><h2>Midtbane</h2></div>${slotControls(mid,"MID")}<div class="section-title"><h2>Angrep</h2></div>${slotControls(att,"ATT")}<div class="section-title"><h2>Reserver</h2><small>sortert etter posisjon</small></div>${["GK","DEF","MID","ATT"].map(pos=>{const ps=bench.filter(p=>p.pos===pos);return ps.length?`<div class="lineup-section-title">${posLabels[pos]}</div>${ps.map(p=>`<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span> · ${p.rating}</div>${playerDetail(p)}</div><div class="lineup-player-side"><strong>${p.rating}</strong><span>${p.fitness}%</span></div></div>`).join("")}`:""}).join("")}<button class="primary" style="width:100%;margin-top:12px" onclick="playMatch()">⚽ Avspark – bruk valgt startellever</button></section>`;
+ return `<div class="hero"><div class="eyebrow">Match preparation</div><h1>Laguttak og taktikk</h1><p>Velg startelleveren før avspark. Form og utholdenhet vises for hver spiller. Utholdenhet er en egen ferdighet og påvirker hvor raskt spilleren blir sliten i kampen.</p><div class="hero-actions"><span class="pill green">${xi.length}/11 valgt</span><span class="pill">Reserver: ${bench.length}</span></div></div><section class="card"><div class="notice" style="margin-top:0"><strong>🤖 Assistentens anbefaling</strong><p style="margin:6px 0">Motstander: ${esc(CLUBS[getNextOpponentIndex()].name)} · forventet formasjon <strong>${getOpponentFormation(getNextOpponentIndex(),appState.week)}</strong>.</p><p style="margin:6px 0">Foreslått oppsett: <strong>${appState.formation}</strong> · mentalitet <strong>${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</strong>. Elleveren er valgt ut fra posisjon, ferdigheter, form og fysisk tilstand.</p><button type="button" onclick="applyPreMatchRecommendation(true);render()">Bruk anbefalingen på nytt</button></div>${disciplinarySummary()}<div class="notice"><strong>🤝 Samspill og formasjonserfaring</strong><p style="margin:6px 0">Erfaring med ${esc(appState.formation)}: <strong>${formationFamiliarity()}%</strong> · Samspill i laget: <strong>${Number(appState.teamCohesion??25)}%</strong></p><div style="height:7px;background:var(--line);border-radius:8px;overflow:hidden;margin:5px 0 10px"><div style="height:100%;width:${formationFamiliarity()}%;background:var(--green)"></div></div><p style="margin:6px 0;font-size:12px">Erfaring bygges ved å bruke samme formasjon. Samspill øker når mange av de samme spillerne starter sammen. Store endringer og formasjonsskifter svekker fordelen.</p></div><div class="field"><label>FORMASJON</label><select id="formation" onchange="appState.formation=this.value;appState.selectedXI=null;save();render()">${["4-4-2","4-3-3","4-2-3-1","3-5-2"].map(f=>`<option ${appState.formation===f?"selected":""}>${f}</option>`).join("")}</select></div><div class="field"><label>MENTALITET</label><select id="tactic" onchange="appState.tactic=this.value;save()">${["Defensive","Balanced","Attacking","High press"].map(f=>`<option value="${f}" ${appState.tactic===f?"selected":""}>${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[f]}</option>`).join("")}</select></div><div class="section-title"><h2>Startellever</h2><small>${xi.length}/11 spillere</small></div><div style="background:linear-gradient(180deg,#17452f,#123622);border:1px solid #2b6848;border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:#b5e6bf">▲ ANGREP</div>${pitch()}</div><div class="section-title"><h2>Velg spillere</h2><small>sortert etter taktisk rolle</small></div><p class="muted" style="font-size:11px">Trykk på listene for å velge hvem som starter. Skadde og suspenderte spillere kan ikke velges.</p><div class="section-title"><h2>Keeper</h2></div>${slotControls(xi.filter(p=>p.assignedRole==='GK'))}<div class="section-title"><h2>Forsvar</h2></div>${slotControls(xi.filter(p=>['LB','LCB','CB','RCB','RB','LWB','RWB'].includes(p.assignedRole)))}<div class="section-title"><h2>Midtbane</h2></div>${slotControls(xi.filter(p=>['DM','CM','LM','RM'].includes(p.assignedRole)))}<div class="section-title"><h2>Angrep</h2></div>${slotControls(xi.filter(p=>['LW','AM','RW','ST'].includes(p.assignedRole)))}<div class="section-title"><h2>Reserver</h2><small>sortert etter taktisk rolle</small></div>${["GK","DEF","MID","ATT"].map(pos=>{const ps=bench.filter(p=>p.pos===pos);return ps.length?`<div class="lineup-section-title">${posLabels[pos]}</div>${ps.map(p=>`<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span> · ${p.rating}</div>${playerDetail(p)}</div><div class="lineup-player-side"><strong>${p.rating}</strong><span>${p.fitness}%</span></div></div>`).join("")}`:""}).join("")}<button class="primary" style="width:100%;margin-top:12px" onclick="playMatch()">⚽ Avspark – bruk valgt startellever</button></section>`;
 }
 function transfers(){let targets=[{name:"T. Adeyemi",pos:"ATT",age:21,rating:76,potential:88,value:27.5,wage:48},{name:"M. Laurent",pos:"MID",age:19,rating:67,potential:86,value:8.5,wage:18},{name:"J. van Dijk",pos:"DEF",age:24,rating:74,potential:79,value:16,wage:35},{name:"A. Costa",pos:"GK",age:22,rating:70,potential:84,value:7.2,wage:22},{name:"R. Mensah",pos:"MID",age:28,rating:78,potential:78,value:21,wage:62}];return `<div class="hero"><div class="eyebrow">Recruitment centre</div><h1>Overgangsmarked</h1><p>Finn forsterkninger, men pass på budsjettet. Alle spillerne i denne listen er fiktive prototypedata.</p><div class="hero-actions"><span class="pill green">Budsjett ${money(appState.budget)}</span><span class="pill">Lønnskostnader kommer senere</span></div></div><section class="card">${targets.map((p,i)=>`<div class="player"><div><div class="player-name">${p.name} <span class="pill">${p.pos}</span></div><div class="player-meta">${p.age} år · Potensial ${p.potential} · Lønn ${p.wage}k/uke</div><div class="attrs"><span class="attr">Verdi ${money(p.value)}</span></div></div><div style="text-align:right"><div class="rating">${p.rating}</div><button style="margin-top:6px;padding:7px 9px" onclick="buyPlayer(${i})" ${appState.budget<p.value?"disabled":""}>By ${money(p.value)}</button></div></div>`).join("")}</section><div class="notice">Overgangene er foreløpig direkte kjøp til markedsverdi. Bud, forhandlinger, AI-klubber og kontrakter kommer i neste iterasjon.</div>`}
 function buyPlayer(i){let targets=[{name:"T. Adeyemi",pos:"ATT",age:21,rating:76,potential:88,value:27.5,wage:48},{name:"M. Laurent",pos:"MID",age:19,rating:67,potential:86,value:8.5,wage:18},{name:"J. van Dijk",pos:"DEF",age:24,rating:74,potential:79,value:16,wage:35},{name:"A. Costa",pos:"GK",age:22,rating:70,potential:84,value:7.2,wage:22},{name:"R. Mensah",pos:"MID",age:28,rating:78,potential:78,value:21,wage:62}];let p={...targets[i],id:Date.now(),attributes:generateAttributes(targets[i].pos,targets[i].rating),fitness:100,morale:80,goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0};if(appState.budget<p.value)return;appState.budget=+(appState.budget-p.value).toFixed(1);appState.squad.push(p);appState.log.push(`${p.name} har signert for ${currentClub().name} for ${money(p.value)}.`);save();render()}
@@ -681,16 +683,7 @@ function weightedPick(players,weights){
  return players[players.length-1];
 }
 function createMatchLineup(players,formation,teamName){
- const p=eligibleSquad(players);
- const counts=({"4-4-2":{ATT:2,MID:4,DEF:4,GK:1},"4-3-3":{ATT:3,MID:3,DEF:4,GK:1},"4-2-3-1":{ATT:1,MID:5,DEF:4,GK:1},"3-5-2":{ATT:2,MID:5,DEF:3,GK:1}})[formation]||{"ATT":3,"MID":3,"DEF":4,"GK":1};
- const xi=[];
- for(const pos of ["GK","DEF","MID","ATT"]){
-  const n=counts[pos]||0;
-  const pool=p.filter(x=>x.pos===pos&&!xi.some(y=>y.id===x.id));
-  xi.push(...pool.slice(0,n));
- }
- while(xi.length<11){const next=p.find(x=>!xi.some(y=>y.id===x.id));if(!next)break;xi.push(next)}
- return xi.slice(0,11);
+ return buildRoleBasedXI(players,formation);
 }
 function simulateMatch(powerA,powerB,homeA,playersA=[],playersB=[],formationA="4-3-3",formationB="4-3-3",mentalityA="Balanced",mentalityB="Balanced"){
  const xiA=assignTacticalRoles(createMatchLineup(playersA,formationA,"A"),formationA),xiB=assignTacticalRoles(createMatchLineup(playersB,formationB,"B"),formationB);
@@ -851,10 +844,9 @@ function refreshSubOptions(engine){
  inc.innerHTML=bench.map(p=>`<option value="${String(p.id)}">${esc(p.name)} · ${p.pos}</option>`).join('');
  if([...inc.options].some(o=>o.value===oldIn))inc.value=oldIn;
  else if(inc.options.length)inc.selectedIndex=0;
- const isHalfTime=engine.halfTimeActive===true;
- const disabled=engine.userSubs>=5||(!isHalfTime&&engine.userSubWindows>=3)||bench.length===0;
+ const disabled=engine.userSubs>=5||engine.userSubWindows>=3||bench.length===0;
  const btn=document.getElementById('makeSubBtn');if(btn)btn.disabled=disabled;
- if(hint){hint.textContent=engine.userSubs>=5?'Alle fem bytter er brukt.':(!isHalfTime&&engine.userSubWindows>=3)?'Alle tre byttevinduene er brukt.':bench.length===0?'Ingen tilgjengelige reserver i samme posisjon.':`${5-engine.userSubs} bytter igjen · ${3-engine.userSubWindows} byttevinduer igjen.`;}
+ if(hint){hint.textContent=engine.userSubs>=5?'Alle fem bytter er brukt.':engine.userSubWindows>=3?'Alle tre byttevinduene er brukt.':bench.length===0?'Ingen tilgjengelige reserver i samme posisjon.':`${5-engine.userSubs} bytter igjen · ${3-engine.userSubWindows} byttevinduer igjen.`;}
 }
 function liveMatchRating(engine,p){
  const perf=engine.performance?.[String(p.id)]||{influence:0,events:0,shots:0,goals:0,assists:0};
@@ -918,7 +910,7 @@ function renderLiveLineup(engine,minute,scoreText){
  }).join('');
  const benchOrder={GK:0,DEF:1,MID:2,ATT:3};
  const sortedBench=[...bench].sort((a,b)=>(benchOrder[a.pos]??4)-(benchOrder[b.pos]??4)||b.rating-a.rating);
- const benchMarkup=`<div class="lineup-section-title">INNBYTTERE</div><div class="lineup-bench-note">Reserver vises nederst, sortert etter posisjon. Trykk på en spiller på banen for å velge hvem som skal ut.</div>`+(sortedBench.length?sortedBench.map(p=>{
+ const benchMarkup=`<div class="lineup-section-title">INNBYTTERE</div><div class="lineup-bench-note">Reserver vises nederst, sortert etter taktisk rolle. Trykk på en spiller på banen for å velge hvem som skal ut.</div>`+(sortedBench.length?sortedBench.map(p=>{
   const stamina=Math.round(playerFitnessValue(p));
   const color=stamina<50?'#f08080':stamina<70?'#f3ca72':'var(--green)';
   return `<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span></div><div class="lineup-player-meta">Ferdighet <strong>${Math.round(p.rating)}</strong> · Grunnferdighet ${p.rating}</div><div class="fitness-track"><div class="fitness-fill" style="width:${stamina}%;background:${color}"></div></div></div><div class="lineup-player-side"><strong>${Math.round(p.rating)}</strong><span>${stamina}%</span></div></div>`;
@@ -949,8 +941,7 @@ function closeLineup(){
 }
 function makeLiveSubstitution(engine,minute){
  if(!engine||minute>=90)return;
- const isHalfTime=engine.halfTimeActive===true&&minute===45;
- if(engine.userSubs>=5||(!isHalfTime&&engine.userSubWindows>=3)){refreshSubOptions(engine);return;}
+ if(engine.userSubs>=5||engine.userSubWindows>=3){refreshSubOptions(engine);return;}
  const outEl=document.getElementById('subOut'),inEl=document.getElementById('subIn');
  const outId=outEl?.value,inId=inEl?.value;
  const xi=engine.userIsA?engine.xiA:engine.xiB;
@@ -960,7 +951,7 @@ function makeLiveSubstitution(engine,minute){
  if((incoming.injured||0)>0||(incoming.suspended||0)>0){alert('Denne spilleren er ikke tilgjengelig.');return;}
  if(incoming.pos!==outgoing.pos){alert('Bytter må være posisjon mot posisjon. Velg en reserve i samme posisjon ('+outgoing.pos+').');return;}
  const windowKey=Math.floor(minute/5);
- const wasWindow=isHalfTime||engine.lastSubWindowKey===windowKey||engine.lastSubMinute===minute;
+ const wasWindow=engine.lastSubWindowKey===windowKey||engine.lastSubMinute===minute;
  if(!wasWindow&&engine.userSubWindows>=3){alert('Du har brukt alle tre byttevinduene.');return;}
  const idx=xi.findIndex(p=>String(p.id)===String(outId));
  if(!engine.subbedOutIds)engine.subbedOutIds=[];
@@ -1174,7 +1165,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    <div class="lineup-section-title">GJØR BYTTER</div>
    <div class="sub-grid" style="display:none" aria-hidden="true"><div><label for="subOut">Spiller ut</label><select id="subOut"></select></div><div><label for="subIn">Spiller inn</label><select id="subIn"></select></div></div>
    <div class="sub-actions"><button type="button" id="makeSubBtn" class="primary-control">Gjennomfør bytte</button><span id="subHint" class="sub-count">5 bytter igjen</span></div>
-   <div class="lineup-section-title">ASSISTENT</div><label class="auto-sub-toggle" style="display:flex;align-items:center;gap:10px;padding:10px 0;font-size:13px"><input type="checkbox" id="autoSubsToggle" style="width:18px;height:18px" ${appState.autoSubs?"checked":""}> La assistenten foreta automatiske bytter</label><div class="muted" style="font-size:11px;margin-bottom:10px">Maks fem bytter totalt. Bytter i pausen teller ikke som ett av de tre byttevinduene; flere bytter i samme stopp teller som ett vindu.</div><div class="lineup-section-title">MENTALITET</div><div class="field"><label for="liveTacticSelect">KAMPTAKTIKK</label><select id="liveTacticSelect"><option value="Defensive">Defensiv</option><option value="Balanced">Balansert</option><option value="Attacking">Offensiv</option><option value="High press">Høyt press</option></select></div>
+   <div class="lineup-section-title">ASSISTENT</div><label class="auto-sub-toggle" style="display:flex;align-items:center;gap:10px;padding:10px 0;font-size:13px"><input type="checkbox" id="autoSubsToggle" style="width:18px;height:18px" ${appState.autoSubs?"checked":""}> La assistenten foreta automatiske bytter</label><div class="muted" style="font-size:11px;margin-bottom:10px">Assistenten vurderer kampkarakter og utholdenhet rundt 60, 70 og 80 minutter. Maks fem bytter og tre stopp.</div><div class="lineup-section-title">MENTALITET</div><div class="field"><label for="liveTacticSelect">KAMPTAKTIKK</label><select id="liveTacticSelect"><option value="Defensive">Defensiv</option><option value="Balanced">Balansert</option><option value="Attacking">Offensiv</option><option value="High press">Høyt press</option></select></div>
    <div class="lineup-footer"><button type="button" id="closeLineupContinue" class="primary">Ferdig – fortsett kampen</button></div>
   </div>
  </div>`;
@@ -1242,7 +1233,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    // Shots remain in match statistics, but the event feed only shows goals, cards and injuries.
    if(e.type==='chance'){commentary.textContent=matchCommentary(displayEvent,c,opp,home);continue}
    const row=document.createElement('div');row.className='match-event live-event-new';
-   row.innerHTML=`<div class="event-min">${e.minute}'</div><div class="event-symbol">${icon}</div><div class="event-detail"><strong>${title}</strong><small><span class="event-team-badge ${e.side==='A'?'event-team-home':'event-team-away'}">${e.side==='A'?'HJEMME':'BORTE'}</span> ${sub} · ${esc(teamName)}</small></div>${e.type==='goal'?`<div class="event-score">${e.score||''}</div>`:''}`;
+   row.innerHTML=`<div class="event-min">${e.minute}'</div><div class="event-symbol">${icon}</div><div class="event-detail"><strong>${title}</strong><small>${sub} · ${esc(teamName)}</small></div>${e.type==='goal'?`<div class="event-score">${e.score||''}</div>`:''}`;
    eventContainer.appendChild(row);
    commentary.textContent=matchCommentary(displayEvent,c,opp,home);
    if(e.type==='goal')goalLabel.textContent=`${goalCount} mål`;
@@ -1254,14 +1245,8 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   // Small narrative beats keep the clock alive between major events.
   if(currentMinute===15)commentary.textContent="Et kvarter spilt. Lagene leter etter rom mellom leddene.";
   if(currentMinute===30)commentary.textContent="En halvtime nærmer seg – hvem tør å ta mer risiko?";
-  if(currentMinute===45){
-   headline.textContent="Pause";commentary.textContent=`Pause! ${currentHome}–${currentAway}. Kampen er satt på pause – juster taktikken og gjør bytter før andre omgang.`;
-   paused=true;engine.halfTimeActive=true;
-   if(timer)clearInterval(timer);timer=null;
-   pauseBtn.textContent="▶ Fortsett";pauseBtn.classList.add('live-paused');status.textContent=`PAUSE · ${currentMinute}'`;
-   const halfModal=document.getElementById('lineupModal');if(halfModal){halfModal.classList.add('open');renderLiveLineup(engine,currentMinute,score.textContent);refreshSubOptions(engine);}
-  }
-  if(currentMinute===46){engine.halfTimeActive=false;commentary.textContent="Andre omgang er i gang. Nå skal kampen avgjøres."};
+  if(currentMinute===45){headline.textContent="Pause";commentary.textContent=`Pause! ${currentHome}–${currentAway}. Manageren får sjansen til å samle laget.`}
+  if(currentMinute===46)commentary.textContent="Andre omgang er i gang. Nå skal kampen avgjøres.";
   if(currentMinute===60)commentary.textContent="Siste halvtimen starter. Slitne bein kan gi nye muligheter.";
   if(currentMinute===75)commentary.textContent="Et kvarter igjen. Nå kan hver eneste situasjon bli avgjørende.";
   if(currentMinute>=90){
@@ -1399,7 +1384,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.33 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.34 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}

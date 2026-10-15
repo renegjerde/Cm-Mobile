@@ -1,15 +1,11 @@
-# CM Mobile v1.33 — Touchline Edition
+# CM Mobile v1.34 – Role-based XI selection
 
-## Endringer i v1.33
-- Kampens hendelser har nå en tydelig HJEMME/BORTE-indikator for å vise hvilket lag spilleren tilhører.
-- Kampen stopper automatisk ved pause etter 45. minutt.
-- Lagoppstilling/bytte-vinduet åpnes automatisk i pausen, slik at manageren kan justere kamptaktikken og gjøre bytter før andre omgang.
-- Bytter i pausen bruker fortsatt av kvoten på fem bytter, men teller ikke som ett av de tre byttevinduene.
-- Flere bytter i samme stopp teller som ett byttevindu.
+Denne versjonen retter laguttak og taktikk slik at elleveren velges etter formasjonens elleve faste roller. 4-2-3-1 får alltid keeper, fire forsvarere, to defensive/sentrale midtbaneroller, venstreving, offensiv midtbane, høyreving og spiss. Spillere velges fra hele den tilgjengelige troppen etter posisjonstilpasning, relevante attributter, rating, form og fysisk form.
 
-## Filer
-- `index.html` — spillet.
-- `README.md` — versjonsnotater.
+Spillerbytte i laguttaket er nå knyttet til en konkret taktisk rolle; listen viser også spillerens naturlige rolle og beregnet rating i den valgte rollen. Motstandernes laguttak bruker samme rollebaserte algoritme. Eldre lagrede ellevere bygges om én gang ved oppgradering, mens øvrige karrieredata bevares.
 
-## Publisering
-For å oppdatere GitHub Pages må `index.html` fra denne mappen også kopieres til rotmappen i `main`-grenen, der nettstedet nå publiseres fra. ZIP-arkivet er den ryddige, komplette versjonskopien.
+## Oppdatering
+Erstatt `index.html` i GitHub Pages-repoets `main`-rot med filen fra denne pakken.
+
+## Teststatus
+JavaScript-syntaks er kontrollert. Dette er ikke en full ende-til-ende-test i mobilnettleser.
