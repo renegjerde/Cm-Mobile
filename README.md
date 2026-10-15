@@ -1,9 +1,15 @@
-# CM Mobile v1.31
+# CM Mobile v1.33 — Touchline Edition
 
-## Fixed formation roles and pitch layout
-- Formation slots are explicitly defined for 4-2-3-1, 4-3-3, 4-4-2 and 3-5-2.
-- Tactical roles are assigned against each player's natural-position suitability, rather than by the broad roster group alone.
-- Pitch layout is rendered from the assigned tactical roles, so the role label and location agree.
-- Displayed rating on the pitch is adjusted for positional suitability.
+## Endringer i v1.33
+- Kampens hendelser har nå en tydelig HJEMME/BORTE-indikator for å vise hvilket lag spilleren tilhører.
+- Kampen stopper automatisk ved pause etter 45. minutt.
+- Lagoppstilling/bytte-vinduet åpnes automatisk i pausen, slik at manageren kan justere kamptaktikken og gjøre bytter før andre omgang.
+- Bytter i pausen bruker fortsatt av kvoten på fem bytter, men teller ikke som ett av de tre byttevinduene.
+- Flere bytter i samme stopp teller som ett byttevindu.
 
-JavaScript syntax checked with Node.js. Full mobile-browser gameplay testing has not been performed.
+## Filer
+- `index.html` — spillet.
+- `README.md` — versjonsnotater.
+
+## Publisering
+For å oppdatere GitHub Pages må `index.html` fra denne mappen også kopieres til rotmappen i `main`-grenen, der nettstedet nå publiseres fra. ZIP-arkivet er den ryddige, komplette versjonskopien.

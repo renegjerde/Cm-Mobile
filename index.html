@@ -39,6 +39,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 .match-event{display:grid;grid-template-columns:42px 26px 1fr auto;align-items:start;gap:8px;padding:10px 0;border-bottom:1px solid #26364a}
 .match-event:last-child{border-bottom:0}
+.event-team-badge{display:inline-block;font-size:9px;font-weight:900;letter-spacing:.05em;padding:2px 5px;border-radius:4px;margin-right:3px;vertical-align:1px}.event-team-home{background:#244a39;color:#a8e8c4;border:1px solid #347451}.event-team-away{background:#3b304a;color:#d8b9ff;border:1px solid #685184}
 .event-min{font-variant-numeric:tabular-nums;font-weight:800;color:var(--muted)}
 .event-symbol{font-size:18px;text-align:center;line-height:1.25}
 .event-detail{min-width:0}
@@ -170,7 +171,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.32</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.33</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
@@ -850,9 +851,10 @@ function refreshSubOptions(engine){
  inc.innerHTML=bench.map(p=>`<option value="${String(p.id)}">${esc(p.name)} · ${p.pos}</option>`).join('');
  if([...inc.options].some(o=>o.value===oldIn))inc.value=oldIn;
  else if(inc.options.length)inc.selectedIndex=0;
- const disabled=engine.userSubs>=5||engine.userSubWindows>=3||bench.length===0;
+ const isHalfTime=engine.halfTimeActive===true;
+ const disabled=engine.userSubs>=5||(!isHalfTime&&engine.userSubWindows>=3)||bench.length===0;
  const btn=document.getElementById('makeSubBtn');if(btn)btn.disabled=disabled;
- if(hint){hint.textContent=engine.userSubs>=5?'Alle fem bytter er brukt.':engine.userSubWindows>=3?'Alle tre byttevinduene er brukt.':bench.length===0?'Ingen tilgjengelige reserver i samme posisjon.':`${5-engine.userSubs} bytter igjen · ${3-engine.userSubWindows} byttevinduer igjen.`;}
+ if(hint){hint.textContent=engine.userSubs>=5?'Alle fem bytter er brukt.':(!isHalfTime&&engine.userSubWindows>=3)?'Alle tre byttevinduene er brukt.':bench.length===0?'Ingen tilgjengelige reserver i samme posisjon.':`${5-engine.userSubs} bytter igjen · ${3-engine.userSubWindows} byttevinduer igjen.`;}
 }
 function liveMatchRating(engine,p){
  const perf=engine.performance?.[String(p.id)]||{influence:0,events:0,shots:0,goals:0,assists:0};
@@ -947,7 +949,8 @@ function closeLineup(){
 }
 function makeLiveSubstitution(engine,minute){
  if(!engine||minute>=90)return;
- if(engine.userSubs>=5||engine.userSubWindows>=3){refreshSubOptions(engine);return;}
+ const isHalfTime=engine.halfTimeActive===true&&minute===45;
+ if(engine.userSubs>=5||(!isHalfTime&&engine.userSubWindows>=3)){refreshSubOptions(engine);return;}
  const outEl=document.getElementById('subOut'),inEl=document.getElementById('subIn');
  const outId=outEl?.value,inId=inEl?.value;
  const xi=engine.userIsA?engine.xiA:engine.xiB;
@@ -957,7 +960,7 @@ function makeLiveSubstitution(engine,minute){
  if((incoming.injured||0)>0||(incoming.suspended||0)>0){alert('Denne spilleren er ikke tilgjengelig.');return;}
  if(incoming.pos!==outgoing.pos){alert('Bytter må være posisjon mot posisjon. Velg en reserve i samme posisjon ('+outgoing.pos+').');return;}
  const windowKey=Math.floor(minute/5);
- const wasWindow=engine.lastSubWindowKey===windowKey||engine.lastSubMinute===minute;
+ const wasWindow=isHalfTime||engine.lastSubWindowKey===windowKey||engine.lastSubMinute===minute;
  if(!wasWindow&&engine.userSubWindows>=3){alert('Du har brukt alle tre byttevinduene.');return;}
  const idx=xi.findIndex(p=>String(p.id)===String(outId));
  if(!engine.subbedOutIds)engine.subbedOutIds=[];
@@ -1171,7 +1174,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    <div class="lineup-section-title">GJØR BYTTER</div>
    <div class="sub-grid" style="display:none" aria-hidden="true"><div><label for="subOut">Spiller ut</label><select id="subOut"></select></div><div><label for="subIn">Spiller inn</label><select id="subIn"></select></div></div>
    <div class="sub-actions"><button type="button" id="makeSubBtn" class="primary-control">Gjennomfør bytte</button><span id="subHint" class="sub-count">5 bytter igjen</span></div>
-   <div class="lineup-section-title">ASSISTENT</div><label class="auto-sub-toggle" style="display:flex;align-items:center;gap:10px;padding:10px 0;font-size:13px"><input type="checkbox" id="autoSubsToggle" style="width:18px;height:18px" ${appState.autoSubs?"checked":""}> La assistenten foreta automatiske bytter</label><div class="muted" style="font-size:11px;margin-bottom:10px">Assistenten vurderer kampkarakter og utholdenhet rundt 60, 70 og 80 minutter. Maks fem bytter og tre stopp.</div><div class="lineup-section-title">MENTALITET</div><div class="field"><label for="liveTacticSelect">KAMPTAKTIKK</label><select id="liveTacticSelect"><option value="Defensive">Defensiv</option><option value="Balanced">Balansert</option><option value="Attacking">Offensiv</option><option value="High press">Høyt press</option></select></div>
+   <div class="lineup-section-title">ASSISTENT</div><label class="auto-sub-toggle" style="display:flex;align-items:center;gap:10px;padding:10px 0;font-size:13px"><input type="checkbox" id="autoSubsToggle" style="width:18px;height:18px" ${appState.autoSubs?"checked":""}> La assistenten foreta automatiske bytter</label><div class="muted" style="font-size:11px;margin-bottom:10px">Maks fem bytter totalt. Bytter i pausen teller ikke som ett av de tre byttevinduene; flere bytter i samme stopp teller som ett vindu.</div><div class="lineup-section-title">MENTALITET</div><div class="field"><label for="liveTacticSelect">KAMPTAKTIKK</label><select id="liveTacticSelect"><option value="Defensive">Defensiv</option><option value="Balanced">Balansert</option><option value="Attacking">Offensiv</option><option value="High press">Høyt press</option></select></div>
    <div class="lineup-footer"><button type="button" id="closeLineupContinue" class="primary">Ferdig – fortsett kampen</button></div>
   </div>
  </div>`;
@@ -1239,7 +1242,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    // Shots remain in match statistics, but the event feed only shows goals, cards and injuries.
    if(e.type==='chance'){commentary.textContent=matchCommentary(displayEvent,c,opp,home);continue}
    const row=document.createElement('div');row.className='match-event live-event-new';
-   row.innerHTML=`<div class="event-min">${e.minute}'</div><div class="event-symbol">${icon}</div><div class="event-detail"><strong>${title}</strong><small>${sub} · ${esc(teamName)}</small></div>${e.type==='goal'?`<div class="event-score">${e.score||''}</div>`:''}`;
+   row.innerHTML=`<div class="event-min">${e.minute}'</div><div class="event-symbol">${icon}</div><div class="event-detail"><strong>${title}</strong><small><span class="event-team-badge ${e.side==='A'?'event-team-home':'event-team-away'}">${e.side==='A'?'HJEMME':'BORTE'}</span> ${sub} · ${esc(teamName)}</small></div>${e.type==='goal'?`<div class="event-score">${e.score||''}</div>`:''}`;
    eventContainer.appendChild(row);
    commentary.textContent=matchCommentary(displayEvent,c,opp,home);
    if(e.type==='goal')goalLabel.textContent=`${goalCount} mål`;
@@ -1251,8 +1254,14 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   // Small narrative beats keep the clock alive between major events.
   if(currentMinute===15)commentary.textContent="Et kvarter spilt. Lagene leter etter rom mellom leddene.";
   if(currentMinute===30)commentary.textContent="En halvtime nærmer seg – hvem tør å ta mer risiko?";
-  if(currentMinute===45){headline.textContent="Pause";commentary.textContent=`Pause! ${currentHome}–${currentAway}. Manageren får sjansen til å samle laget.`}
-  if(currentMinute===46)commentary.textContent="Andre omgang er i gang. Nå skal kampen avgjøres.";
+  if(currentMinute===45){
+   headline.textContent="Pause";commentary.textContent=`Pause! ${currentHome}–${currentAway}. Kampen er satt på pause – juster taktikken og gjør bytter før andre omgang.`;
+   paused=true;engine.halfTimeActive=true;
+   if(timer)clearInterval(timer);timer=null;
+   pauseBtn.textContent="▶ Fortsett";pauseBtn.classList.add('live-paused');status.textContent=`PAUSE · ${currentMinute}'`;
+   const halfModal=document.getElementById('lineupModal');if(halfModal){halfModal.classList.add('open');renderLiveLineup(engine,currentMinute,score.textContent);refreshSubOptions(engine);}
+  }
+  if(currentMinute===46){engine.halfTimeActive=false;commentary.textContent="Andre omgang er i gang. Nå skal kampen avgjøres."};
   if(currentMinute===60)commentary.textContent="Siste halvtimen starter. Slitne bein kan gi nye muligheter.";
   if(currentMinute===75)commentary.textContent="Et kvarter igjen. Nå kan hver eneste situasjon bli avgjørende.";
   if(currentMinute>=90){
@@ -1390,7 +1399,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.32 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.33 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}
