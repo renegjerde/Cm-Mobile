@@ -1,13 +1,15 @@
-# CM Mobile v1.41 — Automatic Substitutions
+# CM Mobile v1.42 — Recovery and squad rotation
 
-## Endringer
-- Automatiske assistentbytter aktiveres som standard ved oppgradering fra eldre karrierer.
-- Valget kan fortsatt slås av/på i kampens lagoppstilling og huskes etterpå.
-- Lagoppstillingen viser tydelig om assistentbytter er aktivert.
-- Eksisterende regler om maksimalt fem innbyttere og tre stoppvinduer beholdes.
+## Changes
+- Physical fitness no longer resets automatically to 100% before each round.
+- Recovery between rounds is gradual and depends on the player's stamina attribute.
+- Injured players recover more slowly.
+- Players who did not play receive an additional recovery bonus.
+- Playing the full match causes more meaningful fatigue; high press increases the physical load, while a defensive approach reduces it.
+- The pre-match setup explains the recovery system.
 
-## Oppdatering på GitHub Pages
-Last opp `index.html` til rotmappen på `main`-grenen i `Cm-Mobile`. `README.md` kan beholdes som dokumentasjon. `check.js` er ikke nødvendig for at spillet skal kjøre.
+## Install
+Replace the root `index.html` on the `main` branch used by GitHub Pages with the included `index.html`. The ZIP contains this version folder with `index.html` and `README.md`.
 
-## Teststatus
-JavaScript-syntaks kontrollert med `node --check`. Ingen full ende-til-ende mobiltest er utført.
+## Validation
+JavaScript syntax checked with Node.js. Full browser/gameplay testing has not been performed.
