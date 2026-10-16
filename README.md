@@ -1,19 +1,18 @@
-# CM Mobile v1.48 — Transfer Market Overhaul
+# CM Mobile v1.49 — English League Pyramid & Domestic Cups
 
-## Hva er nytt
-- Overgangsmarkedet bruker den lokale spillerbasen fra alle andre Premier League-klubber, i stedet for fem faste prototypenavn.
-- 100 genererte klubbløse talenter gir markedet ekstra bredde. Disse er tydelig fiktive/genererte, ikke ekte spillerdata.
-- Søk etter spiller eller klubb, filtrer på posisjon/tilgjengelighet, og sorter etter anbefaling, ferdighet, potensial, pris eller alder.
-- Kjøp oppdaterer kjøperens tropp og selgerklubbens database; budsjettet trekkes fra. Nøkkelspillere kan avslå bud og kreve høyere pris.
-- Markedet bygges lokalt og lagres i nettleserens spilltilstand; ingen eksterne data hentes når markedet åpnes.
+## Included
+- Competition centre with Premier League, Championship, League One and League Two tables.
+- Simulated lower-division league rounds progress alongside the Premier League season.
+- FA Cup and EFL Cup knockout competitions with draws, results, winners and round progression.
+- Cup dates are scheduled into selected midweek round slots.
+- When the user's club plays a scheduled cup tie, the tie is recorded and the squad takes an additional fitness load; low-stamina players recover more slowly through the existing recovery system, and minor injury risk is applied.
+- Competition data is stored locally with the career save; it does not fetch external statistics repeatedly.
 
-## Viktige avgrensninger
-- Spillerverdier og om en klubb godtar et bud er spillmodell-estimater, ikke faktiske Transfermarkt-priser.
-- Dette er første steg i overgangsmarkedet. AI-styrte kjøp/salg gjennom sesongen, kontraktsforhandlinger og formelt overgangsvindu er fortsatt videre arbeid.
-- Europeiske turneringer og EFL Championship/League One/League Two er planlagt som neste større trinn, ikke implementert i denne versjonen.
+## Important limitations
+- Cup ties and lower-division matches are simulated automatically in parallel; the current live-match engine is still used for the user's Premier League match only.
+- Exact real-world fixture dates, replays, two-legged semi-finals, EFL Cup bye rules, and the full non-league pyramid are simplified. The FA Cup includes a representative selection of non-league clubs.
+- Lower-division tables are simulated, but automatic promotion/relegation into the Premier League and club-by-club squad management across all 92 league clubs are not yet fully wired into the next season.
+- This is a local single-player prototype, not a verified real-world fixture database.
 
-## Publisering
-Last opp denne `index.html` til rotmappen på `main`-grenen for GitHub Pages. Spilldata lagres lokalt i nettleseren; ta vare på eksport/lagring dersom du vil beskytte en karriere.
-
-## Test
-JavaScript-syntaks kontrollert med `node --check`. Ikke fulltestet i mobilnettleser.
+## Install
+Upload `index.html` from this folder to the root of the `main` branch used by GitHub Pages. Keep `README.md` for documentation; it is not required for the app to run.
