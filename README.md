@@ -1,13 +1,19 @@
-# CM Mobile v1.36
+# CM Mobile v1.38 — Match Management
 
-## Endringer
-- Kampdetaljer for de øvrige kampene viser nå hvilket lag hver målscorer, assistent, kortmottaker eller skadet spiller tilhører.
-- Lagtilhørighet vises som en tydelig etikett på hver hendelse, basert på hjemme-/bortelagets side i kampdataene.
-- Beholder den utvidbare kampoversikten og eksisterende hendelsesdetaljer.
+## Included
+- Injury incidents on the user's team trigger an immediate substitution when a valid substitute and substitution allowance are available.
+- The assistant's optional automatic substitutions consider live match rating, stamina, and positional suitability at the 60th, 70th, and 80th minute checkpoints.
+- The match automatically pauses at half-time (45'). The manager can open the lineup/tactics panel and make changes before starting the second half.
+- Half-time substitutions count toward the maximum of five players but do not consume one of the three substitution windows.
+- Injury, manual, and assistant substitutions share the match's substitution counters.
 
-## Kontroll
-- JavaScript-syntaks kontrollert med `node --check`.
-- Ingen full mobilnettlesertest gjennomført i denne leveransen.
+## Install
+Replace the repository-root `index.html` on the `main` branch with the `index.html` in this version folder. Keep the version folder and README for version history. GitHub Pages currently serves the root `index.html`.
 
-## Publisering
-Pakk ut ZIP-en og bruk `CM_Mobile_v1.36/index.html` til å erstatte rotfilen `index.html` i GitHub-repoet som publiseres fra `main`-branchens rot.
+## Validation
+The embedded JavaScript passed `node --check`. Full interactive testing on mobile browsers is still recommended. The app stores career state locally in the browser.
+
+
+## v1.38 – Kampstart og navigasjon
+- Avspark-knapp også øverst på laguttakssiden, slik at du slipper å bla forbi hele troppen.
+- Når en kamp starter, flyttes visningen automatisk til toppen av live-kampsiden, uavhengig av hvor langt ned du var på forrige side.

@@ -91,6 +91,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .live-goal-score{animation:scorePop .42s ease-out}
 @keyframes scorePop{0%{transform:scale(1)}45%{transform:scale(1.16);color:var(--green)}100%{transform:scale(1)}}
 .live-paused{color:#ffd27d!important}
+#halftimePanel{margin-top:12px} #halftimePanel .hero-actions button{flex:1}
 
 
 .sub-panel{margin-top:12px;padding:12px;border:1px solid #34485f;border-radius:12px;background:#132238}
@@ -170,7 +171,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.36</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.38</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
@@ -595,7 +596,7 @@ function tactics(){
  const pitch=()=>`${stablePitchRows.map(row=>pitchLine(row)).join('')}<div style="margin-top:8px;text-align:center">🧤 ${gk.map(p=>`${esc(p.name)} · ${p.rating}`).join(', ')||'Ingen keeper'}</div>`;
  const playerDetail=(p)=>`<div class="player-meta">${p.pos==="GK"?`Keepergrep ${p.attributes.handling} · Reflekser ${p.attributes.reflexes} · Posisjonering ${p.attributes.positioning}`:p.pos==="DEF"?`Forsvar ${p.attributes.defending} · Styrke ${p.attributes.strength} · Hurtighet ${p.attributes.pace}`:p.pos==="MID"?`Pasninger ${p.attributes.passing} · Kreativitet ${p.attributes.creativity} · Utholdenhet ${p.attributes.stamina}`:`Avslutninger ${p.attributes.finishing} · Hurtighet ${p.attributes.pace} · Teknikk ${p.attributes.technique}`}</div><div class="fitness-track"><div class="fitness-fill" style="width:${p.fitness}%;background:${p.fitness<60?'#e48787':p.fitness<78?'#e8c875':'var(--green)'}"></div></div>`;
  const bench=eligibleSquad(appState.squad).filter(p=>!xi.some(q=>String(q.id)===String(p.id)));
- return `<div class="hero"><div class="eyebrow">Match preparation</div><h1>Laguttak og taktikk</h1><p>Velg startelleveren før avspark. Form og utholdenhet vises for hver spiller. Utholdenhet er en egen ferdighet og påvirker hvor raskt spilleren blir sliten i kampen.</p><div class="hero-actions"><span class="pill green">${xi.length}/11 valgt</span><span class="pill">Reserver: ${bench.length}</span></div></div><section class="card"><div class="notice" style="margin-top:0"><strong>🤖 Assistentens anbefaling</strong><p style="margin:6px 0">Motstander: ${esc(CLUBS[getNextOpponentIndex()].name)} · forventet formasjon <strong>${getOpponentFormation(getNextOpponentIndex(),appState.week)}</strong>.</p><p style="margin:6px 0">Foreslått oppsett: <strong>${appState.formation}</strong> · mentalitet <strong>${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</strong>. Elleveren er valgt ut fra posisjon, ferdigheter, form og fysisk tilstand.</p><button type="button" onclick="applyPreMatchRecommendation(true);render()">Bruk anbefalingen på nytt</button></div>${disciplinarySummary()}<div class="notice"><strong>🤝 Samspill og formasjonserfaring</strong><p style="margin:6px 0">Erfaring med ${esc(appState.formation)}: <strong>${formationFamiliarity()}%</strong> · Samspill i laget: <strong>${Number(appState.teamCohesion??25)}%</strong></p><div style="height:7px;background:var(--line);border-radius:8px;overflow:hidden;margin:5px 0 10px"><div style="height:100%;width:${formationFamiliarity()}%;background:var(--green)"></div></div><p style="margin:6px 0;font-size:12px">Erfaring bygges ved å bruke samme formasjon. Samspill øker når mange av de samme spillerne starter sammen. Store endringer og formasjonsskifter svekker fordelen.</p></div><div class="field"><label>FORMASJON</label><select id="formation" onchange="appState.formation=this.value;appState.selectedXI=null;save();render()">${["4-4-2","4-3-3","4-2-3-1","3-5-2"].map(f=>`<option ${appState.formation===f?"selected":""}>${f}</option>`).join("")}</select></div><div class="field"><label>MENTALITET</label><select id="tactic" onchange="appState.tactic=this.value;save()">${["Defensive","Balanced","Attacking","High press"].map(f=>`<option value="${f}" ${appState.tactic===f?"selected":""}>${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[f]}</option>`).join("")}</select></div><div class="section-title"><h2>Startellever</h2><small>${xi.length}/11 spillere</small></div><div style="background:linear-gradient(180deg,#17452f,#123622);border:1px solid #2b6848;border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:#b5e6bf">▲ ANGREP</div>${pitch()}</div><div class="section-title"><h2>Velg spillere</h2><small>sortert etter taktisk rolle</small></div><p class="muted" style="font-size:11px">Trykk på listene for å velge hvem som starter. Skadde og suspenderte spillere kan ikke velges.</p><div class="section-title"><h2>Keeper</h2></div>${slotControls(xi.filter(p=>p.assignedRole==='GK'))}<div class="section-title"><h2>Forsvar</h2></div>${slotControls(xi.filter(p=>['LB','LCB','CB','RCB','RB','LWB','RWB'].includes(p.assignedRole)))}<div class="section-title"><h2>Midtbane</h2></div>${slotControls(xi.filter(p=>['DM','CM','LM','RM'].includes(p.assignedRole)))}<div class="section-title"><h2>Angrep</h2></div>${slotControls(xi.filter(p=>['LW','AM','RW','ST'].includes(p.assignedRole)))}<div class="section-title"><h2>Reserver</h2><small>sortert etter taktisk rolle</small></div>${["GK","DEF","MID","ATT"].map(pos=>{const ps=bench.filter(p=>p.pos===pos);return ps.length?`<div class="lineup-section-title">${posLabels[pos]}</div>${ps.map(p=>`<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span> · ${p.rating}</div>${playerDetail(p)}</div><div class="lineup-player-side"><strong>${p.rating}</strong><span>${p.fitness}%</span></div></div>`).join("")}`:""}).join("")}<button class="primary" style="width:100%;margin-top:12px" onclick="playMatch()">⚽ Avspark – bruk valgt startellever</button></section>`;
+ return `<div class="hero"><div class="eyebrow">Match preparation</div><h1>Laguttak og taktikk</h1><p>Velg startelleveren før avspark. Form og utholdenhet vises for hver spiller. Utholdenhet er en egen ferdighet og påvirker hvor raskt spilleren blir sliten i kampen.</p><div class="hero-actions"><span class="pill green">${xi.length}/11 valgt</span><span class="pill">Reserver: ${bench.length}</span></div><button class="primary" style="width:100%;margin-top:12px" onclick="playMatch()">⚽ Avspark – bruk valgt startellever</button></div><section class="card"><div class="notice" style="margin-top:0"><strong>🤖 Assistentens anbefaling</strong><p style="margin:6px 0">Motstander: ${esc(CLUBS[getNextOpponentIndex()].name)} · forventet formasjon <strong>${getOpponentFormation(getNextOpponentIndex(),appState.week)}</strong>.</p><p style="margin:6px 0">Foreslått oppsett: <strong>${appState.formation}</strong> · mentalitet <strong>${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</strong>. Elleveren er valgt ut fra posisjon, ferdigheter, form og fysisk tilstand.</p><button type="button" onclick="applyPreMatchRecommendation(true);render()">Bruk anbefalingen på nytt</button></div>${disciplinarySummary()}<div class="notice"><strong>🤝 Samspill og formasjonserfaring</strong><p style="margin:6px 0">Erfaring med ${esc(appState.formation)}: <strong>${formationFamiliarity()}%</strong> · Samspill i laget: <strong>${Number(appState.teamCohesion??25)}%</strong></p><div style="height:7px;background:var(--line);border-radius:8px;overflow:hidden;margin:5px 0 10px"><div style="height:100%;width:${formationFamiliarity()}%;background:var(--green)"></div></div><p style="margin:6px 0;font-size:12px">Erfaring bygges ved å bruke samme formasjon. Samspill øker når mange av de samme spillerne starter sammen. Store endringer og formasjonsskifter svekker fordelen.</p></div><div class="field"><label>FORMASJON</label><select id="formation" onchange="appState.formation=this.value;appState.selectedXI=null;save();render()">${["4-4-2","4-3-3","4-2-3-1","3-5-2"].map(f=>`<option ${appState.formation===f?"selected":""}>${f}</option>`).join("")}</select></div><div class="field"><label>MENTALITET</label><select id="tactic" onchange="appState.tactic=this.value;save()">${["Defensive","Balanced","Attacking","High press"].map(f=>`<option value="${f}" ${appState.tactic===f?"selected":""}>${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[f]}</option>`).join("")}</select></div><div class="section-title"><h2>Startellever</h2><small>${xi.length}/11 spillere</small></div><div style="background:linear-gradient(180deg,#17452f,#123622);border:1px solid #2b6848;border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:#b5e6bf">▲ ANGREP</div>${pitch()}</div><div class="section-title"><h2>Velg spillere</h2><small>sortert etter taktisk rolle</small></div><p class="muted" style="font-size:11px">Trykk på listene for å velge hvem som starter. Skadde og suspenderte spillere kan ikke velges.</p><div class="section-title"><h2>Keeper</h2></div>${slotControls(xi.filter(p=>p.assignedRole==='GK'))}<div class="section-title"><h2>Forsvar</h2></div>${slotControls(xi.filter(p=>['LB','LCB','CB','RCB','RB','LWB','RWB'].includes(p.assignedRole)))}<div class="section-title"><h2>Midtbane</h2></div>${slotControls(xi.filter(p=>['DM','CM','LM','RM'].includes(p.assignedRole)))}<div class="section-title"><h2>Angrep</h2></div>${slotControls(xi.filter(p=>['LW','AM','RW','ST'].includes(p.assignedRole)))}<div class="section-title"><h2>Reserver</h2><small>sortert etter taktisk rolle</small></div>${["GK","DEF","MID","ATT"].map(pos=>{const ps=bench.filter(p=>p.pos===pos);return ps.length?`<div class="lineup-section-title">${posLabels[pos]}</div>${ps.map(p=>`<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span> · ${p.rating}</div>${playerDetail(p)}</div><div class="lineup-player-side"><strong>${p.rating}</strong><span>${p.fitness}%</span></div></div>`).join("")}`:""}).join("")}<button class="primary" style="width:100%;margin-top:12px" onclick="playMatch()">⚽ Avspark – bruk valgt startellever</button></section>`;
 }
 function transfers(){let targets=[{name:"T. Adeyemi",pos:"ATT",age:21,rating:76,potential:88,value:27.5,wage:48},{name:"M. Laurent",pos:"MID",age:19,rating:67,potential:86,value:8.5,wage:18},{name:"J. van Dijk",pos:"DEF",age:24,rating:74,potential:79,value:16,wage:35},{name:"A. Costa",pos:"GK",age:22,rating:70,potential:84,value:7.2,wage:22},{name:"R. Mensah",pos:"MID",age:28,rating:78,potential:78,value:21,wage:62}];return `<div class="hero"><div class="eyebrow">Recruitment centre</div><h1>Overgangsmarked</h1><p>Finn forsterkninger, men pass på budsjettet. Alle spillerne i denne listen er fiktive prototypedata.</p><div class="hero-actions"><span class="pill green">Budsjett ${money(appState.budget)}</span><span class="pill">Lønnskostnader kommer senere</span></div></div><section class="card">${targets.map((p,i)=>`<div class="player"><div><div class="player-name">${p.name} <span class="pill">${p.pos}</span></div><div class="player-meta">${p.age} år · Potensial ${p.potential} · Lønn ${p.wage}k/uke</div><div class="attrs"><span class="attr">Verdi ${money(p.value)}</span></div></div><div style="text-align:right"><div class="rating">${p.rating}</div><button style="margin-top:6px;padding:7px 9px" onclick="buyPlayer(${i})" ${appState.budget<p.value?"disabled":""}>By ${money(p.value)}</button></div></div>`).join("")}</section><div class="notice">Overgangene er foreløpig direkte kjøp til markedsverdi. Bud, forhandlinger, AI-klubber og kontrakter kommer i neste iterasjon.</div>`}
 function buyPlayer(i){let targets=[{name:"T. Adeyemi",pos:"ATT",age:21,rating:76,potential:88,value:27.5,wage:48},{name:"M. Laurent",pos:"MID",age:19,rating:67,potential:86,value:8.5,wage:18},{name:"J. van Dijk",pos:"DEF",age:24,rating:74,potential:79,value:16,wage:35},{name:"A. Costa",pos:"GK",age:22,rating:70,potential:84,value:7.2,wage:22},{name:"R. Mensah",pos:"MID",age:28,rating:78,potential:78,value:21,wage:62}];let p={...targets[i],id:Date.now(),attributes:generateAttributes(targets[i].pos,targets[i].rating),fitness:100,morale:80,goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0};if(appState.budget<p.value)return;appState.budget=+(appState.budget-p.value).toFixed(1);appState.squad.push(p);appState.log.push(`${p.name} har signert for ${currentClub().name} for ${money(p.value)}.`);save();render()}
@@ -873,7 +874,7 @@ function assistantAutoSubs(engine,minute){
   if(done>=2||engine.userSubs>=5||engine.userSubWindows>=3)break;
   const out=item.p;
   if(item.grade>=6.15&&item.stamina>=48)continue;
-  const bench=appState.squad.filter(p=>!onPitch.has(String(p.id))&&!engine.subbedOutIds?.some(id=>String(id)===String(p.id))&&(p.injured||0)<=0&&(p.suspended||0)<=0&&p.pos===out.pos).sort((a,b)=>effectivePlayerRating(engine,b)-effectivePlayerRating(engine,a));
+  const bench=appState.squad.filter(p=>!onPitch.has(String(p.id))&&!engine.subbedOutIds?.some(id=>String(id)===String(p.id))&&(p.injured||0)<=0&&(p.suspended||0)<=0&&p.pos===out.pos).sort((a,b)=>(effectivePlayerRating(engine,b)+roleFitBonus(b,out.assignedRole||out.role))-(effectivePlayerRating(engine,a)+roleFitBonus(a,out.assignedRole||out.role)));
   const incoming=bench[0];if(!incoming)continue;
   const xiIndex=xi.findIndex(p=>String(p.id)===String(out.id));if(xiIndex<0)continue;
   const currentWindow=engine.lastSubWindowKey===Math.floor(trigger/5);
@@ -938,7 +939,7 @@ function openLineup(engine,minute){
 }
 function closeLineup(){
  const modal=document.getElementById('lineupModal');if(modal)modal.classList.remove('open');
- if(!matchFinished&&paused){paused=false;pauseBtn.textContent='Ⅱ Pause';pauseBtn.classList.remove('live-paused');status.textContent=`LIVE · ${currentMinute}'`;timer=setInterval(clockTick,tickMs);}
+ if(!matchFinished&&paused&&currentMinute!==45){paused=false;pauseBtn.textContent='Ⅱ Pause';pauseBtn.classList.remove('live-paused');status.textContent=`LIVE · ${currentMinute}'`;timer=setInterval(clockTick,tickMs);}
 }
 function makeLiveSubstitution(engine,minute){
  if(!engine||minute>=90)return;
@@ -952,7 +953,8 @@ function makeLiveSubstitution(engine,minute){
  if((incoming.injured||0)>0||(incoming.suspended||0)>0){alert('Denne spilleren er ikke tilgjengelig.');return;}
  if(incoming.pos!==outgoing.pos){alert('Bytter må være posisjon mot posisjon. Velg en reserve i samme posisjon ('+outgoing.pos+').');return;}
  const windowKey=Math.floor(minute/5);
- const wasWindow=engine.lastSubWindowKey===windowKey||engine.lastSubMinute===minute;
+ const isHalftime=minute===45;
+ const wasWindow=isHalftime||engine.lastSubWindowKey===windowKey||engine.lastSubMinute===minute;
  if(!wasWindow&&engine.userSubWindows>=3){alert('Du har brukt alle tre byttevinduene.');return;}
  const idx=xi.findIndex(p=>String(p.id)===String(outId));
  if(!engine.subbedOutIds)engine.subbedOutIds=[];
@@ -961,7 +963,7 @@ function makeLiveSubstitution(engine,minute){
  engine.stamina[String(incoming.id)]=clamp(88+(playerFitnessValue(incoming)-80)*.25,78,100);
  if(!engine.performance[String(incoming.id)])engine.performance[String(incoming.id)]={influence:0,events:0,shots:0,goals:0,assists:0};
  engine.userSubs++;
- if(!wasWindow){engine.userSubWindows++;engine.lastSubMinute=minute;engine.lastSubWindowKey=windowKey;}
+ if(!wasWindow){engine.userSubWindows++;engine.lastSubMinute=minute;engine.lastSubWindowKey=windowKey;}else if(!isHalftime){engine.lastSubMinute=minute;}
  const appearance=engine.appearances[String(outgoing.id)];if(appearance)appearance.end=minute;
  engine.appearances[String(incoming.id)]={player:incoming,start:minute,end:90,started:false};
  recomputeLiveTeam(engine,engine.userIsA?'A':'B');
@@ -973,6 +975,56 @@ function makeLiveSubstitution(engine,minute){
  const headline=document.getElementById('liveHeadline');if(headline)headline.textContent='Manageren gjør grep';
  refreshSubOptions(engine);
  renderLiveLineup(engine,minute,document.getElementById('liveScore')?.textContent||`${engine.ga} – ${engine.gb}`);
+}
+
+function roleFitBonus(p,role){
+ const natural=p.naturalPositions||[];if(!role)return 0;
+ if(natural.includes(role))return 8;
+ const group=p.pos==='GK'?['GK']:p.pos==='DEF'?['LB','RB','CB','LCB','RCB']:p.pos==='MID'?['DM','CM','AM','LM','RM','LW','RW']:['ST','CF','LW','RW'];
+ return group.includes(role)?2:-12;
+}
+function handleLiveInjury(engine,event,minute){
+ if(!event||event.type!=='injury'||event.handled)return;
+ event.handled=true;
+ const side=event.side,xi=side==='A'?engine.xiA:engine.xiB;
+ const injured=xi.find(p=>String(p.id)===String(event.playerId))||xi.find(p=>p.name===event.player);
+ if(!injured)return;
+ injured.injured=Math.max(Number(injured.injured)||0,1+Math.floor(Math.random()*3));
+ injured.injuryType='kamp-skade';
+ const appearance=engine.appearances[String(injured.id)];if(appearance)appearance.end=minute;
+ const isUser=(side==='A'?engine.a:engine.b)===appState.club;
+ const teamName=CLUBS[side==='A'?engine.a:engine.b].name;
+ const onPitch=new Set(xi.map(p=>String(p.id)));
+ let incoming=null;
+ if(isUser){
+  const canUseSub=engine.userSubs<5&&(engine.userSubWindows<3||engine.lastSubMinute===minute||minute===45);
+  if(canUseSub){
+   incoming=appState.squad.filter(p=>!onPitch.has(String(p.id))&&!(engine.subbedOutIds||[]).some(id=>String(id)===String(p.id))&&!(p.injured>0)&&!(p.suspended>0))
+    .sort((a,b)=>((b.pos===injured.pos?30:0)+roleFitBonus(b,injured.assignedRole||injured.role)+effectivePlayerRating(engine,b)*.25)-((a.pos===injured.pos?30:0)+roleFitBonus(a,injured.assignedRole||injured.role)+effectivePlayerRating(engine,a)*.25))[0]||null;
+  }
+ }else{
+  const roster=side==='A'?engine.playersA:engine.playersB;
+  incoming=roster.filter(p=>!onPitch.has(String(p.id))&&!(p.injured>0)&&!(p.suspended>0))
+   .sort((a,b)=>((b.pos===injured.pos?30:0)+roleFitBonus(b,injured.assignedRole||injured.role)+effectivePlayerRating(engine,b)*.25)-((a.pos===injured.pos?30:0)+roleFitBonus(a,injured.assignedRole||injured.role)+effectivePlayerRating(engine,a)*.25))[0]||null;
+ }
+ if(incoming){
+  const idx=xi.findIndex(p=>String(p.id)===String(injured.id));
+  if(idx>=0){xi[idx]=incoming;}
+  if(isUser){
+   if(!engine.subbedOutIds)engine.subbedOutIds=[];engine.subbedOutIds.push(injured.id);engine.userSubs++;
+   if(engine.lastSubMinute!==minute&&minute!==45){engine.userSubWindows++;engine.lastSubMinute=minute;engine.lastSubWindowKey=Math.floor(minute/5);}else if(minute!==45){engine.lastSubMinute=minute;}
+  }
+  engine.stamina[String(incoming.id)]=clamp(90+(playerFitnessValue(incoming)-80)*.2,78,100);
+  engine.performance[String(incoming.id)]={influence:0,events:0,shots:0,goals:0,assists:0};
+  engine.appearances[String(incoming.id)]={player:incoming,start:minute,end:90,started:false};
+  const row=document.createElement('div');row.className='match-event live-event-new sub-event';row.innerHTML=`<div class="event-min">${minute}'</div><div class="event-symbol">🔁</div><div class="event-detail"><strong>${esc(incoming.name)} inn for ${esc(injured.name)}</strong><small>Skadebytte · ${esc(teamName)}${isUser?` · ${engine.userSubs}/5 bytter, ${engine.userSubWindows}/3 stopp`:''}</small></div>`;document.getElementById('liveEvents')?.appendChild(row);
+ }else{
+  const idx=xi.findIndex(p=>String(p.id)===String(injured.id));if(idx>=0)xi.splice(idx,1);
+  const row=document.createElement('div');row.className='match-event live-event-new';row.innerHTML=`<div class="event-min">${minute}'</div><div class="event-symbol">⚠️</div><div class="event-detail"><strong>${esc(injured.name)} kan ikke fortsette</strong><small>${esc(teamName)} spiller videre med én færre – ingen gyldig bytteressurs eller byttevindu.</small></div>`;document.getElementById('liveEvents')?.appendChild(row);
+ }
+ if(isUser){if(!appState.injuryReport.some(r=>String(r.playerId)===String(injured.id)&&r.round===appState.week))recordInjury(injured,appState.week);refreshSubOptions(engine);}
+ recomputeLiveTeam(engine,side);
+ const commentary=document.getElementById('liveCommentary');if(commentary)commentary.textContent=incoming?`${injured.name} må ut med skade. ${incoming.name} kommer inn for ${teamName}.`:`${injured.name} må ut med skade. ${teamName} må fortsette med ti mann.`;
 }
 
 function advanceLiveEngine(engine,minute){
@@ -1089,6 +1141,11 @@ function playMatch(){
  }
  const emptyStats={shots:0,shotsAgainst:0,onTarget:0,onTargetAgainst:0,possession:50};
  showMatch(c,opp,0,0,home,'',emptyStats,roundResults,[],[],{},userMatch,round,previousPositions);
+ // Always start a newly opened live match at the top, regardless of the scroll
+ // position in the long pre-match squad selection screen.
+ window.scrollTo(0,0);
+ requestAnimationFrame(()=>window.scrollTo(0,0));
+ setTimeout(()=>window.scrollTo(0,0),40);
 }
 function matchCommentary(e,c,opp,home){
  const club=e.side==="user"?c.name:opp.name;
@@ -1140,6 +1197,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   <div class="live-score-hero"><div class="score-club">${homeName}</div><div id="liveScore" class="live-score">0 – 0</div><div class="score-club">${awayName}</div></div>
   <button type="button" class="lineup-open" id="openLineupBtn">♟ Bytter / taktikk · Lagoppstilling</button>
   <div id="liveCommentary" class="live-commentary">${openerLines[Math.floor(Math.random()*openerLines.length)]}</div>
+  <div id="halftimePanel" class="notice" style="display:none"><strong>Pause – lagprat</strong><p style="margin:6px 0 10px">Gjør bytter og endre taktikk før andre omgang. Bytter i pausen bruker ikke et av de tre stoppvinduene, men teller mot grensen på fem spillere.</p><div class="hero-actions"><button type="button" id="halftimeLineupBtn">Bytter / taktikk</button><button type="button" class="primary" id="startSecondHalfBtn">Start andre omgang →</button></div></div>
  </div>
  <section class="card">
   <div class="row" style="padding:10px 0 18px;align-items:center">
@@ -1203,7 +1261,6 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   const lineupModalLive=document.getElementById('lineupModal');if(lineupModalLive?.classList.contains('open'))renderLiveLineup(engine,currentMinute,score.textContent);
   // Generate the match itself one minute at a time: shots, cards, injuries and goals do not exist until this tick.
   const newEvents=advanceLiveEngine(engine,currentMinute);
-  assistantAutoSubs(engine,currentMinute);
   const liveHomeShots=engine.stats.shotsA;
   const liveAwayShots=engine.stats.shotsB;
   const liveHomeOnTarget=engine.stats.onA;
@@ -1219,6 +1276,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    const teamName=isUser?c.name:opp.name;
    const displayEvent={...e,side:displaySide};
    allEvents.push(displayEvent);
+   if(e.type==='injury')handleLiveInjury(engine,e,currentMinute);
    let icon=e.type==='goal'?'⚽':e.type==='yellow'?'<span class="card-yellow"></span>':e.type==='red'?'<span class="card-red"></span>':e.type==='injury'?'<span class=\"injury-cross\" aria-label=\"Skade\">✚</span>':'🎯';
    let title=e.type==='goal'?esc(e.scorer):esc(e.player||(e.type==='chance'?'Avslutning':'Spiller'));
    let sub=e.type==='goal'?(e.assist?'Mål · Assist: '+esc(e.assist):'Mål'):e.type==='yellow'?'Gult kort · '+esc(e.reason||'Forseelse'):e.type==='red'?'Rødt kort · '+esc(e.reason||'Utvist'):e.type==='injury'?'Skade':e.type==='chance'?(e.onTarget?'Skudd på mål':'Avslutning utenfor mål'):'Hendelse';
@@ -1239,6 +1297,8 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    commentary.textContent=matchCommentary(displayEvent,c,opp,home);
    if(e.type==='goal')goalLabel.textContent=`${goalCount} mål`;
   }
+  // Assistant substitutions happen after injuries from this minute have been handled.
+  assistantAutoSubs(engine,currentMinute);
   // The live score is the source of truth; tactics selected now affect future minutes.
   engine.ga=engine.ga||0;engine.gb=engine.gb||0;
   currentHome=engine.ga;currentAway=engine.gb;
@@ -1246,7 +1306,13 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   // Small narrative beats keep the clock alive between major events.
   if(currentMinute===15)commentary.textContent="Et kvarter spilt. Lagene leter etter rom mellom leddene.";
   if(currentMinute===30)commentary.textContent="En halvtime nærmer seg – hvem tør å ta mer risiko?";
-  if(currentMinute===45){headline.textContent="Pause";commentary.textContent=`Pause! ${currentHome}–${currentAway}. Manageren får sjansen til å samle laget.`}
+  if(currentMinute===45){
+   headline.textContent="Pause";commentary.textContent=`Pause! ${currentHome}–${currentAway}. Gjør bytter og taktiske endringer før andre omgang.`;
+   paused=true;if(timer)clearInterval(timer);timer=null;status.textContent="PAUSE · HT";pauseBtn.textContent="▶ Start andre omgang";pauseBtn.classList.add('live-paused');
+   const hp=document.getElementById('halftimePanel');if(hp)hp.style.display='block';
+   const hbtn=document.getElementById('halftimeLineupBtn');if(hbtn)hbtn.onclick=()=>openLineupNow();
+   const startBtn=document.getElementById('startSecondHalfBtn');if(startBtn)startBtn.onclick=()=>{const panel=document.getElementById('halftimePanel');if(panel)panel.style.display='none';paused=false;pauseBtn.textContent='Ⅱ Pause';pauseBtn.classList.remove('live-paused');status.textContent="LIVE · 45'";headline.textContent='Andre omgang';commentary.textContent='Andre omgang er i gang. Nå skal kampen avgjøres.';timer=setInterval(clockTick,tickMs);};
+  }
   if(currentMinute===46)commentary.textContent="Andre omgang er i gang. Nå skal kampen avgjøres.";
   if(currentMinute===60)commentary.textContent="Siste halvtimen starter. Slitne bein kan gi nye muligheter.";
   if(currentMinute===75)commentary.textContent="Et kvarter igjen. Nå kan hver eneste situasjon bli avgjørende.";
@@ -1267,13 +1333,6 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    appState.log.push(resultText);
    // Match incidents: injuries are uncommon; bookings can accumulate into suspensions.
    const activePlayers=appState.squad.filter(p=>engine.appearances[String(p.id)]&&engine.appearances[String(p.id)].start<90);
-   if(activePlayers.length){
-    const injuryChance=activePlayers.reduce((sum,p)=>sum+matchFitnessRisk(p),0)/activePlayers.length;
-    if(Math.random()<injuryChance){
-     const hurt=weightedPick(activePlayers,activePlayers.map(p=>Math.max(.01,matchFitnessRisk(p))));
-     if(hurt)recordInjury(hurt,appState.week);
-    }
-   }
    // Discipline is player-specific: yellows accumulate, five bring a one-match ban; red cards cause a ban too.
    for(const e of engine.events.filter(e=>e.type==="yellow"||e.type==="red")){
     if(!e.playerId)continue;
@@ -1313,7 +1372,6 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    for(const e of engine.events){
     const own=(e.side==='A'?engine.a:engine.b)===appState.club;
     if(own&&e.type==='goal'&&e.scorerId){const p=appState.squad.find(x=>x.id===e.scorerId);if(p)p.goals=(p.goals||0)+1;if(e.assist){const ap=appState.squad.find(x=>x.name===e.assist);if(ap)ap.assists=(ap.assists||0)+1}}
-    if(own&&e.type==='injury'){const p=appState.squad.find(x=>x.id===e.playerId);if(p)p.injured=1+Math.floor(Math.random()*3)}
     if(own&&e.type==='red'){const p=appState.squad.find(x=>x.id===e.playerId);if(p)p.suspended=1}
    }
    const lines=margin>0?['Tre poeng!','En sterk lagprestasjon!','Jobben er gjort!']:margin===0?['Delt poeng.','En jevn kamp ender uavgjort.','Ingen klarte å vippe det i sin favør.']:['Tap i dag.','Det glapp på små marginer.','Vi må slå tilbake neste kamp.'];
@@ -1339,6 +1397,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  };
  pauseBtn.addEventListener("click",()=>{
   if(matchFinished)return;
+  if(currentMinute===45&&paused){const panel=document.getElementById('halftimePanel');if(panel)panel.style.display='none';paused=false;pauseBtn.textContent='Ⅱ Pause';pauseBtn.classList.remove('live-paused');status.textContent="LIVE · 45'";headline.textContent='Andre omgang';commentary.textContent='Andre omgang er i gang. Nå skal kampen avgjøres.';timer=setInterval(clockTick,tickMs);return;}
   paused=!paused;
   pauseBtn.textContent=paused?"▶ Fortsett":"Ⅱ Pause";
   pauseBtn.classList.toggle("live-paused",paused);
@@ -1371,7 +1430,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  };
  const closeLineupNow=()=>{
   const modal=document.getElementById('lineupModal');if(modal)modal.classList.remove('open');
-  if(!matchFinished&&paused){paused=false;pauseBtn.textContent='Ⅱ Pause';pauseBtn.classList.remove('live-paused');status.textContent=`LIVE · ${currentMinute}'`;timer=setInterval(clockTick,tickMs);}
+  if(!matchFinished&&paused&&currentMinute!==45){paused=false;pauseBtn.textContent='Ⅱ Pause';pauseBtn.classList.remove('live-paused');status.textContent=`LIVE · ${currentMinute}'`;timer=setInterval(clockTick,tickMs);}
  };
  const makeSubBtn=document.getElementById('makeSubBtn');
  if(makeSubBtn)makeSubBtn.addEventListener('click',()=>makeLiveSubstitution(engine,currentMinute));
@@ -1385,7 +1444,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.36 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.38 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}
