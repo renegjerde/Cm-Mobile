@@ -1,18 +1,19 @@
-# CM Mobile v1.49 — English League Pyramid & Domestic Cups
+# CM Mobile v1.51 — Season Progression & Europe
 
 ## Included
-- Competition centre with Premier League, Championship, League One and League Two tables.
-- Simulated lower-division league rounds progress alongside the Premier League season.
-- FA Cup and EFL Cup knockout competitions with draws, results, winners and round progression.
-- Cup dates are scheduled into selected midweek round slots.
-- When the user's club plays a scheduled cup tie, the tie is recorded and the squad takes an additional fitness load; low-stamina players recover more slowly through the existing recovery system, and minor injury risk is applied.
-- Competition data is stored locally with the career save; it does not fetch external statistics repeatedly.
+- European competition panels for Champions League, Europa League and Conference League.
+- European knockout-stage results are simulated with the shared competition match model on selected midweek rounds.
+- Season report stores domestic cup winners and European winners where available.
+- Promotion/relegation is applied at season transition: three teams exchange places between each adjacent division using the current standings.
+- Lower-league tables and fixtures reset after club movement; the manager remains attached to the same club name.
+- Updated version label to v1.51.
 
-## Important limitations
-- Cup ties and lower-division matches are simulated automatically in parallel; the current live-match engine is still used for the user's Premier League match only.
-- Exact real-world fixture dates, replays, two-legged semi-finals, EFL Cup bye rules, and the full non-league pyramid are simplified. The FA Cup includes a representative selection of non-league clubs.
-- Lower-division tables are simulated, but automatic promotion/relegation into the Premier League and club-by-club squad management across all 92 league clubs are not yet fully wired into the next season.
-- This is a local single-player prototype, not a verified real-world fixture database.
+## Notes / limitations
+- This is a simulation layer, not a licensed or fully exact reproduction of UEFA competition formats. European entries use simplified qualification slots and knockout rounds.
+- EFL promotion play-offs are simplified to three direct promotions per division; actual play-off finals and detailed rules remain future work.
+- Newly promoted/relegated club squads are generated placeholders; existing Premier League squads are preserved when their clubs remain in the Premier League, but a full persistent player/roster identity transfer model across every division is still in development.
+- Cup and European fixtures are simulated in the background and do not yet open the interactive minute-by-minute live match UI.
+- JavaScript syntax validation is not a substitute for full mobile/browser playtesting.
 
 ## Install
-Upload `index.html` from this folder to the root of the `main` branch used by GitHub Pages. Keep `README.md` for documentation; it is not required for the app to run.
+Upload this `index.html` to the root of the GitHub Pages `main` branch. Keep this version folder and README as the archive copy.
