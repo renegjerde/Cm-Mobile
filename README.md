@@ -1,13 +1,13 @@
-# CM Mobile v1.44 — Tydelige byttemarkører
+# CM Mobile v1.45 — Balansert formasjonserfaring
 
 ## Endringer
-- Grønne `▲ INN`- og røde `▼ UT`-markører i hendelsesloggen for bytter.
-- Lagoppstillingen viser hvem som er byttet inn, og en egen byttehistorikk viser begge spillerne, minutt, lag og type bytte.
-- Historikken registreres for manuelle bytter, assistentbytter og skadebytter.
-- Markørene er koblet til kampmotorens byttehistorikk, ikke bare visuell pynt.
+- Formasjonserfaring gir nå en liten, begrenset påvirkning på lagets angrep og forsvar i stedet for et stort direkte utslag.
+- Ved 0 % formasjonserfaring er effekten omtrent −0,7 ratingpoeng; ved 100 % er den +1,0.
+- Samspill er en separat, moderat faktor. Effektene er ikke lenger like store som i den tidligere modellen.
+- UI-forklaringen er oppdatert for å gjøre balansen tydelig.
 
 ## Publisering
-Pakk ut ZIP-filen og last opp `cm_mobile_v1_44/index.html` som rotfilen `index.html` i `main`-grenen for GitHub Pages. `check.js` er ikke nødvendig i repoet.
+Pakk ut ZIP-filen og last opp `cm_mobile_v1_45/index.html` som rotfilen `index.html` i `main`-grenen i GitHub Pages. Behold versjonsmappen som arkiv. `check.js` er ikke nødvendig i repoet.
 
 ## Kontroll
-JavaScript-syntaks kontrollert med Node.js. Ingen full ende-til-ende-test i mobilnettleser er utført.
+JavaScript-syntaks kontrollert med `node --check`. Ingen full ende-til-ende-test i mobilnettleser er utført.
