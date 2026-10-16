@@ -1,13 +1,10 @@
-# CM Mobile v1.45 — Balansert formasjonserfaring
+# CM Mobile v1.46 — Named substitution events
 
-## Endringer
-- Formasjonserfaring gir nå en liten, begrenset påvirkning på lagets angrep og forsvar i stedet for et stort direkte utslag.
-- Ved 0 % formasjonserfaring er effekten omtrent −0,7 ratingpoeng; ved 100 % er den +1,0.
-- Samspill er en separat, moderat faktor. Effektene er ikke lenger like store som i den tidligere modellen.
-- UI-forklaringen er oppdatert for å gjøre balansen tydelig.
+- Replaces generic automatic-substitution summary messages with one event per actual player change.
+- Each event names the incoming and outgoing player, minute, reason, match rating/fatigue context, and substitution count.
+- Records automatic substitutions in the same persistent match substitution history used by the lineup markers.
+- Shows substitution markers on player rows in the live lineup and on the bench/history where applicable.
 
-## Publisering
-Pakk ut ZIP-filen og last opp `cm_mobile_v1_45/index.html` som rotfilen `index.html` i `main`-grenen i GitHub Pages. Behold versjonsmappen som arkiv. `check.js` er ikke nødvendig i repoet.
+Upload this version's `index.html` to the repository root used by GitHub Pages. The ZIP's version folder is an archive and is not the live root page.
 
-## Kontroll
-JavaScript-syntaks kontrollert med `node --check`. Ingen full ende-til-ende-test i mobilnettleser er utført.
+Validation: JavaScript syntax checked with Node.js. Full end-to-end mobile browser testing has not been performed.

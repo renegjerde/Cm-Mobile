@@ -172,7 +172,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.45</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.46</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
@@ -979,8 +979,11 @@ function managerAutoSubs(engine,minute){
    const endurance=Number(incoming.attributes?.stamina??incoming.rating??65);engine.stamina[String(incoming.id)]=clamp(88+(playerFitnessValue(incoming)-80)*.18+(endurance-70)*.1,72,100);
    engine.performance[String(incoming.id)]={influence:0,events:0,shots:0,goals:0,assists:0};engine.appearances[String(out.id)]&&(engine.appearances[String(out.id)].end=minute);engine.appearances[String(incoming.id)]={player:incoming,start:minute,end:90,started:false};
    data.subs++;done++;
+   // Persist the exact player pair and publish one named event per substitution.
+   recordSubstitution(engine,minute,CLUBS[side==='A'?engine.a:engine.b]?.name||'Motstander',out,incoming,'Assistentbytte');
+   addManagerEvent(engine,side,minute,`${incoming.name} INN for ${out.name} UT`,`Assistentbytte · karakter ${item.grade.toFixed(1)} · utholdenhet ${Math.round(item.stamina)}% · ${data.subs}/5 bytter`,'🔁');
   }
-  if(done){data.windows++;if(isUser){engine.userSubs=data.subs;engine.userSubWindows=data.windows;engine.subbedOutIds=data.subbedOut;engine.lastSubMinute=minute;engine.lastSubWindowKey=Math.floor(minute/5);}recomputeLiveTeam(engine,side);addManagerEvent(engine,side,minute,`${done} automatisk(e) bytte(r)`,`Form og kampkarakter ${Math.min(...xi.map(p=>liveMatchRating(engine,p))).toFixed(1)} · ${data.subs}/5 bytter, ${data.windows}/3 stopp`);if(isUser){refreshSubOptions(engine);renderLiveLineup(engine,minute,document.getElementById('liveScore')?.textContent||`${engine.ga} – ${engine.gb}`);}}
+  if(done){data.windows++;if(isUser){engine.userSubs=data.subs;engine.userSubWindows=data.windows;engine.subbedOutIds=data.subbedOut;engine.lastSubMinute=minute;engine.lastSubWindowKey=Math.floor(minute/5);}recomputeLiveTeam(engine,side);if(isUser){refreshSubOptions(engine);renderLiveLineup(engine,minute,document.getElementById('liveScore')?.textContent||`${engine.ga} – ${engine.gb}`);}}
  }
 }
 
@@ -1020,7 +1023,7 @@ function renderLiveLineup(engine,minute,scoreText){
  const benchMarkup=`<div class="lineup-section-title">INNBYTTERE</div><div class="lineup-bench-note">Reserver vises nederst, sortert etter taktisk rolle. Trykk på en spiller på banen for å velge hvem som skal ut.</div>`+(sortedBench.length?sortedBench.map(p=>{
   const stamina=Math.round(playerFitnessValue(p));
   const color=stamina<50?'#f08080':stamina<70?'#f3ca72':'var(--green)';
-  return `<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span></div><div class="lineup-player-meta">Ferdighet <strong>${Math.round(p.rating)}</strong> · Grunnferdighet ${p.rating}</div><div class="fitness-track"><div class="fitness-fill" style="width:${stamina}%;background:${color}"></div></div></div><div class="lineup-player-side"><strong>${Math.round(p.rating)}</strong><span>${stamina}%</span></div></div>`;
+  return `<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} ${substitutionMarker(engine,p.id)} <span class="pill">${p.pos}</span></div><div class="lineup-player-meta">Ferdighet <strong>${Math.round(p.rating)}</strong> · Grunnferdighet ${p.rating}</div><div class="fitness-track"><div class="fitness-fill" style="width:${stamina}%;background:${color}"></div></div></div><div class="lineup-player-side"><strong>${Math.round(p.rating)}</strong><span>${stamina}%</span></div></div>`;
  }).join(''):`<div class="muted" style="padding:8px 0">Ingen tilgjengelige reserver.</div>`);
  const history=ensureSubstitutionHistory(engine);
  const historyMarkup=history.length?`<div class="lineup-section-title">BYTTEHISTORIKK</div>`+history.slice().reverse().map(h=>`<div class="lineup-player sub-history-row"><div><div class="lineup-player-name"><span class="sub-mark sub-out">▼ UT</span> ${esc(h.outName)} <span style="color:var(--muted);font-size:11px">→</span> <span class="sub-mark sub-in">▲ INN</span> ${esc(h.inName)}</div><div class="lineup-player-meta">${h.minute}' · ${esc(h.reason)} · ${esc(h.team)}</div></div></div>`).join(''):'';
@@ -1564,7 +1567,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.45 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.46 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}
