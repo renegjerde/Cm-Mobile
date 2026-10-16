@@ -1,10 +1,19 @@
-# CM Mobile v1.47 — Assistant tactical control
+# CM Mobile v1.48 — Transfer Market Overhaul
 
-- Adds four manager tactical-control modes: manual, suggestions only, automatic tactical adaptation, and conservative changes only when clearly needed.
-- The default is **Kun ved behov** to avoid unnecessary tactical changes.
-- Conservative mode only changes formation/mentality for urgent situations: trailing by at least two goals, protecting a two-goal lead late, extremely low team stamina, or very poor performance.
-- The assistant and opponent tactical decisions are logged as separate match events.
+## Hva er nytt
+- Overgangsmarkedet bruker den lokale spillerbasen fra alle andre Premier League-klubber, i stedet for fem faste prototypenavn.
+- 100 genererte klubbløse talenter gir markedet ekstra bredde. Disse er tydelig fiktive/genererte, ikke ekte spillerdata.
+- Søk etter spiller eller klubb, filtrer på posisjon/tilgjengelighet, og sorter etter anbefaling, ferdighet, potensial, pris eller alder.
+- Kjøp oppdaterer kjøperens tropp og selgerklubbens database; budsjettet trekkes fra. Nøkkelspillere kan avslå bud og kreve høyere pris.
+- Markedet bygges lokalt og lagres i nettleserens spilltilstand; ingen eksterne data hentes når markedet åpnes.
 
-Upload this version's `index.html` to the repository root used by GitHub Pages. The ZIP's version folder is an archive and is not the live root page.
+## Viktige avgrensninger
+- Spillerverdier og om en klubb godtar et bud er spillmodell-estimater, ikke faktiske Transfermarkt-priser.
+- Dette er første steg i overgangsmarkedet. AI-styrte kjøp/salg gjennom sesongen, kontraktsforhandlinger og formelt overgangsvindu er fortsatt videre arbeid.
+- Europeiske turneringer og EFL Championship/League One/League Two er planlagt som neste større trinn, ikke implementert i denne versjonen.
 
-Validation: JavaScript syntax checked with Node.js. Full end-to-end mobile browser testing has not been performed.
+## Publisering
+Last opp denne `index.html` til rotmappen på `main`-grenen for GitHub Pages. Spilldata lagres lokalt i nettleseren; ta vare på eksport/lagring dersom du vil beskytte en karriere.
+
+## Test
+JavaScript-syntaks kontrollert med `node --check`. Ikke fulltestet i mobilnettleser.
