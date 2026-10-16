@@ -1,9 +1,9 @@
-# CM Mobile v1.46 — Named substitution events
+# CM Mobile v1.47 — Assistant tactical control
 
-- Replaces generic automatic-substitution summary messages with one event per actual player change.
-- Each event names the incoming and outgoing player, minute, reason, match rating/fatigue context, and substitution count.
-- Records automatic substitutions in the same persistent match substitution history used by the lineup markers.
-- Shows substitution markers on player rows in the live lineup and on the bench/history where applicable.
+- Adds four manager tactical-control modes: manual, suggestions only, automatic tactical adaptation, and conservative changes only when clearly needed.
+- The default is **Kun ved behov** to avoid unnecessary tactical changes.
+- Conservative mode only changes formation/mentality for urgent situations: trailing by at least two goals, protecting a two-goal lead late, extremely low team stamina, or very poor performance.
+- The assistant and opponent tactical decisions are logged as separate match events.
 
 Upload this version's `index.html` to the repository root used by GitHub Pages. The ZIP's version folder is an archive and is not the live root page.
 
