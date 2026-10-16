@@ -171,7 +171,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.42</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.43</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
@@ -305,7 +305,7 @@ function defaultRoleFor(name,pos,slot){if(pos==='GK')return 'GK';if(pos==='ATT')
 function makeRealPlayer(name,pos,clubIndex,slot){const club=CLUBS[clubIndex],known=KNOWN_PLAYER_DATA[name]||{},rng=seededRandom(stableSeed(name+'|'+club.short));const dob=PLAYER_DOBS[name]||null;const age=ageAtSeasonStart(dob)??known.age??(18+(stableSeed('age|'+name)%17));const role=PLAYER_ROLES[name]||defaultRoleFor(name,pos,slot);const roleOffset=pos==='GK'?1:pos==='DEF'?0:pos==='MID'?1:2;let rating=known.rating||Math.max(54,Math.min(90,Math.round(club.strength-5+roleOffset+(rng()*13-6))));if(name==='Senne Lammens')rating=82;if(name==='Karl Darlow')rating=73;if(name==='Tom Heaton')rating=66;const potential=known.potential||Math.max(rating,Math.min(96,Math.round(rating+(age<=21?8:age<=24?5:age<=27?2:0)+(rng()*7-2))));const attrR=(base,spread,key)=>Math.max(25,Math.min(99,Math.round(base+(rng()*spread*2-spread))));let attributes={pace:attrR(rating,9,'pace'),stamina:attrR(rating,8,'stamina'),strength:attrR(rating,8,'strength'),technique:attrR(rating,8,'technique'),creativity:attrR(rating,10,'creativity'),finishing:attrR(rating-9,11,'finishing'),defending:attrR(rating-7,11,'defending'),passing:attrR(rating,8,'passing'),handling:attrR(28,4,'handling'),reflexes:attrR(28,4,'reflexes'),positioning:attrR(rating,8,'positioning')};if(pos==='GK'){attributes={...attributes,handling:attrR(rating,7,'handling'),reflexes:attrR(rating+1,7,'reflexes'),positioning:attrR(rating,7,'positioning'),finishing:attrR(25,2,'finishing'),defending:attrR(35,5,'defending')}}if(pos==='DEF'){attributes.defending=attrR(rating+6,7,'defending');attributes.strength=attrR(rating+3,8,'strength');attributes.finishing=attrR(rating-20,8,'finishing')}if(pos==='MID'){attributes.passing=attrR(rating+4,7,'passing');attributes.creativity=attrR(rating+3,8,'creativity')}if(pos==='ATT'){attributes.finishing=attrR(rating+5,7,'finishing');attributes.pace=attrR(rating+3,8,'pace')}return {id:clubIndex*1000+slot+1,name,pos,role,naturalPositions:naturalPositionsFor(name,pos,role),assignedRole:null,age,dob,ageSource:dob?'birth-date':'estimated',rating,attributes,potential,value:Math.max(.2,+((Math.max(5,rating-45)**2)/100*(age<23?1.35:age>30?.65:1)).toFixed(1)),wage:Math.max(2,Math.round((rating-45)*1.15+(club.strength-65)*.5)),fitness:100,morale:75+Math.round(rng()*15),goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,form:6.5,injured:0,suspended:0,clubIndex,source:'PL 2026/27 squad list; attributes estimated'}}
 function buildRealSquad(clubIndex){const club=CLUBS[clubIndex],groups=REAL_ROSTERS[club.name]||{};const out=[];for(const pos of ['GK','DEF','MID','ATT']){const list=(groups[pos]||'').split('|').filter(Boolean);for(const name of list){if(out.some(p=>p.name===name))continue;out.push(makeRealPlayer(name,pos,clubIndex,out.length));}}if(out.length!==25)console.warn('Expected 25 players for',club.name,'got',out.length);return out.slice(0,25)}
 function buildWorldDatabase(){return CLUBS.map((c,i)=>buildRealSquad(i))}
-const appState={page:"home",club:3,week:1,played:0,seasonYear:2026,formation:"4-3-3",tactic:"Balanced",selectedXI:null,log:[],transferTab:"market",squad:[],table:[],budget:0,started:false,positionChanges:{},lastSeasonSummary:null,lastRecoveryRound:null,formationExperience:{"4-3-3":20,"4-4-2":20,"4-2-3-1":20,"3-5-2":20},teamCohesion:25,lastStartingXI:[],injuryReport:[],discipline:{},medicalHistory:[],lineupRoleVersion:2};
+const appState={page:"home",club:3,week:1,played:0,seasonYear:2026,formation:"4-3-3",tactic:"Balanced",selectedXI:null,log:[],transferTab:"market",squad:[],table:[],budget:0,started:false,positionChanges:{},lastSeasonSummary:null,lastRecoveryRound:null,formationExperience:{"4-3-3":20,"4-4-2":20,"4-2-3-1":20,"3-5-2":20},teamCohesion:25,lastStartingXI:[],injuryReport:[],discipline:{},medicalHistory:[],lineupRoleVersion:2,managerMode:"hybrid"};
 
 function generateAttributes(pos,base){
  const r=(center,spread=10)=>Math.max(25,Math.min(99,Math.round(center+(Math.random()*spread*2-spread))));
@@ -343,7 +343,7 @@ function load(){try{let s=JSON.parse(localStorage.getItem("cmMobileSave"));if(s&
   appState.positionChanges={};appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
   appState.fixtures=[];appState.leagueFormatVersion=2;
  }
- if(appState.lastRecoveryRound===undefined)appState.lastRecoveryRound=null;if(appState.recommendationRound===undefined)appState.recommendationRound=null;if(!Number(s.lineupRoleVersion||0)||Number(s.lineupRoleVersion)<2){appState.selectedXI=null;appState.recommendationRound=null;appState.lineupRoleVersion=2;} appState.squad.forEach(p=>{ensurePlayerAttributes(p);if(!Array.isArray(p.naturalPositions)||!p.naturalPositions.length)p.naturalPositions=naturalPositionsFor(p.name,p.pos,p.role);});if(!appState.squad.some(p=>p.pos==="GK"&&p.id!==appState.squad.find(x=>x.pos==="GK")?.id)){const club=CLUBS[appState.club]||CLUBS[3];const nextId=Math.max(0,...appState.squad.map(p=>Number(p.id)||0))+1;appState.squad.push({id:nextId,name:"M. Kovac",pos:"GK",age:25,rating:Math.max(55,club.strength-3),attributes:generateAttributes("GK",Math.max(55,club.strength-3)),potential:Math.max(60,club.strength+3),value:5,wage:18,fitness:90,morale:75,goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0});}if(!Number.isFinite(appState.seasonYear))appState.seasonYear=2026;if(!appState.positionChanges)appState.positionChanges={};if(!appState.leagueView)appState.leagueView="table";if(!appState.playerStatMetric)appState.playerStatMetric="goals";if(!appState.discipline)appState.discipline={};if(!Number(appState.autoSubsPreferenceVersion)){appState.autoSubs=true;appState.autoSubsPreferenceVersion=1;}else if(typeof appState.autoSubs!=="boolean")appState.autoSubs=true;if(!appState.fixtures||!s.fixtures.length){appState.week=1;appState.played=0;appState.log=[];appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));appState.fixtures=[];}appState.leagueFormatVersion=2;return true}}catch(e){}return false}
+ if(appState.lastRecoveryRound===undefined)appState.lastRecoveryRound=null;if(appState.recommendationRound===undefined)appState.recommendationRound=null;if(!Number(s.lineupRoleVersion||0)||Number(s.lineupRoleVersion)<2){appState.selectedXI=null;appState.recommendationRound=null;appState.lineupRoleVersion=2;} appState.squad.forEach(p=>{ensurePlayerAttributes(p);if(!Array.isArray(p.naturalPositions)||!p.naturalPositions.length)p.naturalPositions=naturalPositionsFor(p.name,p.pos,p.role);});if(!appState.squad.some(p=>p.pos==="GK"&&p.id!==appState.squad.find(x=>x.pos==="GK")?.id)){const club=CLUBS[appState.club]||CLUBS[3];const nextId=Math.max(0,...appState.squad.map(p=>Number(p.id)||0))+1;appState.squad.push({id:nextId,name:"M. Kovac",pos:"GK",age:25,rating:Math.max(55,club.strength-3),attributes:generateAttributes("GK",Math.max(55,club.strength-3)),potential:Math.max(60,club.strength+3),value:5,wage:18,fitness:90,morale:75,goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0});}if(!Number.isFinite(appState.seasonYear))appState.seasonYear=2026;if(!appState.positionChanges)appState.positionChanges={};if(!appState.leagueView)appState.leagueView="table";if(!appState.playerStatMetric)appState.playerStatMetric="goals";if(!appState.discipline)appState.discipline={};if(!appState.managerMode)appState.managerMode="hybrid";if(!Number(appState.autoSubsPreferenceVersion)){appState.autoSubs=true;appState.autoSubsPreferenceVersion=1;}else if(typeof appState.autoSubs!=="boolean")appState.autoSubs=true;if(!appState.fixtures||!s.fixtures.length){appState.week=1;appState.played=0;appState.log=[];appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));appState.fixtures=[];}appState.leagueFormatVersion=2;return true}}catch(e){}return false}
 function money(n){return "£"+(n<1?Math.round(n*1000)+"k":n.toFixed(1)+"m")}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function currentClub(){return CLUBS[appState.club]}
@@ -818,7 +818,7 @@ function createLiveEngine(a,b,homeUser,playersA,playersB,xiA,xiB,formationA="4-3
  const engine={
   a,b,homeUser,userIsA,playersA,playersB,xiA,xiB,formationA,formationB,ga:0,gb:0,events:[],
   stats:{shotsA:0,shotsB:0,onA:0,onB:0,possessionA:50},
-  stamina,lastPossession:50,userSubs:0,userSubWindows:0,lastSubMinute:-1,subbedOutIds:[],minute:0,
+  stamina,lastPossession:50,userSubs:0,userSubWindows:0,lastSubMinute:-1,subbedOutIds:[],sideManagement:{A:{subs:0,windows:0,lastWindow:null,subbedOut:[]},B:{subs:0,windows:0,lastWindow:null,subbedOut:[]}},managerChanges:{A:[],B:[]},minute:0,
   appearances:Object.fromEntries([...xiA,...xiB].filter(p=>p.id!=null).map(p=>[String(p.id),{player:p,start:0,end:90,started:true}])),
   performance:Object.fromEntries([...xiA,...xiB].filter(p=>p.id!=null).map(p=>[String(p.id),{influence:0,events:0,shots:0,goals:0,assists:0}]))
  };
@@ -827,8 +827,8 @@ function createLiveEngine(a,b,homeUser,playersA,playersB,xiA,xiB,formationA="4-3
 }
 function liveTacticDelta(engine,side){
  const isUser=(side==='A'?engine.a:engine.b)===appState.club;
- if(!isUser)return 0;
- return ({Defensive:-2.2,Balanced:0,Attacking:2.2,'High press':1.5})[appState.tactic]||0;
+ const tactic=isUser?appState.tactic:(engine.sideTactics?.[side]||'Balanced');
+ return ({Defensive:-2.2,Balanced:0,Attacking:2.2,'High press':1.5})[tactic]||0;
 }
 function recomputeLiveTeam(engine,side){
  const familiarity=side==="A"?(engine.a===appState.club?formationFamiliarity(engine.formationA):20):(engine.b===appState.club?formationFamiliarity(engine.formationB):20);
@@ -908,6 +908,74 @@ function assistantAutoSubs(engine,minute){
   const commentary=document.getElementById('liveCommentary');if(commentary)commentary.textContent=`Assistenten bytter: ${incoming.name} erstatter ${out.name} (${item.grade.toFixed(1)} i kampkarakter, ${Math.round(item.stamina)}% utholdenhet).`;
  }
  if(done){recomputeLiveTeam(engine,engine.userIsA?'A':'B');refreshSubOptions(engine);renderLiveLineup(engine,minute,document.getElementById('liveScore')?.textContent||`${engine.ga} – ${engine.gb}`);}
+}
+
+function sideIsUser(engine,side){return (side==='A'?engine.a:engine.b)===appState.club;}
+function sideData(engine,side){if(!engine.sideManagement)engine.sideManagement={A:{subs:0,windows:0,lastWindow:null,subbedOut:[]},B:{subs:0,windows:0,lastWindow:null,subbedOut:[]}};const d=engine.sideManagement[side];if(sideIsUser(engine,side)){d.subs=Math.max(d.subs||0,engine.userSubs||0);d.windows=Math.max(d.windows||0,engine.userSubWindows||0);d.subbedOut=[...new Set([...(d.subbedOut||[]),...(engine.subbedOutIds||[])])];}return d;}
+function addManagerEvent(engine,side,minute,title,detail,icon='🔁'){
+ const team=CLUBS[side==='A'?engine.a:engine.b]?.name||'Motstander';
+ const row=document.createElement('div');row.className='match-event live-event-new sub-event';row.innerHTML=`<div class="event-min">${minute}'</div><div class="event-symbol">${icon}</div><div class="event-detail"><strong>${esc(title)}</strong><small>${esc(detail)} · ${esc(team)}</small></div>`;document.getElementById('liveEvents')?.appendChild(row);
+ engine.events.push({minute,side,type:'manager',player:title,reason:detail});
+}
+function managerSideRoster(engine,side){return sideIsUser(engine,side)?appState.squad:(side==='A'?engine.playersA:engine.playersB);}
+function managerSideXI(engine,side){return side==='A'?engine.xiA:engine.xiB;}
+function managerSideFormation(engine,side){return side==='A'?engine.formationA:engine.formationB;}
+function setManagerSideFormation(engine,side,formation){if(side==='A')engine.formationA=formation;else engine.formationB=formation;assignTacticalRoles(managerSideXI(engine,side),formation);recomputeLiveTeam(engine,side);}
+function maybeManagerTactics(engine,minute){
+ if(![60,70,80].includes(minute))return;
+ for(const side of ['A','B']){
+  const isUser=sideIsUser(engine,side);const mode=appState.managerMode||'hybrid';
+  if(isUser&&mode==='manual')continue;
+  const goalsFor=side==='A'?engine.ga:engine.gb,goalsAgainst=side==='A'?engine.gb:engine.ga,diff=goalsFor-goalsAgainst;
+  const xi=managerSideXI(engine,side),roster=managerSideRoster(engine,side),data=sideData(engine,side);
+  const current=managerSideFormation(engine,side);let desired=current,tactic=isUser?appState.tactic:(engine.sideTactics?.[side]||'Balanced'),reason='';
+  const staminaAvg=xi.length?xi.reduce((n,p)=>n+matchStamina(engine,p),0)/xi.length:75;
+  const gradeAvg=xi.length?xi.reduce((n,p)=>n+liveMatchRating(engine,p),0)/xi.length:6.5;
+  if(diff<0&&minute>=60){desired=current==='4-3-3'?'4-2-3-1':'4-3-3';tactic='Attacking';reason='Ligger under – øker risikoen';}
+  else if(diff>0&&minute>=75){desired=current==='4-3-3'?'4-2-3-1':'4-3-3';tactic='Defensive';reason='Leder – forsøker å kontrollere kampen';}
+  else if(staminaAvg<62&&minute>=70){tactic='Balanced';reason='Mange slitne spillere – senker intensiteten';}
+  else if(gradeAvg<6.35&&minute>=70){desired=current==='4-3-3'?'4-2-3-1':'4-3-3';reason='Laget presterer svakt – endrer formasjon';}
+  if(!reason)continue;
+  const already=data.lastTacticCheck===minute;if(already)continue;data.lastTacticCheck=minute;
+  if(isUser&&mode==='hybrid'){
+   addManagerEvent(engine,side,minute,`Taktikkforslag: ${reason}`,`Forslag: ${desired}, ${tactic==='Attacking'?'offensiv':tactic==='Defensive'?'defensiv':'balansert'} mentalitet`,'🧠');
+   const commentary=document.getElementById('liveCommentary');if(commentary)commentary.textContent=`Assistentens forslag: ${reason.toLowerCase()}. Vurder ${desired} og ${tactic==='Attacking'?'offensiv':tactic==='Defensive'?'defensiv':'balansert'} mentalitet.`;
+   continue;
+  }
+  if(desired!==current)setManagerSideFormation(engine,side,desired);
+  if(isUser){appState.tactic=tactic;const sel=document.getElementById('liveTacticSelect');if(sel)sel.value=tactic;}
+  else{if(!engine.sideTactics)engine.sideTactics={A:'Balanced',B:'Balanced'};engine.sideTactics[side]=tactic;}
+  engine.managerChanges[side].push({minute,formation:desired,tactic,reason});
+  addManagerEvent(engine,side,minute,`Taktisk endring: ${desired}`,`${reason}; ${tactic==='Attacking'?'offensiv':tactic==='Defensive'?'defensiv':'balansert'} mentalitet`,'🧠');
+ }
+}
+function managerAutoSubs(engine,minute){
+ if(![60,70,80].includes(minute))return;
+ for(const side of ['A','B']){
+  const isUser=sideIsUser(engine,side),mode=appState.managerMode||'hybrid';
+  if(isUser&&(!appState.autoSubs||mode==='manual'))continue;
+  const data=sideData(engine,side),xi=managerSideXI(engine,side),roster=managerSideRoster(engine,side);
+  if(data.subs>=5||data.windows>=3)continue;
+  const onPitch=new Set(xi.map(p=>String(p.id)));
+  const candidates=xi.filter(p=>p.pos!=='GK'&&!data.subbedOut.some(id=>String(id)===String(p.id))).map(p=>({p,grade:liveMatchRating(engine,p),stamina:matchStamina(engine,p)})).sort((a,b)=>((a.grade-6.7)*1.6+(a.stamina-68)*.055)-((b.grade-6.7)*1.6+(b.stamina-68)*.055));
+  let done=0;
+  for(const item of candidates){
+   if(done>=2||data.subs>=5||data.windows>=3)break;
+   const out=item.p;if(item.grade>=6.75&&item.stamina>=([60,70,80].includes(minute)?66:60))continue;
+   const role=out.assignedRole||out.role;
+   const bench=roster.filter(p=>!onPitch.has(String(p.id))&&!data.subbedOut.some(id=>String(id)===String(p.id))&&(p.injured||0)<=0&&(p.suspended||0)<=0&&p.pos!=='GK').sort((a,b)=>{
+    const score=p=>effectivePlayerRating(engine,p)+roleFitBonus(p,role)*1.8+(p.pos===out.pos?7:0)+Number(p.attributes?.stamina??60)*.05;
+    return score(b)-score(a);
+   });
+   const incoming=bench[0];if(!incoming)continue;
+   const idx=xi.findIndex(p=>String(p.id)===String(out.id));if(idx<0)continue;
+   xi[idx]=incoming;data.subbedOut.push(out.id);onPitch.delete(String(out.id));onPitch.add(String(incoming.id));
+   const endurance=Number(incoming.attributes?.stamina??incoming.rating??65);engine.stamina[String(incoming.id)]=clamp(88+(playerFitnessValue(incoming)-80)*.18+(endurance-70)*.1,72,100);
+   engine.performance[String(incoming.id)]={influence:0,events:0,shots:0,goals:0,assists:0};engine.appearances[String(out.id)]&&(engine.appearances[String(out.id)].end=minute);engine.appearances[String(incoming.id)]={player:incoming,start:minute,end:90,started:false};
+   data.subs++;done++;
+  }
+  if(done){data.windows++;if(isUser){engine.userSubs=data.subs;engine.userSubWindows=data.windows;engine.subbedOutIds=data.subbedOut;engine.lastSubMinute=minute;engine.lastSubWindowKey=Math.floor(minute/5);}recomputeLiveTeam(engine,side);addManagerEvent(engine,side,minute,`${done} automatisk(e) bytte(r)`,`Form og kampkarakter ${Math.min(...xi.map(p=>liveMatchRating(engine,p))).toFixed(1)} · ${data.subs}/5 bytter, ${data.windows}/3 stopp`);if(isUser){refreshSubOptions(engine);renderLiveLineup(engine,minute,document.getElementById('liveScore')?.textContent||`${engine.ga} – ${engine.gb}`);}}
+ }
 }
 
 function renderLiveLineup(engine,minute,scoreText){
@@ -1053,7 +1121,7 @@ function advanceLiveEngine(engine,minute){
  for(const side of ["A","B"]){
   const xi=side==="A"?engine.xiA:engine.xiB;
   const isUser=(side==="A"?engine.a:engine.b)===appState.club;
-  const tactic=isUser?appState.tactic:"Balanced";
+  const tactic=isUser?appState.tactic:(engine.sideTactics?.[side]||'Balanced');
   const pressCost=tactic==="High press"?.22:tactic==="Attacking"?.15:tactic==="Defensive"?.075:.11;
   for(const p of xi){
    const id=String(p.id);
@@ -1248,7 +1316,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    <div class="lineup-section-title">GJØR BYTTER</div>
    <div class="sub-grid" style="display:none" aria-hidden="true"><div><label for="subOut">Spiller ut</label><select id="subOut"></select></div><div><label for="subIn">Spiller inn</label><select id="subIn"></select></div></div>
    <div class="sub-actions"><button type="button" id="makeSubBtn" class="primary-control">Gjennomfør bytte</button><span id="subHint" class="sub-count">5 bytter igjen</span></div>
-   <div class="lineup-section-title">ASSISTENT</div><label class="auto-sub-toggle" style="display:flex;align-items:center;gap:10px;padding:10px 0;font-size:13px"><input type="checkbox" id="autoSubsToggle" style="width:18px;height:18px" ${appState.autoSubs?"checked":""}> La assistenten foreta automatiske bytter</label><div class="muted" id="autoSubsStatus" style="font-size:11px;margin-bottom:10px">${appState.autoSubs?"🟢 Assistentbytter er AKTIVERT.":"⚪ Assistentbytter er AVSLÅTT."} Assistenten vurderer kampkarakter og utholdenhet fra 60. minutt og ved nye stopp. Svak prestasjon ELLER lav utholdenhet kan utløse bytte. Maks fem bytter og tre stopp.</div><div class="lineup-section-title">MENTALITET</div><div class="field"><label for="liveTacticSelect">KAMPTAKTIKK</label><select id="liveTacticSelect"><option value="Defensive">Defensiv</option><option value="Balanced">Balansert</option><option value="Attacking">Offensiv</option><option value="High press">Høyt press</option></select></div>
+   <div class="lineup-section-title">MANAGERASSISTENT</div><div class="field"><label for="managerModeSelect">STYRING AV TAKTIKK</label><select id="managerModeSelect"><option value="manual">Manuell – jeg bestemmer</option><option value="hybrid">Hybrid – foreslå taktikk</option><option value="assistant">Assistent – endre automatisk</option></select></div><label class="auto-sub-toggle" style="display:flex;align-items:center;gap:10px;padding:10px 0;font-size:13px"><input type="checkbox" id="autoSubsToggle" style="width:18px;height:18px" ${appState.autoSubs?"checked":""}> La assistenten foreta automatiske bytter</label><div class="muted" id="autoSubsStatus" style="font-size:11px;margin-bottom:10px">${appState.autoSubs?"🟢 Assistentbytter er AKTIVERT.":"⚪ Assistentbytter er AVSLÅTT."} Assistenten vurderer kampkarakter og utholdenhet fra 60. minutt og ved nye stopp. Svak prestasjon ELLER lav utholdenhet kan utløse bytte. Maks fem bytter og tre stopp.</div><div class="lineup-section-title">MENTALITET</div><div class="field"><label for="liveTacticSelect">KAMPTAKTIKK</label><select id="liveTacticSelect"><option value="Defensive">Defensiv</option><option value="Balanced">Balansert</option><option value="Attacking">Offensiv</option><option value="High press">Høyt press</option></select></div>
    <div class="lineup-footer"><button type="button" id="closeLineupContinue" class="primary">Ferdig – fortsett kampen</button></div>
   </div>
  </div>`;
@@ -1322,7 +1390,8 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    if(e.type==='goal')goalLabel.textContent=`${goalCount} mål`;
   }
   // Assistant substitutions happen after injuries from this minute have been handled.
-  assistantAutoSubs(engine,currentMinute);
+  managerAutoSubs(engine,currentMinute);
+  maybeManagerTactics(engine,currentMinute);
   engine.previousMinute=currentMinute;
   // The live score is the source of truth; tactics selected now affect future minutes.
   engine.ga=engine.ga||0;engine.gb=engine.gb||0;
@@ -1450,6 +1519,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   const sub=document.getElementById('liveSub');if(sub)sub.textContent=`${home?'Hjemmekamp på eget gress':'På bortebane'} · Taktikk: ${labels[appState.tactic]||appState.tactic}`;
   commentary.textContent=`Taktikken endres til ${labels[appState.tactic]||appState.tactic}. Laget justerer seg.`;
  });
+ const managerModeSelect=document.getElementById('managerModeSelect');if(managerModeSelect){managerModeSelect.value=appState.managerMode||'hybrid';managerModeSelect.addEventListener('change',()=>{appState.managerMode=managerModeSelect.value;save();const status=document.getElementById('autoSubsStatus');if(status)status.textContent=`Styring: ${{manual:'Manuell',hybrid:'Hybrid – taktikkforslag',assistant:'Assistentstyring'}[appState.managerMode]}. Motstanderen styres alltid automatisk.`;});}
  const openLineupNow=()=>{
   const modal=document.getElementById('lineupModal');if(!modal||matchFinished)return;
   if(!paused){paused=true;if(timer)clearInterval(timer);timer=null;pauseBtn.textContent='▶ Fortsett';pauseBtn.classList.add('live-paused');status.textContent=`PAUSE · ${currentMinute}'`;}
@@ -1473,7 +1543,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.42 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.43 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}

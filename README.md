@@ -1,15 +1,18 @@
-# CM Mobile v1.42 — Recovery and squad rotation
+# CM Mobile v1.43 — Opponent Management & Tactical AI
 
-## Changes
-- Physical fitness no longer resets automatically to 100% before each round.
-- Recovery between rounds is gradual and depends on the player's stamina attribute.
-- Injured players recover more slowly.
-- Players who did not play receive an additional recovery bonus.
-- Playing the full match causes more meaningful fatigue; high press increases the physical load, while a defensive approach reduces it.
-- The pre-match setup explains the recovery system.
+## Endringer
+- Motstanderen gjennomfører automatiske bytter basert på kampkarakter, utholdenhet og tilgjengelige reserver.
+- Begge lag følger grensen på fem innbyttere og tre byttevinduer for ordinære assistentbytter.
+- Motstanderens taktikk og formasjon kan endres ut fra stilling, kampform og samlet utholdenhet.
+- Ny innstilling for spillerens managerassistent:
+  - **Manuell:** du styrer taktiske endringer.
+  - **Hybrid:** assistenten viser taktikkforslag i hendelsesloggen.
+  - **Assistent:** assistenten endrer formasjon og mentalitet automatisk.
+- Automatisk taktisk vurdering ved 60., 70. og 80. minutt.
+- Taktiske endringer og automatiske bytter vises i hendelsesloggen med lagtilhørighet.
 
-## Install
-Replace the root `index.html` on the `main` branch used by GitHub Pages with the included `index.html`. The ZIP contains this version folder with `index.html` and `README.md`.
+## Publisering
+Pakk ut ZIP-filen og last opp `cm_mobile_v1_43/index.html` som rotfilen `index.html` i `main`-grenen for GitHub Pages. README-en kan beholdes som dokumentasjon. `check.js` er ikke nødvendig i repoet.
 
-## Validation
-JavaScript syntax checked with Node.js. Full browser/gameplay testing has not been performed.
+## Kontroll
+JavaScript-syntaks kontrollert med Node.js. Ingen full ende-til-ende-test i mobilnettleser er utført.
