@@ -1,19 +1,14 @@
-# CM Mobile v1.51 — Season Progression & Europe
+# CM Mobile v1.52 — Full New Career Reset
 
-## Included
-- European competition panels for Champions League, Europa League and Conference League.
-- European knockout-stage results are simulated with the shared competition match model on selected midweek rounds.
-- Season report stores domestic cup winners and European winners where available.
-- Promotion/relegation is applied at season transition: three teams exchange places between each adjacent division using the current standings.
-- Lower-league tables and fixtures reset after club movement; the manager remains attached to the same club name.
-- Updated version label to v1.51.
-
-## Notes / limitations
-- This is a simulation layer, not a licensed or fully exact reproduction of UEFA competition formats. European entries use simplified qualification slots and knockout rounds.
-- EFL promotion play-offs are simplified to three direct promotions per division; actual play-off finals and detailed rules remain future work.
-- Newly promoted/relegated club squads are generated placeholders; existing Premier League squads are preserved when their clubs remain in the Premier League, but a full persistent player/roster identity transfer model across every division is still in development.
-- Cup and European fixtures are simulated in the background and do not yet open the interactive minute-by-minute live match UI.
-- JavaScript syntax validation is not a substitute for full mobile/browser playtesting.
+## New in v1.52
+- “Ny karriere” now rebuilds the mutable football world from the original player database.
+- Resets club finances, squads, transfers, free-agent pool, player and season statistics, injuries, suspensions, discipline, league tables, fixtures, domestic cups, European competitions, lower-division tables, calendar, tactical settings and match history.
+- Resets market search/filter state.
+- Starts a fresh 2026/27 career with the selected club and its original budget.
+- Confirms that the current career will be replaced before resetting.
 
 ## Install
-Upload this `index.html` to the root of the GitHub Pages `main` branch. Keep this version folder and README as the archive copy.
+Upload this `index.html` to the root of the GitHub Pages repository, replacing the current root `index.html`.
+
+## Notes
+The new-career reset rebuilds local mutable data in the browser. It does not delete files from the GitHub repository. JavaScript syntax was checked with Node.js; a full end-to-end mobile browser test has not been performed.

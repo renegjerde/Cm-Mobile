@@ -172,7 +172,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.51</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.52</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -813,12 +813,30 @@ function startNewCareer(){
  if(answer===null)return;
  const idx=Number(answer)-1;
  if(!Number.isInteger(idx)||idx<0||idx>=CLUBS.length){alert("Skriv et nummer fra 1 til "+CLUBS.length+".");return;}
- if(!confirm(`Starte en helt ny karriere med ${CLUBS[idx].name} fra sesongstart 2026/27? Nåværende karriere erstattes på denne enheten.`))return;
- appState.page="home";appState.club=idx;appState.week=1;appState.played=0;appState.seasonYear=2026;appState.formation="4-3-3";appState.tactic="Balanced";appState.selectedXI=null;appState.log=[`Ny karriere startet: ${CLUBS[idx].name}, sesongen 2026/27.`];appState.transferTab="market";appState.positionChanges={};appState.lastSeasonSummary=null;appState.lastRecoveryRound=null;appState.formationExperience={"4-3-3":20,"4-4-2":20,"4-2-3-1":20,"3-5-2":20};appState.teamCohesion=25;appState.lastStartingXI=[];appState.injuryReport=[];appState.discipline={};appState.medicalHistory=[];appState.recommendationRound=null;
- appState.squad=makeSquad(idx).map(p=>({...p,fitness:100,morale:75,goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0}));
- appState.budget=CLUBS[idx].budget;appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));appState.fixtures=[];appState.leagueFormatVersion=2;appState.started=true;ensureFixtures();appState.domesticVersion=0;initDomesticCompetitions();save();render();
+ if(!confirm(`Starte en HELT NY karriere med ${CLUBS[idx].name} fra sesongstart 2026/27? All økonomi, spillerhistorikk, overganger, skader, tabeller og konkurranser fra nåværende karriere nullstilles.`))return;
+ // Rebuild the mutable world from the original database, never from the previous save.
+ const freshWorld=buildWorldDatabase();
+ const defaults={
+  page:"home",club:idx,week:1,played:0,seasonYear:2026,formation:"4-3-3",tactic:"Balanced",selectedXI:null,
+  log:[`Ny karriere startet: ${CLUBS[idx].name}, sesongen 2026/27.`],transferTab:"market",squad:[],table:[],budget:0,started:true,
+  positionChanges:{},lastSeasonSummary:null,lastRecoveryRound:null,formationExperience:{"4-3-3":20,"4-4-2":20,"4-2-3-1":20,"3-5-2":20},
+  teamCohesion:25,lastStartingXI:[],injuryReport:[],discipline:{},medicalHistory:[],lineupRoleVersion:2,managerMode:"needed",
+  worldSquads:freshWorld,worldDatabaseVersion:PLAYER_DB_VERSION,leagueFormatVersion:2,fixtures:[],freeAgents:[],lowerLeagues:{},
+  domesticVersion:0,domesticCalendar:[],lastDomesticRound:0,cupCompetitions:null,europeanCompetitions:null,europeanSeason:null,
+  autoSubs:true,autoSubsPreferenceVersion:1,recommendationRound:null,transferHistory:[],transferOffers:[],lastMatch:null,
+  playerStats:{},matchHistory:[],careerHistory:[],seasonStats:{},leagueView:"table",playerStatMetric:"goals",matchdayEvents:[],
+  assistantSuggestions:[],managerModePreference:"needed",lastTacticalChangeRound:null
+ };
+ Object.keys(appState).forEach(k=>delete appState[k]);
+ Object.assign(appState,defaults);
+ marketSearch="";marketPosition="ALL";marketSort="recommended";marketScope="all";
+ appState.squad=makeSquad(idx).map(p=>({...p,fitness:100,morale:75,goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,form:6.5,injured:0,suspended:0}));
+ appState.budget=CLUBS[idx].budget;
+ appState.table=CLUBS.map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
+ appState.fixtures=[];ensureFixtures();initDomesticCompetitions();
+ try{localStorage.setItem("cmMobileSave",JSON.stringify(appState));}catch(e){}
+ render();
 }
-
 function chooseClub(){let options=CLUBS.map((c,i)=>`${i+1}. ${c.name}`).join("\n");let answer=prompt("Velg klubb ved å skrive nummeret:\n"+options, String(appState.club+1));if(answer===null)return;let idx=Number(answer)-1;if(!Number.isInteger(idx)||idx<0||idx>=CLUBS.length){alert("Skriv et nummer fra 1 til "+CLUBS.length+".");return;}if(idx===appState.club)return;if(confirm("Bytte til "+CLUBS[idx].name+"? Dette starter en ny testkarriere.")){appState.club=idx;appState.week=1;appState.played=0;appState.seasonYear=2026;appState.positionChanges={};appState.lastSeasonSummary=null;appState.log=[];init();}}
 
 function ensureFixtures(){
@@ -1738,7 +1756,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();initDomesticCompetitions();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.51 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)();save()}
+function render(){ensureFixtures();initDomesticCompetitions();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.52 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{ensureTransferPool();render()}
