@@ -126,6 +126,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .lineup-player:last-child{border-bottom:0}
 .lineup-player.pick-out{cursor:pointer;border-radius:8px;padding-left:8px;padding-right:8px}
 .lineup-player.pick-out:active,.lineup-player.pick-out.selected-out{background:#20364c;box-shadow:inset 0 0 0 1px #6b8aa7}
+.sub-mark{display:inline-flex;align-items:center;margin-left:5px;padding:2px 5px;border-radius:5px;font-size:9px;font-weight:800;letter-spacing:.3px;vertical-align:middle}.sub-in{color:#8ff0ae;background:rgba(34,197,94,.17);border:1px solid rgba(74,222,128,.4)}.sub-out{color:#ff9b9b;background:rgba(239,68,68,.15);border:1px solid rgba(248,113,113,.4)}
 .lineup-player.pick-out .lineup-player-name:after{content:" · velg for bytte";font-size:9px;color:var(--muted);font-weight:500}
 .inline-sub-curtain{grid-column:1/-1;background:#0d1929;border:1px solid #49617a;border-radius:10px;padding:10px;margin:4px 0 8px;box-shadow:0 8px 20px #0003}.inline-sub-curtain strong{display:block;font-size:11px;color:var(--green);margin-bottom:7px}.inline-sub-options{display:flex;flex-direction:column;gap:6px}.inline-sub-option{display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;width:100%;padding:9px 10px;border-radius:8px;background:#22334a;border:1px solid #405670;color:var(--text)}.inline-sub-option small{color:var(--muted)}.inline-sub-option:disabled{opacity:.45}.inline-sub-empty{font-size:11px;color:var(--muted)}
 .lineup-bench-note{font-size:10px;color:var(--muted);margin:4px 0 8px}
@@ -171,7 +172,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.43</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.44</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="league"><b>♜</b>Tabell</button>
@@ -897,14 +898,15 @@ function assistantAutoSubs(engine,minute){
   const xiIndex=xi.findIndex(p=>String(p.id)===String(out.id));if(xiIndex<0)continue;
   const currentWindow=engine.lastSubWindowKey===Math.floor(trigger/5);
   if(!currentWindow){engine.userSubWindows++;engine.lastSubWindowKey=Math.floor(trigger/5);engine.lastSubMinute=minute;}
-  engine.subbedOutIds.push(out.id);xi[xiIndex]=incoming;onPitch.delete(String(out.id));onPitch.add(String(incoming.id));
+  engine.subbedOutIds.push(out.id);recordSubstitution(engine,minute,CLUBS[side==='A'?engine.a:engine.b]?.name||'Motstander',out,incoming,'Assistentbytte');
+  xi[xiIndex]=incoming;onPitch.delete(String(out.id));onPitch.add(String(incoming.id));
   const endurance=Number(incoming.attributes?.stamina??incoming.rating??65);
   engine.stamina[String(incoming.id)]=clamp(87+(playerFitnessValue(incoming)-80)*.18+(endurance-70)*.10,72,100);
   engine.performance[String(incoming.id)]={influence:0,events:0,shots:0,goals:0,assists:0};
   const oldAppearance=engine.appearances[String(out.id)];if(oldAppearance)oldAppearance.end=minute;
   engine.appearances[String(incoming.id)]={player:incoming,start:minute,end:90,started:false};
   engine.userSubs++;done++;
-  const container=document.getElementById('liveEvents');if(container){const row=document.createElement('div');row.className='match-event live-event-new sub-event';row.innerHTML=`<div class="event-min">${minute}'</div><div class="event-symbol">🔁</div><div class="event-detail"><strong>${esc(incoming.name)} inn for ${esc(out.name)}</strong><small>Assistentbytte · Karakter ${item.grade.toFixed(1)} · Utholdenhet ${Math.round(item.stamina)}%</small></div>`;container.appendChild(row);}
+  const container=document.getElementById('liveEvents');if(container){const row=document.createElement('div');row.className='match-event live-event-new sub-event';row.innerHTML=`<div class="event-min">${minute}'</div><div class="event-symbol"><span class="sub-mark sub-in">▲ INN</span><span class="sub-mark sub-out">▼ UT</span></div><div class="event-detail"><strong>${esc(incoming.name)} inn for ${esc(out.name)}</strong><small>Assistentbytte · Karakter ${item.grade.toFixed(1)} · Utholdenhet ${Math.round(item.stamina)}%</small></div>`;container.appendChild(row);}
   const commentary=document.getElementById('liveCommentary');if(commentary)commentary.textContent=`Assistenten bytter: ${incoming.name} erstatter ${out.name} (${item.grade.toFixed(1)} i kampkarakter, ${Math.round(item.stamina)}% utholdenhet).`;
  }
  if(done){recomputeLiveTeam(engine,engine.userIsA?'A':'B');refreshSubOptions(engine);renderLiveLineup(engine,minute,document.getElementById('liveScore')?.textContent||`${engine.ga} – ${engine.gb}`);}
@@ -978,6 +980,17 @@ function managerAutoSubs(engine,minute){
  }
 }
 
+function ensureSubstitutionHistory(engine){if(!engine.substitutionHistory)engine.substitutionHistory=[];return engine.substitutionHistory;}
+function recordSubstitution(engine,minute,team,outgoing,incoming,reason='Bytte'){
+ const history=ensureSubstitutionHistory(engine);
+ history.push({minute,team,outId:String(outgoing.id),outName:outgoing.name,inId:String(incoming.id),inName:incoming.name,reason});
+}
+function substitutionMarker(engine,playerId){
+ const h=ensureSubstitutionHistory(engine);let html='';
+ if(h.some(x=>x.inId===String(playerId)))html+='<span class="sub-mark sub-in" title="Byttet inn" aria-label="Byttet inn">▲ INN</span>';
+ if(h.some(x=>x.outId===String(playerId)))html+='<span class="sub-mark sub-out" title="Byttet ut" aria-label="Byttet ut">▼ UT</span>';
+ return html;
+}
 function renderLiveLineup(engine,minute,scoreText){
  const holder=document.getElementById('lineupPlayers');if(!holder||!engine)return;
  const xi=engine.userIsA?engine.xiA:engine.xiB;
@@ -995,7 +1008,7 @@ function renderLiveLineup(engine,minute,scoreText){
    const selected=String(p.id)===String(selectedOut);
    const options=selected?bench.filter(b=>b.pos===p.pos).sort((a,b)=>b.rating-a.rating):[];
    const curtain=selected?`<div class="inline-sub-curtain"><strong>VELG INNBYTTER · ${p.pos}</strong><div class="inline-sub-options">${options.length?options.map(b=>`<button type="button" class="inline-sub-option" data-player-in="${esc(String(b.id))}" data-player-out-target="${esc(String(p.id))}"><span>${esc(b.name)} <small>· ${b.pos}</small></span><span>${Math.round(b.rating)} ferdighet · ${Math.round(playerFitnessValue(b))}% form</span></button>`).join(''):`<div class="inline-sub-empty">Ingen tilgjengelige reserver i samme posisjon.</div>`}</div></div>`:'';
-   return `<div class="lineup-player pick-out ${selected?'selected-out':''}" role="button" tabindex="0" data-player-out="${esc(String(p.id))}" aria-label="Velg ${esc(p.name)} for bytte"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span></div><div class="lineup-player-meta">Kampkarakter <strong style="color:${liveMatchRating(engine,p)<6?'#f08080':liveMatchRating(engine,p)>=7?'var(--green)':'var(--text)'}">${liveMatchRating(engine,p).toFixed(1)}</strong> · Ferdighet ${Math.round(effectivePlayerRating(engine,p))} · Grunnferdighet ${p.rating}</div><div class="fitness-track"><div class="fitness-fill" style="width:${stamina}%;background:${color}"></div></div></div><div class="lineup-player-side"><strong>${Math.round(effectivePlayerRating(engine,p))}</strong><span>${stamina}%</span></div></div>${curtain}`;
+   return `<div class="lineup-player pick-out ${selected?'selected-out':''}" role="button" tabindex="0" data-player-out="${esc(String(p.id))}" aria-label="Velg ${esc(p.name)} for bytte"><div><div class="lineup-player-name">${esc(p.name)} ${substitutionMarker(engine,p.id)} <span class="pill">${p.pos}</span></div><div class="lineup-player-meta">Kampkarakter <strong style="color:${liveMatchRating(engine,p)<6?'#f08080':liveMatchRating(engine,p)>=7?'var(--green)':'var(--text)'}">${liveMatchRating(engine,p).toFixed(1)}</strong> · Ferdighet ${Math.round(effectivePlayerRating(engine,p))} · Grunnferdighet ${p.rating}</div><div class="fitness-track"><div class="fitness-fill" style="width:${stamina}%;background:${color}"></div></div></div><div class="lineup-player-side"><strong>${Math.round(effectivePlayerRating(engine,p))}</strong><span>${stamina}%</span></div></div>${curtain}`;
   }).join('');
  }).join('');
  const benchOrder={GK:0,DEF:1,MID:2,ATT:3};
@@ -1005,7 +1018,9 @@ function renderLiveLineup(engine,minute,scoreText){
   const color=stamina<50?'#f08080':stamina<70?'#f3ca72':'var(--green)';
   return `<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span></div><div class="lineup-player-meta">Ferdighet <strong>${Math.round(p.rating)}</strong> · Grunnferdighet ${p.rating}</div><div class="fitness-track"><div class="fitness-fill" style="width:${stamina}%;background:${color}"></div></div></div><div class="lineup-player-side"><strong>${Math.round(p.rating)}</strong><span>${stamina}%</span></div></div>`;
  }).join(''):`<div class="muted" style="padding:8px 0">Ingen tilgjengelige reserver.</div>`);
- holder.innerHTML=onPitchMarkup+benchMarkup;
+ const history=ensureSubstitutionHistory(engine);
+ const historyMarkup=history.length?`<div class="lineup-section-title">BYTTEHISTORIKK</div>`+history.slice().reverse().map(h=>`<div class="lineup-player sub-history-row"><div><div class="lineup-player-name"><span class="sub-mark sub-out">▼ UT</span> ${esc(h.outName)} <span style="color:var(--muted);font-size:11px">→</span> <span class="sub-mark sub-in">▲ INN</span> ${esc(h.inName)}</div><div class="lineup-player-meta">${h.minute}' · ${esc(h.reason)} · ${esc(h.team)}</div></div></div>`).join(''):'';
+ holder.innerHTML=onPitchMarkup+benchMarkup+historyMarkup;
  holder.querySelectorAll('[data-player-out]').forEach(el=>{
   const choose=()=>{const out=document.getElementById('subOut');if(!out)return;out.value=el.dataset.playerOut;refreshSubOptions(engine);renderLiveLineup(engine,minute,scoreText);};
   el.addEventListener('click',choose);el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();}});
@@ -1047,6 +1062,7 @@ function makeLiveSubstitution(engine,minute){
  const idx=xi.findIndex(p=>String(p.id)===String(outId));
  if(!engine.subbedOutIds)engine.subbedOutIds=[];
  if(!engine.subbedOutIds.some(id=>String(id)===String(outgoing.id)))engine.subbedOutIds.push(outgoing.id);
+ recordSubstitution(engine,minute,currentClub().name,outgoing,incoming,'Manuelt bytte');
  xi[idx]=incoming;
  engine.stamina[String(incoming.id)]=clamp(87+(playerFitnessValue(incoming)-80)*.18+(Number(incoming.attributes?.stamina??incoming.rating??65)-70)*.10,72,100);
  if(!engine.performance[String(incoming.id)])engine.performance[String(incoming.id)]={influence:0,events:0,shots:0,goals:0,assists:0};
@@ -1057,7 +1073,7 @@ function makeLiveSubstitution(engine,minute){
  recomputeLiveTeam(engine,engine.userIsA?'A':'B');
  const teamName=currentClub().name;
  const row=document.createElement('div');row.className='match-event live-event-new sub-event';
- row.innerHTML=`<div class="event-min">${minute}'</div><div class="event-symbol">🔁</div><div class="event-detail"><strong>${esc(incoming.name)} inn for ${esc(outgoing.name)}</strong><small>Bytte · ${esc(teamName)}</small></div>`;
+ row.innerHTML=`<div class="event-min">${minute}'</div><div class="event-symbol"><span class="sub-mark sub-in">▲ INN</span><span class="sub-mark sub-out">▼ UT</span></div><div class="event-detail"><strong>${esc(incoming.name)} inn for ${esc(outgoing.name)}</strong><small>Bytte · ${esc(teamName)}</small></div>`;
  const container=document.getElementById('liveEvents');if(container)container.appendChild(row);
  const commentary=document.getElementById('liveCommentary');if(commentary)commentary.textContent=`Bytte: ${incoming.name} kommer inn for ${outgoing.name}. Nå får vi se om det gir effekt.`;
  const headline=document.getElementById('liveHeadline');if(headline)headline.textContent='Manageren gjør grep';
@@ -1098,6 +1114,7 @@ function handleLiveInjury(engine,event,minute){
  if(incoming){
   const idx=xi.findIndex(p=>String(p.id)===String(injured.id));
   if(idx>=0){xi[idx]=incoming;}
+  recordSubstitution(engine,minute,teamName,injured,incoming,'Skadebytte');
   if(isUser){
    if(!engine.subbedOutIds)engine.subbedOutIds=[];engine.subbedOutIds.push(injured.id);engine.userSubs++;
    if(engine.lastSubMinute!==minute&&minute!==45){engine.userSubWindows++;engine.lastSubMinute=minute;engine.lastSubWindowKey=Math.floor(minute/5);}else if(minute!==45){engine.lastSubMinute=minute;}
@@ -1105,7 +1122,7 @@ function handleLiveInjury(engine,event,minute){
   engine.stamina[String(incoming.id)]=clamp(90+(playerFitnessValue(incoming)-80)*.2,78,100);
   engine.performance[String(incoming.id)]={influence:0,events:0,shots:0,goals:0,assists:0};
   engine.appearances[String(incoming.id)]={player:incoming,start:minute,end:90,started:false};
-  const row=document.createElement('div');row.className='match-event live-event-new sub-event';row.innerHTML=`<div class="event-min">${minute}'</div><div class="event-symbol">🔁</div><div class="event-detail"><strong>${esc(incoming.name)} inn for ${esc(injured.name)}</strong><small>Skadebytte · ${esc(teamName)}${isUser?` · ${engine.userSubs}/5 bytter, ${engine.userSubWindows}/3 stopp`:''}</small></div>`;document.getElementById('liveEvents')?.appendChild(row);
+  const row=document.createElement('div');row.className='match-event live-event-new sub-event';row.innerHTML=`<div class="event-min">${minute}'</div><div class="event-symbol"><span class="sub-mark sub-in">▲ INN</span><span class="sub-mark sub-out">▼ UT</span></div><div class="event-detail"><strong>${esc(incoming.name)} inn for ${esc(injured.name)}</strong><small>Skadebytte · ${esc(teamName)}${isUser?` · ${engine.userSubs}/5 bytter, ${engine.userSubWindows}/3 stopp`:''}</small></div>`;document.getElementById('liveEvents')?.appendChild(row);
  }else{
   const idx=xi.findIndex(p=>String(p.id)===String(injured.id));if(idx>=0)xi.splice(idx,1);
   const row=document.createElement('div');row.className='match-event live-event-new';row.innerHTML=`<div class="event-min">${minute}'</div><div class="event-symbol">⚠️</div><div class="event-detail"><strong>${esc(injured.name)} kan ikke fortsette</strong><small>${esc(teamName)} spiller videre med én færre – ingen gyldig bytteressurs eller byttevindu.</small></div>`;document.getElementById('liveEvents')?.appendChild(row);
@@ -1543,7 +1560,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.43 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
+function render(){ensureFixtures();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.44 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,league,season:seasonSummary};document.getElementById("app").innerHTML=pages[appState.page]();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{render()}
