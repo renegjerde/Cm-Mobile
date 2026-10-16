@@ -1,19 +1,15 @@
-# CM Mobile v1.38 — Match Management
+# CM Mobile v1.40 — Match fatigue and smarter substitutions
 
-## Included
-- Injury incidents on the user's team trigger an immediate substitution when a valid substitute and substitution allowance are available.
-- The assistant's optional automatic substitutions consider live match rating, stamina, and positional suitability at the 60th, 70th, and 80th minute checkpoints.
-- The match automatically pauses at half-time (45'). The manager can open the lineup/tactics panel and make changes before starting the second half.
-- Half-time substitutions count toward the maximum of five players but do not consume one of the three substitution windows.
-- Injury, manual, and assistant substitutions share the match's substitution counters.
+## Changes
+- Match stamina now starts from pre-match fitness and the player's stamina attribute, rather than using almost the same baseline for everyone.
+- High pressing and attacking tactics cost more energy; attacking wide roles have additional workload. Player stamina attributes reduce or increase fatigue rate.
+- Fatigue has a more meaningful effect on effective match rating.
+- The assistant now considers a poor match rating OR notable fatigue at the 60th, 70th and 80th minute checkpoints. It can make up to two substitutions in one stoppage, subject to the existing five-player/three-window limits.
+- The assistant prefers a suitable role-fit substitute, with a small preference for same-position replacements.
+- The automatic-substitution checkpoint handles a clock step that crosses the target minute.
 
-## Install
-Replace the repository-root `index.html` on the `main` branch with the `index.html` in this version folder. Keep the version folder and README for version history. GitHub Pages currently serves the root `index.html`.
-
-## Validation
-The embedded JavaScript passed `node --check`. Full interactive testing on mobile browsers is still recommended. The app stores career state locally in the browser.
-
-
-## v1.38 – Kampstart og navigasjon
-- Avspark-knapp også øverst på laguttakssiden, slik at du slipper å bla forbi hele troppen.
-- Når en kamp starter, flyttes visningen automatisk til toppen av live-kampsiden, uavhengig av hvor langt ned du var på forrige side.
+## Notes
+- Automatic substitutions must be enabled in the in-match lineup panel.
+- Injury substitutions still use the shared substitution counters and are limited by the available windows, except for half-time substitutions.
+- The match clock and fatigue values are a game simulation, not physiological measurements.
+- JavaScript syntax checked with Node.js. Full end-to-end mobile browser testing has not been completed.
