@@ -1,10 +1,10 @@
-# CM Mobile v1.57 — Championship Count Fix
+# CM Mobile v1.59 — EFL Division Count Fix
 
-## Fix
-The lower-league builder previously removed EFL clubs whenever their names appeared in the global `CLUBS` array. This could reduce the Championship from 24 clubs to 23. The filter now removes only reserve/U21 names, not first-team clubs, and the domestic data version is bumped so saved league tables are rebuilt.
+- Rebuilt the three EFL division lists to contain 24 distinct club names each.
+- Removed cross-division duplicates and Premier League clubs from the EFL lists.
+- Bumped domestic data schema to version 5 so existing saved league tables are rebuilt.
+- Structural fix for 23-team tables caused by duplicate clubs being filtered out.
 
-## Scope and limitations
-This fixes the league row-count bug. It does **not** mean all 92 squads are already fully verified. Many player profiles and attributes still require source-by-source verification. The official EFL 2026/27 squad list is the starting source for player names, and ages must be calculated from verified dates of birth as of 22 August 2026.
+Important: this repairs the structure, but exact 2026/27 division membership still needs comparison with official final league membership. Player rosters and dates of birth remain a separate verification task.
 
-## Install
-Replace the root `index.html` in the `main` branch of the `Cm-Mobile` repository.
+Install: replace root index.html on the main branch of the Cm-Mobile GitHub repository.
