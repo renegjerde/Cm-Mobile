@@ -1,11 +1,16 @@
-# CM Mobile v1.67
+# CM Mobile v1.68 — Manuell posisjonsredigering
 
-## Sesongbasert aldring og pensjonering
-- Spillere utvikler seg oftere før toppalder.
-- Gradvis ferdighetsfall starter ved ulik alder etter posisjon; keepere holder normalt nivå lenger.
-- Overgangsverdi faller med alder.
-- Pensjonering blir mer sannsynlig fra ca. 35 år (keepere ca. 38), med variasjon per spiller.
-- Alle AI-tropper og brukertroppen oppdateres ved sesongstart.
-- Hvis pensjoneringer etterlater hull, fylles de med akademiprospekter slik at troppene forblir spillbare.
+## Endringer
+- Oppdatert versjonsmerke og topptekst til v1.68.
+- På spillertroppen kan du åpne en spiller og redigere primærposisjon og flere sekundærposisjoner.
+- Primærposisjonen oppdaterer spillerens posisjonsgruppe, og valgene lagres i karrieren.
+- Posisjonsredigeringen er tilgjengelig i spillerens utvidede detaljkort.
 
-Aldring skjer ved start av ny sesong. Dette er spillmodellering; sannsynligheter er balanseringsestimater.
+## Slik bruker du det
+1. Åpne **Tropp**.
+2. Trykk på spilleren for å åpne detaljene.
+3. Velg **Rediger primær- og sekundærposisjon**.
+4. Skriv nummeret til primærposisjonen, og deretter sekundærposisjon(er) som kommaseparerte numre. Skriv `0` for ingen sekundærposisjoner.
+
+## Publisering
+Kopier `index.html` til roten av GitHub Pages-repoet. ZIP-arkivet inneholder denne versjonsmappen.
