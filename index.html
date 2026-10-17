@@ -172,7 +172,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.69</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.70</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -1103,11 +1103,18 @@ function startNewSeason(){
 }
 
 function startNewCareer(){
- const options=CLUBS.map((c,i)=>`${i+1}. ${c.name}`).join("\n");
- const answer=prompt("NY KARRIERE · 2026/27\nVelg klubb ved å skrive nummeret:\n"+options,String(appState.club+1));
+ const all=[{division:'Premier League',names:CLUBS.map(c=>c.name)},...Object.entries(EFL_DIVISIONS).map(([division,names])=>({division,names}))];
+ const options=all.map(({division,names})=>division+'\n'+names.map(name=>`${all.slice(0,all.findIndex(x=>x.division===division)).reduce((n,x)=>n+x.names.length,0)+names.indexOf(name)+1}. ${name}`).join('\n')).join('\n\n');
+ const answer=prompt('NY KARRIERE · 2026/27\n92 klubber fordelt på fire divisjoner.\nVelg klubbnummer:\n\n'+options,String(appState.club+1));
  if(answer===null)return;
- const idx=Number(answer)-1;
- if(!Number.isInteger(idx)||idx<0||idx>=CLUBS.length){alert("Skriv et nummer fra 1 til "+CLUBS.length+".");return;}
+ const selection=Number(answer)-1;
+ if(!Number.isInteger(selection)||selection<0||selection>=92){alert('Velg et nummer fra 1 til 92.');return;}
+ if(selection>=CLUBS.length){
+  const chosen=all.flatMap(({division,names})=>names.map(name=>({division,name})))[selection];
+  alert(chosen.name+' ('+chosen.division+') er registrert blant de 92 klubbene. Spillbar karriere i denne divisjonen krever fortsatt at kampmotor, tabell og opprykk/nedrykk kobles til den valgte ligaen. Ingen lagring er endret.');
+  return;
+ }
+ const idx=selection;
  if(!confirm(`Starte en HELT NY karriere med ${CLUBS[idx].name} fra sesongstart 2026/27? All økonomi, spillerhistorikk, overganger, skader, tabeller og konkurranser fra nåværende karriere nullstilles.`))return;
  // Rebuild the mutable world from the original database, never from the previous save.
  const freshWorld=buildWorldDatabase();
@@ -2051,7 +2058,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.69 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
+function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.70 · ${seasonLabel()} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{ensureTransferPool();render()}

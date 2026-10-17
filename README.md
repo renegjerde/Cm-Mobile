@@ -1,7 +1,7 @@
-# CM Mobile v1.69
+# CM Mobile v1.70
 
-## PL-roster duplicate cleanup
+Første trinn i utvidelsen til 92 valgfrie klubber: Ny karriere viser alle 92 klubber fordelt på Premier League, Championship, League One og League Two.
 
-This version removes nine repeated names from the Premier League roster seed by keeping the original player at one club and replacing the duplicate slot with a distinct player name. The roster seed still targets 25 players per club.
+**Viktig begrensning:** Kun de 20 Premier League-klubbene kan fortsatt startes som spillbar karriere. Valg av EFL-klubb viser en forklaring uten å overskrive lagringen. Kampmotor, terminliste, tabell og opprykk/nedrykk for EFL er ikke ferdig integrert.
 
-Note: this is a duplicate-name cleanup only, not a full independent verification of all player identities, club affiliations, birth dates, or positions. Existing saved careers may retain previously generated squads; start a new career to inspect the corrected roster seed.
+For publisering via GitHub Pages må `index.html` kopieres til roten av `main`-grenen.
