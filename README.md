@@ -1,5 +1,10 @@
-# CM Mobile v1.54 — EFL player database foundation
+# CM Mobile v1.57 — Championship Count Fix
 
-Adds a local 25-profile roster for lower-division clubs and exposes these players to the transfer market. Division affects ratings, estimated values and wages. The roster uses a small starter set of real-world player names for selected EFL clubs; all remaining names are placeholders and age/attributes are estimates. This is not yet a verified complete real-player database. Player profiles are stored locally and are not fetched repeatedly. The Plymouth Argyle Reserves padding fallback has been removed.
+## Fix
+The lower-league builder previously removed EFL clubs whenever their names appeared in the global `CLUBS` array. This could reduce the Championship from 24 clubs to 23. The filter now removes only reserve/U21 names, not first-team clubs, and the domestic data version is bumped so saved league tables are rebuilt.
 
-Deploy by replacing root index.html on main.
+## Scope and limitations
+This fixes the league row-count bug. It does **not** mean all 92 squads are already fully verified. Many player profiles and attributes still require source-by-source verification. The official EFL 2026/27 squad list is the starting source for player names, and ages must be calculated from verified dates of birth as of 22 August 2026.
+
+## Install
+Replace the root `index.html` in the `main` branch of the `Cm-Mobile` repository.
