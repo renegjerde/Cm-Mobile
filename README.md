@@ -1,13 +1,13 @@
-# CM Mobile v1.74
+# CM Mobile v1.75
 
 ## Endring i denne versjonen
-- Assistentens taktiske vurdering skjer også ved 65, 75, 85 og 90 minutter.
-- I «Kun ved behov»-modus reagerer assistenten nå på ethvert underskudd fra 75. minutt, også når laget bare ligger under 0–1.
-- Ved uavgjort fra 85. minutt kan assistenten gå mer offensivt for å jakte vinnermål.
-- Ved komfortabel ledelse sent i kampen forsøker assistenten fortsatt å beskytte resultatet.
+- Ligatabellen fargekoder nå konsekvensen av plasseringen: grønt for direkte opprykk, blått for playoff og rødt for nedrykk.
+- Premier League viser røde nedrykksplasser; de andre divisjonene viser opprykk, playoff og nedrykk etter divisjonens plassfordeling.
+- Brukerens klubb beholder en tydelig markering samtidig som sonefargen vises.
+- En forklaring under tabellen viser hva fargene betyr.
 
-## Begrensning / testing
-JavaScript-syntaksen er kontrollert med `node --check`. Dette er ikke det samme som en full nettlesertest av kampbalansen.
+## Kontroll
+JavaScript trekkes ut og kontrolleres med `node --check`. Dette er en syntakskontroll, ikke en full nettlesertest.
 
 ## Publisering
-Pakk ut ZIP-filen og last opp `cm_mobile_v1_74/index.html` som rotfilen `index.html` i `main`-grenen dersom GitHub Pages publiserer fra rot.
+Pakk ut ZIP-filen og last opp `cm_mobile_v1_75/index.html` som rotfilen `index.html` i `main`-grenen dersom GitHub Pages publiserer fra rot.
