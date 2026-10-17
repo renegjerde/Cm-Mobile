@@ -798,11 +798,26 @@ function processAITransferOffers(week=appState.week){
   const morale=Number(p.morale??70);
   const base=listed?.38:(star?.003:.012);
   if(Math.random()>base)continue;
-  const buyers=CLUBS.map((c,i)=>({...c,index:i})).filter(c=>c.index!==appState.club&&c.budget>0&&c.strength>=(Number(p.rating||60)-8));
-  if(!buyers.length)continue;
-  const buyer=buyers[Math.floor(Math.random()*buyers.length)];
-  const statusGap=buyer.strength-userClub.strength;
+  const divisionRank={'Premier League':0,'Championship':1,'League One':2,'League Two':3};
+  const sellerDivision=clubDivision(userClub);
+  const sellerRank=divisionRank[sellerDivision]??0;
   const value=Number(p.value)||Math.max(.2,((Number(p.rating||55)-45)**2)/100);
+  const estimatedAsk=value*(star?1.55:1.18)*(listed?.96:1.08)*(p.age<22?1.12:p.age>30?.82:1);
+  // Default interest is limited to the same division or one division above. A listed standout may attract a club two tiers above.
+  const buyers=CLUBS.map((c,i)=>({...c,index:i,rank:divisionRank[clubDivision(c)]??3})).filter(c=>{
+   if(c.index===appState.club||c.budget<=0||c.strength<(Number(p.rating||60)-10))return false;
+   const tierGap=sellerRank-c.rank;
+   const maxTierGap=listed&&star?2:1;
+   if(tierGap<0||tierGap>maxTierGap)return false;
+   const expectedBid=estimatedAsk*(listed?.86:.72);
+   return Number(c.budget)>=expectedBid;
+  });
+  if(!buyers.length)continue;
+  // Prefer nearby clubs in the pyramid and realistic sporting fits rather than choosing any stronger club at random.
+  const buyerPool=buyers.filter(c=>c.rank===Math.max(0,sellerRank-1));
+  const candidates=buyerPool.length?buyerPool:buyers;
+  const buyer=candidates[Math.floor(Math.random()*candidates.length)];
+  const statusGap=buyer.strength-userClub.strength;
   // Sellers resist losing key players, especially to direct rivals; listed players are priced more realistically.
   const resistance=star?(statusGap>=8?1.32:1.72):(statusGap>=8?1.08:1.24);
   const ask=+(value*resistance*(listed?.96:1.08)*(p.age<22?1.12:p.age>30?.82:1)).toFixed(1);
@@ -1112,11 +1127,20 @@ function startNewSeason(){
 }
 
 function startNewCareer(){
- const options=CLUBS.map((c,i)=>`${i+1}. ${c.name} (${clubDivision(c)})`).join("\n");
- const answer=prompt("NY KARRIERE · 2026/27\nVelg klubb ved å skrive nummeret (1–"+CLUBS.length+"):\n"+options,String(appState.club+1));
+ const divisions=['Premier League','Championship','League One','League Two'];
+ const divisionText=divisions.map((d,i)=>`${i+1}. ${d} (${CLUBS.filter(c=>clubDivision(c)===d).length} klubber)`).join("\n");
+ const divisionAnswer=prompt("NY KARRIERE · 2026/27\nVelg divisjon:\n"+divisionText,"1");
+ if(divisionAnswer===null)return;
+ const divisionIndex=Number(divisionAnswer)-1;
+ if(!Number.isInteger(divisionIndex)||divisionIndex<0||divisionIndex>=divisions.length){alert('Skriv 1, 2, 3 eller 4 for å velge divisjon.');return;}
+ const selectedDivision=divisions[divisionIndex];
+ const divisionClubs=CLUBS.map((c,i)=>({...c,index:i})).filter(c=>clubDivision(c)===selectedDivision);
+ const options=divisionClubs.map((c,i)=>`${i+1}. ${c.name}`).join("\n");
+ const answer=prompt(`NY KARRIERE · 2026/27\n${selectedDivision} · Velg klubb (1–${divisionClubs.length}):\n`+options,"1");
  if(answer===null)return;
- const idx=Number(answer)-1;
- if(!Number.isInteger(idx)||idx<0||idx>=CLUBS.length){alert("Skriv et nummer fra 1 til "+CLUBS.length+".");return;}
+ const choice=Number(answer)-1;
+ if(!Number.isInteger(choice)||choice<0||choice>=divisionClubs.length){alert(`Skriv et nummer fra 1 til ${divisionClubs.length}.`);return;}
+ const idx=divisionClubs[choice].index;
  if(!confirm(`Starte en HELT NY karriere med ${CLUBS[idx].name} fra sesongstart 2026/27? All økonomi, spillerhistorikk, overganger, skader, tabeller og konkurranser fra nåværende karriere nullstilles.`))return;
  // Rebuild the mutable world from the original database, never from the previous save.
  const freshWorld=buildWorldDatabase();
@@ -2052,7 +2076,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.70 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
+function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.71 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{ensureTransferPool();render()}
