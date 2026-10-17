@@ -1,13 +1,11 @@
-# CM Mobile v1.71
+# CM Mobile v1.73
 
-## Endringer
-- Ny karriere starter med valg av divisjon først, og viser deretter bare klubbene i valgt divisjon. Dette unngår at den lange listen kuttes i nettleserens `prompt`-dialog.
-- AI-bud på spillerne dine begrenses som standard til klubber i samme divisjon eller én divisjon over, med krav til økonomisk kapasitet og sportslig nivå.
-- En spiller som er lagt ut for salg og er en nøkkelspiller kan unntaksvis tiltrekke interesse fra en klubb opptil to divisjoner over.
-- Versjonsmerket er oppdatert til v1.71.
+## Endring i denne versjonen
+- AI-bud på spillerne dine vurderes nå ut fra kjøperklubbens sportslige nivå og behov i spillerens posisjonsgruppe.
+- En klubb må ha en troverdig grunn til å hente spilleren: fylle et hull i troppen eller forbedre kvaliteten på eksisterende alternativer.
+- Å legge en svak spiller ut for salg gjør ham tilgjengelig, men skal ikke i seg selv gjøre ham attraktiv for en toppklubb som ligger langt over spillerens nivå.
+- Klubber lavere i divisjonssystemet kan fortsatt by på spillere når spilleren faktisk vil styrke eller forbedre bredden i troppen deres.
+- Eksisterende klubbvelger med divisjonsfilter fra v1.72 er videreført.
 
-## Begrensninger
-Dette er en avgrenset forbedring av klubbvalg og AI-bud. Det er ikke en bekreftelse på at hele karrieremotoren for alle 92 klubber er fullstendig testet i nettleser. Spillerdata i lavere divisjoner er fortsatt delvis generert.
-
-## Installering
-Bruk `index.html` i denne versjonsmappen for testing. Hvis GitHub Pages publiserer fra `main`-rot, må den aktive rotfilen `index.html` oppdateres separat; ZIP-ens versjonsmappe endrer ikke automatisk nettsiden.
+## Kontrollstatus
+JavaScript-syntaksen kontrolleres med Node.js. Dette er ikke det samme som en full spilltest i nettleser; AI-overganger bør testes i en aktiv karriere.

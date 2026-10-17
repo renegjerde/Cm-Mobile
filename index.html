@@ -785,45 +785,71 @@ function processAILeagueTransfers(week=appState.week){
  return moved;
 }
 
+function aiBuyerFitForPlayer(buyerIndex,p){
+ const club=CLUBS[buyerIndex];if(!club)return {ok:false,reason:'missing-club'};
+ const squad=appState.worldSquads?.[buyerIndex]||[];
+ const group=aiPosGroup(p);
+ const same=squad.filter(x=>aiPosGroup(x)===group);
+ const target=AI_SQUAD_TARGETS[group]||6;
+ const needs=aiSquadNeeds(squad);
+ const rating=Number(p.rating)||0;
+ const strength=Number(club.strength)||60;
+ const weakest=same.length?Math.min(...same.map(x=>Number(x.rating)||0)):0;
+ // A signing must be credible for the buyer's level and either fill a shortage
+ // or improve the quality of the club's existing options in that position.
+ const qualityFloor=strength-7;
+ const improvesDepth=same.length<target || rating>=weakest+2;
+ return {ok:rating>=qualityFloor&&improvesDepth,group,needs:needs[group]||0,weakest,qualityFloor,improvesDepth};
+}
 function processAITransferOffers(week=appState.week){
  if(!transferWindowOpen(week))return [];
  if(!Array.isArray(appState.transferOffers))appState.transferOffers=[];
  if(!Array.isArray(appState.listedForTransfer))appState.listedForTransfer=[];
  const pending=new Set(appState.transferOffers.filter(o=>o.status==='pending').map(o=>String(o.playerId)));
  const created=[];const userClub=CLUBS[appState.club];
+ if(!userClub)return created;
+ const divisionRank={'Premier League':0,'Championship':1,'League One':2,'League Two':3};
+ const sellerDivision=clubDivision(userClub);const sellerRank=divisionRank[sellerDivision]??0;
  for(const p of appState.squad){
   if(!p||!p.name||pending.has(String(p.id)))continue;
   const listed=appState.listedForTransfer.includes(String(p.id));
-  const star=(Number(p.rating)||0)>=userClub.strength+2;
+  const rating=Number(p.rating)||0;
+  const star=rating>=Number(userClub.strength||65)+2;
   const morale=Number(p.morale??70);
+  // Listing raises interest, but does not make a player attractive to a club
+  // whose squad level is far above his ability.
   const base=listed?.38:(star?.003:.012);
   if(Math.random()>base)continue;
-  const divisionRank={'Premier League':0,'Championship':1,'League One':2,'League Two':3};
-  const sellerDivision=clubDivision(userClub);
-  const sellerRank=divisionRank[sellerDivision]??0;
-  const value=Number(p.value)||Math.max(.2,((Number(p.rating||55)-45)**2)/100);
-  const estimatedAsk=value*(star?1.55:1.18)*(listed?.96:1.08)*(p.age<22?1.12:p.age>30?.82:1);
-  // Default interest is limited to the same division or one division above. A listed standout may attract a club two tiers above.
-  const buyers=CLUBS.map((c,i)=>({...c,index:i,rank:divisionRank[clubDivision(c)]??3})).filter(c=>{
-   if(c.index===appState.club||c.budget<=0||c.strength<(Number(p.rating||60)-10))return false;
-   const tierGap=sellerRank-c.rank;
-   const maxTierGap=listed&&star?2:1;
-   if(tierGap<0||tierGap>maxTierGap)return false;
+  const value=Number(p.value)||Math.max(.2,((rating-45)**2)/100);
+  const estimatedAsk=value*(star?1.55:1.18)*(listed?.96:1.08)*(Number(p.age)<22?1.12:Number(p.age)>30?.82:1);
+  const buyers=CLUBS.map((c,i)=>({...c,index:i,rank:divisionRank[clubDivision(c)]??3,fit:aiBuyerFitForPlayer(i,p)})).filter(c=>{
+   if(c.index===Number(appState.club)||Number(c.budget)<=0||!c.fit.ok)return false;
+   // One division down is entirely possible when the player improves that squad.
+   // Avoid implausible jumps to a top club for a player below its normal level.
+   const tierGap=c.rank-sellerRank;
+   if(tierGap>2)return false;
+   if(c.rank===0&&Number(c.strength||0)>rating+7)return false;
    const expectedBid=estimatedAsk*(listed?.86:.72);
    return Number(c.budget)>=expectedBid;
   });
   if(!buyers.length)continue;
-  // Prefer nearby clubs in the pyramid and realistic sporting fits rather than choosing any stronger club at random.
-  const buyerPool=buyers.filter(c=>c.rank===Math.max(0,sellerRank-1));
-  const candidates=buyerPool.length?buyerPool:buyers;
-  const buyer=candidates[Math.floor(Math.random()*candidates.length)];
-  const statusGap=buyer.strength-userClub.strength;
-  // Sellers resist losing key players, especially to direct rivals; listed players are priced more realistically.
+  // Prefer clubs at a similar level. Stronger clubs are not automatically favoured;
+  // a lower-division club can win the bid if the player genuinely improves its squad.
+  const score=c=>{
+   const levelGap=Math.abs(Number(c.strength||60)-rating);
+   const sameTier=c.rank===sellerRank?2:0;
+   const need=Math.max(0,Number(c.fit.needs)||0);
+   return need*3+sameTier-levelGap*.45+(c.rank>sellerRank?1:0);
+  };
+  buyers.sort((a,b)=>score(b)-score(a));
+  const top=buyers.slice(0,Math.min(4,buyers.length));
+  const buyer=top[Math.floor(Math.random()*top.length)];
+  const statusGap=Number(buyer.strength||60)-Number(userClub.strength||60);
   const resistance=star?(statusGap>=8?1.32:1.72):(statusGap>=8?1.08:1.24);
-  const ask=+(value*resistance*(listed?.96:1.08)*(p.age<22?1.12:p.age>30?.82:1)).toFixed(1);
+  const ask=+(value*resistance*(listed?.96:1.08)*(Number(p.age)<22?1.12:Number(p.age)>30?.82:1)).toFixed(1);
   const bid=+(ask*(listed?.86:.72)*(statusGap>=10?1.08:1)).toFixed(1);
   const offer={id:'OFFER-'+Date.now()+'-'+Math.floor(Math.random()*100000),playerId:String(p.id),playerName:p.name,buyerIndex:buyer.index,buyerName:buyer.name,amount:Math.max(.1,bid),asking:ask,week,status:'pending',listed,star,createdAt:Date.now()};
-  appState.transferOffers.push(offer);created.push(offer);
+  appState.transferOffers.push(offer);created.push(offer);pending.add(String(p.id));
   appState.log.push(`${buyer.name} har lagt inn bud på ${p.name}: ${money(offer.amount)}${listed?' etter at spilleren ble lagt ut for salg':''}.`);
  }
  return created;
@@ -1128,19 +1154,24 @@ function startNewSeason(){
 
 function startNewCareer(){
  const divisions=['Premier League','Championship','League One','League Two'];
- const divisionText=divisions.map((d,i)=>`${i+1}. ${d} (${CLUBS.filter(c=>clubDivision(c)===d).length} klubber)`).join("\n");
- const divisionAnswer=prompt("NY KARRIERE · 2026/27\nVelg divisjon:\n"+divisionText,"1");
- if(divisionAnswer===null)return;
- const divisionIndex=Number(divisionAnswer)-1;
- if(!Number.isInteger(divisionIndex)||divisionIndex<0||divisionIndex>=divisions.length){alert('Skriv 1, 2, 3 eller 4 for å velge divisjon.');return;}
- const selectedDivision=divisions[divisionIndex];
- const divisionClubs=CLUBS.map((c,i)=>({...c,index:i})).filter(c=>clubDivision(c)===selectedDivision);
- const options=divisionClubs.map((c,i)=>`${i+1}. ${c.name}`).join("\n");
- const answer=prompt(`NY KARRIERE · 2026/27\n${selectedDivision} · Velg klubb (1–${divisionClubs.length}):\n`+options,"1");
- if(answer===null)return;
- const choice=Number(answer)-1;
- if(!Number.isInteger(choice)||choice<0||choice>=divisionClubs.length){alert(`Skriv et nummer fra 1 til ${divisionClubs.length}.`);return;}
- const idx=divisionClubs[choice].index;
+ const overlay=document.createElement('div');overlay.id='careerClubPicker';
+ overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(4,10,20,.82);display:flex;align-items:center;justify-content:center;padding:16px;';
+ overlay.innerHTML=`<div style="width:min(520px,100%);max-height:90vh;overflow:auto;background:var(--panel,#142033);color:var(--text,#fff);border:1px solid #33445d;border-radius:16px;padding:22px;box-shadow:0 20px 70px #0009">
+ <h2 style="margin:0 0 8px">Ny karriere · 2026/27</h2><p style="margin:0 0 18px;color:var(--muted,#9fb0c7)">Velg divisjon først, deretter én av klubbene i divisjonen.</p>
+ <label for="careerDivision" style="display:block;margin:0 0 6px;font-weight:700">Divisjon</label><select id="careerDivision" onchange="updateCareerClubOptions()" style="width:100%;padding:12px;margin-bottom:16px;border-radius:9px;background:#0c1728;color:#fff;border:1px solid #52647e;font:inherit">${divisions.map(d=>`<option value="${d}">${d} (${CLUBS.filter(c=>clubDivision(c)===d).length} klubber)</option>`).join('')}</select>
+ <label for="careerClub" style="display:block;margin:0 0 6px;font-weight:700">Klubb</label><select id="careerClub" size="8" style="width:100%;padding:8px;border-radius:9px;background:#0c1728;color:#fff;border:1px solid #52647e;font:inherit"></select>
+ <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button onclick="document.getElementById('careerClubPicker')?.remove()" style="padding:10px 18px;border-radius:9px;border:1px solid #52647e;background:transparent;color:inherit;font:inherit">Avbryt</button><button onclick="startSelectedCareer()" style="padding:10px 18px;border-radius:9px;border:0;background:#ffbd66;color:#172033;font-weight:700;font:inherit">Start karriere</button></div></div>`;
+ document.body.appendChild(overlay);updateCareerClubOptions();
+}
+function updateCareerClubOptions(){
+ const division=document.getElementById('careerDivision')?.value,select=document.getElementById('careerClub');if(!select)return;
+ const clubs=CLUBS.map((c,index)=>({...c,index})).filter(c=>clubDivision(c)===division);
+ select.innerHTML=clubs.map(c=>`<option value="${c.index}">${c.name}</option>`).join('');
+ select.selectedIndex=0;
+}
+function startSelectedCareer(){
+ const select=document.getElementById('careerClub');if(!select||select.value==='')return;
+ const idx=Number(select.value);document.getElementById('careerClubPicker')?.remove();
  if(!confirm(`Starte en HELT NY karriere med ${CLUBS[idx].name} fra sesongstart 2026/27? All økonomi, spillerhistorikk, overganger, skader, tabeller og konkurranser fra nåværende karriere nullstilles.`))return;
  // Rebuild the mutable world from the original database, never from the previous save.
  const freshWorld=buildWorldDatabase();
@@ -2076,7 +2107,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.71 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
+function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.73 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{ensureTransferPool();render()}
