@@ -1,16 +1,7 @@
-# CM Mobile v1.68 — Manuell posisjonsredigering
+# CM Mobile v1.69
 
-## Endringer
-- Oppdatert versjonsmerke og topptekst til v1.68.
-- På spillertroppen kan du åpne en spiller og redigere primærposisjon og flere sekundærposisjoner.
-- Primærposisjonen oppdaterer spillerens posisjonsgruppe, og valgene lagres i karrieren.
-- Posisjonsredigeringen er tilgjengelig i spillerens utvidede detaljkort.
+## PL-roster duplicate cleanup
 
-## Slik bruker du det
-1. Åpne **Tropp**.
-2. Trykk på spilleren for å åpne detaljene.
-3. Velg **Rediger primær- og sekundærposisjon**.
-4. Skriv nummeret til primærposisjonen, og deretter sekundærposisjon(er) som kommaseparerte numre. Skriv `0` for ingen sekundærposisjoner.
+This version removes nine repeated names from the Premier League roster seed by keeping the original player at one club and replacing the duplicate slot with a distinct player name. The roster seed still targets 25 players per club.
 
-## Publisering
-Kopier `index.html` til roten av GitHub Pages-repoet. ZIP-arkivet inneholder denne versjonsmappen.
+Note: this is a duplicate-name cleanup only, not a full independent verification of all player identities, club affiliations, birth dates, or positions. Existing saved careers may retain previously generated squads; start a new career to inspect the corrected roster seed.
