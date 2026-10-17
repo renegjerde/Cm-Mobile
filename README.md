@@ -1,7 +1,18 @@
-# CM Mobile v1.70
+# CM Mobile v1.70 — 92-klubbkarriere
 
-Første trinn i utvidelsen til 92 valgfrie klubber: Ny karriere viser alle 92 klubber fordelt på Premier League, Championship, League One og League Two.
+## Endringer
+- Klubbregisteret inneholder 92 unike klubber: 20 i Premier League og 24 i hver av Championship, League One og League Two.
+- Ny karriere lar deg velge klubb fra alle fire divisjonene.
+- Den aktive klubben starter med en tropp på 25 spillere.
+- Ligatabell og terminliste bygges for valgt divisjon: 38 runder i Premier League og 46 runder i hver EFL-divisjon.
+- Kampoppsettet bruker globale klubb-ID-er, slik at motstandere og spillerstaller kan knyttes til riktig klubb.
+- Sesongovergangen oppdaterer divisjonstilhørighet ved opprykk og nedrykk og bygger nye ligalister.
+- Eksisterende spillfunksjoner fra v1.69 er beholdt i samme HTML-fil.
 
-**Viktig begrensning:** Kun de 20 Premier League-klubbene kan fortsatt startes som spillbar karriere. Valg av EFL-klubb viser en forklaring uten å overskrive lagringen. Kampmotor, terminliste, tabell og opprykk/nedrykk for EFL er ikke ferdig integrert.
+## Viktige begrensninger
+- Mange spillere i EFL-troppene er genererte modellspillere, ikke verifiserte, autentiske spillerstaller. Klubbene kan spilles, men spillerdataene er ikke ferdig kvalitetssikret.
+- Når manageren ikke spiller i Premier League, er PL-resultatene i denne versjonen rangert etter styrke i sesongovergangen; en fullstendig separat, kamp-for-kamp simulering av alle tre andre ligaer er fortsatt et senere forbedringspunkt.
+- Kontroll utført: JavaScript-syntaks (`node --check`) og logikktest av 92 unike klubber, divisjonsantall, 25 spillere per valgt klubb samt terminlister på 38/46 runder. Full nettleser-/mobiltest er ikke utført.
 
-For publisering via GitHub Pages må `index.html` kopieres til roten av `main`-grenen.
+## Installering
+Pakk ut ZIP-filen. Bruk `cm_mobile_v1_70/index.html` som testfil. For GitHub Pages som publiserer fra `main`-rot, må den testede filen kopieres til rotens `index.html` for å erstatte den aktive versjonen.
