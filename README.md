@@ -1,11 +1,13 @@
-# CM Mobile v1.73
+# CM Mobile v1.74
 
 ## Endring i denne versjonen
-- AI-bud på spillerne dine vurderes nå ut fra kjøperklubbens sportslige nivå og behov i spillerens posisjonsgruppe.
-- En klubb må ha en troverdig grunn til å hente spilleren: fylle et hull i troppen eller forbedre kvaliteten på eksisterende alternativer.
-- Å legge en svak spiller ut for salg gjør ham tilgjengelig, men skal ikke i seg selv gjøre ham attraktiv for en toppklubb som ligger langt over spillerens nivå.
-- Klubber lavere i divisjonssystemet kan fortsatt by på spillere når spilleren faktisk vil styrke eller forbedre bredden i troppen deres.
-- Eksisterende klubbvelger med divisjonsfilter fra v1.72 er videreført.
+- Assistentens taktiske vurdering skjer også ved 65, 75, 85 og 90 minutter.
+- I «Kun ved behov»-modus reagerer assistenten nå på ethvert underskudd fra 75. minutt, også når laget bare ligger under 0–1.
+- Ved uavgjort fra 85. minutt kan assistenten gå mer offensivt for å jakte vinnermål.
+- Ved komfortabel ledelse sent i kampen forsøker assistenten fortsatt å beskytte resultatet.
 
-## Kontrollstatus
-JavaScript-syntaksen kontrolleres med Node.js. Dette er ikke det samme som en full spilltest i nettleser; AI-overganger bør testes i en aktiv karriere.
+## Begrensning / testing
+JavaScript-syntaksen er kontrollert med `node --check`. Dette er ikke det samme som en full nettlesertest av kampbalansen.
+
+## Publisering
+Pakk ut ZIP-filen og last opp `cm_mobile_v1_74/index.html` som rotfilen `index.html` i `main`-grenen dersom GitHub Pages publiserer fra rot.

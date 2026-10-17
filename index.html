@@ -1460,7 +1460,8 @@ function managerSideXI(engine,side){return side==='A'?engine.xiA:engine.xiB;}
 function managerSideFormation(engine,side){return side==='A'?engine.formationA:engine.formationB;}
 function setManagerSideFormation(engine,side,formation){if(side==='A')engine.formationA=formation;else engine.formationB=formation;assignTacticalRoles(managerSideXI(engine,side),formation);recomputeLiveTeam(engine,side);}
 function maybeManagerTactics(engine,minute){
- if(![60,70,80].includes(minute))return;
+ // Evaluate at regular late-match checkpoints; a one-goal deficit must count as urgent.
+ if(![60,65,70,75,80,85,90].includes(minute))return;
  for(const side of ['A','B']){
   const isUser=sideIsUser(engine,side);const mode=appState.managerMode||'hybrid';
   if(isUser&&mode==='manual')continue;
@@ -1470,8 +1471,9 @@ function maybeManagerTactics(engine,minute){
   const staminaAvg=xi.length?xi.reduce((n,p)=>n+matchStamina(engine,p),0)/xi.length:75;
   const gradeAvg=xi.length?xi.reduce((n,p)=>n+liveMatchRating(engine,p),0)/xi.length:6.5;
   if(mode==='needed'){
-   // Conservative mode: intervene only for a clearly urgent game state.
-   if(diff<=-2&&minute>=70){desired=current==='4-3-3'?'4-2-3-1':current==='4-2-3-1'?'3-5-2':'4-3-3';tactic='Attacking';reason='Ligger under med minst to mål – øker risikoen';}
+   // Conservative by default, but actively chase a result when behind late on.
+   if(diff<0&&minute>=75){desired=current==='3-5-2'?'4-2-3-1':current==='4-2-3-1'?'4-3-3':'4-2-3-1';tactic='Attacking';reason=diff<=-2?'Ligger under med minst to mål sent – går tydeligere offensivt':'Ligger under sent i kampen – øker risikoen for å jakte utligning';}
+   else if(diff===0&&minute>=85){desired=current==='4-3-3'?'4-2-3-1':'4-3-3';tactic='Attacking';reason='Uavgjort mot slutten – prøver å finne et vinnermål';}
    else if(diff>=2&&minute>=80){desired=current==='4-3-3'?'4-2-3-1':current;tactic='Defensive';reason='Leder komfortabelt sent i kampen – beskytter ledelsen';}
    else if(staminaAvg<48&&minute>=70){tactic='Balanced';reason='Svært lav utholdenhet i laget – reduserer intensiteten';}
    else if(gradeAvg<5.8&&diff<=0&&minute>=70){desired=current==='4-3-3'?'4-2-3-1':'4-3-3';tactic=diff<0?'Attacking':'Balanced';reason='Svært svak lagprestasjon – gjør en begrenset taktisk justering';}
@@ -2107,7 +2109,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.73 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
+function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.74 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{ensureTransferPool();render()}
