@@ -1,12 +1,15 @@
-# CM Mobile — Touchline v1.61
+# CM Mobile v1.62 — Klubbøkonomi og juniorakademi
 
-## Overgangsmarked – forbedringer
-- Overgangsvinduene er gameweek 1–4 og 20–24. Kjøp og salg kan gjennomføres i disse vinduene.
-- Spillere i egen tropp kan legges ut for salg og tas av markedet igjen.
-- AI-klubber kan sende bud, med høyere interesse for spillere som er lagt ut.
-- Nøkkelspillere er vanskeligere å hente; klubbstatusforskjell påvirker bud og motstand.
-- Bud vises i egen innboks med Godta, Krev mer og Avslå. Et godkjent salg oppdaterer troppen, klubbens tropp og overgangsbudsjettet.
-- Nye bud etter kamp vises i kampsluttmeldingen.
+## Endringer
+- Klubbspesifikke overgangsbudsjetter og lønnsrammer, skalert etter divisjon og klubbens styrke.
+- Ukentlige lønnsutgifter belastes overgangsbudsjettet etter kamp. Ved overskridelse logges økonomivarsel.
+- Egen Juniorstall-side med alder, posisjon, ferdighet, potensial, verdi, lønn og sesong for markedsadgang.
+- Alle 92 klubber i PL, Championship, League One og League Two får akademikohorter ved sesongstart.
+- Akademispillere blir værende i minst én sesong og blir tilgjengelige for markedet fra påfølgende sesong; svært høyt potensial er mulig, men ekstremt sjeldent og mulig i alle klubber.
+- Overgangsvinduer fra tidligere versjon beholdt: gameweek 1–4 og 20–24.
 
-## Viktig
-Spillernes verdier og AI-bud er spillestimater. Test i en kopi av lagringen før du overskriver den aktive GitHub Pages-versjonen.
+## Økonomimodell
+Budsjetter, lønn og spillerverdier er spillestimater. Dette er en første balansemodell, ikke offisielle regnskapstall. Lønn trekkes fra managerens tilgjengelige overgangsbudsjett ukentlig; separat langsiktig kontantstrøm/inntektsregnskap er fortsatt forenklet.
+
+## Publisering
+Pakkens versjonsmappe inneholder `index.html` og `README.md`. For GitHub Pages må den aktive `index.html` fortsatt kopieres til repository-roten.
