@@ -190,7 +190,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .cup-accordion>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px}.cup-accordion>summary::-webkit-details-marker{display:none}.cup-accordion>summary:after{content:'⌄';font-size:20px;color:var(--muted);margin-left:auto}.cup-accordion[open]>summary:after{content:'⌃'}.cup-accordion>summary h2{margin:0}.cup-accordion{overflow:hidden}.cup-accordion .section-title{margin-bottom:8px}.cup-accordion>.player{padding:9px 10px;margin:6px 0;gap:8px;align-items:center}.cup-accordion .player-meta{line-height:1.35}.cup-accordion>p.muted{margin:6px 0 10px}.cup-accordion .pill{white-space:nowrap}.cup-accordion .notice{margin:8px 0;padding:10px}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.86</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.87</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -1025,6 +1025,7 @@ function shootoutScore(homeStrength,awayStrength){
 }
 function finishPendingCupMatch(engine,ga,gb){
  const pending=appState.pendingCupMatch;if(!pending)return null;
+ if(pending.isEuropeanKnockout===true)return finishEuropeanKnockoutUserMatch(engine,ga,gb,pending);
  if(pending.isEuropeanLeague===true){
   const comp=appState.europeanCompetitions?.[pending.competition];if(!comp)return null;
   const homeName=pending.homeTeam.name,awayName=pending.awayTeam.name;
@@ -1088,7 +1089,7 @@ function playPendingCupMatch(){
  const homeId=engineIdFor(homeTeam),awayId=engineIdFor(awayTeam);
  const xiA=homeIsUser?currentStartingXI():assignTacticalRoles(createMatchLineup(playersA,'4-3-3',homeTeam.name),'4-3-3');
  const xiB=!homeIsUser?currentStartingXI():assignTacticalRoles(createMatchLineup(playersB,'4-3-3',awayTeam.name),'4-3-3');
- const engine=createLiveEngine(homeId,awayId,homeIsUser,playersA,playersB,xiA,xiB,homeIsUser?appState.formation:'4-3-3',!homeIsUser?appState.formation:'4-3-3',{isCupMatch:true,isLeaguePhase:pending.isEuropeanLeague===true,competition:pending.competition,competitionRound:pending.roundNo,teamNames:{A:homeTeam.name,B:awayTeam.name}});
+ const engine=createLiveEngine(homeId,awayId,homeIsUser,playersA,playersB,xiA,xiB,homeIsUser?appState.formation:'4-3-3',!homeIsUser?appState.formation:'4-3-3',{isCupMatch:true,isLeaguePhase:pending.isEuropeanLeague===true||(pending.isEuropeanKnockout===true&&pending.knockoutStageKey!=='final'),competition:pending.competition,competitionRound:pending.roundNo,teamNames:{A:homeTeam.name,B:awayTeam.name}});
  const emptyStats={shots:0,shotsAgainst:0,onTarget:0,onTargetAgainst:0,possession:50};
  showMatch(c,opp,0,0,homeIsUser,'',emptyStats,[],[],[],{},engine,null,new Map(sortedTable().map((team,index)=>[team.name,index+1])));
  window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40);
@@ -1169,8 +1170,14 @@ function simulateEuropeanLeagueMatch(homeTeam,awayTeam,compName,matchday,gameNo)
  return {round:matchday,home:homeTeam.name,away:awayTeam.name,score:`${sim.ga}–${sim.gb}`,winner:sim.ga===sim.gb?'Uavgjort':sim.ga>sim.gb?homeTeam.name:awayTeam.name,competition:compName,events:sim.events||[],stats:sim.stats||{},isLeaguePhase:true,gameNo};
 }
 function ensureEuropeanCompetitions(reset=false){
- const valid=!reset&&appState.europeanCompetitions&&appState.europeanSeason===appState.seasonYear&&appState.europeanDatabaseVersion===4&&Object.values(appState.europeanCompetitions).every(c=>c?.format==='league'&&Array.isArray(c.leagueSchedule)&&c.leagueSchedule.length===c.matchdays&&Array.isArray(c.table)&&c.table.length===36);
- if(valid)return;
+ const hasLeagueData=!reset&&appState.europeanCompetitions&&appState.europeanSeason===appState.seasonYear&&Object.values(appState.europeanCompetitions).length===3&&Object.values(appState.europeanCompetitions).every(c=>c?.format==='league'&&Array.isArray(c.leagueSchedule)&&c.leagueSchedule.length===c.matchdays&&Array.isArray(c.table)&&c.table.length===36);
+ // Migrate v1.86 saves without throwing away already-played European league matches or tables.
+ if(hasLeagueData&&Number(appState.europeanDatabaseVersion)===4){
+  Object.values(appState.europeanCompetitions).forEach(c=>{if(!c.knockout)c.knockout={stageIndex:0,activeStage:null,history:[],playoffWinners:[]};if(Number(c.leagueRound)>=Number(c.matchdays)){c.phase='knockout';c.leaguePhaseComplete=true;}});
+  appState.europeanDatabaseVersion=5;return;
+ }
+ const valid=hasLeagueData&&Number(appState.europeanDatabaseVersion)===5;
+ if(valid){Object.values(appState.europeanCompetitions).forEach(c=>{if(!c.knockout)c.knockout={stageIndex:0,activeStage:null,history:[],playoffWinners:[]};});return;}
  const table=sortedTable();
  const toTeam=(name,division='Premier League')=>{const c=CLUBS.find(x=>x.name===name);const intl=INTERNATIONAL_CLUBS.find(x=>x.name===name)||EUROPEAN_EXTRA_CLUBS.find(x=>x.name===name);return {name,country:intl?.country||c?.city||'England',strength:Number(c?.strength||intl?.strength)||62,clubIndex:c?CLUBS.indexOf(c):null,division:c?clubDivision(c):division,europeanQualified:true,international:!c}};
  const prior=appState.lastSeasonSummary?.europeanPlaces||{};
@@ -1193,14 +1200,14 @@ function ensureEuropeanCompetitions(reset=false){
   if(teams.length!==36)throw new Error(`${name}: could not form 36 unique clubs`);
   const matchdaysSchedule=buildEuropeanLeagueSchedule(teams,matchdays,`${appState.seasonYear}|${name}|league-phase`);
   const seedStrength=new Map(teams.map(t=>[t.name,t.strength]));
-  return {name,format:'league',phase:'league',stage:0,leagueRound:0,matchdays,scheduledWeeks:weeks,teams,leagueSchedule:matchdaysSchedule,table:teams.map(t=>({name:t.name,country:t.country,strength:seedStrength.get(t.name)||60,played:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0})),results:[],champion:null,finished:false};
+  return {name,format:'league',phase:'league',stage:0,leagueRound:0,matchdays,scheduledWeeks:weeks,teams,leagueSchedule:matchdaysSchedule,table:teams.map(t=>({name:t.name,country:t.country,strength:seedStrength.get(t.name)||60,played:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0})),results:[],champion:null,finished:false,leaguePhaseComplete:false,knockout:{stageIndex:0,activeStage:null,history:[],playoffWinners:[]}};
  };
  appState.europeanCompetitions={
   'Champions League':makeComp('Champions League',clNames,INTERNATIONAL_CLUBS,8,[3,7,11,15,19,25,29,35]),
   'Europa League':makeComp('Europa League',elNames,EUROPA_LEAGUE_POOL,8,[3,7,11,15,19,25,29,35]),
   'Conference League':makeComp('Conference League',confNames,CONFERENCE_LEAGUE_POOL,6,[3,7,11,15,19,25])
  };
- appState.europeanSeason=appState.seasonYear;appState.europeanDatabaseVersion=4;
+ appState.europeanSeason=appState.seasonYear;appState.europeanDatabaseVersion=5;
 }
 
 function simulateEuropeanStage(comp,week){
@@ -1238,6 +1245,147 @@ function processEuropeanCompetitions(round){
   comp.leagueRound=matchdayIndex+1;comp.stage=comp.leagueRound;
   if(comp.leagueRound>=comp.matchdays){comp.phase='knockout';comp.leaguePhaseComplete=true;}
  });
+}
+
+
+const EUROPEAN_KNOCKOUT_STAGES=[
+ {key:'playoff',name:'Playoff',label:'Start playoff'},
+ {key:'round16',name:'Åttedelsfinaler',label:'Start åttedelsfinaler'},
+ {key:'quarterfinal',name:'Kvartfinaler',label:'Start kvartfinaler'},
+ {key:'semifinal',name:'Semifinaler',label:'Start semifinaler'},
+ {key:'final',name:'Finale',label:'Spill finalen'}
+];
+function europeanTeamWithSeed(comp,name,seed){
+ const source=(comp.teams||[]).find(t=>t.name===name);return source?{...source,leagueSeed:Number(seed)||source.leagueSeed||99}:null;
+}
+function makeEuropeanTie(comp,team1,team2,stageIndex,tieIndex){
+ const a={...team1},b={...team2};const aSeed=Number(a.leagueSeed)||99,bSeed=Number(b.leagueSeed)||99;
+ // The lower-ranked seed hosts the first leg; the higher-ranked seed hosts the return leg.
+ const firstHome=aSeed>bSeed?a:b,firstAway=aSeed>bSeed?b:a;
+ return {id:`${EUROPEAN_KNOCKOUT_STAGES[stageIndex].key}-${tieIndex+1}`,team1:a,team2:b,seed1:aSeed,seed2:bSeed,firstHome:{...firstHome},firstAway:{...firstAway},legs:{},winner:null,stageIndex,tieIndex};
+}
+function buildEuropeanKnockoutTies(comp,stageIndex){
+ const ranked=sortedEuropeanTable(comp).map((row,i)=>europeanTeamWithSeed(comp,row.name,i+1)).filter(Boolean);
+ if(stageIndex===0){
+  const ties=[];for(let i=0;i<8;i++){const high=ranked[8+i],low=ranked[23-i];if(!high||!low)throw new Error('Could not build European playoff draw');ties.push(makeEuropeanTie(comp,high,low,stageIndex,i));}return ties;
+ }
+ const previous=comp.knockout?.history?.[comp.knockout.history.length-1];
+ const winners=(previous?.ties||[]).map(t=>t.winner).filter(Boolean);
+ if(stageIndex===1){
+  if(winners.length!==8)throw new Error('Eight playoff winners are required for the round of 16');
+  const top8=ranked.slice(0,8),lowerSeeds=[...winners].sort((a,b)=>(Number(b.leagueSeed)||0)-(Number(a.leagueSeed)||0));
+  return top8.map((seeded,i)=>makeEuropeanTie(comp,seeded,lowerSeeds[i],stageIndex,i));
+ }
+ const expected=stageIndex===2?8:stageIndex===3?4:2;
+ if(winners.length!==expected)throw new Error(`Expected ${expected} qualified clubs before ${EUROPEAN_KNOCKOUT_STAGES[stageIndex].name}, got ${winners.length}`);
+ const ties=[];for(let i=0;i<winners.length;i+=2)ties.push(makeEuropeanTie(comp,winners[i],winners[i+1],stageIndex,ties.length));return ties;
+}
+function euroKnockoutScores(result){
+ if(Number.isFinite(result?.homeGoals)&&Number.isFinite(result?.awayGoals))return {home:Number(result.homeGoals),away:Number(result.awayGoals)};
+ const m=String(result?.score||'').match(/^(\d+)\s*[–-]\s*(\d+)/);return m?{home:Number(m[1]),away:Number(m[2])}:null;
+}
+function recordEuropeanKnockoutLeg(comp,stage,tie,leg,home,away,homeGoals,awayGoals,result){
+ const score={home:String(home.name),away:String(away.name),homeGoals:Number(homeGoals)||0,awayGoals:Number(awayGoals)||0,result};
+ tie.legs[leg]=score;
+ result.isEuropeanKnockout=true;result.knockoutStageKey=stage.key;result.knockoutStageName=stage.name;result.tieId=tie.id;result.leg=leg;
+ result.homeGoals=score.homeGoals;result.awayGoals=score.awayGoals;
+}
+function setEuropeanKnockoutWinner(comp,tie,allowPenalties=true){
+ const l1=tie.legs[1],l2=tie.legs[2];
+ if(!l1)return null;
+ if(tie.stageIndex===4){
+  const score=l1.homeGoals===l1.awayGoals&&l1.result?.penaltyWinner?l1.result.penaltyWinner:(l1.homeGoals>l1.awayGoals?l1.home:l1.awayGoals>l1.homeGoals?l1.away:null);
+  if(score)return tie.winner=score===tie.team1.name?{...tie.team1}:score===tie.team2.name?{...tie.team2}:null;
+  if(!allowPenalties)return null;
+  const pen=shootoutScore(tie.firstHome.strength,tie.firstAway.strength);const winner=pen.home>pen.away?tie.firstHome:tie.firstAway;
+  l1.result.decidedByPenalties=true;l1.result.penaltyScore=pen;l1.result.penaltyWinner=winner.name;l1.result.winner=winner.name;l1.result.score=`${l1.homeGoals}–${l1.awayGoals} (${pen.home}–${pen.away} str.)`;
+  tie.winner={...winner};return tie.winner;
+ }
+ if(!l2)return null;
+ const goals={};for(const team of [tie.team1,tie.team2])goals[team.name]=0;
+ for(const leg of [l1,l2]){goals[leg.home]=(goals[leg.home]||0)+leg.homeGoals;goals[leg.away]=(goals[leg.away]||0)+leg.awayGoals;}
+ const aggregate=goals[tie.team1.name]-goals[tie.team2.name];
+ const aggregateText=`${goals[tie.team1.name]}–${goals[tie.team2.name]}`;
+ for(const leg of [l1,l2]){leg.result.aggregateScore=aggregateText;leg.result.aggregateTeam1=tie.team1.name;leg.result.aggregateTeam2=tie.team2.name;}
+ if(aggregate!==0)tie.winner={...(aggregate>0?tie.team1:tie.team2)};
+ else if(allowPenalties){const homeSecond=l2.home,awaySecond=l2.away;const pen=shootoutScore((compTeamStrength(comp,homeSecond)||60),(compTeamStrength(comp,awaySecond)||60));const winningName=pen.home>pen.away?homeSecond:awaySecond;tie.winner={...(winningName===tie.team1.name?tie.team1:tie.team2)};l2.result.decidedByPenalties=true;l2.result.penaltyScore=pen;l2.result.penaltyWinner=winningName;l2.result.score=`${l2.homeGoals}–${l2.awayGoals} (${pen.home}–${pen.away} str.)`;}
+ if(tie.winner){for(const leg of [l1,l2]){leg.result.tieWinner=tie.winner.name;leg.result.winner=tie.winner.name;}}
+ return tie.winner;
+}
+function compTeamStrength(comp,name){const team=comp.teams.find(t=>t.name===name);return Number(team?.strength)||60;}
+function buildEuropeanKnockoutResult(comp,stage,tie,leg,home,away,goalsHome,goalsAway,engine=null){
+ const matchWinner=goalsHome===goalsAway?'Uavgjort':goalsHome>goalsAway?home.name:away.name;
+ const result={round:stage.stageIndex+1,roundLabel:stage.name,leg,home:home.name,away:away.name,score:`${goalsHome}–${goalsAway}`,winner:matchWinner,competition:comp.name,events:engine?.events||[],stats:engine?.stats||{},week:appState.week,isEuropeanKnockout:true,knockoutStageKey:stage.key,knockoutStageName:stage.name,tieId:tie.id,homeGoals:goalsHome,awayGoals:goalsAway};
+ return result;
+}
+function processEuropeanKnockoutLeg(comp,leg){
+ const state=comp.knockout,stage=state?.activeStage;if(!stage||stage.complete)return;
+ stage.leg=leg;const completed=[];let userFixture=null;
+ for(const tie of stage.ties){
+  const home=leg===1?tie.firstHome:tie.firstAway,away=leg===1?tie.firstAway:tie.firstHome;
+  if((home.clubIndex===appState.club)||(away.clubIndex===appState.club)){
+   userFixture={tie,home:{...home},away:{...away}};continue;
+  }
+  const sim=simulateCompetitionMatch(home,away,`${comp.name} · ${stage.name}`,stage.stageIndex+1,tie.tieIndex);
+  const result=buildEuropeanKnockoutResult(comp,stage,tie,leg,home,away,sim.ga,sim.gb,{events:sim.events,stats:sim.stats});
+  if(stage.key==='final'&&sim.ga===sim.gb){const pen=shootoutScore(home.strength,away.strength);const penWinner=pen.home>pen.away?home:away;result.score=`${sim.ga}–${sim.gb} (${pen.home}–${pen.away} str.)`;result.decidedByPenalties=true;result.penaltyScore=pen;result.penaltyWinner=penWinner.name;result.winner=penWinner.name;}
+  recordEuropeanKnockoutLeg(comp,stage,tie,leg,home,away,sim.ga,sim.gb,result);completed.push(result);
+ }
+ stage.legResults=stage.legResults||{};stage.legResults[leg]=completed;comp.results.push(...completed);
+ if(userFixture){
+  const t=userFixture.tie;
+  appState.pendingCupMatch={competition:comp.name,isEuropean:true,isEuropeanKnockout:true,knockoutStageKey:stage.key,knockoutStageName:stage.name,knockoutLeg:leg,knockoutTieId:t.id,roundNo:stage.stageIndex+1,roundLabel:stage.name,scheduledWeek:appState.week,homeTeam:userFixture.home,awayTeam:userFixture.away,createdSeason:appState.seasonYear};
+  appState.log.push(`${comp.name} · ${stage.name}: ${userFixture.home.name} mot ${userFixture.away.name} (${leg===1?'første':'andre'} kamp).`);return;
+ }
+ if(stage.key==='final'){
+  const tie=stage.ties[0];if(tie&&!tie.winner){setEuropeanKnockoutWinner(comp,tie,true);}finishEuropeanKnockoutStage(comp);return;
+ }
+ if(leg===1){processEuropeanKnockoutLeg(comp,2);return;}
+ stage.ties.forEach(t=>setEuropeanKnockoutWinner(comp,t,true));finishEuropeanKnockoutStage(comp);
+}
+function finishEuropeanKnockoutStage(comp){
+ const state=comp.knockout,stage=state?.activeStage;if(!stage||stage.complete)return;
+ if(stage.key==='final'){
+  const winner=stage.ties[0]?.winner;comp.champion=winner?.name||'Ukjent';comp.finished=true;comp.phase='finished';
+ }else{
+  const expected=stage.key==='playoff'?8:stage.key==='round16'?8:stage.key==='quarterfinal'?4:2;
+  if(stage.ties.length!==expected||stage.ties.some(t=>!t.winner)){throw new Error(`Cannot complete ${stage.name}: one or more ties have no winner`);}
+ }
+ stage.complete=true;state.history=state.history||[];state.history.push({key:stage.key,name:stage.name,stageIndex:stage.stageIndex,ties:stage.ties.map(t=>({...t,legs:{...t.legs}}))});
+ if(stage.key==='playoff')state.playoffWinners=stage.ties.map(t=>({...t.winner}));
+ if(stage.key!=='final'){state.stageIndex=stage.stageIndex+1;state.activeStage=null;comp.phase='knockout';}
+ else{state.stageIndex=5;state.activeStage=null;}
+ appState.log.push(comp.finished?`${comp.name}: ${comp.champion} vant turneringen.`:`${comp.name}: ${stage.name} ferdigspilt. ${stage.ties.length} oppgjør avgjort.`);
+}
+function startEuropeanKnockout(name){
+ ensureEuropeanCompetitions();const comp=appState.europeanCompetitions?.[name];if(!comp||comp.format!=='league')return;
+ if(Number(comp.leagueRound)<Number(comp.matchdays)){appState.log.push(`${name}: ligafasen er ikke ferdig ennå.`);save();render();return;}
+ comp.leaguePhaseComplete=true;comp.phase='knockout';
+ if(comp.finished){save();render();return;}
+ if(!comp.knockout)comp.knockout={stageIndex:0,activeStage:null,history:[],playoffWinners:[]};
+ if(comp.knockout.activeStage&&!comp.knockout.activeStage.complete){save();render();return;}
+ const stageIndex=Number(comp.knockout.stageIndex)||0;if(stageIndex>=EUROPEAN_KNOCKOUT_STAGES.length){save();render();return;}
+ const definition=EUROPEAN_KNOCKOUT_STAGES[stageIndex];
+ const ties=buildEuropeanKnockoutTies(comp,stageIndex);
+ comp.knockout.activeStage={key:definition.key,name:definition.name,stageIndex,ties,leg:1,legResults:{1:[],2:[]},complete:false};
+ appState.log.push(`${name}: ${definition.name} startet med ${ties.length} oppgjør.`);
+ processEuropeanKnockoutLeg(comp,1);save();render();
+}
+function finishEuropeanKnockoutUserMatch(engine,ga,gb,pending){
+ const comp=appState.europeanCompetitions?.[pending.competition];const stage=comp?.knockout?.activeStage;const tie=stage?.ties?.find(t=>t.id===pending.knockoutTieId);
+ if(!comp||!stage||!tie)return null;
+ const leg=Number(pending.knockoutLeg)||1,home=pending.homeTeam,away=pending.awayTeam;
+ const result=buildEuropeanKnockoutResult(comp,stage,tie,leg,home,away,ga,gb,engine);
+ if(stage.key==='final'&&ga===gb){const pen=shootoutScore(home.strength,away.strength);const penWinner=pen.home>pen.away?home:away;result.score=`${ga}–${gb} (${pen.home}–${pen.away} str.)`;result.decidedByPenalties=true;result.penaltyScore=pen;result.penaltyWinner=penWinner.name;result.winner=penWinner.name;}
+ recordEuropeanKnockoutLeg(comp,stage,tie,leg,home,away,ga,gb,result);stage.legResults=stage.legResults||{};stage.legResults[leg]=stage.legResults[leg]||[];stage.legResults[leg].push(result);comp.results.push(result);
+ appState.domesticCalendar=appState.domesticCalendar||[];appState.domesticCalendar.push({week:pending.scheduledWeek||appState.week,competition:pending.competition,...result});
+ appState.log.push(`${comp.name} · ${stage.name} ${leg===1?'første':'andre'} kamp: ${home.name} ${result.score} ${away.name}.`);
+ appState.pendingCupMatch=null;
+ if(stage.key==='final'){
+  setEuropeanKnockoutWinner(comp,tie,true);finishEuropeanKnockoutStage(comp);
+ }else if(leg===1){processEuropeanKnockoutLeg(comp,2);}
+ else{stage.ties.forEach(t=>setEuropeanKnockoutWinner(comp,t,true));finishEuropeanKnockoutStage(comp);}
+ save();return {winner:tie.winner?.name||result.winner,score:result.score,resultText:appState.log[appState.log.length-1],competition:comp.name,isEuropeanKnockout:true};
 }
 
 function moveClubsBetweenDivisions(){
@@ -1300,11 +1448,11 @@ function processMidweekCompetitions(round){
 function renderEuropeanCompetitionCard(comp){
  if(comp?.format!=='league')return `<details class="card cup-accordion"><summary class="section-title"><h2>🌍 ${esc(comp?.name||'Europacup')}</h2><span class="pill">Utslagsrunde</span></summary><p class="muted">Eldre turneringsdata må erstattes med den nye ligafasemodellen for å fortsette.</p></details>`;
  const rows=sortedEuropeanTable(comp);const roundDone=Number(comp.leagueRound)||0;const isComplete=roundDone>=comp.matchdays;
- const pending=appState.pendingCupMatch?.isEuropeanLeague&&appState.pendingCupMatch.competition===comp.name?appState.pendingCupMatch:null;
- const recent=roundDone?comp.results.filter(r=>r.round===roundDone).slice(-6).reverse():[];
+ const pending=appState.pendingCupMatch?.competition===comp.name&&(appState.pendingCupMatch.isEuropeanLeague||appState.pendingCupMatch.isEuropeanKnockout)?appState.pendingCupMatch:null;
+ const recent=roundDone?comp.results.filter(r=>r.isLeaguePhase&&r.round===roundDone).slice(-6).reverse():[];const knockoutRecent=[...(comp.results||[])].filter(r=>r.isEuropeanKnockout).slice(-10).reverse();const knockout=comp.knockout||{stageIndex:0,activeStage:null,history:[]};const nextKnockoutStage=EUROPEAN_KNOCKOUT_STAGES[Math.min(Number(knockout.stageIndex)||0,EUROPEAN_KNOCKOUT_STAGES.length-1)];
  const nextFixtures=comp.leagueSchedule?.[roundDone]||[];const userNext=nextFixtures.find(f=>f.home===currentClub().name||f.away===currentClub().name);
  const zoneText='Plass 1–8: direkte til åttedelsfinale · 9–24: playoff · 25–36: slått ut';
- return `<details class="card cup-accordion"><summary class="section-title"><h2>🌍 ${esc(comp.name)}</h2><span class="pill">${isComplete?'Ligafase ferdig':`Ligafase ${roundDone}/${comp.matchdays}`}</span></summary><p class="muted">36 klubber · ${comp.matchdays} kampdager · ${comp.matchdays===8?'4 hjemme og 4 borte':'3 hjemme og 3 borte'} for hvert lag. Uavgjort er tillatt i ligafasen.</p>${pending?`<div class="notice"><strong>Din europakamp venter</strong><p>${esc(pending.homeTeam.name)} mot ${esc(pending.awayTeam.name)} · Ligafase runde ${pending.roundNo}</p><button class="primary" onclick="startPendingCupMatch()">Spill kampen →</button></div>`:''}${!pending&&userNext?`<div class="notice"><strong>Neste kamp for din klubb</strong><p>${esc(userNext.home)} mot ${esc(userNext.away)} · Runde ${roundDone+1}</p><span class="muted">Kampen blir tilgjengelig når denne kampuken behandles.</span></div>`:''}<div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>V</th><th>U</th><th>T</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((t,i)=>{const rank=i+1,zone=rank<=8?'table-zone-promotion':rank<=24?'table-zone-playoff':'table-zone-relegation',you=t.name===currentClub().name;return `<tr class="${zone}${you?' you':''}"><td>${rank}</td><td>${esc(t.name)}</td><td>${t.played}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${t.gd>0?'+':''}${t.gd}</td><td><strong>${t.pts}</strong></td></tr>`}).join('')}</tbody></table></div><p class="muted" style="font-size:11px;margin:8px 0">${zoneText}</p><div class="section-title"><h3>Resultater</h3><span class="pill">${comp.results.length} kamper registrert</span></div>${recent.length?recent.map(r=>`<div class="player"><div style="flex:1"><strong>${esc(r.home)} <span class="muted">${esc(r.score)}</span> ${esc(r.away)}</strong></div><span class="pill">R${r.round}</span></div>`).join(''):'<p class="muted">Ingen europakamper spilt ennå.</p>'}${isComplete?`<div class="notice"><strong>Ligafasen er ferdig.</strong><p>Tabellen er klar. Neste utviklingssteg er å koble plasseringene til playoff og utslagsrundene.</p></div>`:''}</details>`;
+ return `<details class="card cup-accordion"><summary class="section-title"><h2>🌍 ${esc(comp.name)}</h2><span class="pill">${comp.finished?'Vinner: '+esc(comp.champion):isComplete?(knockout.activeStage?esc(knockout.activeStage.name):knockout.history?.length?'Sluttspill':'Ligafase ferdig'):`Ligafase ${roundDone}/${comp.matchdays}`}</span></summary><p class="muted">36 klubber · ${comp.matchdays} kampdager · ${comp.matchdays===8?'4 hjemme og 4 borte':'3 hjemme og 3 borte'} for hvert lag. Uavgjort er tillatt i ligafasen.</p>${pending?`<div class="notice"><strong>Din europakamp venter</strong><p>${esc(pending.homeTeam.name)} mot ${esc(pending.awayTeam.name)} · ${pending.isEuropeanKnockout?`${esc(pending.knockoutStageName)} · ${pending.knockoutLeg===1?'første kamp':pending.knockoutStageKey==='final'?'finale':'returoppgjør'}`:`Ligafase runde ${pending.roundNo}`}</p><button class="primary" onclick="startPendingCupMatch()">Spill kampen →</button></div>`:''}${!pending&&userNext?`<div class="notice"><strong>Neste kamp for din klubb</strong><p>${esc(userNext.home)} mot ${esc(userNext.away)} · Runde ${roundDone+1}</p><span class="muted">Kampen blir tilgjengelig når denne kampuken behandles.</span></div>`:''}<div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>V</th><th>U</th><th>T</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((t,i)=>{const rank=i+1,zone=rank<=8?'table-zone-promotion':rank<=24?'table-zone-playoff':'table-zone-relegation',you=t.name===currentClub().name;return `<tr class="${zone}${you?' you':''}"><td>${rank}</td><td>${esc(t.name)}</td><td>${t.played}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${t.gd>0?'+':''}${t.gd}</td><td><strong>${t.pts}</strong></td></tr>`}).join('')}</tbody></table></div><p class="muted" style="font-size:11px;margin:8px 0">${zoneText}</p><div class="section-title"><h3>Resultater</h3><span class="pill">${comp.results.length} kamper registrert</span></div>${recent.length?recent.map(r=>`<div class="player"><div style="flex:1"><strong>${esc(r.home)} <span class="muted">${esc(r.score)}</span> ${esc(r.away)}</strong></div><span class="pill">R${r.round}</span></div>`).join(''):'<p class="muted">Ingen europakamper spilt ennå.</p>'}${isComplete?(comp.finished?`<div class="notice"><strong>${esc(comp.champion)} vant ${esc(comp.name)}.</strong><p>Turneringen er ferdigspilt.</p></div>`:pending?'':knockout.activeStage?`<div class="notice"><strong>${esc(knockout.activeStage.name)} pågår.</strong><p>${knockout.activeStage.leg===2?'Returoppgjørene spilles nå.':'Første kamp i hvert oppgjør.'}</p></div>`:`<div class="notice"><strong>Ligafasen er ferdig.</strong><p>${knockout.history?.length?`Siste fullførte runde: ${esc(knockout.history[knockout.history.length-1].name)}.`:'De åtte beste går direkte til åttedelsfinale. Plass 9–24 spiller playoff, og plass 25–36 er slått ut.'}</p><button class="primary" onclick="startEuropeanKnockout('${esc(comp.name)}')">${esc(nextKnockoutStage?.label||'Start sluttspill')} →</button></div>`):''}${knockoutRecent.length?`<div class="section-title"><h3>Sluttspillresultater</h3><span class="pill">${knockoutRecent.length} siste</span></div>${knockoutRecent.map(r=>`<div class="player"><div style="flex:1"><strong>${esc(r.home)} <span class="muted">${esc(r.score)}</span> ${esc(r.away)}</strong><div class="player-meta">${esc(r.knockoutStageName||r.roundLabel||'Sluttspill')} · ${r.leg===1?'Første kamp':r.knockoutStageKey==='final'?'Finale':'Returoppgjør'}${r.aggregateScore?` · Sammenlagt ${esc(r.aggregateScore)}`:''}${r.tieWinner?` · Videre: ${esc(r.tieWinner)}`:''}</div></div><span class="pill">${esc(r.knockoutStageName||'Sluttspill')}</span></div>`).join('')}`:''}</details>`;
 }
 function competitions(){initDomesticCompetitions();const cups=appState.cupCompetitions;const latest=(name)=>[...(cups[name]?.results||[])].reverse().slice(0,8);const cupCard=(name)=>{const cup=cups[name],recent=latest(name);return `<details class="card cup-accordion"><summary class="section-title"><h2>${name==='EFL Cup'?'🏆 Carabao Cup (EFL Cup)':'🏆 FA Cup'}</h2><span class="pill">${cup.champion?'Avsluttet':`Runde ${Math.max(1,cup.round+1)}`}</span></summary><p class="muted">${name==='EFL Cup'?'Knockoutturnering med Premier League og de 72 EFL-klubbene.':'Knockoutturnering med Premier League, EFL og et utvalg ikke-ligaklubber.'}</p>${appState.pendingCupMatch?.competition===name?`<div class="notice"><strong>Din kamp venter</strong><p>${esc(appState.pendingCupMatch.homeTeam.name)} mot ${esc(appState.pendingCupMatch.awayTeam.name)}. De øvrige oppgjørene er klare, men runden fullføres først når du har spilt.</p><button class="primary" onclick="startPendingCupMatch()">Spill cupkamp →</button></div>`:''}${cup.champion?`<div class="notice">Vinner: <strong>${esc(cup.champion)}</strong></div>`:''}${recent.length?recent.map(r=>`<div class="player"><div style="flex:1"><strong>${esc(r.home)}</strong> <span class="muted">vs</span> <strong>${esc(r.away)}</strong><div class="player-meta">${r.score==='BYE'?'Direkte videre':`Resultat ${r.score}${r.decidedByPenalties?' · avgjort etter straffer':''} · Videre: ${esc(r.winner)}`}${r.events?.some(e=>e.type==='goal')?`<div class="player-meta">${r.events.filter(e=>e.type==='goal').map(e=>`${Number(e.minute)||'–'}' ${esc(e.scorer||e.player||'Mål')}`).join(' · ')}</div>`:''}</div></div><span class="pill">R${r.round}</span></div>`).join(''):'<div class="muted">Ingen runder spilt ennå.</div>'}</details>`};const divisions=Object.entries(appState.lowerLeagues).map(([name,d])=>{const rows=[...d.rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));return `<section class="card"><div class="section-title"><h2>${name}</h2><span class="pill">${d.playedRounds}/46 runder</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join('')}</tbody></table></div><div class="muted" style="font-size:11px;margin-top:7px">Topp 2 rykker direkte opp; plass 3–6 spiller playoff. De nederste klubbene kjemper for å unngå nedrykk.</div></section>`});const calendar=(appState.domesticCalendar||[]).slice(-12).reverse();return `<div class="hero"><div class="eyebrow">Domestic competitions · ${seasonLabel()}</div><h1>Ligapyramiden og cuper</h1><p>Premier League, Championship, League One og League Two. FA Cup og Carabao Cup spilles gjennom sesongen. Ditt cupoppgjør spilles i live-motoren; de øvrige kampene simuleres automatisk.</p><div class="grid"><div class="stat"><small>Divisjoner</small><strong>4</strong></div><div class="stat"><small>Klubber i ligasystemet</small><strong>92</strong></div><div class="stat"><small>FA Cup-runder</small><strong>${cups['FA Cup'].round}</strong></div><div class="stat"><small>EFL Cup-runder</small><strong>${cups['EFL Cup'].round}</strong></div></div></div>${cupCard('EFL Cup')}${cupCard('FA Cup')}${Object.values(appState.europeanCompetitions||{}).map(comp=>renderEuropeanCompetitionCard(comp)).join('')}<section class="card"><div class="section-title"><h2>Midtukekalender og belastning</h2><span class="pill">${calendar.length} siste</span></div>${calendar.length?calendar.map(r=>`<div class="player"><div style="flex:1"><strong>Runde ${r.week} · ${esc(r.competition)}</strong><div class="player-meta">${esc(r.home)} ${esc(r.score)} ${esc(r.away)} · Vinner: ${esc(r.winner)}</div></div><span class="pill">Midtuke</span></div>`).join(''):'<p class="muted">Cupkamper vises her når sesongen går fremover.</p>'}<div class="notice">Cupkampene kommer i tillegg til ligakampene. Etter en cupkamp faller utholdenheten i troppen, og enkelte spillere kan pådra seg småskader. Lav utholdenhetsferdighet gir tregere restitusjon. Kalenderen er modellert på vanlige engelske kampuker; eksakte datoer og TV-flyttinger er forenklet.</div></section>`}
 
@@ -2413,7 +2561,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.86 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
+function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.87 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{ensureTransferPool();render()}

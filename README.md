@@ -1,17 +1,17 @@
-# CM Mobile v1.86
+# CM Mobile v1.87
 
-## Endringer i denne versjonen
-- Erstattet den tidligere europacupens rene utslagsmodell med en ligafase for Champions League, Europa League og Conference League.
-- Hver turnering har 36 unike deltakere. Champions League og Europa League har 8 kampdager; Conference League har 6.
-- Kampplanen gir hvert lag én kamp per kampdag, ingen dupliserte motstandere i ligafasen, og balansert hjemme-/bortefordeling (4/4 eller 3/3).
-- Ligatabell regner kamper, seire, uavgjort, tap, mål, målforskjell og poeng fra faktiske registrerte resultater.
-- Brukerens europakamp opprettes som ventende kamp og spilles gjennom den eksisterende live-motoren. Resultatet fullfører kampdagen og oppdaterer tabellen.
-- Europacupvisningen viser tabell, avanseringssoner og siste resultater.
+## Endringer
+- Bevarer ligafasekampene fra v1.86 ved oppgradering av lagrede karrierer.
+- Legger til knockout-system etter ligafasen: playoff (plass 9–24), åttedelsfinaler, kvartfinaler, semifinaler og finale.
+- Playoff og alle rundene fram til semifinalen er tobeinte. Finalen spilles over én kamp.
+- Brukerens knockoutkamper bruker den eksisterende live-kampmotoren. Motstanderoppgjør simuleres, og den aktive tie-en venter på brukerens resultat før returkampen eller neste runde behandles.
+- Oppgjør avgjøres på samlet resultat; ved likt sammenlagtresultat avgjøres tie-en med straffesparkkonkurranse i denne modellversjonen.
+- Sluttspillvisningen viser kampresultater, leg/retur, sammenlagtresultat og hvem som går videre.
 
-## Begrensninger som gjenstår
-- Plasseringen i ligafasen er ennå ikke koblet til komplette playoff-/utslagsbraketter.
-- Deltakerlistene er en spillmodell, ikke offisiell UEFA-kvalifisering eller klubbkoeffisientbasert trekning.
-- Hele spillet er ikke gjennomspilt manuelt i en nettleser. Denne versjonen må fortsatt prøves i en kopi av karrieren før publisering.
+## Viktige avgrensninger
+- Ligafasetrekning/deltakerlister er fortsatt en spillmodell og ikke offisiell UEFA-kvalifisering.
+- Ved uavgjort sammenlagt avgjøres tie-en med straffespark etter de to kampene; ekstraomganger etter returoppgjøret er ikke modellert separat. Finalen kan bruke eksisterende ekstraomgangsflyt.
+- Hele spillet må fortsatt gjennomgås i nettleser med en kopi av brukerens karriere før publisering.
 
 ## Publisering
-ZIP-en inneholder `cm_mobile_v1_86/index.html` og denne `README.md`. GitHub Pages som publiserer fra `main`-rot bruker fortsatt rotens `index.html`; å pakke ut denne mappen alene publiserer ikke versjonen.
+ZIP-en inneholder `cm_mobile_v1_87/index.html` og `cm_mobile_v1_87/README.md`. Hvis GitHub Pages publiserer fra `main`-rot, må rotens `index.html` oppdateres separat; versjonsmappen i ZIP-en publiseres ikke automatisk.
