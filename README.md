@@ -1,8 +1,8 @@
-# CM Mobile v1.92
+# CM Mobile v1.93
 
 ## Spillerdatabase: Premier League – førstegangs kvalitetsløft
 
-Denne versjonen viderefører CM Mobile v1.91 og økonomisystemet derfra. Den oppgraderer spillerdatabasens innlasting, datakvalitetsmerking, rolleprofiler og bruk av referansedata.
+Denne versjonen viderefører CM Mobile v1.92 med økonomisystem og spillerdata, og justerer sesongkalenderen og overgangsvinduene. Den oppgraderer spillerdatabasens innlasting, datakvalitetsmerking, rolleprofiler og bruk av referansedata.
 
 ### Hva som er endret
 
@@ -34,17 +34,37 @@ Denne versjonen viderefører CM Mobile v1.91 og økonomisystemet derfra. Den opp
 - Markedsverdi er ikke det samme som ferdighetsrating, faktisk overgangssum eller lønn. Lønn og potensial er fortsatt modellestimater.
 - Overgangen fra en tidligere versjon bygger om spillerstallene i en eksisterende karriere. Kampstatistikk på spillere med eksakt navnetreff forsøkes bevart; eventuelle endringer i skrivemåte kan gjøre at statistikken ikke kan knyttes sikkert til en ny oppføring.
 
-## Teststatus for v1.92
+## Teststatus for v1.93
 
 - JavaScript pakket ut fra HTML og kontrollert med `node --check` – bestått.
-- Chromium-sjekk med eksterne forespørsler blokkert: oppstart, oversikt og troppsside rendrer fra reservebasen – bestått, ingen JavaScript-sidefeil etter feilretting av logo-fallback.
-- Chromium-sjekk med simulerte FPL- og Transfermarkt-svar: referansedata lastes, status viser runde og kilde, spillerstall bygges for 20 klubbkoder – bestått.
-- Full live-henting fra FPL/GitHub ble ikke verifisert i nettlesertesten i dette miljøet, fordi nettverkstilgangen for den lokale testen er blokkert. Derfor skal ekte live-dekning kontrolleres i nettleseren etter utpakking før publisering.
+- Chromium-headless-smoketest for denne kalenderoppdateringen forsøkt, men prosessen timet ut i miljøet. Derfor er full visuell/browser-verifisering av v1.93 ikke bekreftet.
+- Kontroll av kampuker med statisk validering: 8/8/6 UEFA-ligafaseuker i stigende rekkefølge, sju Carabao Cup-steg, åtte FA Cup-steg; Carabao Cup-slots kolliderer ikke med UEFA-ligafaseslottene.
+- Full live-henting fra FPL/GitHub ble ikke verifisert i dette miljøet. Kontroller ekte live-dekning og den visuelle kalenderen i nettleseren etter utpakking før publisering.
 
 ## Pakkestruktur
 
 ```text
-CM_Mobile_v1.92/
+CM_Mobile_v1.93/
 ├── index.html
 └── README.md
 ```
+
+## Sesongkalender og overgangsvinduer (v1.93)
+
+- Oppdaterte gameweek-slottene for Champions League, Europa League og Conference League slik at ligafasene ligger nærmere de offisielle datoene for 2026/27, fra september/oktober til siste kampdag i januar.
+- FA Cup-rundene er flyttet nærmere offisielle rundehelger: november, desember, januar, februar, mars, april og finalen i mai.
+- Carabao Cup-rundene er flyttet nærmere den offisielle tidslinjen. Modellen bruker fortsatt én kamp per runde, slik at semifinalens to offisielle oppgjør ikke er fullstendig modellert.
+- Europeiske PL-klubber merkes som europeisk kvalifiserte i Carabao Cup. Det betyr at de ikke blir lagt inn i de tidlige rundene, i tråd med cupens 2026/27 inngangsregler.
+- Tidlige hjemlige cuprunder kan nå simuleres automatisk når brukerklubben ennå ikke har kommet inn i den turneringen, uten å overskrive en ventende europacupkamp.
+- Overgangsvinduer er endret fra GW 1–4 og GW 20–24 til GW 1–2 og GW 19–23. Dette følger bedre at sommerfristen er 1. september 2026 og vintervinduet åpner 1. januar og stenger 1. februar 2027. Markedet viser de faktiske vindusdatoene, men selve tillatelsen styres fortsatt av gameweek-slotter, ikke klokkeslett og kalenderdato.
+- Eksisterende karrierer får nye planlagte kampuker uten å nullstille allerede spilte europacupresultater eller tabeller. Eventuelle kampdager som allerede er passert, flyttes til neste ledige gameweek for at sesongen ikke skal låse seg.
+
+## Viktig begrensning i kalendermodellen
+
+Spillet har fremdeles gameweek-baserte ankere, ikke en full dato-for-dato-fixtureengine. Europa-knockoutfasen startes fra turneringsvisningen, og returkampene i tobeinte oppgjør spilles fortsatt umiddelbart etter første kamp i stedet for på hver sin offisielle dato. Carabao Cup-semifinalen er også forenklet til én simuleringsrunde. Liga- og cupkampene spilles fortsatt som sekvensielle hendelser etter en gameweek, og erstatter ikke automatisk en ligakamp på den offisielle cuphelgen. Derfor er dette et tydelig kalenderløft, men ikke en full garanti for at hver knockoutkamp har korrekt faktisk dato. Dette er neste nødvendige kalenderjobb før vi kan si at hele sesongen er tidsmessig realistisk.
+
+## Verifisering av v1.93
+
+- JavaScript-syntakskontroll med `node --check`.
+- Kontroll av at hver UEFA-ligafase har riktig antall planlagte kampuker (8/8/6), og at Carabao Cup-slottene ligger utenfor UEFA-ligafaseslottene. FA Cup Round Two faller på samme modellslot som UEFA Matchday 6, men Premier League-klubber er ennå ikke med i FA Cupen på det tidspunktet; tidlige cup-runder kan derfor simuleres uten å overskrive brukerens ventende europacupkamp.
+- Kontrollen av datoer bygger på offisielle Premier League-, EFL-, FA- og UEFA-kunngjøringer. Eksakte TV-flyttinger og individuelle klubbkamper er ikke simulert.
