@@ -1,18 +1,19 @@
-# CM Mobile v1.89
+# CM Mobile v1.90
 
-## Endringer siden v1.88
-- Oppdatert deltakergrunnlaget for Champions League, Europa League og Conference League til de 36 klubbene i hver ligafase for 2026/27, basert på UEFAs publiserte deltakerlister.
-- Beholder 8 kampdager i Champions League og Europa League og 6 kampdager i Conference League.
-- Bruker databasealiaser for å koble enkelte UEFA-navn til eksisterende klubbdata; klubber uten egen spillerstall får fortsatt genererte spillere.
-- Senere sesonger bruker fortsatt spillets kvalifiserings-/simuleringsmodell.
+## Endringer siden v1.89
+- Lagt til en europeisk klubbemblem-mapping for en rekke klubber i Champions League, Europa League og Conference League.
+- Livekampens klubbmerker bruker nå logo-URL når den finnes i mappingen.
+- Europeiske deltakerobjekter får med seg logo og kortnavn, slik at andre visninger kan bruke samme data.
+- Klubblag uten en verifisert logo beholder et automatisk generert emblem med initialer; manglende logo gir ikke ødelagt bilde.
+- Beholder turneringsoppsettet og kampmotoren fra v1.89.
 
 ## Teststatus
 - JavaScript-syntakskontroll med Node.js.
-- Kontroll av at hver 2026/27-turnering har nøyaktig 36 unike lag.
-- Kontroll av at de tre listene ikke inneholder engelske klubber i mer enn én turnering.
-- Kontroll av turneringsoppsettets kampdager og at hver runde har 18 kamper.
-- Full visuell nettlesertest må fortsatt gjennomføres lokalt før publisering.
+- Kontroll av at de tre turneringslistene fortsatt inneholder 36 unike lag hver.
+- Kontroll av at europeiske emblem-URL-er faller tilbake til initialer ved bildeinnlastingsfeil.
+- Full visuell nettlesertest og kontroll av alle eksterne bildeadresser må fortsatt gjennomføres lokalt før publisering.
 
 ## Avgrensninger
-- Dersom sammenlagtresultatet fortsatt er uavgjort etter ekstraomgangene, avgjøres europacupoppgjøret med straffespark.
-- Trekning/kvalifisering og klubblister er fremdeles en forenklet spillmodell, ikke en full reproduksjon av alle offisielle UEFA-begrensninger.
+- Logoer lastes fra football-data.orgs crest-CDN og krever internettilgang.
+- Logo-dekningen er ikke komplett for alle 108 europeiske deltakere ennå. Klubber som mangler en kontrollert ID vises med initialbasert reserveemblem.
+- 2026/27-deltakerlistene er beholdt fra v1.89; kvalifiseringsmodellen for senere sesonger er fortsatt forenklet.

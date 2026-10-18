@@ -190,7 +190,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .cup-accordion>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px}.cup-accordion>summary::-webkit-details-marker{display:none}.cup-accordion>summary:after{content:'⌄';font-size:20px;color:var(--muted);margin-left:auto}.cup-accordion[open]>summary:after{content:'⌃'}.cup-accordion>summary h2{margin:0}.cup-accordion{overflow:hidden}.cup-accordion .section-title{margin-bottom:8px}.cup-accordion>.player{padding:9px 10px;margin:6px 0;gap:8px;align-items:center}.cup-accordion .player-meta{line-height:1.35}.cup-accordion>p.muted{margin:6px 0 10px}.cup-accordion .pill{white-space:nowrap}.cup-accordion .notice{margin:8px 0;padding:10px}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.89</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.90</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -1246,7 +1246,8 @@ function ensureEuropeanCompetitions(reset=false){
   const c=CLUBS.find(x=>x.name===name)||CLUBS.find(x=>x.name===lookup);
   const intl=INTERNATIONAL_CLUBS.find(x=>x.name===name)||EUROPEAN_EXTRA_CLUBS.find(x=>x.name===name)||INTERNATIONAL_CLUBS.find(x=>x.name===lookup)||EUROPEAN_EXTRA_CLUBS.find(x=>x.name===lookup);
   const countryOverrides={'LASK':'Østerrike','Sabah':'Aserbajdsjan','Lens':'Frankrike','Lille':'Frankrike','Paris Saint-Germain':'Frankrike','Stuttgart':'Tyskland','Como':'Italia','Roma':'Italia','Feyenoord':'Nederland','Viking FK':'Norge','Lillestrøm':'Norge','Celta':'Spania','Real Sociedad':'Spania','Hoffenheim':'Tyskland','Levski Sofia':'Bulgaria','Torreense':'Portugal','Tromsø':'Norge'};
-  return {name,country:countryOverrides[name]||intl?.country||c?.city||'Europa',strength:Number(c?.strength||intl?.strength)||62,clubIndex:c?CLUBS.indexOf(c):null,division:c?clubDivision(c):division,europeanQualified:true,international:!c};
+  const logo=c?.logo||((EUROPEAN_LOGOS[name]||EUROPEAN_LOGOS[lookup])?`https://crests.football-data.org/${EUROPEAN_LOGOS[name]||EUROPEAN_LOGOS[lookup]}.svg`:'');
+  return {name,country:countryOverrides[name]||intl?.country||c?.city||'Europa',strength:Number(c?.strength||intl?.strength)||62,clubIndex:c?CLUBS.indexOf(c):null,division:c?clubDivision(c):division,europeanQualified:true,international:!c,logo,short:name.split(/\s+/).map(x=>x[0]).join('').slice(0,3).toUpperCase()};
  };
  const prior=appState.lastSeasonSummary?.europeanPlaces||{};
  const activeIsPremier=clubDivision(CLUBS[appState.club])==='Premier League';
@@ -2327,10 +2328,22 @@ function matchCommentary(e,c,opp,home){
  if(e.type==="chance")return `${club} kommer til avslutning, men ${opponent} holder stand.`;
  return `Det skjer ting ute på banen mellom ${c.name} og ${opp.name}.`;
 }
+// European club crests (football-data.org crest CDN). Unknown clubs use generated initials.
+const EUROPEAN_LOGOS = {
+ 'Real Madrid':86,'Barcelona':81,'Atlético Madrid':78,'Atlético de Madrid':78,'Real Betis':90,'Villarreal':94,
+ 'Bayern München':5,'Borussia Dortmund':4,'Bayer Leverkusen':3,'Leverkusen':3,'RB Leipzig':721,'Leipzig':721,'Stuttgart':10,'Hoffenheim':2,
+ 'Paris Saint-Germain':524,'Paris':524,'Marseille':516,'Lille':521,'Lens':546,'Lyon':523,'Monaco':548,'Rennes':529,'Celta':558,'Celta Vigo':558,'Real Sociedad':92,
+ 'Inter':108,'AC Milan':98,'Milan':98,'Juventus':109,'Napoli':113,'Roma':100,'Atalanta':102,'Como':7397,
+ 'Ajax':678,'PSV Eindhoven':674,'PSV':674,'Feyenoord':675,'AZ Alkmaar':682,'FC Porto':503,'Porto':503,'Sporting CP':498,'Benfica':1903,
+ 'Arsenal':57,'Aston Villa':58,'Liverpool':64,'Manchester City':65,'Manchester United':66,'AFC Bournemouth':1044,'Bournemouth':1044,
+ 'Crystal Palace':354,'Sunderland':71,'Brighton & Hove Albion':397,'Brighton':397,'Newcastle United':67,'Chelsea':61,'Tottenham Hotspur':73,
+ 'Everton':62,'Fulham':63,'Brentford':402,'Nottingham Forest':351,'Leeds United':341,'Wolverhampton Wanderers':76,
+};
+
 function clubBadgeMarkup(club,size=42){
  const name=club?.name||'Klubb';
  const short=club?.short||name.split(/\s+/).map(x=>x[0]).join('').slice(0,3).toUpperCase();
- const logo=club?.logo||'';
+ const logo=club?.logo||((EUROPEAN_LOGOS[name]||EUROPEAN_LOGOS[club?.name])?`https://crests.football-data.org/${EUROPEAN_LOGOS[name]||EUROPEAN_LOGOS[club?.name]}.svg`: '');
  const safeName=esc(name);
  if(logo)return `<img src="${esc(logo)}" alt="${safeName}-logo" loading="lazy" style="width:${size}px;height:${size}px;object-fit:contain" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="club-badge-fallback" style="display:none;width:${size}px;height:${size}px">${esc(short)}</span>`;
  const hue=stableSeed(name)%360;
