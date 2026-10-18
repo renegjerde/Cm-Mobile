@@ -1,16 +1,12 @@
-# CM Mobile v1.80
+# CM Mobile v1.81
 
-## Endringer
-- La inn et første lag med navngitte spillere for åtte sentrale europeiske klubber i Champions League/Europa-turneringene.
-- Navngitte spillere inngår i den eksisterende konkurransesimuleringen og påvirker kampmotorens lagstyrke gjennom spiller-ratingene.
-- Klubber uten en kuratert navneliste beholder genererte spillere. Ufullstendige plasser i navngitte lag er også genererte plassholdere.
-- Europacupdatabasen versjoneres på nytt slik at lagene bygges med den oppdaterte spillerstrukturen.
+## Rettelser
+- Rettet manglende navn på Champions League, Europa League og Conference League (årsaken var at `makeComp` ble kalt uten turneringsnøkkel).
+- Økt europeisk databaseversjon slik at lagrede turneringer med manglende navn bygges på nytt.
+- Europacupkort viser kommende oppgjør og planlagt ligarunde før første resultat er registrert.
+- Beholder eksisterende engelske ligaer, cuper og lagringsstruktur.
 
-## Viktige begrensninger
-- Dette er et delvis spillerdata-grunnlag, ikke 25 verifiserte spillere for alle 32 internasjonale klubber.
-- Spillernavnene er kuratert fra tilgjengelige 2025/26-lag- og kampkilder, men klubbtilhørighet kan endre seg og bør kvalitetssikres før en karriere med streng realisme.
-- Europacupkampene simuleres fortsatt automatisk. Neste steg er å koble managerens europacupkamper til live-kampmotoren.
-- JavaScript-syntaks er kontrollert med `node --check`; full ende-til-ende-test i mobilnettleser er ikke utført.
+## Teststatus
+JavaScript-syntaks og strukturelle kontroller er kjørt. Dette er ikke en full mobilnettleser- eller sesongtest. Europacupkampene er fortsatt simulert automatisk; de er ikke gjort spillbare i live-kampmotoren i denne versjonen.
 
-## Publisering
-Pakk ut ZIP og erstatt `index.html` i roten av `main`-grenen for GitHub Pages.
+Publiser `index.html` i roten av `main`-grenen for GitHub Pages.
