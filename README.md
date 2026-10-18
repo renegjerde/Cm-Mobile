@@ -1,15 +1,16 @@
-# CM Mobile v1.79
+# CM Mobile v1.80
 
 ## Endringer
-- Europacupene inkluderer nå kjente klubber fra flere europeiske land, ikke bare engelske lag.
-- Hver internasjonal klubb har land og en modellert styrkevurdering som påvirker simuleringene.
-- Champions League, Europa League og Conference League starter med engelske kvalifiserte lag blandet med internasjonale klubber.
-- Oppgradert europeisk databasedversjon gjør at konkurransene opprettes på nytt i eksisterende karrierer for gjeldende sesong.
+- La inn et første lag med navngitte spillere for åtte sentrale europeiske klubber i Champions League/Europa-turneringene.
+- Navngitte spillere inngår i den eksisterende konkurransesimuleringen og påvirker kampmotorens lagstyrke gjennom spiller-ratingene.
+- Klubber uten en kuratert navneliste beholder genererte spillere. Ufullstendige plasser i navngitte lag er også genererte plassholdere.
+- Europacupdatabasen versjoneres på nytt slik at lagene bygges med den oppdaterte spillerstrukturen.
 
 ## Viktige begrensninger
-- Utenlandske spillerstaller er foreløpig modellgenererte, ikke autentiske spiller-for-spiller-databaser.
-- Europeiske turneringer simuleres automatisk; de er ikke ennå spillbare via live-kampmotoren.
-- Kvalifiseringen er forenklet og basert på engelske ligaplasseringer; full UEFA-ligafase, koeffisienter og kvalifiseringsrunder er ikke implementert.
+- Dette er et delvis spillerdata-grunnlag, ikke 25 verifiserte spillere for alle 32 internasjonale klubber.
+- Spillernavnene er kuratert fra tilgjengelige 2025/26-lag- og kampkilder, men klubbtilhørighet kan endre seg og bør kvalitetssikres før en karriere med streng realisme.
+- Europacupkampene simuleres fortsatt automatisk. Neste steg er å koble managerens europacupkamper til live-kampmotoren.
+- JavaScript-syntaks er kontrollert med `node --check`; full ende-til-ende-test i mobilnettleser er ikke utført.
 
 ## Publisering
-Last opp `index.html` til roten av `main`-grenen i GitHub-repoet. ZIP-arkivet skal ikke brukes som aktiv `index.html`.
+Pakk ut ZIP og erstatt `index.html` i roten av `main`-grenen for GitHub Pages.

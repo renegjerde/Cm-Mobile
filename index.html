@@ -186,7 +186,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.79</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.80</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -950,11 +950,24 @@ function makeLowerFixtures(rows){const ids=rows.map((_,i)=>i);let arr=[...ids],r
 function addGenericResult(rows,a,b,ga,gb){const A=rows[a],B=rows[b];if(!A||!B)return;A.p++;B.p++;A.gf+=ga;A.ga+=gb;B.gf+=gb;B.ga+=ga;if(ga>gb){A.w++;A.pts+=3;B.l++}else if(ga<gb){B.w++;B.pts+=3;A.l++}else{A.d++;B.d++;A.pts++;B.pts++}}
 function seededScore(a,b,seed){const rng=seededRandom(seed);const diff=(a-b)/13;const goalsA=Math.min(6,Math.max(0,Math.round(1.25+diff*.7+rng()*2.2)));const goalsB=Math.min(6,Math.max(0,Math.round(1.15-diff*.65+rng()*2.1)));return [goalsA,goalsB]}
 function simulateLowerLeaguesThroughRound(round){Object.entries(appState.lowerLeagues||{}).forEach(([div,data])=>{const target=Math.min(46,Math.floor(round*46/38));while(data.playedRounds<target){const games=data.fixtures[data.playedRounds]||[];games.forEach(([a,b],i)=>{const [ga,gb]=seededScore(data.rows[a].strength,data.rows[b].strength,stableSeed(`${seasonLabel()}|${div}|${data.playedRounds}|${a}|${b}`));addGenericResult(data.rows,a,b,ga,gb)});data.playedRounds++;}})}
+// Partial, curated real-player layer for major European clubs. Names are based on published 2025/26 first-team squad/line-up sources; unnamed squad places remain clearly generic.
+const INTERNATIONAL_REAL_PLAYERS={
+ 'Real Madrid':{GK:['Thibaut Courtois','Andriy Lunin'],DEF:['Antonio Rüdiger','Éder Militão','Dean Huijsen','Raúl Asencio','Álvaro Carreras','Ferland Mendy'],MID:['Jude Bellingham','Federico Valverde','Aurélien Tchouaméni','Eduardo Camavinga','Arda Güler','Dani Ceballos'],ATT:['Kylian Mbappé','Vinícius Júnior','Rodrygo','Endrick','Brahim Díaz']},
+ 'Barcelona':{GK:['Joan García','Wojciech Szczęsny'],DEF:['Alejandro Balde','Pau Cubarsí','Jules Koundé','Eric García','Andreas Christensen','Ronald Araújo'],MID:['Pedri','Gavi','Fermín López','Dani Olmo','Frenkie de Jong','Marc Bernal'],ATT:['Lamine Yamal','Raphinha','Robert Lewandowski','Ferran Torres','Marcus Rashford']},
+ 'Bayern München':{GK:['Manuel Neuer','Sven Ulreich','Jonas Urbig'],DEF:['Dayot Upamecano','Min-jae Kim','Jonathan Tah','Alphonso Davies','Hiroki Ito','Josip Stanišić'],MID:['Joshua Kimmich','Leon Goretzka','Jamal Musiala','Tom Bischof','Raphaël Guerreiro','Aleksandar Pavlović','Konrad Laimer'],ATT:['Harry Kane','Serge Gnabry','Luis Díaz','Michael Olise','Nicolas Jackson','Lennart Karl']},
+ 'Inter':{GK:['Yann Sommer','Josep Martínez'],DEF:['Alessandro Bastoni','Manuel Akanji','Benjamin Pavard','Yann Bisseck','Federico Dimarco','Carlos Augusto'],MID:['Nicolò Barella','Hakan Çalhanoğlu','Piotr Zieliński','Petar Sučić','Henrikh Mkhitaryan','Denzel Dumfries'],ATT:['Lautaro Martínez','Marcus Thuram','Ange-Yoan Bonny','Pio Esposito']},
+ 'Paris Saint-Germain':{GK:['Gianluigi Donnarumma','Matvey Safonov'],DEF:['Marquinhos','Achraf Hakimi','Nuno Mendes','Lucas Hernández','Willian Pacho','Lucas Beraldo'],MID:['Vitinha','João Neves','Warren Zaïre-Emery','Fabián Ruiz','Lee Kang-in'],ATT:['Ousmane Dembélé','Bradley Barcola','Désiré Doué','Khvicha Kvaratskhelia','Gonçalo Ramos']},
+ 'Borussia Dortmund':{GK:['Gregor Kobel','Alexander Meyer'],DEF:['Nico Schlotterbeck','Niklas Süle','Waldemar Anton','Ramy Bensebaini','Julian Ryerson'],MID:['Felix Nmecha','Pascal Groß','Marcel Sabitzer','Jobe Bellingham','Julian Brandt'],ATT:['Serhou Guirassy','Karim Adeyemi','Maximilian Beier','Jamie Gittens']},
+ 'Juventus':{GK:['Michele Di Gregorio','Mattia Perin'],DEF:['Bremer','Federico Gatti','Pierre Kalulu','Andrea Cambiaso','Lloyd Kelly'],MID:['Manuel Locatelli','Khephren Thuram','Teun Koopmeiners','Weston McKennie','Douglas Luiz'],ATT:['Dušan Vlahović','Kenan Yıldız','Francisco Conceição','Jonathan David','Arkadiusz Milik']},
+ 'Benfica':{GK:['Anatoliy Trubin','Samuel Soares'],DEF:['Nicolás Otamendi','António Silva','Alexander Bah','Álvaro Carreras','Tomás Araújo'],MID:['Orkun Kökçü','Florentino Luís','Fredrik Aursnes','Leandro Barreiro','João Rego'],ATT:['Vangelis Pavlidis','Ángel Di María','Kerem Aktürkoğlu','Andreas Schjelderup','Bruma']}
+};
 function competitionSquad(team){
  if(Number.isInteger(team.clubIndex)&&appState.worldSquads?.[team.clubIndex])return appState.worldSquads[team.clubIndex].map(p=>({...p,attributes:{...p.attributes},fitness:100,morale:p.morale||75,form:p.form||6.5}));
  const rng=seededRandom(stableSeed(`${seasonLabel()}|${team.name}|cup-squad`));
  const positions=['GK','GK','DEF','DEF','DEF','DEF','DEF','DEF','MID','MID','MID','MID','MID','MID','ATT','ATT','ATT','ATT'];
- return positions.map((pos,i)=>{const rating=Math.max(38,Math.min(84,Math.round(team.strength+(rng()*10-5))));return {id:`${team.name}-${i}`,name:`${team.name} ${pos==='GK'?'Keeper':pos==='DEF'?'Defender':pos==='MID'?'Midfielder':'Forward'} ${i+1}`,pos,role:defaultRoleFor(`${team.name}-${i}`,pos,i),rating,attributes:generateAttributes(pos,rating),fitness:100,morale:70,form:6.5,age:20+i%14};});
+ const real=INTERNATIONAL_REAL_PLAYERS[team.name]||{};
+ const used={GK:0,DEF:0,MID:0,ATT:0};
+ return positions.map((pos,i)=>{const idx=used[pos]++,known=real[pos]?.[idx],rating=Math.max(38,Math.min(94,Math.round(team.strength+(rng()*8-4)+(known?1:0)))),name=known||`${team.name} ${pos==='GK'?'Keeper':pos==='DEF'?'Defender':pos==='MID'?'Midfielder':'Forward'} ${i+1}`;return {id:`${team.name}-${i}`,name,pos,role:defaultRoleFor(name,pos,i),rating,attributes:generateAttributes(pos,rating),fitness:100,morale:70,form:6.5,age:known?Math.max(18,21+(stableSeed(name)%15)):20+i%14,realNameVerified:!!known,source:known?'Curated real-player name; squad membership should be rechecked each season':'Generated placeholder'};});
 }
 function simulateCompetitionMatch(a,b,competition,roundNo,gameNo){
  const pa=competitionSquad(a),pb=competitionSquad(b);
@@ -1053,7 +1066,7 @@ const INTERNATIONAL_CLUBS=[
  {name:'Galatasaray',country:'Tyrkia',strength:80},{name:'Fenerbahçe',country:'Tyrkia',strength:79},{name:'Shakhtar Donetsk',country:'Ukraina',strength:77},{name:'Olympiacos',country:'Hellas',strength:76}
 ];
 function ensureEuropeanCompetitions(reset=false){
- if(!reset&&appState.europeanCompetitions&&appState.europeanSeason===appState.seasonYear&&appState.europeanDatabaseVersion===1)return;
+ if(!reset&&appState.europeanCompetitions&&appState.europeanSeason===appState.seasonYear&&appState.europeanDatabaseVersion===2)return;
  const table=sortedTable();
  const toTeam=(name,division='Premier League')=>{const c=CLUBS.find(x=>x.name===name);const roster=appState.worldSquads?.find((_,i)=>CLUBS[i]?.name===name);const intl=INTERNATIONAL_CLUBS.find(x=>x.name===name);return {name,country:intl?.country||'England',strength:Number(c?.strength||intl?.strength)||(roster?.reduce((s,p)=>s+p.rating,0)/(roster?.length||1))||62,clubIndex:c?CLUBS.indexOf(c):null,division,europeanQualified:true,international:!!intl}};
  const prior=appState.lastSeasonSummary?.europeanPlaces;
@@ -1072,7 +1085,7 @@ function ensureEuropeanCompetitions(reset=false){
   'Europa League':makeComp([...englishEL.slice(0,4),...elIntl].map(n=>toTeam(n))),
   'Conference League':makeComp([...englishConf.slice(0,4),...confIntl].map(n=>toTeam(n)))
  };
- appState.europeanSeason=appState.seasonYear;appState.europeanDatabaseVersion=1;
+ appState.europeanSeason=appState.seasonYear;appState.europeanDatabaseVersion=2;
 }
 function simulateEuropeanStage(comp,week){
  if(!comp||comp.finished||week<comp.scheduledWeeks[comp.stage])return;
@@ -2240,7 +2253,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.79 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
+function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.80 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{ensureTransferPool();render()}
