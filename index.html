@@ -91,6 +91,9 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .table-position .rank-change.same,.rank-movement.same{color:#8193a8}
 .rank-movement{font-size:11px;font-weight:900;margin-left:5px;white-space:nowrap}
 
+.club-badge-fallback{display:inline-grid;place-items:center;box-sizing:border-box;border-radius:12px;border:2px solid hsla(var(--badge-hue,210),65%,72%,.8);background:linear-gradient(145deg,hsl(var(--badge-hue,210),38%,28%),hsl(var(--badge-hue,210),42%,15%));color:#f4f7fb;font-weight:900;font-size:11px;letter-spacing:-.4px;box-shadow:0 2px 7px #0003;flex:0 0 auto}
+.match-club-badge{display:flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:16px}
+.match-club-badge img{display:block}
 .live-match-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:12px 0 4px}
 .live-match-controls button{border:1px solid var(--line);background:#203149;color:var(--text);border-radius:10px;padding:9px 12px;font-weight:800;font-size:13px}
 .live-match-controls button.primary-control{background:var(--green);color:#102016;border-color:var(--green)}
@@ -186,7 +189,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.81</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.82</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -1960,9 +1963,19 @@ function matchCommentary(e,c,opp,home){
  if(e.type==="chance")return `${club} kommer til avslutning, men ${opponent} holder stand.`;
  return `Det skjer ting ute på banen mellom ${c.name} og ${opp.name}.`;
 }
+function clubBadgeMarkup(club,size=42){
+ const name=club?.name||'Klubb';
+ const short=club?.short||name.split(/\s+/).map(x=>x[0]).join('').slice(0,3).toUpperCase();
+ const logo=club?.logo||'';
+ const safeName=esc(name);
+ if(logo)return `<img src="${esc(logo)}" alt="${safeName}-logo" loading="lazy" style="width:${size}px;height:${size}px;object-fit:contain" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="club-badge-fallback" style="display:none;width:${size}px;height:${size}px">${esc(short)}</span>`;
+ const hue=stableSeed(name)%360;
+ return `<span class="club-badge-fallback" role="img" aria-label="${safeName} klubbmerke" title="${safeName}" style="width:${size}px;height:${size}px;--badge-hue:${hue}">${esc(short)}</span>`;
+}
 function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userEvents,positionChanges={},engine=null,round=null,previousPositions=new Map()){
  const homeName=home?c.name:opp.name, awayName=home?opp.name:c.name;
- const homeCrest=home?c.crest:opp.crest, awayCrest=home?opp.crest:c.crest;
+ const homeClub=home?c:(CLUBS.find(x=>x.name===opp.name)||opp), awayClub=home?(CLUBS.find(x=>x.name===opp.name)||opp):c;
+ const homeCrest=clubBadgeMarkup(homeClub,48), awayCrest=clubBadgeMarkup(awayClub,48);
  const positions=tablePositionMap();
  const homePosition=positions.get(homeName)||"–", awayPosition=positions.get(awayName)||"–";
  const rankLabel=(rank,isUser=false,change=0)=>`<span class="table-position ${isUser?"user-rank":""}"><span class="rank-number">${rank}.</span><span>PLASS</span>${positionChangeMarkup(change)}</span>`;
@@ -1996,8 +2009,8 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  </div>
  <section class="card">
   <div class="row" style="padding:10px 0 18px;align-items:center">
-   <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${homeCrest}</div><div style="margin-top:8px;font-weight:800">${homeName}</div>${rankLabel(homePosition,homeName===c.name,positionChanges[homeName]||0)}<small style="color:var(--muted);display:block;margin-top:2px">HJEMME</small></div>
-   <div style="text-align:center;flex:1;min-width:0"><div class="crest" style="margin:auto">${awayCrest}</div><div style="margin-top:8px;font-weight:800">${awayName}</div>${rankLabel(awayPosition,awayName===c.name,positionChanges[awayName]||0)}<small style="color:var(--muted);display:block;margin-top:2px">BORTE</small></div>
+   <div style="text-align:center;flex:1;min-width:0"><div class="crest match-club-badge" style="margin:auto">${homeCrest}</div><div style="margin-top:8px;font-weight:800">${homeName}</div>${rankLabel(homePosition,homeName===c.name,positionChanges[homeName]||0)}<small style="color:var(--muted);display:block;margin-top:2px">HJEMME</small></div>
+   <div style="text-align:center;flex:1;min-width:0"><div class="crest match-club-badge" style="margin:auto">${awayCrest}</div><div style="margin-top:8px;font-weight:800">${awayName}</div>${rankLabel(awayPosition,awayName===c.name,positionChanges[awayName]||0)}<small style="color:var(--muted);display:block;margin-top:2px">BORTE</small></div>
   </div>
   <div class="fixture"><div class="team">Ballbesittelse</div><b id="livePossession">50% – 50%</b></div>
   <div class="fixture"><div class="team">Avslutninger</div><b id="liveShots">0 – 0</b></div>
@@ -2253,7 +2266,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.81 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
+function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.82 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{ensureTransferPool();render()}
