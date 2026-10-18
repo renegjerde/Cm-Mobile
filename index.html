@@ -456,7 +456,7 @@ function load(){try{let s=JSON.parse(localStorage.getItem("cmMobileSave"));if(s&
   appState.positionChanges={};appState.activeDivision=appState.activeDivision||clubDivision(CLUBS[appState.club]);appState.table=activeLeagueClubs().map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
   appState.fixtures=[];appState.leagueFormatVersion=2;
  }
- if(appState.lastRecoveryRound===undefined)appState.lastRecoveryRound=null;if(appState.recommendationRound===undefined)appState.recommendationRound=null;if(!Number(s.lineupRoleVersion||0)||Number(s.lineupRoleVersion)<2){appState.selectedXI=null;appState.recommendationRound=null;appState.lineupRoleVersion=2;} appState.squad.forEach(p=>{ensurePlayerAttributes(p);if(!Array.isArray(p.naturalPositions)||!p.naturalPositions.length)p.naturalPositions=naturalPositionsFor(p.name,p.pos,p.role);});if(!appState.squad.some(p=>p.pos==="GK"&&p.id!==appState.squad.find(x=>x.pos==="GK")?.id)){const club=CLUBS[appState.club]||CLUBS[3];const nextId=Math.max(0,...appState.squad.map(p=>Number(p.id)||0))+1;appState.squad.push({id:nextId,name:"M. Kovac",pos:"GK",age:25,rating:Math.max(55,club.strength-3),attributes:generateAttributes("GK",Math.max(55,club.strength-3)),potential:Math.max(60,club.strength+3),value:5,wage:18,fitness:90,morale:75,goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0});}if(!Number.isFinite(appState.seasonYear))appState.seasonYear=2026;if(!appState.positionChanges)appState.positionChanges={};if(!appState.leagueView)appState.leagueView="table";if(!appState.playerStatMetric)appState.playerStatMetric="goals";if(!appState.discipline)appState.discipline={};if(!appState.managerMode)appState.managerMode="hybrid";if(!appState.clubFinances)appState.financeVersion=0;if(!appState.youthAcademies)appState.youthAcademies={};if(!Number(appState.autoSubsPreferenceVersion)){appState.autoSubs=true;appState.autoSubsPreferenceVersion=1;}else if(typeof appState.autoSubs!=="boolean")appState.autoSubs=true;if(!appState.fixtures||!s.fixtures.length){appState.week=1;appState.played=0;appState.log=[];appState.activeDivision=appState.activeDivision||clubDivision(CLUBS[appState.club]);appState.table=activeLeagueClubs().map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));appState.fixtures=[];}appState.activeDivision=appState.activeDivision||clubDivision(CLUBS[appState.club]);appState.leagueFormatVersion=3;return true}}catch(e){}return false}
+ if(appState.lastRecoveryRound===undefined)appState.lastRecoveryRound=null;if(appState.recommendationRound===undefined)appState.recommendationRound=null;if(!Number(s.lineupRoleVersion||0)||Number(s.lineupRoleVersion)<2){appState.selectedXI=null;appState.recommendationRound=null;appState.lineupRoleVersion=2;} appState.squad.forEach(p=>{ensurePlayerAttributes(p);if(!Array.isArray(p.naturalPositions)||!p.naturalPositions.length)p.naturalPositions=naturalPositionsFor(p.name,p.pos,p.role);});if(!appState.squad.some(p=>p.pos==="GK"&&p.id!==appState.squad.find(x=>x.pos==="GK")?.id)){const club=CLUBS[appState.club]||CLUBS[3];const nextId=Math.max(0,...appState.squad.map(p=>Number(p.id)||0))+1;appState.squad.push({id:nextId,name:"M. Kovac",pos:"GK",age:25,rating:Math.max(55,club.strength-3),attributes:generateAttributes("GK",Math.max(55,club.strength-3)),potential:Math.max(60,club.strength+3),value:5,wage:18,fitness:90,morale:75,goals:0,assists:0,apps:0,minutes:0,form:6.5,injured:0,suspended:0});}if(!Number.isFinite(appState.seasonYear))appState.seasonYear=2026;if(!appState.positionChanges)appState.positionChanges={};if(!appState.leagueView)appState.leagueView="table";if(!appState.leagueTableDivision)appState.leagueTableDivision=appState.activeDivision||clubDivision(CLUBS[appState.club]);if(!appState.playerStatMetric)appState.playerStatMetric="goals";if(!appState.discipline)appState.discipline={};if(!appState.managerMode)appState.managerMode="hybrid";if(!appState.clubFinances)appState.financeVersion=0;if(!appState.youthAcademies)appState.youthAcademies={};if(!Number(appState.autoSubsPreferenceVersion)){appState.autoSubs=true;appState.autoSubsPreferenceVersion=1;}else if(typeof appState.autoSubs!=="boolean")appState.autoSubs=true;if(!appState.fixtures||!s.fixtures.length){appState.week=1;appState.played=0;appState.log=[];appState.activeDivision=appState.activeDivision||clubDivision(CLUBS[appState.club]);appState.table=activeLeagueClubs().map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));appState.fixtures=[];}appState.activeDivision=appState.activeDivision||clubDivision(CLUBS[appState.club]);appState.leagueFormatVersion=3;return true}}catch(e){}return false}
 function money(n){return "£"+(n<1?Math.round(n*1000)+"k":n.toFixed(1)+"m")}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function currentClub(){return CLUBS[appState.club]||CLUBS[3]}
@@ -478,12 +478,12 @@ function getNextOpponentIndex(){ensureFixtures();let r=appState.fixtures.find(f=
 function home(){
  let c=currentClub(),t=currentClubRecord(),next=CLUBS[getNextOpponentIndex()],done=seasonCompleted();
  const rank=sortedTable().findIndex(x=>x.name===c.name)+1;
- const mainAction=done?`<button class="primary" onclick="setPage('season')">Se sesongoppsummering →</button>`:`<button class="primary" onclick="setPage('tactics')">▶ Sett opp laget</button>`;
+ const mainAction=appState.pendingCupMatch?`<button class="primary" onclick="startPendingCupMatch()">🏆 Forbered ${esc(appState.pendingCupMatch.competition)}-kamp →</button>`:done?`<button class="primary" onclick="setPage('season')">Se sesongoppsummering →</button>`:`<button class="primary" onclick="setPage('tactics')">▶ Sett opp laget</button>`;
  const seasonMessage=done?`Sesongen ${seasonLabel()} er ferdig. Se hvordan ${c.name} gjorde det, og start deretter en ny sesong med samme klubb og tropp.`:`Det er din klubb. Nå begynner jobben: bygg laget, vinn kampene og finn de spillerne ingen andre har oppdaget.`;
  return `
 <div class="hero"><div class="hero-mark">⚽</div><div class="eyebrow">Manager profile · Season ${seasonLabel()}</div><h1>${c.name}</h1><p>${seasonMessage}</p><div class="hero-actions">${mainAction}<button onclick="setPage('squad')">Se tropp →</button><button class="ghost" onclick="chooseClub()">Bytt klubb</button><button class="ghost" onclick="startNewCareer()">＋ Ny karriere</button></div></div>
 <div class="grid"><div class="stat"><small>${done?'Sluttplass':'Ligaplass'}</small><strong>${rank}. <span class="muted" style="font-size:12px">/ ${activeLeagueClubs().length}</span></strong></div><div class="stat"><small>Poeng</small><strong>${t.pts}</strong></div><div class="stat"><small>Overgangsbudsjett</small><strong class="positive">${money(appState.budget)}</strong></div><div class="stat"><small>Lønn per uke</small><strong>${money(appState.squad.reduce((n,p)=>n+(p.wage||0),0)/1000)}</strong></div><div class="stat"><small>${done?'Sesongkamper':'Spilt'}</small><strong>${t.p} <span class="muted" style="font-size:12px">kamper</span></strong></div></div>
-${done?panel("Sesongen er ferdig",`<div class="fixture"><div class="team">${esc(sortedTable()[0].name)} – seriemester</div><span class="pill green">${sortedTable()[0].pts} poeng</span></div><p class="muted" style="margin:12px 0">Se hele sluttabellen, klubbens sesongstatistikk og toppscorer i sesongoppsummeringen.</p><button class="primary" style="width:100%" onclick="setPage('season')">Åpne sesongoppsummering</button>`):panel("Neste kamp",`<div class="row"><div class="club"><div class="crest">${c.logo?`<img src="${c.logo}" alt="${esc(c.name)}-logo" loading="lazy" style="width:32px;height:32px;object-fit:contain" onerror="this.remove();this.parentElement.textContent='${c.short}'">`:c.crest}</div><div><h3>${c.name}</h3><p>${appState.fixtures.find(f=>f.round===appState.week)?.games.find(g=>g.includes(appState.club))?.[0]===appState.club?"Hjemmekamp":"Bortekamp"} · Runde ${appState.week}</p></div></div><div style="font-size:18px;color:var(--muted)">vs</div><div class="club"><div><h3 style="text-align:right">${next.name}</h3><p style="text-align:right">Motstander</p></div><div class="crest">${next.logo?`<img src="${next.logo}" alt="${esc(next.name)}-logo" loading="lazy" style="width:32px;height:32px;object-fit:contain" onerror="this.remove();this.parentElement.textContent='${next.short}'">`:next.crest}</div></div></div>`)}
+${appState.pendingCupMatch?panel("Cupkamp venter",`<div class="fixture"><div class="team"><strong>${esc(appState.pendingCupMatch.competition)} · Runde ${appState.pendingCupMatch.roundNo}</strong><div class="player-meta">${esc(appState.pendingCupMatch.homeTeam.name)} mot ${esc(appState.pendingCupMatch.awayTeam.name)}</div></div><span class="pill">Spill selv</span></div><button class="primary" style="width:100%" onclick="startPendingCupMatch()">Gå til laguttak og avspark →</button>`):done?panel("Sesongen er ferdig",`<div class="fixture"><div class="team">${esc(sortedTable()[0].name)} – seriemester</div><span class="pill green">${sortedTable()[0].pts} poeng</span></div><p class="muted" style="margin:12px 0">Se hele sluttabellen, klubbens sesongstatistikk og toppscorer i sesongoppsummeringen.</p><button class="primary" style="width:100%" onclick="setPage('season')">Åpne sesongoppsummering</button>`):panel("Neste kamp",`<div class="row"><div class="club"><div class="crest">${c.logo?`<img src="${c.logo}" alt="${esc(c.name)}-logo" loading="lazy" style="width:32px;height:32px;object-fit:contain" onerror="this.remove();this.parentElement.textContent='${c.short}'">`:c.crest}</div><div><h3>${c.name}</h3><p>${appState.fixtures.find(f=>f.round===appState.week)?.games.find(g=>g.includes(appState.club))?.[0]===appState.club?"Hjemmekamp":"Bortekamp"} · Runde ${appState.week}</p></div></div><div style="font-size:18px;color:var(--muted)">vs</div><div class="club"><div><h3 style="text-align:right">${next.name}</h3><p style="text-align:right">Motstander</p></div><div class="crest">${next.logo?`<img src="${next.logo}" alt="${esc(next.name)}-logo" loading="lazy" style="width:32px;height:32px;object-fit:contain" onerror="this.remove();this.parentElement.textContent='${next.short}'">`:next.crest}</div></div></div>`)}
 ${panel("Siste nytt",appState.log.length?appState.log.slice(-3).reverse().map(x=>`<div class="fixture"><div class="team">${esc(x)}</div><span class="pill">NYTT</span></div>`).join(""):`<div class="muted">Ingen nyheter ennå. Første kamp venter på deg.</div>`)}
 <div class="notice">Spillerbasen er lagret lokalt. Ferdigheter, potensial, markedsverdi og enkelte aldre er foreløpige estimater og må verifiseres mot pålitelige spillerdata.</div>`
 }
@@ -704,7 +704,7 @@ function recordTeamContinuity(){
  appState.lastStartingXI=playedXI;
 }
 function tactics(){
- recoverSquadBeforeRound();
+ if(!appState.pendingCupMatch)recoverSquadBeforeRound();
  applyPreMatchRecommendation();
  const xi=currentStartingXI();
  const gk=xi.filter(p=>p.assignedRole==='GK');
@@ -730,7 +730,7 @@ function tactics(){
  const pitch=()=>`${stablePitchRows.map(row=>pitchLine(row)).join('')}<div style="margin-top:8px;text-align:center">🧤 ${gk.map(p=>`${esc(p.name)} · ${p.rating}`).join(', ')||'Ingen keeper'}</div>`;
  const playerDetail=(p)=>`<div class="player-meta">${p.pos==="GK"?`Keepergrep ${p.attributes.handling} · Reflekser ${p.attributes.reflexes} · Posisjonering ${p.attributes.positioning}`:p.pos==="DEF"?`Forsvar ${p.attributes.defending} · Styrke ${p.attributes.strength} · Hurtighet ${p.attributes.pace}`:p.pos==="MID"?`Pasninger ${p.attributes.passing} · Kreativitet ${p.attributes.creativity} · Utholdenhet ${p.attributes.stamina}`:`Avslutninger ${p.attributes.finishing} · Hurtighet ${p.attributes.pace} · Teknikk ${p.attributes.technique}`}</div><div class="fitness-track"><div class="fitness-fill" style="width:${p.fitness}%;background:${p.fitness<60?'#e48787':p.fitness<78?'#e8c875':'var(--green)'}"></div></div>`;
  const bench=eligibleSquad(appState.squad).filter(p=>!xi.some(q=>String(q.id)===String(p.id)));
- return `<div class="hero"><div class="eyebrow">Match preparation</div><h1>Laguttak og taktikk</h1><p>Velg startelleveren før avspark. Form og utholdenhet vises for hver spiller. Utholdenhet er en egen ferdighet og påvirker hvor raskt spilleren blir sliten i kampen. Fysisk form bygges gradvis opp mellom kampene; spillere med høy utholdenhet restituerer seg raskere, mens spillere som starter ofte kan trenge hvile.</p><div class="hero-actions"><span class="pill green">${xi.length}/11 valgt</span><span class="pill">Reserver: ${bench.length}</span></div></div><section class="card"><div class="notice" style="margin-top:0"><strong>🤖 Assistentens anbefaling</strong><p style="margin:6px 0">Motstander: ${esc(CLUBS[getNextOpponentIndex()].name)} · forventet formasjon <strong>${getOpponentFormation(getNextOpponentIndex(),appState.week)}</strong>.</p><p style="margin:6px 0">Foreslått oppsett: <strong>${appState.formation}</strong> · mentalitet <strong>${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</strong>. Elleveren er valgt ut fra posisjon, ferdigheter, form og fysisk tilstand.</p><button type="button" onclick="applyPreMatchRecommendation(true);render()">Bruk anbefalingen på nytt</button></div>${disciplinarySummary()}<div class="notice"><strong>🤝 Samspill og formasjonserfaring</strong><p style="margin:6px 0">Erfaring med ${esc(appState.formation)}: <strong>${formationFamiliarity()}%</strong> · Samspill i laget: <strong>${Number(appState.teamCohesion??25)}%</strong></p><div style="height:7px;background:var(--line);border-radius:8px;overflow:hidden;margin:5px 0 10px"><div style="height:100%;width:${formationFamiliarity()}%;background:var(--green)"></div></div><p style="margin:6px 0;font-size:12px">Formasjonserfaring gir nå bare en liten bonus eller ulempe (omtrent −0,7 til +1,0 ratingpoeng). Samspill vurderes separat. Du kan derfor bytte formasjon uten at laget straffes hardt; stabilitet gir fortsatt en moderat fordel.</p></div><div class="field"><label>FORMASJON</label><select id="formation" onchange="appState.formation=this.value;appState.selectedXI=null;save();render()">${["4-4-2","4-3-3","4-2-3-1","3-5-2"].map(f=>`<option ${appState.formation===f?"selected":""}>${f}</option>`).join("")}</select></div><div class="field"><label>MENTALITET</label><select id="tactic" onchange="appState.tactic=this.value;save()">${["Defensive","Balanced","Attacking","High press"].map(f=>`<option value="${f}" ${appState.tactic===f?"selected":""}>${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[f]}</option>`).join("")}</select></div><div class="section-title"><h2>Startellever</h2><small>${xi.length}/11 spillere</small></div><div style="background:linear-gradient(180deg,#17452f,#123622);border:1px solid #2b6848;border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:#b5e6bf">▲ ANGREP</div>${pitch()}</div><button class="primary" style="width:100%;margin:12px 0 18px" onclick="playMatch()">⚽ Avspark – bruk valgt startellever</button><div class="section-title"><h2>Velg spillere</h2><small>sortert etter taktisk rolle</small></div><p class="muted" style="font-size:11px">Trykk på listene for å velge hvem som starter. Skadde og suspenderte spillere kan ikke velges.</p><div class="section-title"><h2>Keeper</h2></div>${slotControls(xi.filter(p=>p.assignedRole==='GK'))}<div class="section-title"><h2>Forsvar</h2></div>${slotControls(xi.filter(p=>['LB','LCB','CB','RCB','RB','LWB','RWB'].includes(p.assignedRole)))}<div class="section-title"><h2>Midtbane</h2></div>${slotControls(xi.filter(p=>['DM','CM','LM','RM'].includes(p.assignedRole)))}<div class="section-title"><h2>Angrep</h2></div>${slotControls(xi.filter(p=>['LW','AM','RW','ST'].includes(p.assignedRole)))}<div class="section-title"><h2>Reserver</h2><small>sortert etter taktisk rolle</small></div>${["GK","DEF","MID","ATT"].map(pos=>{const ps=bench.filter(p=>p.pos===pos);return ps.length?`<div class="lineup-section-title">${posLabels[pos]}</div>${ps.map(p=>`<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span> · ${p.rating}</div>${playerDetail(p)}</div><div class="lineup-player-side"><strong>${p.rating}</strong><span>${p.fitness}%</span></div></div>`).join("")}`:""}).join("")}<button class="primary" style="width:100%;margin-top:12px" onclick="playMatch()">⚽ Avspark – bruk valgt startellever</button></section>`;
+ return `<div class="hero"><div class="eyebrow">Match preparation</div><h1>Laguttak og taktikk</h1><p>Velg startelleveren før avspark. Form og utholdenhet vises for hver spiller. Utholdenhet er en egen ferdighet og påvirker hvor raskt spilleren blir sliten i kampen. Fysisk form bygges gradvis opp mellom kampene; spillere med høy utholdenhet restituerer seg raskere, mens spillere som starter ofte kan trenge hvile.</p><div class="hero-actions"><span class="pill green">${xi.length}/11 valgt</span><span class="pill">Reserver: ${bench.length}</span></div></div><section class="card"><div class="notice" style="margin-top:0"><strong>🤖 Assistentens anbefaling</strong><p style="margin:6px 0">Motstander: ${esc(appState.pendingCupMatch?(appState.pendingCupMatch.homeTeam.clubIndex===appState.club?appState.pendingCupMatch.awayTeam.name:appState.pendingCupMatch.homeTeam.name):CLUBS[getNextOpponentIndex()].name)} · ${appState.pendingCupMatch?esc(appState.pendingCupMatch.competition)+' · ':''}forventet formasjon <strong>${appState.pendingCupMatch?'4-3-3':getOpponentFormation(getNextOpponentIndex(),appState.week)}</strong>.</p><p style="margin:6px 0">Foreslått oppsett: <strong>${appState.formation}</strong> · mentalitet <strong>${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</strong>. Elleveren er valgt ut fra posisjon, ferdigheter, form og fysisk tilstand.</p><button type="button" onclick="applyPreMatchRecommendation(true);render()">Bruk anbefalingen på nytt</button></div>${disciplinarySummary()}<div class="notice"><strong>🤝 Samspill og formasjonserfaring</strong><p style="margin:6px 0">Erfaring med ${esc(appState.formation)}: <strong>${formationFamiliarity()}%</strong> · Samspill i laget: <strong>${Number(appState.teamCohesion??25)}%</strong></p><div style="height:7px;background:var(--line);border-radius:8px;overflow:hidden;margin:5px 0 10px"><div style="height:100%;width:${formationFamiliarity()}%;background:var(--green)"></div></div><p style="margin:6px 0;font-size:12px">Formasjonserfaring gir nå bare en liten bonus eller ulempe (omtrent −0,7 til +1,0 ratingpoeng). Samspill vurderes separat. Du kan derfor bytte formasjon uten at laget straffes hardt; stabilitet gir fortsatt en moderat fordel.</p></div><div class="field"><label>FORMASJON</label><select id="formation" onchange="appState.formation=this.value;appState.selectedXI=null;save();render()">${["4-4-2","4-3-3","4-2-3-1","3-5-2"].map(f=>`<option ${appState.formation===f?"selected":""}>${f}</option>`).join("")}</select></div><div class="field"><label>MENTALITET</label><select id="tactic" onchange="appState.tactic=this.value;save()">${["Defensive","Balanced","Attacking","High press"].map(f=>`<option value="${f}" ${appState.tactic===f?"selected":""}>${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[f]}</option>`).join("")}</select></div><div class="section-title"><h2>Startellever</h2><small>${xi.length}/11 spillere</small></div><div style="background:linear-gradient(180deg,#17452f,#123622);border:1px solid #2b6848;border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:#b5e6bf">▲ ANGREP</div>${pitch()}</div><button class="primary" style="width:100%;margin:12px 0 18px" onclick="playMatch()">${appState.pendingCupMatch?`🏆 Avspark – ${esc(appState.pendingCupMatch.competition)}`:'⚽ Avspark – bruk valgt startellever'}</button><div class="section-title"><h2>Velg spillere</h2><small>sortert etter taktisk rolle</small></div><p class="muted" style="font-size:11px">Trykk på listene for å velge hvem som starter. Skadde og suspenderte spillere kan ikke velges.</p><div class="section-title"><h2>Keeper</h2></div>${slotControls(xi.filter(p=>p.assignedRole==='GK'))}<div class="section-title"><h2>Forsvar</h2></div>${slotControls(xi.filter(p=>['LB','LCB','CB','RCB','RB','LWB','RWB'].includes(p.assignedRole)))}<div class="section-title"><h2>Midtbane</h2></div>${slotControls(xi.filter(p=>['DM','CM','LM','RM'].includes(p.assignedRole)))}<div class="section-title"><h2>Angrep</h2></div>${slotControls(xi.filter(p=>['LW','AM','RW','ST'].includes(p.assignedRole)))}<div class="section-title"><h2>Reserver</h2><small>sortert etter taktisk rolle</small></div>${["GK","DEF","MID","ATT"].map(pos=>{const ps=bench.filter(p=>p.pos===pos);return ps.length?`<div class="lineup-section-title">${posLabels[pos]}</div>${ps.map(p=>`<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span> · ${p.rating}</div>${playerDetail(p)}</div><div class="lineup-player-side"><strong>${p.rating}</strong><span>${p.fitness}%</span></div></div>`).join("")}`:""}).join("")}<button class="primary" style="width:100%;margin-top:12px" onclick="playMatch()">${appState.pendingCupMatch?`🏆 Avspark – ${esc(appState.pendingCupMatch.competition)}`:'⚽ Avspark – bruk valgt startellever'}</button></section>`;
 }
 function ensureTransferPool(){
  if(!Array.isArray(appState.freeAgents)||appState.freeAgents.length<60){
@@ -930,7 +930,7 @@ function validEFLTables(){
  return ['Championship','League One','League Two'].every(d=>Array.isArray(appState.lowerLeagues?.[d]?.rows)&&appState.lowerLeagues[d].rows.length===24&&new Set(appState.lowerLeagues[d].rows.map(r=>r.name)).size===24&&!appState.lowerLeagues[d].rows.some(r=>/reserves|u21|under-21/i.test(r.name||'')))&&new Set(names).size===72&&!names.some(n=>CLUBS.some(c=>c.name===n&&clubDivision(c)==='Premier League'))&&!appState.lowerLeagues?.Championship?.rows?.some(r=>r.name==='Plymouth Argyle');
 }
 function initDomesticCompetitions(){
- // v1.76: narrow club-strength spread within each EFL division while preserving saved tables and fixtures.
+ // v1.78: narrow club-strength spread within each EFL division while preserving saved tables and fixtures.
  if(appState.lowerLeagues&&appState.eflBalanceVersion!==2){const baselines={Championship:63,'League One':56,'League Two':49};Object.entries(appState.lowerLeagues).forEach(([div,data])=>(data.rows||[]).forEach(r=>{r.strength=Math.max(40,Math.min(76,Math.round((baselines[div]||49)+((stableSeed(r.name)%9)-4))));}));appState.eflBalanceVersion=2;}
  if(!appState.domesticVersion||appState.domesticVersion<5||!validEFLTables()){
   const strengths={Championship:63,"League One":56,"League Two":49};
@@ -965,7 +965,7 @@ function simulateCompetitionMatch(a,b,competition,roundNo,gameNo){
  return {ga,gb,events:sim.events||[],stats:sim.stats||{},winner:ga>gb?a:b,penalties:sim.ga===sim.gb?true:false};
 }
 function simulateCupRound(name,roundNo){
- const cup=appState.cupCompetitions[name];if(!cup||cup.champion||cup.round>=roundNo)return;
+ const cup=appState.cupCompetitions[name];if(!cup||cup.champion||cup.round>=roundNo||appState.pendingCupMatch)return;
  while(cup.round<roundNo&&!cup.champion){
   const participants=[...cup.teams];if(participants.length<=1){cup.champion=participants[0]?.name||'Ukjent';break;}
   // FA Cup: Premier League clubs enter in the third round proper; EFL clubs enter earlier.
@@ -976,14 +976,71 @@ function simulateCupRound(name,roundNo){
   if(eligible.length<2)eligible=participants;
   const seeded=[...eligible].sort((a,b)=>stableSeed(`${seasonLabel()}|${name}|${cup.round}|${a.name}`)-stableSeed(`${seasonLabel()}|${name}|${cup.round}|${b.name}`));
   const entrants=[...seeded];const bye=entrants.length%2?entrants.pop():null;const winners=[],roundResults=[];
-  for(let i=0;i<entrants.length;i+=2){const a=entrants[i],b=entrants[i+1];const sim=simulateCompetitionMatch(a,b,name,cup.round+1,i/2);const winner=sim.winner;winners.push(winner);roundResults.push({round:cup.round+1,home:a.name,away:b.name,score:`${sim.ga}–${sim.gb}`,winner:winner.name,competition:name,events:sim.events,stats:sim.stats,decidedByPenalties:sim.penalties});}
+  let userPair=null;
+  for(let i=0;i<entrants.length;i+=2){
+   const a=entrants[i],b=entrants[i+1];
+   if(a.clubIndex===appState.club||b.clubIndex===appState.club){userPair={homeTeam:a,awayTeam:b,gameNo:i/2};continue;}
+   const sim=simulateCompetitionMatch(a,b,name,cup.round+1,i/2);const winner=sim.winner;winners.push(winner);roundResults.push({round:cup.round+1,home:a.name,away:b.name,score:`${sim.ga}–${sim.gb}`,winner:winner.name,competition:name,events:sim.events,stats:sim.stats,decidedByPenalties:sim.penalties});
+  }
   if(bye){winners.push(bye);roundResults.push({round:cup.round+1,home:bye.name,away:'—',score:'BYE',winner:bye.name,competition:name,events:[],stats:{}});}
   // Clubs not yet entered remain eligible for the next round.
   const notEntered=participants.filter(t=>!eligible.some(e=>e.name===t.name));
+  if(userPair){
+   appState.pendingCupMatch={competition:name,roundNo:cup.round+1,scheduledWeek:appState.week,homeTeam:{...userPair.homeTeam},awayTeam:{...userPair.awayTeam},roundResults,winners,notEntered,homeName:userPair.homeTeam.name,awayName:userPair.awayTeam.name,createdSeason:appState.seasonYear};
+   appState.log.push(`${name}: ${userPair.homeTeam.name} mot ${userPair.awayTeam.name} venter på at du spiller cupkampen.`);
+   return;
+  }
   cup.results.push(...roundResults);cup.teams=[...winners,...notEntered];cup.round++;
   if(cup.teams.length===1)cup.champion=cup.teams[0].name;
  }
 }
+function shootoutScore(homeStrength,awayStrength){
+ let h=0,a=0;const chance=strength=>Math.max(.58,Math.min(.88,.73+(Number(strength||60)-60)*.003));
+ for(let i=0;i<5;i++){if(Math.random()<chance(homeStrength))h++;if(Math.random()<chance(awayStrength))a++;if(h>a+(4-i))return {home:h,away:a};if(a>h+(4-i))return {home:h,away:a};}
+ let kicks=0;while(h===a&&kicks<20){if(Math.random()<chance(homeStrength))h++;if(Math.random()<chance(awayStrength))a++;kicks++;if(kicks%2===0&&h!==a)break;}
+ if(h===a){if(Number(homeStrength||60)>=Number(awayStrength||60))h++;else a++;}
+ return {home:h,away:a};
+}
+function finishPendingCupMatch(engine,ga,gb){
+ const pending=appState.pendingCupMatch;if(!pending)return null;
+ const cup=appState.cupCompetitions?.[pending.competition];if(!cup)return null;
+ let winnerTeam=ga>gb?pending.homeTeam:gb>ga?pending.awayTeam:null;
+ let penaltyScore=null;
+ if(!winnerTeam){penaltyScore=shootoutScore(pending.homeTeam.strength,pending.awayTeam.strength);winnerTeam=penaltyScore.home>penaltyScore.away?pending.homeTeam:pending.awayTeam;}
+ const score=`${ga}–${gb}${penaltyScore?` (${penaltyScore.home}–${penaltyScore.away} str.)`:''}`;
+ const userResult={round:pending.roundNo,home:pending.homeTeam.name,away:pending.awayTeam.name,score,winner:winnerTeam.name,competition:pending.competition,events:engine.events||[],stats:engine.stats||{},decidedByPenalties:!!penaltyScore,penaltyScore};
+ cup.results.push(...(pending.roundResults||[]),userResult);
+ cup.teams=[...(pending.winners||[]),{...winnerTeam},...(pending.notEntered||[])];
+ cup.round=pending.roundNo;
+ if(cup.teams.length===1)cup.champion=cup.teams[0].name;
+ appState.domesticCalendar=appState.domesticCalendar||[];
+ appState.domesticCalendar.push({week:pending.scheduledWeek||appState.week,competition:pending.competition,...userResult});
+ const text=`${pending.competition} · ${pending.homeTeam.name} ${score} ${pending.awayTeam.name}. Videre: ${winnerTeam.name}.`;
+ appState.log.push(text);appState.pendingCupMatch=null;
+ return {winner:winnerTeam.name,score,penaltyScore,resultText:text,competition:pending.competition};
+}
+function startPendingCupMatch(){if(!appState.pendingCupMatch)return;appState.page='tactics';save();render();window.scrollTo(0,0);}
+function playPendingCupMatch(){
+ const pending=appState.pendingCupMatch;if(!pending)return;
+ const c=currentClub();const userIsHome=pending.homeTeam.clubIndex===appState.club;
+ const opponentTeam=userIsHome?pending.awayTeam:pending.homeTeam;
+ const oppClub=CLUBS.find(x=>x.name===opponentTeam.name);
+ const opp={name:opponentTeam.name,short:oppClub?.short||opponentTeam.name.split(/\\s+/).map(x=>x[0]).join('').slice(0,3).toUpperCase(),crest:oppClub?.crest||'⚽',logo:oppClub?.logo||'',strength:opponentTeam.strength||oppClub?.strength||55};
+ const homeTeam=pending.homeTeam,awayTeam=pending.awayTeam;
+ const homeIsUser=homeTeam.clubIndex===appState.club;
+ const opponentRoster=competitionSquad(opponentTeam).map((p,i)=>({...p,id:`cup-${pending.competition}-${pending.roundNo}-${opponentTeam.name}-${i}`,attributes:{...p.attributes},fitness:100,injured:0,suspended:0}));
+ const playersA=homeIsUser?appState.squad:opponentRoster;
+ const playersB=!homeIsUser?appState.squad:opponentRoster;
+ const engineIdFor=team=>team.clubIndex!=null?team.clubIndex:-(10000+stableSeed(`${pending.competition}|${pending.roundNo}|${team.name}`)%100000);
+ const homeId=engineIdFor(homeTeam),awayId=engineIdFor(awayTeam);
+ const xiA=homeIsUser?currentStartingXI():assignTacticalRoles(createMatchLineup(playersA,'4-3-3',homeTeam.name),'4-3-3');
+ const xiB=!homeIsUser?currentStartingXI():assignTacticalRoles(createMatchLineup(playersB,'4-3-3',awayTeam.name),'4-3-3');
+ const engine=createLiveEngine(homeId,awayId,homeIsUser,playersA,playersB,xiA,xiB,homeIsUser?appState.formation:'4-3-3',!homeIsUser?appState.formation:'4-3-3',{isCupMatch:true,competition:pending.competition,competitionRound:pending.roundNo,teamNames:{A:homeTeam.name,B:awayTeam.name}});
+ const emptyStats={shots:0,shotsAgainst:0,onTarget:0,onTargetAgainst:0,possession:50};
+ showMatch(c,opp,0,0,homeIsUser,'',emptyStats,[],[],[],{},engine,null,new Map(sortedTable().map((team,index)=>[team.name,index+1])));
+ window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40);
+}
+
 function ensureEuropeanCompetitions(reset=false){
  if(!reset&&appState.europeanCompetitions&&appState.europeanSeason===appState.seasonYear)return;
  const table=sortedTable();
@@ -1047,6 +1104,7 @@ function processMidweekCompetitions(round){
   const idx=weeks.indexOf(round);if(idx<0)continue;
   const cup=appState.cupCompetitions[name];if(!cup||cup.champion||cup.round>idx)continue;
   const oldResults=cup.results.length;simulateCupRound(name,idx+1);
+  if(appState.pendingCupMatch?.competition===name)continue;
   const results=cup.results.slice(oldResults).filter(r=>r.round===idx+1);
   const userResult=results.find(r=>r.home===currentClub().name||r.away===currentClub().name);
   if(userResult){
@@ -1064,7 +1122,7 @@ function processMidweekCompetitions(round){
  }
  appState.lastDomesticRound=round;
 }
-function competitions(){initDomesticCompetitions();const cups=appState.cupCompetitions;const latest=(name)=>[...(cups[name]?.results||[])].reverse().slice(0,8);const cupCard=(name)=>{const cup=cups[name],recent=latest(name);return `<section class="card"><div class="section-title"><h2>${name==='EFL Cup'?'🏆 Carabao Cup (EFL Cup)':'🏆 FA Cup'}</h2><span class="pill">${cup.champion?'Avsluttet':`Runde ${Math.max(1,cup.round+1)}`}</span></div><p class="muted">${name==='EFL Cup'?'Knockoutturnering med Premier League og de 72 EFL-klubbene. Kampene legges i midtuker.':'Knockoutturnering med Premier League, EFL og et utvalg ikke-ligaklubber. Tidlige runder og helgekamper.'}</p>${cup.champion?`<div class="notice">Vinner: <strong>${esc(cup.champion)}</strong></div>`:''}${recent.length?recent.map(r=>`<div class="player"><div style="flex:1"><strong>${esc(r.home)}</strong> <span class="muted">vs</span> <strong>${esc(r.away)}</strong><div class="player-meta">${r.score==='BYE'?'Direkte videre':`Resultat ${r.score}${r.decidedByPenalties?' · avgjort etter straffer':''} · Videre: ${esc(r.winner)}`}${r.events?.some(e=>e.type==='goal')?`<div class="player-meta">${r.events.filter(e=>e.type==='goal').map(e=>`${Number(e.minute)||'–'}' ${esc(e.scorer||e.player||'Mål')}`).join(' · ')}</div>`:''}</div></div><span class="pill">R${r.round}</span></div>`).join(''):'<div class="muted">Ingen runder spilt ennå.</div>'}</section>`};const divisions=Object.entries(appState.lowerLeagues).map(([name,d])=>{const rows=[...d.rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));return `<section class="card"><div class="section-title"><h2>${name}</h2><span class="pill">${d.playedRounds}/46 runder</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join('')}</tbody></table></div><div class="muted" style="font-size:11px;margin-top:7px">Topp 2 rykker direkte opp; plass 3–6 spiller playoff. De nederste klubbene kjemper for å unngå nedrykk.</div></section>`});const calendar=(appState.domesticCalendar||[]).slice(-12).reverse();return `<div class="hero"><div class="eyebrow">Domestic competitions · ${seasonLabel()}</div><h1>Ligapyramiden og cuper</h1><p>Premier League, Championship, League One og League Two. FA Cup og EFL Cup spilles på egne midtukedatoer. Cupkampene simuleres parallelt med ligasesongen og belaster spillernes restitusjon.</p><div class="grid"><div class="stat"><small>Divisjoner</small><strong>4</strong></div><div class="stat"><small>Klubber i ligasystemet</small><strong>92</strong></div><div class="stat"><small>FA Cup-runder</small><strong>${cups['FA Cup'].round}</strong></div><div class="stat"><small>EFL Cup-runder</small><strong>${cups['EFL Cup'].round}</strong></div></div></div>${cupCard('EFL Cup')}${cupCard('FA Cup')}${Object.values(appState.europeanCompetitions||{}).map(comp=>`<section class="card"><div class="section-title"><h2>🌍 ${esc(comp.name)}</h2><span class="pill">${comp.finished?'Ferdig':`Runde ${comp.stage+1}`}</span></div><p class="muted">Simulert europeisk utslagsturnering. Kampene bruker samme resultatmodell som nasjonale cupkamper.</p>${comp.champion?`<div class="notice">Vinner: <strong>${esc(comp.champion)}</strong></div>`:''}${comp.results.slice(-6).reverse().map(r=>`<div class="player"><div><strong>${esc(r.home)} ${r.score} ${esc(r.away)}</strong><div class="player-meta">Videre: ${esc(r.winner)} · Runde ${r.round}</div></div></div>`).join('')||'<div class="muted">Ingen europakamper registrert ennå.</div>'}</section>`).join('')}<section class="card"><div class="section-title"><h2>Midtukekalender og belastning</h2><span class="pill">${calendar.length} siste</span></div>${calendar.length?calendar.map(r=>`<div class="player"><div style="flex:1"><strong>Runde ${r.week} · ${esc(r.competition)}</strong><div class="player-meta">${esc(r.home)} ${esc(r.score)} ${esc(r.away)} · Vinner: ${esc(r.winner)}</div></div><span class="pill">Midtuke</span></div>`).join(''):'<p class="muted">Cupkamper vises her når sesongen går fremover.</p>'}<div class="notice">Cupkampene kommer i tillegg til ligakampene. Etter en cupkamp faller utholdenheten i troppen, og enkelte spillere kan pådra seg småskader. Lav utholdenhetsferdighet gir tregere restitusjon. Kalenderen er modellert på vanlige engelske kampuker; eksakte datoer og TV-flyttinger er forenklet.</div></section>${divisions.join('')}`}
+function competitions(){initDomesticCompetitions();const cups=appState.cupCompetitions;const latest=(name)=>[...(cups[name]?.results||[])].reverse().slice(0,8);const cupCard=(name)=>{const cup=cups[name],recent=latest(name);return `<section class="card"><div class="section-title"><h2>${name==='EFL Cup'?'🏆 Carabao Cup (EFL Cup)':'🏆 FA Cup'}</h2><span class="pill">${cup.champion?'Avsluttet':`Runde ${Math.max(1,cup.round+1)}`}</span></div><p class="muted">${name==='EFL Cup'?'Knockoutturnering med Premier League og de 72 EFL-klubbene.':'Knockoutturnering med Premier League, EFL og et utvalg ikke-ligaklubber.'}</p>${appState.pendingCupMatch?.competition===name?`<div class="notice"><strong>Din kamp venter</strong><p>${esc(appState.pendingCupMatch.homeTeam.name)} mot ${esc(appState.pendingCupMatch.awayTeam.name)}. De øvrige oppgjørene er klare, men runden fullføres først når du har spilt.</p><button class="primary" onclick="startPendingCupMatch()">Spill cupkamp →</button></div>`:''}${cup.champion?`<div class="notice">Vinner: <strong>${esc(cup.champion)}</strong></div>`:''}${recent.length?recent.map(r=>`<div class="player"><div style="flex:1"><strong>${esc(r.home)}</strong> <span class="muted">vs</span> <strong>${esc(r.away)}</strong><div class="player-meta">${r.score==='BYE'?'Direkte videre':`Resultat ${r.score}${r.decidedByPenalties?' · avgjort etter straffer':''} · Videre: ${esc(r.winner)}`}${r.events?.some(e=>e.type==='goal')?`<div class="player-meta">${r.events.filter(e=>e.type==='goal').map(e=>`${Number(e.minute)||'–'}' ${esc(e.scorer||e.player||'Mål')}`).join(' · ')}</div>`:''}</div></div><span class="pill">R${r.round}</span></div>`).join(''):'<div class="muted">Ingen runder spilt ennå.</div>'}</section>`};const divisions=Object.entries(appState.lowerLeagues).map(([name,d])=>{const rows=[...d.rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));return `<section class="card"><div class="section-title"><h2>${name}</h2><span class="pill">${d.playedRounds}/46 runder</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join('')}</tbody></table></div><div class="muted" style="font-size:11px;margin-top:7px">Topp 2 rykker direkte opp; plass 3–6 spiller playoff. De nederste klubbene kjemper for å unngå nedrykk.</div></section>`});const calendar=(appState.domesticCalendar||[]).slice(-12).reverse();return `<div class="hero"><div class="eyebrow">Domestic competitions · ${seasonLabel()}</div><h1>Ligapyramiden og cuper</h1><p>Premier League, Championship, League One og League Two. FA Cup og Carabao Cup spilles gjennom sesongen. Ditt cupoppgjør spilles i live-motoren; de øvrige kampene simuleres automatisk.</p><div class="grid"><div class="stat"><small>Divisjoner</small><strong>4</strong></div><div class="stat"><small>Klubber i ligasystemet</small><strong>92</strong></div><div class="stat"><small>FA Cup-runder</small><strong>${cups['FA Cup'].round}</strong></div><div class="stat"><small>EFL Cup-runder</small><strong>${cups['EFL Cup'].round}</strong></div></div></div>${cupCard('EFL Cup')}${cupCard('FA Cup')}${Object.values(appState.europeanCompetitions||{}).map(comp=>`<section class="card"><div class="section-title"><h2>🌍 ${esc(comp.name)}</h2><span class="pill">${comp.finished?'Ferdig':`Runde ${comp.stage+1}`}</span></div><p class="muted">Simulert europeisk utslagsturnering. Kampene bruker samme resultatmodell som nasjonale cupkamper.</p>${comp.champion?`<div class="notice">Vinner: <strong>${esc(comp.champion)}</strong></div>`:''}${comp.results.slice(-6).reverse().map(r=>`<div class="player"><div><strong>${esc(r.home)} ${r.score} ${esc(r.away)}</strong><div class="player-meta">Videre: ${esc(r.winner)} · Runde ${r.round}</div></div></div>`).join('')||'<div class="muted">Ingen europakamper registrert ennå.</div>'}</section>`).join('')}<section class="card"><div class="section-title"><h2>Midtukekalender og belastning</h2><span class="pill">${calendar.length} siste</span></div>${calendar.length?calendar.map(r=>`<div class="player"><div style="flex:1"><strong>Runde ${r.week} · ${esc(r.competition)}</strong><div class="player-meta">${esc(r.home)} ${esc(r.score)} ${esc(r.away)} · Vinner: ${esc(r.winner)}</div></div><span class="pill">Midtuke</span></div>`).join(''):'<p class="muted">Cupkamper vises her når sesongen går fremover.</p>'}<div class="notice">Cupkampene kommer i tillegg til ligakampene. Etter en cupkamp faller utholdenheten i troppen, og enkelte spillere kan pådra seg småskader. Lav utholdenhetsferdighet gir tregere restitusjon. Kalenderen er modellert på vanlige engelske kampuker; eksakte datoer og TV-flyttinger er forenklet.</div></section>`}
 
 function tableZoneClass(division,rank,total){
  if(division==='Premier League')return rank>total-3?'table-zone-relegation':'';
@@ -1079,7 +1137,22 @@ function tableZoneLegend(division){
  bits.push('<span><i class="relegation"></i>Nedrykk</span>');
  return `<div class="table-zone-legend" aria-label="Forklaring på tabellfarger">${bits.join('')}</div>`;
 }
-function league(){let rows=sortedTable(),done=seasonCompleted();return `<div class="hero"><div class="eyebrow">League centre</div><h1>${esc(appState.activeDivision||clubDivision(currentClub()))}</h1><p>Sesong ${seasonLabel()} · ${done?"Sesongen er ferdig":`Runde ${appState.week} · ${appState.played} av ${appState.fixtures.length} runder spilt`}</p><div class="hero-actions"><button class="${appState.leagueView==='players'?'primary':''}" onclick="appState.leagueView='table';render()">Ligatabell</button><button class="${appState.leagueView==='players'?'primary':''}" onclick="appState.leagueView='players';render()">Spillerstatistikk</button>${done?`<button onclick="setPage('season')">Se sesongoppsummering →</button>`:""}</div></div>${appState.leagueView==='players'?leaguePlayerStats():`<div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>V</th><th>U</th><th>T</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${[tableZoneClass(appState.activeDivision||clubDivision(currentClub()),i+1,rows.length),r.name===currentClub().name?"you":""].filter(Boolean).join(" ")}"><td>${i+1}${done?"":movementMarkup((appState.positionChanges||{})[r.name]||0)}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join("")}</tbody></table></div>${tableZoneLegend(appState.activeDivision||clubDivision(currentClub()))}<div class="notice">${done?"Endelig tabell for sesongen. Plasseringene er låst frem til du starter neste sesong.":`Tabellen oppdateres når du spiller kamper. ${esc(appState.activeDivision||clubDivision(currentClub()))} består av ${activeLeagueClubs().length} klubber. Alle møter hverandre hjemme og borte – ${appState.fixtures.length} runder totalt.`}</div>`}`}
+function league(){
+ const active=appState.activeDivision||clubDivision(currentClub());
+ const selected=appState.leagueTableDivision||active;
+ const isMain=selected===active;
+ const done=seasonCompleted();
+ const options=['Premier League','Championship','League One','League Two'];
+ const selector=`<section class="card"><div class="field"><label>VELG DIVISJON</label><select onchange="appState.leagueTableDivision=this.value;render()">${options.map(d=>`<option value="${d}" ${selected===d?'selected':''}>${d}</option>`).join('')}</select></div></section>`;
+ if(appState.leagueView==='players')return `<div class="hero"><div class="eyebrow">League centre</div><h1>Tabell og statistikk</h1><p>Sesong ${seasonLabel()}</p><div class="hero-actions"><button onclick="appState.leagueView='table';render()">Ligatabell</button><button class="primary" onclick="appState.leagueView='players';render()">Spillerstatistikk</button></div></div>${leaguePlayerStats()}`;
+ let rows,playedRounds,totalRounds;
+ if(isMain){rows=sortedTable();playedRounds=appState.played;totalRounds=appState.fixtures.length;}
+ else {const d=appState.lowerLeagues?.[selected];rows=[...(d?.rows||[])].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf);playedRounds=d?.playedRounds||0;totalRounds=46;}
+ const tableMarkup=rows.length?`<div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>V</th><th>U</th><th>T</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${[tableZoneClass(selected,i+1,rows.length),r.name===currentClub().name?'you':''].filter(Boolean).join(' ')}"><td>${i+1}${isMain&&!done?movementMarkup((appState.positionChanges||{})[r.name]||0):''}</td><td>${esc(r.name)}</td><td>${r.p||0}</td><td>${r.w||0}</td><td>${r.d||0}</td><td>${r.l||0}</td><td>${(r.gf||0)-(r.ga||0)}</td><td><b>${r.pts||0}</b></td></tr>`).join('')}</tbody></table></div>`:'<div class="notice">Tabellen er ikke tilgjengelig ennå. Start en ny karriere eller last inn lagringen på nytt.</div>';
+ const isSelectedActive=selected===active;
+ const desc=isSelectedActive?(done?'Endelig tabell for sesongen. Plasseringene er låst frem til neste sesong.':`Tabellen oppdateres når du spiller kamper. ${esc(selected)} består av ${rows.length} klubber. ${totalRounds} runder totalt.`):`${esc(selected)} · ${playedRounds} av ${totalRounds} runder spilt. Tabellen oppdateres av simuleringen av de øvrige divisjonene.`;
+ return `<div class="hero"><div class="eyebrow">League centre</div><h1>Tabell</h1><p>Sesong ${seasonLabel()} · ${isSelectedActive?(done?'Sesongen er ferdig':`Runde ${appState.week} · ${appState.played} av ${appState.fixtures.length} runder spilt`):`${esc(selected)} · ${playedRounds}/${totalRounds} runder`}</p><div class="hero-actions"><button class="primary" onclick="appState.leagueView='table';render()">Ligatabell</button><button onclick="appState.leagueView='players';render()">Spillerstatistikk</button>${done&&isSelectedActive?`<button onclick="setPage('season')">Se sesongoppsummering →</button>`:''}</div></div>${selector}${tableMarkup}${tableZoneLegend(selected)}<div class="notice">${desc}</div>`;
+}
 function leaguePlayerStats(){
  const all=[];
  (appState.worldSquads||[]).forEach((roster,clubIndex)=>{if(clubIndex===appState.club)return;(roster||[]).forEach(p=>all.push({...p,clubName:CLUBS[clubIndex].name}));});
@@ -1210,7 +1283,7 @@ function startSelectedCareer(){
   positionChanges:{},lastSeasonSummary:null,lastRecoveryRound:null,formationExperience:{"4-3-3":20,"4-4-2":20,"4-2-3-1":20,"3-5-2":20},
   teamCohesion:25,lastStartingXI:[],injuryReport:[],discipline:{},medicalHistory:[],lineupRoleVersion:2,managerMode:"needed",
   worldSquads:freshWorld,worldDatabaseVersion:PLAYER_DB_VERSION,leagueFormatVersion:3,fixtures:[],freeAgents:[],lowerLeagues:{},
-  domesticVersion:0,domesticCalendar:[],lastDomesticRound:0,cupCompetitions:null,europeanCompetitions:null,europeanSeason:null,
+  domesticVersion:0,domesticCalendar:[],lastDomesticRound:0,cupCompetitions:null,pendingCupMatch:null,europeanCompetitions:null,europeanSeason:null,
   autoSubs:true,autoSubsPreferenceVersion:1,recommendationRound:null,transferHistory:[],transferOffers:[],transferWindowReports:[],pendingTransferWindowReport:null,lastMatch:null,
   playerStats:{},matchHistory:[],careerHistory:[],seasonStats:{},leagueView:"table",playerStatMetric:"goals",matchdayEvents:[],
   assistantSuggestions:[],managerModePreference:"needed",lastTacticalChangeRound:null
@@ -1370,18 +1443,18 @@ function tacticalShapeBonus(engine,side,kind){
  return 0;
 }
 function averageRating(players,filter){const list=players.filter(filter);return list.length?list.reduce((s,p)=>s+p.rating,0)/list.length:65}
-function createLiveEngine(a,b,homeUser,playersA,playersB,xiA,xiB,formationA="4-3-3",formationB="4-3-3"){
- const userIsA=a===appState.club;
+function createLiveEngine(a,b,homeUser,playersA,playersB,xiA,xiB,formationA="4-3-3",formationB="4-3-3",options={}){
+ const userIsA=a===appState.club;const matchLimit=options.isCupMatch?120:90;
  const stamina={};
  [...xiA,...xiB].forEach(p=>{
   const endurance=Number(p.attributes?.stamina??p.rating??65);
   stamina[String(p.id)]=clamp(86+(playerFitnessValue(p)-85)*.22+(endurance-70)*.12,70,100);
  });
  const engine={
-  a,b,homeUser,userIsA,playersA,playersB,xiA,xiB,formationA,formationB,ga:0,gb:0,events:[],
+  a,b,homeUser,userIsA,playersA,playersB,xiA,xiB,formationA,formationB,...options,ga:0,gb:0,events:[],
   stats:{shotsA:0,shotsB:0,onA:0,onB:0,possessionA:50},
   stamina,lastPossession:50,userSubs:0,userSubWindows:0,lastSubMinute:-1,subbedOutIds:[],sideManagement:{A:{subs:0,windows:0,lastWindow:null,subbedOut:[]},B:{subs:0,windows:0,lastWindow:null,subbedOut:[]}},managerChanges:{A:[],B:[]},minute:0,
-  appearances:Object.fromEntries([...xiA,...xiB].filter(p=>p.id!=null).map(p=>[String(p.id),{player:p,start:0,end:90,started:true}])),
+  appearances:Object.fromEntries([...xiA,...xiB].filter(p=>p.id!=null).map(p=>[String(p.id),{player:p,start:0,end:matchLimit,started:true}])),
   performance:Object.fromEntries([...xiA,...xiB].filter(p=>p.id!=null).map(p=>[String(p.id),{influence:0,events:0,shots:0,goals:0,assists:0}]))
  };
  recomputeLiveTeam(engine,"A");recomputeLiveTeam(engine,"B");
@@ -1426,7 +1499,7 @@ function refreshSubOptions(engine){
 }
 function liveMatchRating(engine,p){
  const perf=engine.performance?.[String(p.id)]||{influence:0,events:0,shots:0,goals:0,assists:0};
- const minutes=Math.max(1,Math.min(90,(engine.minute||0)-(engine.appearances?.[String(p.id)]?.start||0)));
+ const minutes=Math.max(1,Math.min(engine.isCupMatch?120:90,(engine.minute||0)-(engine.appearances?.[String(p.id)]?.start||0)));
  const stamina=matchStamina(engine,p);
  let score=6.15+(effectivePlayerRating(engine,p)-p.rating)*0.055+(stamina-70)*0.012;
  score+=Math.min(1.25,(perf.goals||0)*0.85+(perf.assists||0)*0.55);
@@ -1463,13 +1536,13 @@ function assistantAutoSubs(engine,minute){
   const xiIndex=xi.findIndex(p=>String(p.id)===String(out.id));if(xiIndex<0)continue;
   const currentWindow=engine.lastSubWindowKey===Math.floor(trigger/5);
   if(!currentWindow){engine.userSubWindows++;engine.lastSubWindowKey=Math.floor(trigger/5);engine.lastSubMinute=minute;}
-  engine.subbedOutIds.push(out.id);recordSubstitution(engine,minute,CLUBS[side==='A'?engine.a:engine.b]?.name||'Motstander',out,incoming,'Assistentbytte');
+  engine.subbedOutIds.push(out.id);recordSubstitution(engine,minute,engine.teamNames?.[side]||CLUBS[side==='A'?engine.a:engine.b]?.name||'Motstander',out,incoming,'Assistentbytte');
   xi[xiIndex]=incoming;onPitch.delete(String(out.id));onPitch.add(String(incoming.id));
   const endurance=Number(incoming.attributes?.stamina??incoming.rating??65);
   engine.stamina[String(incoming.id)]=clamp(87+(playerFitnessValue(incoming)-80)*.18+(endurance-70)*.10,72,100);
   engine.performance[String(incoming.id)]={influence:0,events:0,shots:0,goals:0,assists:0};
   const oldAppearance=engine.appearances[String(out.id)];if(oldAppearance)oldAppearance.end=minute;
-  engine.appearances[String(incoming.id)]={player:incoming,start:minute,end:90,started:false};
+  engine.appearances[String(incoming.id)]={player:incoming,start:minute,end:engine.isCupMatch?120:90,started:false};
   engine.userSubs++;done++;
   const container=document.getElementById('liveEvents');if(container){const row=document.createElement('div');row.className='match-event live-event-new sub-event';row.innerHTML=`<div class="event-min">${minute}'</div><div class="event-symbol"><span class="sub-mark sub-in">▲ INN</span><span class="sub-mark sub-out">▼ UT</span></div><div class="event-detail"><strong>${esc(incoming.name)} inn for ${esc(out.name)}</strong><small>Assistentbytte · Karakter ${item.grade.toFixed(1)} · Utholdenhet ${Math.round(item.stamina)}%</small></div>`;container.appendChild(row);}
   const commentary=document.getElementById('liveCommentary');if(commentary)commentary.textContent=`Assistenten bytter: ${incoming.name} erstatter ${out.name} (${item.grade.toFixed(1)} i kampkarakter, ${Math.round(item.stamina)}% utholdenhet).`;
@@ -1480,7 +1553,7 @@ function assistantAutoSubs(engine,minute){
 function sideIsUser(engine,side){return (side==='A'?engine.a:engine.b)===appState.club;}
 function sideData(engine,side){if(!engine.sideManagement)engine.sideManagement={A:{subs:0,windows:0,lastWindow:null,subbedOut:[]},B:{subs:0,windows:0,lastWindow:null,subbedOut:[]}};const d=engine.sideManagement[side];if(sideIsUser(engine,side)){d.subs=Math.max(d.subs||0,engine.userSubs||0);d.windows=Math.max(d.windows||0,engine.userSubWindows||0);d.subbedOut=[...new Set([...(d.subbedOut||[]),...(engine.subbedOutIds||[])])];}return d;}
 function addManagerEvent(engine,side,minute,title,detail,icon='🔁'){
- const team=CLUBS[side==='A'?engine.a:engine.b]?.name||'Motstander';
+ const team=engine.teamNames?.[side]||CLUBS[side==='A'?engine.a:engine.b]?.name||'Motstander';
  const row=document.createElement('div');row.className='match-event live-event-new sub-event';row.innerHTML=`<div class="event-min">${minute}'</div><div class="event-symbol">${icon}</div><div class="event-detail"><strong>${esc(title)}</strong><small>${esc(detail)} · ${esc(team)}</small></div>`;document.getElementById('liveEvents')?.appendChild(row);
  engine.events.push({minute,side,type:'manager',player:title,reason:detail});
 }
@@ -1548,10 +1621,10 @@ function managerAutoSubs(engine,minute){
    const idx=xi.findIndex(p=>String(p.id)===String(out.id));if(idx<0)continue;
    xi[idx]=incoming;data.subbedOut.push(out.id);onPitch.delete(String(out.id));onPitch.add(String(incoming.id));
    const endurance=Number(incoming.attributes?.stamina??incoming.rating??65);engine.stamina[String(incoming.id)]=clamp(88+(playerFitnessValue(incoming)-80)*.18+(endurance-70)*.1,72,100);
-   engine.performance[String(incoming.id)]={influence:0,events:0,shots:0,goals:0,assists:0};engine.appearances[String(out.id)]&&(engine.appearances[String(out.id)].end=minute);engine.appearances[String(incoming.id)]={player:incoming,start:minute,end:90,started:false};
+   engine.performance[String(incoming.id)]={influence:0,events:0,shots:0,goals:0,assists:0};engine.appearances[String(out.id)]&&(engine.appearances[String(out.id)].end=minute);engine.appearances[String(incoming.id)]={player:incoming,start:minute,end:engine.isCupMatch?120:90,started:false};
    data.subs++;done++;
    // Persist the exact player pair and publish one named event per substitution.
-   recordSubstitution(engine,minute,CLUBS[side==='A'?engine.a:engine.b]?.name||'Motstander',out,incoming,'Assistentbytte');
+   recordSubstitution(engine,minute,engine.teamNames?.[side]||CLUBS[side==='A'?engine.a:engine.b]?.name||'Motstander',out,incoming,'Assistentbytte');
    addManagerEvent(engine,side,minute,`${incoming.name} INN for ${out.name} UT`,`Assistentbytte · karakter ${item.grade.toFixed(1)} · utholdenhet ${Math.round(item.stamina)}% · ${data.subs}/5 bytter`,'🔁');
   }
   if(done){data.windows++;if(isUser){engine.userSubs=data.subs;engine.userSubWindows=data.windows;engine.subbedOutIds=data.subbedOut;engine.lastSubMinute=minute;engine.lastSubWindowKey=Math.floor(minute/5);}recomputeLiveTeam(engine,side);if(isUser){refreshSubOptions(engine);renderLiveLineup(engine,minute,document.getElementById('liveScore')?.textContent||`${engine.ga} – ${engine.gb}`);}}
@@ -1647,7 +1720,7 @@ function makeLiveSubstitution(engine,minute){
  engine.userSubs++;
  if(!wasWindow){engine.userSubWindows++;engine.lastSubMinute=minute;engine.lastSubWindowKey=windowKey;}else if(!isHalftime){engine.lastSubMinute=minute;}
  const appearance=engine.appearances[String(outgoing.id)];if(appearance)appearance.end=minute;
- engine.appearances[String(incoming.id)]={player:incoming,start:minute,end:90,started:false};
+ engine.appearances[String(incoming.id)]={player:incoming,start:minute,end:engine.isCupMatch?120:90,started:false};
  recomputeLiveTeam(engine,engine.userIsA?'A':'B');
  const teamName=currentClub().name;
  const row=document.createElement('div');row.className='match-event live-event-new sub-event';
@@ -1675,7 +1748,7 @@ function handleLiveInjury(engine,event,minute){
  injured.injuryType='kamp-skade';
  const appearance=engine.appearances[String(injured.id)];if(appearance)appearance.end=minute;
  const isUser=(side==='A'?engine.a:engine.b)===appState.club;
- const teamName=CLUBS[side==='A'?engine.a:engine.b].name;
+ const teamName=engine.teamNames?.[side]||CLUBS[side==='A'?engine.a:engine.b]?.name||'Motstander';
  const onPitch=new Set(xi.map(p=>String(p.id)));
  let incoming=null;
  if(isUser){
@@ -1699,7 +1772,7 @@ function handleLiveInjury(engine,event,minute){
   }
   engine.stamina[String(incoming.id)]=clamp(90+(playerFitnessValue(incoming)-80)*.2,78,100);
   engine.performance[String(incoming.id)]={influence:0,events:0,shots:0,goals:0,assists:0};
-  engine.appearances[String(incoming.id)]={player:incoming,start:minute,end:90,started:false};
+  engine.appearances[String(incoming.id)]={player:incoming,start:minute,end:engine.isCupMatch?120:90,started:false};
   const row=document.createElement('div');row.className='match-event live-event-new sub-event';row.innerHTML=`<div class="event-min">${minute}'</div><div class="event-symbol"><span class="sub-mark sub-in">▲ INN</span><span class="sub-mark sub-out">▼ UT</span></div><div class="event-detail"><strong>${esc(incoming.name)} inn for ${esc(injured.name)}</strong><small>Skadebytte · ${esc(teamName)}${isUser?` · ${engine.userSubs}/5 bytter, ${engine.userSubWindows}/3 stopp`:''}</small></div>`;document.getElementById('liveEvents')?.appendChild(row);
  }else{
   const idx=xi.findIndex(p=>String(p.id)===String(injured.id));if(idx>=0)xi.splice(idx,1);
@@ -1800,6 +1873,7 @@ function recordSimulatedPlayerStats(clubA,clubB,playersA,playersB,sim){
  update(clubA,playersA,'A');update(clubB,playersB,'B');
 }
 function playMatch(){
+ if(appState.pendingCupMatch){playPendingCupMatch();return;}
  ensureFixtures();
  const round=appState.fixtures.find(f=>f.round===appState.week&&!f.played);
  if(!round){appState.page='season';save();render();return}
@@ -1943,8 +2017,8 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  const clockTick=()=>{
   if(paused||matchFinished)return;
   currentMinute++;
-  status.textContent=currentMinute<=45?`LIVE · ${currentMinute}'`:currentMinute<=90?`LIVE · ${currentMinute}'`:`FULL TIME`;
-  progress.style.width=Math.min(100,currentMinute/90*100)+"%";
+  status.textContent=currentMinute<=90?`LIVE · ${currentMinute}'`:engine.isCupMatch&&currentMinute<=120?`EKSTRAOMGANGER · ${currentMinute}'`:`FULL TIME`;
+  progress.style.width=Math.min(100,currentMinute/(engine.isCupMatch?120:90)*100)+"%";
   const lineupModalLive=document.getElementById('lineupModal');if(lineupModalLive?.classList.contains('open'))renderLiveLineup(engine,currentMinute,score.textContent);
   // Generate the match itself one minute at a time: shots, cards, injuries and goals do not exist until this tick.
   const newEvents=advanceLiveEngine(engine,currentMinute);
@@ -1987,7 +2061,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   // Assistant substitutions happen after injuries from this minute have been handled.
   managerAutoSubs(engine,currentMinute);
   maybeManagerTactics(engine,currentMinute);
-  engine.previousMinute=currentMinute;
+  engine.minute=currentMinute;engine.previousMinute=currentMinute;
   // The live score is the source of truth; tactics selected now affect future minutes.
   engine.ga=engine.ga||0;engine.gb=engine.gb||0;
   currentHome=engine.ga;currentAway=engine.gb;
@@ -2005,25 +2079,31 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   if(currentMinute===46)commentary.textContent="Andre omgang er i gang. Nå skal kampen avgjøres.";
   if(currentMinute===60)commentary.textContent="Siste halvtimen starter. Slitne bein kan gi nye muligheter.";
   if(currentMinute===75)commentary.textContent="Et kvarter igjen. Nå kan hver eneste situasjon bli avgjørende.";
-  if(currentMinute>=90){
+  if(engine.isCupMatch&&currentMinute===90&&engine.ga===engine.gb&&!engine.extraTimeStarted){engine.extraTimeStarted=true;headline.textContent='Uavgjort – ekstraomganger';commentary.textContent=`Det står ${engine.ga}–${engine.gb}. Cupkampen går til ekstraomganger.`;status.textContent="EKSTRAOMGANGER";}
+  const finishThisMatch=engine.isCupMatch?(engine.extraTimeStarted?currentMinute>=120:(currentMinute>=90&&engine.ga!==engine.gb)):currentMinute>=90;
+  if(finishThisMatch){
    matchFinished=true;clearInterval(timer);status.textContent='FULL TIME';controls.style.display='none';const lineupModal=document.getElementById('lineupModal');if(lineupModal)lineupModal.classList.remove('open');
    const ga=engine.ga,gb=engine.gb;
-   applyTableResult(engine.a,engine.b,ga,gb);
-   const fixtureRound=round||appState.fixtures.find(f=>f.round===appState.week&&!f.played);
-   if(fixtureRound){fixtureRound.played=true;fixtureRound.games=fixtureRound.games.map(([a,b])=>a===engine.a&&b===engine.b?[a,b]:[a,b]);}
-   const positionsBefore=previousPositions;
-   const positionsAfter=new Map(sortedTable().map((team,index)=>[team.name,index+1]));
-   appState.positionChanges={};
-   for(const team of appState.table){const oldPos=positionsBefore.get(team.name),newPos=positionsAfter.get(team.name);appState.positionChanges[team.name]=oldPos==null?0:oldPos-newPos;}
+   let cupResolution=null;
+   if(engine.isCupMatch)cupResolution=finishPendingCupMatch(engine,ga,gb);
+   else applyTableResult(engine.a,engine.b,ga,gb);
+   if(!engine.isCupMatch){
+    const fixtureRound=round||appState.fixtures.find(f=>f.round===appState.week&&!f.played);
+    if(fixtureRound){fixtureRound.played=true;fixtureRound.games=fixtureRound.games.map(([a,b])=>a===engine.a&&b===engine.b?[a,b]:[a,b]);}
+    const positionsBefore=previousPositions;
+    const positionsAfter=new Map(sortedTable().map((team,index)=>[team.name,index+1]));
+    appState.positionChanges={};
+    for(const team of appState.table){const oldPos=positionsBefore.get(team.name),newPos=positionsAfter.get(team.name);appState.positionChanges[team.name]=oldPos==null?0:oldPos-newPos;}
+   }
    const userIsA=engine.a===appState.club;
    const userGoals=userIsA?ga:gb, opponentGoals=userIsA?gb:ga;
    const margin=userGoals-opponentGoals;
-   const resultText=`Runde ${appState.week}: ${c.name} ${userGoals}–${opponentGoals} ${opp.name} (${home?'hjemme':'borte'}).`;
-   appState.log.push(resultText);
+   const resultText=engine.isCupMatch?(cupResolution?.resultText||`${engine.competition} · ${c.name} ${userGoals}–${opponentGoals} ${opp.name}.`):`Runde ${appState.week}: ${c.name} ${userGoals}–${opponentGoals} ${opp.name} (${home?'hjemme':'borte'}).`;
+   if(!engine.isCupMatch)appState.log.push(resultText);
    // Match incidents: injuries are uncommon; bookings can accumulate into suspensions.
    const activePlayers=appState.squad.filter(p=>engine.appearances[String(p.id)]&&engine.appearances[String(p.id)].start<90);
    // Discipline is player-specific: yellows accumulate, five bring a one-match ban; red cards cause a ban too.
-   for(const e of engine.events.filter(e=>e.type==="yellow"||e.type==="red")){
+   for(const e of (engine.isCupMatch?[]:engine.events.filter(e=>e.type==="yellow"||e.type==="red"))){
     if(!e.playerId)continue;
     const carded=appState.squad.find(p=>String(p.id)===String(e.playerId));
     if(!carded)continue;
@@ -2036,11 +2116,12 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
      appState.log.push(`${carded.name} er suspendert i neste kamp etter rødt kort.`);
     }
    }
-   recordTeamContinuity();processMidweekCompetitions(appState.week);const aiMoves=processAILeagueTransfers(appState.week);const newOffers=processAITransferOffers(appState.week);payWeeklyWages();const completedWeek=appState.week;appState.week++;appState.played++;if(completedWeek===4||completedWeek===24){appState.transferWindowReports=appState.transferWindowReports||[];const report=buildTransferWindowReport(completedWeek);appState.transferWindowReports.push(report);appState.pendingTransferWindowReport=report;}appState.recommendationRound=null;appState.recommendationInfo=null;
+   let newOffers=[];
+   if(!engine.isCupMatch){recordTeamContinuity();processMidweekCompetitions(appState.week);const aiMoves=processAILeagueTransfers(appState.week);newOffers=processAITransferOffers(appState.week);payWeeklyWages();const completedWeek=appState.week;appState.week++;appState.played++;if(completedWeek===4||completedWeek===24){appState.transferWindowReports=appState.transferWindowReports||[];const report=buildTransferWindowReport(completedWeek);appState.transferWindowReports.push(report);appState.pendingTransferWindowReport=report;}appState.recommendationRound=null;appState.recommendationInfo=null;}
    appState.squad.forEach(p=>{
     // Availability counters are decremented at the next round's team-selection entry, not immediately after the incident.
     const appearance=engine.appearances[String(p.id)];
-    const playedMinutes=appearance?Math.max(0,Math.min(90,Math.min(90,currentMinute)-appearance.start,appearance.end-appearance.start)):0;
+    const matchLimit=engine.isCupMatch?120:90;const playedMinutes=appearance?Math.max(0,Math.min(matchLimit,Math.min(matchLimit,currentMinute)-appearance.start,appearance.end-appearance.start)):0;
     if(playedMinutes>0){
      p.apps=(p.apps||0)+1;p.minutes=(p.minutes||0)+playedMinutes;
      const matchLoad=playedMinutes/90;
@@ -2048,7 +2129,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
      const playerStamina=Number(p.attributes?.stamina??p.rating??60);
      const tacticalLoad=appState.tactic==='High press'?1.35:appState.tactic==='Attacking'?1.12:appState.tactic==='Defensive'?.88:1;
      const lowEndurancePenalty=Math.max(0,70-playerStamina)*.10;
-     const fatigue=Math.round(matchLoad*(10+(100-finalStamina)*.12+lowEndurancePenalty)*tacticalLoad);
+     const fatigue=Math.round(matchLoad*(10+(100-finalStamina)*.12+lowEndurancePenalty)*tacticalLoad*(engine.isCupMatch?1.08:1));
      p.fitness=Math.max(35,Math.min(100,p.fitness-fatigue));
      const perf=engine.performance[String(p.id)];
      const impact=perf?Math.min(.35,perf.goals*.22+perf.assists*.14+perf.shots*.015):0;
@@ -2067,9 +2148,9 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
     if(own&&e.type==='goal'&&e.scorerId){const p=appState.squad.find(x=>x.id===e.scorerId);if(p)p.goals=(p.goals||0)+1;if(e.assist){const ap=appState.squad.find(x=>x.name===e.assist);if(ap)ap.assists=(ap.assists||0)+1}}
     if(own&&e.type==='red'){const p=appState.squad.find(x=>x.id===e.playerId);if(p)p.suspended=1}
    }
-   const lines=margin>0?['Tre poeng!','En sterk lagprestasjon!','Jobben er gjort!']:margin===0?['Delt poeng.','En jevn kamp ender uavgjort.','Ingen klarte å vippe det i sin favør.']:['Tap i dag.','Det glapp på små marginer.','Vi må slå tilbake neste kamp.'];
-   headline.textContent=newOffers.length?'📩 Nytt overgangsbud mottatt':lines[Math.floor(Math.random()*lines.length)];
-   commentary.textContent=`Sluttsignal! ${homeName} ${currentHome}–${currentAway} ${awayName}.${newOffers.length?` ${newOffers.length} nytt bud mottatt – sjekk Overgangsmarked.`:''}`;
+   const lines=margin>0?['Seier!','En sterk lagprestasjon!','Jobben er gjort!']:margin===0?['Uavgjort.','En jevn kamp ender uavgjort.','Ingen klarte å vippe det i sin favør.']:['Tap i dag.','Det glapp på små marginer.','Vi må slå tilbake neste kamp.'];
+   headline.textContent=engine.isCupMatch?(cupResolution?.penaltyScore?`Videre etter straffer! ${cupResolution.winner}`:`Cupkamp ferdig · ${cupResolution?.winner||'Resultat registrert'}`):newOffers.length?'📩 Nytt overgangsbud mottatt':lines[Math.floor(Math.random()*lines.length)];
+   commentary.textContent=engine.isCupMatch?`Sluttsignal! ${homeName} ${currentHome}–${currentAway} ${awayName}. ${cupResolution?.penaltyScore?`Straffer ${cupResolution.penaltyScore.home}–${cupResolution.penaltyScore.away}. `:''}Videre i ${engine.competition}: ${cupResolution?.winner||'–'}.`:`Sluttsignal! ${homeName} ${currentHome}–${currentAway} ${awayName}.${newOffers.length?` ${newOffers.length} nytt bud mottatt – sjekk Overgangsmarked.`:''}`;
    score.textContent=`${currentHome} – ${currentAway}`;progress.style.width='100%';
    // Keep final statistics in the same home-away order as the score, and enforce
    // the match invariant that goals cannot exceed shots on target or total shots.
@@ -2082,7 +2163,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    possession.textContent=`${Math.round(engine.stats.possessionA)}% – ${100-Math.round(engine.stats.possessionA)}%`;
    goalLabel.textContent=`${goalCount} mål`;finalSection.style.display='block';
    const finalText=finalSection.querySelector('p');if(finalText)finalText.textContent=resultText;
-   const continueBtn=finalSection.querySelector('button');if(continueBtn){continueBtn.textContent=seasonCompleted()?'Se sesongoppsummering →':'Fortsett →';continueBtn.setAttribute('onclick',`setPage('${seasonCompleted()?'season':'home'}')`)}
+   const continueBtn=finalSection.querySelector('button');if(continueBtn){continueBtn.textContent=engine.isCupMatch?'Tilbake til cupene →':seasonCompleted()?'Se sesongoppsummering →':'Fortsett →';continueBtn.setAttribute('onclick',`setPage('${engine.isCupMatch?'competitions':seasonCompleted()?'season':'home'}')`)}
    if(saveButton)saveButton.disabled=false;
    save();
    const btn=finalSection.querySelector('button');if(btn)btn.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -2138,7 +2219,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.76 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
+function render(){ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v1.78 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{save();let b=document.getElementById("saveBtn");b.textContent="✓ Lagret";setTimeout(()=>b.textContent="▣ Lagre",1200)});
 if(!load()){init()}else{ensureTransferPool();render()}
