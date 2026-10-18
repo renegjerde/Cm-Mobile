@@ -1,25 +1,15 @@
-# CM Mobile v1.78
+# CM Mobile v1.79
 
-## Nytt i v1.78: spill cupkampene selv
+## Endringer
+- Europacupene inkluderer nå kjente klubber fra flere europeiske land, ikke bare engelske lag.
+- Hver internasjonal klubb har land og en modellert styrkevurdering som påvirker simuleringene.
+- Champions League, Europa League og Conference League starter med engelske kvalifiserte lag blandet med internasjonale klubber.
+- Oppgradert europeisk databasedversjon gjør at konkurransene opprettes på nytt i eksisterende karrierer for gjeldende sesong.
 
-- FA Cup- og Carabao Cup-rundene simulerer ikke lenger managerens oppgjør på forhånd.
-- Når managerens klubb trekkes til en cupkamp, blir den stående som en ventende kamp. De øvrige kampene i runden simuleres.
-- Cupkampen åpnes via laguttaket og spilles i den eksisterende live-kampmotoren.
-- Cupresultatet lagres i riktig turnering, og vinneren går videre. Ligatabellen, ligarunden og ligapoengene endres ikke av cupkampen.
-- Ved uavgjort etter 90 minutter spilles ekstraomganger til 120 minutter. Står det fortsatt uavgjort, avgjøres kampen av en simulert straffesparkkonkurranse, og resultatet vises i cupoversikten.
-- Ventende cupkamp lagres i spilltilstanden slik at den kan fortsettes etter at spillet åpnes igjen.
-- Cupkamper påvirker spillerbelastning og kampstatistikk; ligaens ukeflyt går først videre etter at ligakampen er spilt.
+## Viktige begrensninger
+- Utenlandske spillerstaller er foreløpig modellgenererte, ikke autentiske spiller-for-spiller-databaser.
+- Europeiske turneringer simuleres automatisk; de er ikke ennå spillbare via live-kampmotoren.
+- Kvalifiseringen er forenklet og basert på engelske ligaplasseringer; full UEFA-ligafase, koeffisienter og kvalifiseringsrunder er ikke implementert.
 
-## Tester utført
-
-- JavaScript syntaks kontrollert med `node --check`.
-- Isolert tilstandstest kontrollert at en cup-runde venter på managerens kamp, at cuprunden ikke avanserer før resultatet er registrert, og at ligarunden ikke endres når cupkampen fullføres.
-- Isolert oppsettstest kontrollert at cupkampen oppretter live-kampmotor med korrekt hjemme-/bortelag, turneringsnavn og ventende tilstand.
-
-## Begrensning
-
-Full nettlesertest av hele kampflyten er ikke gjennomført. Testene ovenfor er syntaks- og isolerte logikktester, ikke en full kamp spilt gjennom i en nettleser. Test gjerne fra en ny karriere eller en lagring før neste cup-runde. Tidligere lagringer der laget allerede ble slått ut i en tidligere versjon blir ikke automatisk satt inn igjen i cupen.
-
-## Publisering på GitHub Pages
-
-Publiser `index.html` fra denne mappen som `index.html` i roten av `main`-grenen. GitHub Pages er fortsatt konfigurert til å publisere fra rotmappen; ZIP-mappen er arkiv for versjonen, ikke en mappe som Pages automatisk publiserer.
+## Publisering
+Last opp `index.html` til roten av `main`-grenen i GitHub-repoet. ZIP-arkivet skal ikke brukes som aktiv `index.html`.
