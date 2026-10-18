@@ -190,7 +190,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .cup-accordion>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px}.cup-accordion>summary::-webkit-details-marker{display:none}.cup-accordion>summary:after{content:'⌄';font-size:20px;color:var(--muted);margin-left:auto}.cup-accordion[open]>summary:after{content:'⌃'}.cup-accordion>summary h2{margin:0}.cup-accordion{overflow:hidden}.cup-accordion .section-title{margin-bottom:8px}.cup-accordion>.player{padding:9px 10px;margin:6px 0;gap:8px;align-items:center}.cup-accordion .player-meta{line-height:1.35}.cup-accordion>p.muted{margin:6px 0 10px}.cup-accordion .pill{white-space:nowrap}.cup-accordion .notice{margin:8px 0;padding:10px}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.88</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v1.89</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -1163,6 +1163,29 @@ const CONFERENCE_LEAGUE_POOL=[
  {name:'FC Pyunik',country:'Armenia',strength:58},{name:'The New Saints',country:'Wales',strength:55},{name:'Víkingur Reykjavík',country:'Island',strength:55},{name:'FC Astana',country:'Kasakhstan',strength:62}
 ];
 const EUROPEAN_EXTRA_CLUBS=[...EUROPA_LEAGUE_POOL,...CONFERENCE_LEAGUE_POOL];
+// Confirmed 2026/27 UEFA league-phase participants (36 clubs per competition).
+// Names follow the game database/display names where practical; unmatched clubs receive generated squads.
+const UEFA_2026_27 = {
+ 'Champions League': [
+  'LASK','Sabah','Club Brugge','Slavia Praha','Arsenal','Aston Villa','Liverpool','Manchester City','Manchester United',
+  'Lens','Lille','Paris Saint-Germain','Bayern München','Borussia Dortmund','RB Leipzig','Stuttgart','AEK Athens',
+  'Como','Inter','Napoli','Roma','Feyenoord','PSV Eindhoven','Bodø/Glimt','Viking FK','FC Porto','Sporting CP',
+  'Slovan Bratislava','Atlético Madrid','Barcelona','Real Betis','Real Madrid','Villarreal','Fenerbahçe','Galatasaray','Shakhtar Donetsk'
+ ],
+ 'Europa League': [
+  'Anderlecht','Ararat-Armenia','AZ Alkmaar','Benfica','Beşiktaş','AFC Bournemouth','Celje','Celta','Celtic','Crystal Palace',
+  'Ferencváros','GNK Dinamo','Hapoel Beer-Sheva','Hoffenheim','Jagiellonia Białystok','Juventus','Lech Poznań','Bayer Leverkusen',
+  'Levski Sofia','Lillestrøm','Lyon','Marseille','AC Milan','NEC Nijmegen','OFI Crete','Olympiacos','Omonia Nicosia',
+  'Real Sociedad','Rennes','Red Bull Salzburg','Sunderland','Torreense','Union Saint-Gilloise','Viktoria Plzeň','Sparta Praha','SK Sturm Graz'
+ ],
+ 'Conference League': [
+  'Aarhus','Ajax','Atalanta','Borac','Braga','SK Brann','Brighton & Hove Albion','FC København','Crvena zvezda','CSKA Sofia',
+  'Egnatia','Freiburg','Gent','Getafe','Hajduk Split','Hearts','Iberia Tbilisi','Inter Escaldes','Jablonec','Kairat Almaty',
+  'Kauno Žalgiris','KuPS','Lincoln Red Imps','Lugano','FC Midtjylland','Mjällby','Monaco','FC Nordsjælland','Pafos FC',
+  'Panathinaikos','Riga FC','Sint-Truiden','Thun','Trabzonspor','FC Twente','Universitatea Craiova'
+ ]
+};
+
 function buildEuropeanLeagueSchedule(teams,matchdays,seedKey){
  const unique=[...new Map((teams||[]).filter(t=>t&&t.name).map(t=>[t.name,t])).values()];
  if(unique.length!==36)throw new Error(`European league phase requires exactly 36 unique teams; got ${unique.length}`);
@@ -1214,8 +1237,17 @@ function ensureEuropeanCompetitions(reset=false){
  }
  const valid=hasLeagueData&&Number(appState.europeanDatabaseVersion)===5;
  if(valid){Object.values(appState.europeanCompetitions).forEach(c=>{if(!c.knockout)c.knockout={stageIndex:0,activeStage:null,history:[],playoffWinners:[]};});return;}
+ // Older saves retain their current participants after the opening 2026/27 season.
+ if(hasLeagueData&&Number(appState.europeanDatabaseVersion)===5&&Number(appState.seasonYear)!==2026){appState.europeanDatabaseVersion=6;return;}
  const table=sortedTable();
- const toTeam=(name,division='Premier League')=>{const c=CLUBS.find(x=>x.name===name);const intl=INTERNATIONAL_CLUBS.find(x=>x.name===name)||EUROPEAN_EXTRA_CLUBS.find(x=>x.name===name);return {name,country:intl?.country||c?.city||'England',strength:Number(c?.strength||intl?.strength)||62,clubIndex:c?CLUBS.indexOf(c):null,division:c?clubDivision(c):division,europeanQualified:true,international:!c}};
+ const toTeam=(name,division='Premier League')=>{
+  const aliases={'Manchester City':'Manchester City','Atlético de Madrid':'Atlético Madrid','Paris':'Paris Saint-Germain','Leipzig':'RB Leipzig','Villarreal':'Villarreal','Celta':'Celta','NEC Nijmegen':'N.E.C.','Hapoel Beer-Sheva':'H. Beer-Sheva','Lincoln Red Imps':'L. Red Imps','Riga FC':'Riga','Sint-Truiden':'Sint-Truidense','Universitatea Craiova':'U. Craiova','KuPS':'KuPS Kuopio','Aarhus':'Aarhus','FC København':'Copenhagen','FC Midtjylland':'Midtjylland','FC Nordsjælland':'Nordsjælland','FC Twente':'Twente','SK Brann':'Brann','Brighton & Hove Albion':'Brighton','AFC Bournemouth':'Bournemouth','Red Bull Salzburg':'Salzburg','SK Sturm Graz':'Sturm Graz','Union Saint-Gilloise':'Union SG','Crvena zvezda':'Crvena Zvezda','AC Milan':'Milan','Bayer Leverkusen':'Leverkusen','Atlético Madrid':'Atlético Madrid'};
+  const lookup=aliases[name]||name;
+  const c=CLUBS.find(x=>x.name===name)||CLUBS.find(x=>x.name===lookup);
+  const intl=INTERNATIONAL_CLUBS.find(x=>x.name===name)||EUROPEAN_EXTRA_CLUBS.find(x=>x.name===name)||INTERNATIONAL_CLUBS.find(x=>x.name===lookup)||EUROPEAN_EXTRA_CLUBS.find(x=>x.name===lookup);
+  const countryOverrides={'LASK':'Østerrike','Sabah':'Aserbajdsjan','Lens':'Frankrike','Lille':'Frankrike','Paris Saint-Germain':'Frankrike','Stuttgart':'Tyskland','Como':'Italia','Roma':'Italia','Feyenoord':'Nederland','Viking FK':'Norge','Lillestrøm':'Norge','Celta':'Spania','Real Sociedad':'Spania','Hoffenheim':'Tyskland','Levski Sofia':'Bulgaria','Torreense':'Portugal','Tromsø':'Norge'};
+  return {name,country:countryOverrides[name]||intl?.country||c?.city||'Europa',strength:Number(c?.strength||intl?.strength)||62,clubIndex:c?CLUBS.indexOf(c):null,division:c?clubDivision(c):division,europeanQualified:true,international:!c};
+ };
  const prior=appState.lastSeasonSummary?.europeanPlaces||{};
  const activeIsPremier=clubDivision(CLUBS[appState.club])==='Premier League';
  const premierTable=activeIsPremier?table.filter(r=>clubDivision(CLUBS.find(c=>c.name===r.name))==='Premier League').map(r=>r.name):[];
@@ -1228,7 +1260,7 @@ function ensureEuropeanCompetitions(reset=false){
  const pickEnglish=(list)=>{const out=[];for(const n of list.concat(english)){if(!n||usedEnglish.has(n)||!CLUBS.some(c=>c.name===n&&clubDivision(c)==='Premier League'))continue;out.push(n);usedEnglish.add(n);if(out.length===4)break;}return out;};
  const clNames=pickEnglish(fallbackCL),elNames=pickEnglish(fallbackEL),confNames=pickEnglish(fallbackConf);
  const makeComp=(name,englishNames,foreignPool,matchdays,weeks)=>{
-  const names=[...englishNames,...foreignPool.map(t=>t.name)];
+  const names=Number(appState.seasonYear)===2026&&UEFA_2026_27[name]?[...UEFA_2026_27[name]]:[...englishNames,...foreignPool.map(t=>t.name)];
   const teams=[...new Map(names.map(n=>{const fromForeign=foreignPool.find(t=>t.name===n);return [n,toTeam(n,fromForeign?'Europe':'Premier League')]})).values()];
   // Defensive fill: keep the competition structurally valid even if a saved season's qualifier list is incomplete.
   const available=[...INTERNATIONAL_CLUBS,...EUROPEAN_EXTRA_CLUBS];
@@ -1243,7 +1275,7 @@ function ensureEuropeanCompetitions(reset=false){
   'Europa League':makeComp('Europa League',elNames,EUROPA_LEAGUE_POOL,8,[3,7,11,15,19,25,29,35]),
   'Conference League':makeComp('Conference League',confNames,CONFERENCE_LEAGUE_POOL,6,[3,7,11,15,19,25])
  };
- appState.europeanSeason=appState.seasonYear;appState.europeanDatabaseVersion=5;
+ appState.europeanSeason=appState.seasonYear;appState.europeanDatabaseVersion=6;
 }
 
 function simulateEuropeanStage(comp,week){

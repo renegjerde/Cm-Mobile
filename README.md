@@ -1,18 +1,17 @@
-# CM Mobile v1.88
+# CM Mobile v1.89
 
-## Endringer siden v1.87
-- Returoppgjør i europacupenes utslagsrunder går nå til ekstraomganger hvis sammenlagtresultatet er uavgjort etter 90 minutter.
-- Motstanderlagene bruker også en separat ekstraomgangssimulering ved uavgjort sammenlagt; resultater merkes med «e.e.o.» i sluttspilloversikten.
-- Førsteoppgjør går ikke til ekstraomganger bare fordi selve kampen står uavgjort.
-- Europacupfinalen går til ekstraomganger ved uavgjort etter 90 minutter.
-- Kampmotoren får med seg turneringsfase, tie-ID og kampnummer slik at korrekt regel brukes i livekampen.
-- Engelske cupers eksisterende ekstraomgangsregel er beholdt.
+## Endringer siden v1.88
+- Oppdatert deltakergrunnlaget for Champions League, Europa League og Conference League til de 36 klubbene i hver ligafase for 2026/27, basert på UEFAs publiserte deltakerlister.
+- Beholder 8 kampdager i Champions League og Europa League og 6 kampdager i Conference League.
+- Bruker databasealiaser for å koble enkelte UEFA-navn til eksisterende klubbdata; klubber uten egen spillerstall får fortsatt genererte spillere.
+- Senere sesonger bruker fortsatt spillets kvalifiserings-/simuleringsmodell.
 
 ## Teststatus
-- Automatisk JavaScript-syntakskontroll.
-- Automatisk test av europacupenes ligafase, poengtabell, live-kampflyt og sluttspill.
-- Automatiske tester av når ekstraomganger skal/ikke skal starte, og lagring av kampdata underveis i sluttspillet.
-- Nettleserens fullstendige visuelle gjennomspilling er ikke bekreftet i dette miljøet; test lokalt før publisering.
+- JavaScript-syntakskontroll med Node.js.
+- Kontroll av at hver 2026/27-turnering har nøyaktig 36 unike lag.
+- Kontroll av at de tre listene ikke inneholder engelske klubber i mer enn én turnering.
+- Kontroll av turneringsoppsettets kampdager og at hver runde har 18 kamper.
+- Full visuell nettlesertest må fortsatt gjennomføres lokalt før publisering.
 
 ## Avgrensninger
 - Dersom sammenlagtresultatet fortsatt er uavgjort etter ekstraomgangene, avgjøres europacupoppgjøret med straffespark.
