@@ -1,4 +1,4 @@
-# CM Mobile v1.97
+# CM Mobile v1.98
 
 ## Formål
 
@@ -62,10 +62,18 @@ v1.95 utvider alders- og spillerprofilrettingen fra Premier League til Champions
 Versjon: **1.96**
 
 
-## Nytt i v1.97 – Roter troppen
+## Nytt i v1.98 – Roter troppen
 
 - Ny knapp **Roter troppen** på skjermen for laguttak og taktikk.
 - Setter automatisk en ny ellever med prioritet til tilgjengelige spillere som ikke startet forrige kamp.
 - Velger fortsatt spillere rolle for rolle i valgt formasjon og respekterer posisjonskrav.
 - Skadde og suspenderte spillere kan ikke velges. Hvis det ikke finnes nok andre spillere til en full rotasjon, beholdes tidligere startspillere der det er nødvendig.
 - Etter valget vises hvor mange av de 11 som er nye sammenlignet med forrige kamp.
+
+
+## v1.98 – oppstartsretting
+
+- Oppdatert synlig versjonsmerking til v1.98.
+- Optimalisert oppslag i det innebygde Transfermarkt-registeret ved å indeksere profiler etter normalisert spillernavn. Dette reduserer gjentatte fullskanninger av den store databasen under oppstart og lagbygging.
+- Beholder den innebygde spillerprofil-/fødselsdatabasen og funksjonen «Roter troppen».
+- Kontrollert JavaScript-syntaks og ZIP-struktur. Nettleserbasert ende-til-ende-test er ikke tilgjengelig i dette byggemiljøet.
