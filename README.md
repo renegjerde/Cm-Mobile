@@ -1,8 +1,15 @@
-# CM Mobile v1.95
+# CM Mobile v1.96
 
 ## Formål
 
 v1.95 utvider alders- og spillerprofilrettingen fra Premier League til Championship, League One, League Two og klubbene i Champions League, Europa League og Conference League.
+
+## Hva er endret
+
+- **Nyhet i v1.96:** Hele spillerprofilregisteret (50 100 profiler med gyldig fødselsdato) er bygget inn i `index.html`. Spillerprofiler kan dermed slås opp uten å hente Transfermarkt-CSV ved oppstart.
+- Ved oppstart brukes det innebygde registeret som standard. Nettverksfeil mot Transfermarkt påvirker ikke lenger tilgjengeligheten av grunnregisteret.
+- Profilregisteret brukes til navne-/fødselsdatamatching, men klubbtilhørighet i snapshotet brukes ikke som fasit for 2026/27-tropper.
+- Spillerregisterversjonen er økt for å utløse migrering av eksisterende karrierer. Ta sikkerhetskopi før første oppstart; lagret tropp og statistikk skal beholdes.
 
 ## Hva er endret
 
@@ -13,7 +20,7 @@ v1.95 utvider alders- og spillerprofilrettingen fra Premier League til Champions
 - Spillere som har flyttet klubb etter referansedato kan fremdeles få DOB dersom eksakte navnematcher entydig peker på samme fødselsdato. Ved tvetydige navnematcher avvises koblingen, og alderen forblir ukjent.
 - EFL-tropper og europacupmotstandere kan bygges fra profiler i kilderegisteret når det finnes nok spillere i den aktuelle klubben. Dersom dekningen ikke er tilstrekkelig, beholdes reserve-/kuraterte oppføringer, men en ubekreftet alder blir ikke presentert som fakta.
 - Troppsiden viser om det eksterne registeret er lastet, snapshotdato, antall klubber med minst 12 profiler og hvor mange spillere i den aktive troppen som har DOB.
-- Eksterne data mellomlagres i nettleserens localStorage for å redusere gjentatte nedlastinger. Spillet skal fortsatt kunne starte med reservebasen dersom kilde eller nettverk ikke er tilgjengelig.
+- Profilregisteret for fødselsdatoer er innebygd i spillet. FPL-prestasjonsdata kan fortsatt hentes eksternt, men manglende FPL-tilgang blokkerer ikke det innebygde profilregisteret.
 - Ved migrering av en eksisterende karriere oppdateres alder og referansefelt der spilleren kan matches. Lagets tropp, spiller-ID-er, overganger, statistikk og utvikling skal beholdes. Ubekreftede reserve-/placeholder-spillere får «ukjent alder» i stedet for en tilfeldig alder.
 
 ## Kilder og begrensninger
@@ -34,6 +41,10 @@ v1.95 utvider alders- og spillerprofilrettingen fra Premier League til Champions
 
 ## Teststatus
 
+- Innebygd register: 50 100 spillerprofiler med gyldig ISO-fødselsdato fra det leverte datasettet. Dette er antall kildeprofiler, ikke et løfte om at alle spillere i spillet kan matches entydig.
+- CSV-profilene er fra snapshotet datert 6. juli 2026; dette er ikke en komplett 2026/27-troppdatabase.
+- Kontroll av alle spillernavn i hver divisjon og full visuell nettlesertest gjenstår; spillere som ikke kan matches sikkert skal fortsatt vises med ukjent alder.
+
 - `node --check` for det innebygde JavaScriptet: bestått.
 - Isolerte tester av CSV-parseren: bestått, inkludert navn med komma, aksenter, GB2/GB3/GB4 og europeiske klubbprofiler.
 - Dato-/aldersberegning: 7 tester bestått, inkludert `Mar 7, 2001`, `7 Aug 1998`, ISO-dato, datoformat med tidsdel, og alder ved sesongstart.
@@ -48,4 +59,4 @@ v1.95 utvider alders- og spillerprofilrettingen fra Premier League til Champions
 3. Test en kopi av eksisterende karriere først. Behold separat sikkerhetskopi av tidligere versjon og lagring.
 4. På troppsiden kontrolleres spillerdata-status, kildeprofildekning og antall spillere med bekreftet fødselsdato.
 
-Versjon: **1.95**
+Versjon: **1.96**
