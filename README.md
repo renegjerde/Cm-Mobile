@@ -1,17 +1,19 @@
-# CM Mobile v2.20 — Balanced match discipline
+# CM Mobile v2.21 — One-match squad rotation
 
-## Changes in v2.20
+## Changes in v2.21
 
-- Live-match yellow-card incidents now select the booked team independently of goal/chance dominance. The stronger team is no longer more likely to receive cards simply because its chance probability is higher.
-- The live match and simulated matches retain the same baseline yellow-card event probability. Player selection within the booked team remains weighted toward players more likely to commit fouls.
-- Second-yellow dismissals remain in place: the second yellow is followed by a red card in the same minute, and the player is removed from the active XI.
+- Squad rotation is treated as a one-match decision, not a new default lineup.
+- When the manager uses **Roter troppen** and that rotated XI plays, the assistant recognises that the previous match was rotated.
+- For the following match, the assistant prioritises the best available XI rather than applying another rotation penalty against the rotated starters. Rotation can still be considered later when the opponent is substantially weaker.
+- Existing career and squad data are retained; two small state flags track rotation intent and whether the last played XI was rotated.
 
 ## Validation
 
 - JavaScript syntax checked.
 - ZIP archive integrity checked.
-- Confirmed live yellow-card team selection uses a 50/50 side selection rather than the attack/chance probability. Full browser match testing is still recommended.
+- Logic inspected to confirm the rotation marker is recorded with the XI that actually plays and consumed by the next assistant recommendation.
+- Full browser testing across multiple matches is still recommended.
 
 ## Install
 
-Upload the contents of `CM_Mobile_v2.20/` to the intended location in your GitHub repository. The folder contains `index.html` and this `README.md`. If GitHub Pages publishes from the repository root, the live root `index.html` must still be updated separately.
+Upload the contents of `CM_Mobile_v2.21/` to the intended location in your GitHub repository. The folder contains `index.html` and this `README.md`. If GitHub Pages publishes from the repository root, the live root `index.html` must still be updated separately.
