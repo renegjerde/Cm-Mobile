@@ -1,21 +1,20 @@
-# CM Mobile v2.05 — Touchline Edition
+# CM Mobile v2.06 — Touchline Edition
 
-## Nytt i v2.05 — mer presist overgangssøk
+## Nytt i v2.06 — egen økonomiside
+- Flyttet klubbens økonomioversikt ut av Juniorstall og inn i en egen Økonomi-side i hovedmenyen.
+- Lagt til en kort økonomioppsummering på Oversikt, med netto drift og lønnsramme samt snarvei til detaljene.
+- Økonomisiden viser overgangsbudsjett, driftsinntekter, lønnsutgifter, netto drift, lønnsramme og tilgjengelig lønnsrom.
+- Juniorstall er nå fokusert på akademiets 3–8–8–6-struktur, talenter og kvalifisering for opprykk.
+- Beholdt økonomimodellen og eksisterende lagringsformat; endringen flytter visningene, ikke karrieredataene.
 
-- La til sammenleggbart «Avansert søk» i overgangsmarkedet, slik at grunnvisningen fortsatt er ryddig på mobil.
-- Aldersfilter med nedre og øvre grense. Spillere uten registrert alder utelates når et aldersfilter er aktivt.
-- Eksakt posisjon/rolle, blant annet RB (høyreback), LB, LCB, CB, RCB, vingback, DM, CM, AM, LW, RW og ST. Filteret sjekker primærrolle og registrerte naturlige posisjoner.
-- Maksimal overgangssum og minimumspotensial.
-- Filtrene kombineres med fritekstsøk, bred posisjonsgruppe, spillertilgjengelighet og sortering.
-- «Nullstill avanserte filtre» fjerner bare de avanserte kriteriene.
-
-## Videreført fra v2.04
-- Teknisk spillerdata skjult i sammenleggbart diagnostikkpanel.
-- Klubbløst overgangsmarked, juniorakademi, pre-season, treningsformasjoner, utviklingsregler og karrierelagring.
-- Egen overgangsliste beholdes sammenleggbar, med åpen/lukket status når spillere legges ut for salg.
+## Videreført fra v2.05
+- Avansert overgangssøk med alder, eksakt posisjon, maksimal overgangssum og minimumspotensial.
+- Sammenleggbar egen overgangsliste, med stabil åpen/lukket tilstand.
+- Skjult teknisk spillerdatainformasjon i diagnostikkpanelet.
+- Pre-season, treningsformasjoner, spillerutvikling, klubbløst marked og juniorakademi.
 
 ## Testing
 - JavaScript-syntaks kontrollert med Node.js.
-- Avanserte filtre testet sammen med markedets eksisterende søk og sortering i Chromium.
-- Filtrene er kontrollert for aldersgrenser, rollefiltrering, prisgrense, potensial og nullstilling.
-- Full testing av alle karrieresituasjoner på publisert GitHub Pages er ikke garantert.
+- Oppstart og navigasjon mellom Oversikt, Økonomi og Juniorstall testet i Chromium med den innebygde HTML-filen. Ingen JavaScript-feil under disse visningstestene.
+- Kontrollert at økonomioversikten ikke lenger vises på Juniorstall, og at Økonomi-siden viser de relevante budsjett- og driftsfeltene.
+- Publisering på GitHub Pages og full testing av alle karrieresituasjoner er ikke testet i denne runden.
