@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.12 — Touchline</title>
+<title>CM Mobile v2.14 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -222,7 +222,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(min-width:600px){.tactics-training-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.12</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.14</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -599,7 +599,7 @@ function playerDatabaseStatusHTML(players){
  const unknown=rows.filter(p=>!Number.isFinite(p.age)).length;
  const globals=PLAYER_REFERENCE_STATUS.globalLoaded?`Bredt Transfermarkt-register: ${PLAYER_REFERENCE_STATUS.globalPlayers} relevante profiler · snapshot ${PLAYER_REFERENCE_STATUS.globalSourceDate||TM_GLOBAL_REFERENCE_CUTOFF}`:'Bredt Transfermarkt-register er ikke lastet i denne nettleserøkten';
  const coverage=PLAYER_REFERENCE_STATUS.globalLoaded?`Kildeprofildekning: ${PLAYER_REFERENCE_STATUS.eflClubsWithProfiles||0}/72 EFL-klubber og ${PLAYER_REFERENCE_STATUS.europeanClubsWithProfiles||0}/108 europacupdeltakere har minst 12 profiler i snapshotet.`:'Kildeprofildekning beregnes etter at nettregisteret er lastet.';
- return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.12</strong><div class="player-meta">${esc(sourceLabel)} · ${esc(tmLabel)} · ${esc(globals)}.</div><div class="player-meta">${esc(coverage)}</div><div class="player-meta">Denne troppen: ${esc(ageLabel)} · ${unknown} med ukjent alder · ${tm} med Transfermarkt-profilfelt · ${fpl} med FPL-statistikk.</div><div class="player-meta">Fødselsdatoer brukes til å beregne alder per 22. august ${Number(appState.seasonYear)||2026}. Ukjent alder vises heller enn et tilfeldig estimat. Snapshot 6. juli 2026 gir ikke bekreftet klubbtilhørighet etter datoen. Ferdigheter er spillmodell-estimater.</div></div>`;
+ return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.14</strong><div class="player-meta">${esc(sourceLabel)} · ${esc(tmLabel)} · ${esc(globals)}.</div><div class="player-meta">${esc(coverage)}</div><div class="player-meta">Denne troppen: ${esc(ageLabel)} · ${unknown} med ukjent alder · ${tm} med Transfermarkt-profilfelt · ${fpl} med FPL-statistikk.</div><div class="player-meta">Fødselsdatoer brukes til å beregne alder per 22. august ${Number(appState.seasonYear)||2026}. Ukjent alder vises heller enn et tilfeldig estimat. Snapshot 6. juli 2026 gir ikke bekreftet klubbtilhørighet etter datoen. Ferdigheter er spillmodell-estimater.</div></div>`;
 }
 function squadDiagnosticsPanel(players){
  const rows=Array.isArray(players)?players:[];
@@ -732,7 +732,7 @@ function makeRealPlayer(name,pos,clubIndex,slot,reference={}){
  const ageSource=tmDob?(localDob&&tmDob!==localDob?'Transfermarkt DOB (local DOB conflict flagged)':'Transfermarkt DOB (parsed from source date)'):localDob?'local DOB list (no Transfermarkt DOB match)':'age unverified: no trusted date of birth';
  const attributesSource=fpl?'position archetype + current FPL output + player profile':'position archetype + player profile (no live FPL sample)';
  const fallbackMarketValueM=(Math.max(5,rating-45)**2)/100*(internalAge<23?1.35:internalAge>30?.65:1);const valueM=marketValueM>0?marketValueM*TM_EUR_TO_GAME_CURRENCY_RATE:fallbackMarketValueM;
- return {id:clubIndex*1000+slot+1,name,pos,role,naturalPositions,assignedRole:null,age,dob,ageSource,rating,attributes,potential,value:Math.max(.1,+valueM.toFixed(1)),valueSource:marketValueM>0?'Transfermarkt market value, EUR converted to game currency':'estimated from rating and age',wage:Math.max(2,Math.round((rating-45)*1.15+(club.strength-65)*.5+(club.budget||30)*.025)),fitness:100,morale:75+Math.round(seededRandom(stableSeed(name+'|morale|v192'))()*15),goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,form:fpl&&Number(fpl.minutes)>=180?Math.max(4,Math.min(10,Number(fpl.form)||6.5)):6.5,injured:0,suspended:0,clubIndex,source:reference?.source||(dob?'embedded roster; age calculated from DOB':'embedded roster; some fields model-estimated'),preferredFoot:tm?.foot||'',heightCm:Number(tm?.height)||null,nationality:tm?.nationality||'',transfermarktPosition:tm?.position||'',transfermarktMarketValueEuro:Number(tm?.marketValue)||0,fplStats,referenceData:{fpl:!!fpl,transfermarkt:!!tm,tmReferenceDate:tm?.referenceDate||null},dataQuality:{dobVerified:!!dob,ageCalculatedFromDob:!!dob,ageSource,positionVerified:!!(tm?.position||fpl),clubAffiliationVerified:!!reference?.clubVerified,attributesEstimated:true,attributesSource,transfermarktMatch:!!tm,fplStatsAvailable:!!fpl,marketValueEstimated:!Number(tm?.marketValue),wageEstimated:true}};
+ return {id:clubIndex*1000+slot+1,name,pos,role,naturalPositions,assignedRole:null,age,dob,ageSource,rating,attributes,potential,value:Math.max(.1,+valueM.toFixed(1)),valueSource:marketValueM>0?'Transfermarkt market value, EUR converted to game currency':'estimated from rating and age',wage:Math.max(2,Math.round(((rating-45)*.82+(club.strength-65)*.32+(club.budget||30)*.015)*0.88)),fitness:100,morale:75+Math.round(seededRandom(stableSeed(name+'|morale|v192'))()*15),goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,form:fpl&&Number(fpl.minutes)>=180?Math.max(4,Math.min(10,Number(fpl.form)||6.5)):6.5,injured:0,suspended:0,clubIndex,source:reference?.source||(dob?'embedded roster; age calculated from DOB':'embedded roster; some fields model-estimated'),preferredFoot:tm?.foot||'',heightCm:Number(tm?.height)||null,nationality:tm?.nationality||'',transfermarktPosition:tm?.position||'',transfermarktMarketValueEuro:Number(tm?.marketValue)||0,fplStats,referenceData:{fpl:!!fpl,transfermarkt:!!tm,tmReferenceDate:tm?.referenceDate||null},dataQuality:{dobVerified:!!dob,ageCalculatedFromDob:!!dob,ageSource,positionVerified:!!(tm?.position||fpl),clubAffiliationVerified:!!reference?.clubVerified,attributesEstimated:true,attributesSource,transfermarktMatch:!!tm,fplStatsAvailable:!!fpl,marketValueEstimated:!Number(tm?.marketValue),wageEstimated:true}};
 }
 function refreshPlayerAgeData(player,seasonYear){
  if(!player||!player.name)return player;
@@ -793,8 +793,11 @@ function attributeMarkup(p){
  return `<div class="attrs">${keys.map(k=>`<span class="attr">${ATTRIBUTE_LABELS[k]} ${a[k]}</span>`).join("")}</div>`;
 }
 
-const FINANCE_VERSION=1;
-const WAGE_POLICY_VERSION=1;
+const FINANCE_VERSION=3;
+const WAGE_POLICY_VERSION=3;
+const STADIUMS={"Arsenal":60704,"Manchester City":53400,"Liverpool":61276,"Manchester United":74310,"Chelsea":40341,"Tottenham Hotspur":62850,"Newcastle United":52305,"Aston Villa":42657,"Brighton & Hove Albion":31876,"AFC Bournemouth":11307,"Crystal Palace":25486,"Everton":52888,"Brentford":17250,"Coventry City":32609,"Fulham":29130,"Hull City":25404,"Ipswich Town":30311,"Leeds United":37792,"Nottingham Forest":30445,"Sunderland":48707};
+function clubStadiumCapacity(name,division){if(STADIUMS[name])return STADIUMS[name];const cap=division==='Championship'?22000:division==='League One'?15000:division==='League Two'?10000:6500;return Math.round(cap*(.82+(stableSeed(name+'|stadium')%37)/100));}
+function clubCommercialFactor(name,strength){const top={"Manchester United":1.34,"Manchester City":1.32,"Liverpool":1.30,"Arsenal":1.28,"Chelsea":1.23,"Tottenham Hotspur":1.19,"Newcastle United":1.12};return top[name]||Math.max(.58,Math.min(1.08,.62+(Number(strength||60)-55)*.012));}
 function divisionForClubName(name){
  const registered=CLUBS.find(c=>c.name===name);if(registered)return clubDivision(registered);
  for(const [div,names] of Object.entries(EFL_DIVISIONS))if(names.includes(name))return div;
@@ -803,30 +806,43 @@ function divisionForClubName(name){
 }
 function divisionFactor(div){return div==='Premier League'?1:div==='Championship'?.31:div==='League One'?.12:.055;}
 function baselineFinance(name,strength,div){
- const f=divisionFactor(div),tier=div==='Premier League'?1:div==='Championship'?.64:div==='League One'?.42:.30;
- const wealth=Math.max(.65,Math.pow(Math.max(35,strength)/65,2.15));
- const transfer=+(Math.max(.18, f*wealth*(.75+(stableSeed(name+' transfer')%70)/100))).toFixed(2);
- const wage= Math.round((div==='Premier League'?450:div==='Championship'?125:div==='League One'?42:18)*wealth*(.78+(stableSeed(name+' wages')%45)/100));
+ const f=divisionFactor(div),wealth=Math.max(.58,Math.pow(Math.max(35,strength)/65,2.0));
+ const transfer=+(Math.max(.12,f*wealth*(.75+(stableSeed(name+' transfer')%70)/100))).toFixed(2);
+ const wageBase=div==='Premier League'?430:div==='Championship'?115:div==='League One'?38:16;
+ const wage=Math.round(wageBase*wealth*(.78+(stableSeed(name+' wages')%45)/100));
  return {division:div,transferBudget:transfer,wageBudget:wage,wageBill:0,financialStatus:'stable'};
 }
 function initClubFinances(force=false){
+ const migrating=!!appState.clubFinances&&Number(appState.financeVersion||0)<FINANCE_VERSION;
+ if(migrating&&!appState.financeWageMigration213){
+  // One-time normalization for careers created under the old wage scale; preserve players and contract structure.
+  const all=[...(appState.squad||[]),...(appState.worldSquads||[]).flatMap(r=>r||[]),...Object.values(appState.eflPlayerDatabase||{}).flatMap(d=>Object.values(d||{}).flatMap(r=>r||[]))];
+  const seen=new Set();all.forEach(p=>{if(!p||seen.has(p))return;seen.add(p);p.wage=Math.max(1,Math.round((Number(p.wage)||1)*.78));});
+  appState.financeWageMigration213=true;
+ }
  if(!appState.clubFinances||appState.financeVersion!==FINANCE_VERSION||force){
   const map={};
-  CLUBS.forEach(c=>{const f=baselineFinance(c.name,c.strength,clubDivision(c));map[c.name]=f;});
-  Object.entries(appState.lowerLeagues||{}).forEach(([div,d])=>(d.rows||[]).forEach(c=>{map[c.name]=baselineFinance(c.name,c.strength,div);c.budget=map[c.name].transferBudget;}));
+  CLUBS.forEach(c=>{const f=baselineFinance(c.name,c.strength,clubDivision(c));f.transferBudget=Number(c.budget)||f.transferBudget;map[c.name]=f;});
+  Object.entries(appState.lowerLeagues||{}).forEach(([div,d])=>(d.rows||[]).forEach(c=>{const f=baselineFinance(c.name,c.strength,div);f.transferBudget=Number(c.budget)||f.transferBudget;map[c.name]=f;c.budget=f.transferBudget;}));
   appState.clubFinances=map;appState.financeVersion=FINANCE_VERSION;
  }
- // Keep manager's existing transfer budget as the live value; do not reset it on each render.
  const own=appState.clubFinances[currentClub().name];
- if(own){if(!Number.isFinite(appState.budget))appState.budget=own.transferBudget;own.transferBudget=appState.budget;}
+ if(own){if(!Number.isFinite(appState.budget))appState.budget=Number(own.transferBudget)||Number(currentClub().budget)||0;own.transferBudget=appState.budget;}
  Object.entries(appState.clubFinances).forEach(([name,f])=>{
   let players=[];const ci=CLUBS.findIndex(c=>c.name===name);
-  if(ci>=0)players=appState.worldSquads?.[ci]||[];
+  if(ci>=0)players=ci===Number(appState.club)?(appState.squad||[]):(appState.worldSquads?.[ci]||[]);
   else for(const clubs of Object.values(appState.eflPlayerDatabase||{}))if(clubs[name]){players=clubs[name];break;}
+  f.division=f.division||divisionForClubName(name);
   f.wageBill=players.reduce((sum,p)=>sum+(Number(p.wage)||0),0);
-  const overspend=f.wageBill>f.wageBudget;
-  f.financialStatus=overspend?'under-pressure':'stable';
+  // The initial wage limit is based on the actual squad, with a sensible headroom, not a generic club-strength guess.
+  if(!f.wageBudgetInitialized||force){
+   const base=Number(f.wageBudget)||1;
+   f.wageBudget=Math.max(base,Math.ceil(f.wageBill/0.88));
+   f.wageBudgetInitialized=true;
+  }
+  f.financialStatus=f.wageBill>f.wageBudget?'under-pressure':'stable';
  });
+ appState.financeVersion=FINANCE_VERSION;
 }
 function getClubFinance(name=currentClub().name){initClubFinances();return appState.clubFinances[name]||baselineFinance(name,60,divisionForClubName(name));}
 function adjustWageBudgetsForNewSeason(finalTable,previousSeason){
@@ -835,7 +851,7 @@ function adjustWageBudgetsForNewSeason(finalTable,previousSeason){
  initClubFinances();
  const rank=Math.max(1,(finalTable||[]).findIndex(t=>t.name===currentClub().name)+1);
  const prizeTotal=(appState.prizeLedger||[]).filter(x=>Number(x.season)===Number(previousSeason)).reduce((sum,x)=>sum+(Number(x.amount)||0),0);
- const f=getClubFinance(),div=clubDivision(currentClub()),income=weeklyOperatingRevenueM(div,currentClub().strength);
+ const f=getClubFinance(),div=clubDivision(currentClub()),income=weeklyOperatingRevenueM(div,currentClub().strength,currentClub().name);
  const oldBudget=Math.max(1,Number(f.wageBudget)||1),wageBill=(appState.squad||[]).reduce((sum,p)=>sum+(Number(p.wage)||0),0);
  const cash=Number(appState.budget)||0;
  const divisionBase=div==='Premier League'?450:div==='Championship'?125:div==='League One'?42:18;
@@ -858,6 +874,60 @@ function adjustWageBudgetsForNewSeason(finalTable,previousSeason){
  appState.log.push(`Styret har vurdert lønnsrammen for ${seasonLabel()}: ${target}k/uke (${target>=oldBudget?'+':''}${target-oldBudget}k/uke). Vurderingen bygger på divisjon, inntekter, premiepenger, sluttplassering og økonomisk status.`);
  if(wageBill>target)appState.log.push(`Styreadvarsel: lønnskostnadene er ${Math.round((wageBill-target))}k/uke over den nye lønnsrammen. Rammen økes ikke automatisk for å dekke overskridelsen.`);
  appState.wagePolicyVersion=WAGE_POLICY_VERSION;
+}
+function reviewAllClubFinancesForNewSeason(rankings,previousSeason,movement){
+ // Annual review for every club, not only the human-controlled team. Capture rankings before the league tables reset.
+ initClubFinances();
+ const rankByName=rankings||{};
+ const promoted=new Set(Object.values(movement?.promoted||{}).flat());
+ const relegated=new Set(Object.values(movement?.relegated||{}).flat());
+ const all=[];
+ CLUBS.forEach((c,i)=>all.push({club:c,name:c.name,division:clubDivision(c),roster:i===Number(appState.club)?(appState.squad||[]):(appState.worldSquads?.[i]||[]),isUser:i===Number(appState.club)}));
+ for(const [div,league] of Object.entries(appState.lowerLeagues||{})) for(const c of league.rows||[]){
+  let roster=[];for(const group of Object.values(appState.eflPlayerDatabase?.[div]||{})) if(Array.isArray(group)&&group.length&&group[0]?.clubName===c.name){roster=group;break;}
+  all.push({club:c,name:c.name,division:clubDivision(c)||div,roster,isUser:c.name===currentClub().name});
+ }
+ for(const item of all){
+  const {club,name,roster,isUser}=item;let div=clubDivision(club)||item.division;
+  const f=appState.clubFinances[name]||(appState.clubFinances[name]=baselineFinance(name,club.strength,div));
+  const rankInfo=rankByName[name]||{};const rank=Number(rankInfo.rank)||0;const total=Number(rankInfo.total)||0;
+  const wageBill=(roster||[]).reduce((sum,p)=>sum+(Number(p.wage)||0),0);
+  const revenue=weeklyOperatingRevenueM(div,club.strength,name);
+  const oldBudget=Math.max(1,Number(f.wageBudget)||baselineFinance(name,club.strength,div).wageBudget);
+  const base=div==='Premier League'?450:div==='Championship'?125:div==='League One'?42:18;
+  const strengthFactor=Math.max(.62,Math.min(1.85,Math.pow(Math.max(35,Number(club.strength)||60)/65,2.05)));
+  let target=base*strengthFactor*(.84+(stableSeed(name+'|wage-policy')%33)/100);
+  const incomeFactor=Math.max(.68,Math.min(1.3,.82+revenue/(div==='Premier League'?3.5:div==='Championship'?.85:div==='League One'?.32:.18)));
+  let resultFactor=1;
+  if(rank===1)resultFactor=1.07;else if(rank>0&&rank<=4)resultFactor=1.04;else if(rank>0&&total>0&&rank>=total-2)resultFactor=.94;
+  if(promoted.has(name))resultFactor*=1.12;
+  if(relegated.has(name))resultFactor*=.76;
+  const cash=Math.max(0,Number(club.budget)||0);
+  const cashFactor=cash>60?1.08:cash>25?1.03:cash<5?.86:1;
+  target*=incomeFactor*resultFactor*cashFactor;
+  const oldDiv=f.division||div,divisionChanged=oldDiv!==div||promoted.has(name)||relegated.has(name);
+  if(!divisionChanged)target=Math.max(oldBudget*.84,Math.min(oldBudget*1.2,target));
+  else target=Math.max(target,base*strengthFactor*(promoted.has(name)?1.03:.66));
+  target=Math.max(6,Math.round(target));
+  f.division=div;f.wageBudget=target;f.wageBill=wageBill;f.wageBudgetInitialized=true;f.wageBudgetReviewedSeason=Number(appState.seasonYear)||2027;
+  f.weeklyIncomeM=revenue;f.weeklyNetM=+(revenue-wageBill/1000).toFixed(3);f.financialStatus=wageBill>target?'under-pressure':'stable';
+  // Reputation responds gradually to sustained results, while division changes have a clearer immediate effect.
+  let rep=Number.isFinite(Number(f.reputation))?Number(f.reputation):Math.max(25,Math.min(100,Number(club.strength)||60));
+  if(rankInfo.rank){const midpoint=(total+1)/2;rep+=rank<midpoint?Math.min(2.2,(midpoint-rank)/Math.max(1,total)*3.5):-Math.min(1.8,(rank-midpoint)/Math.max(1,total)*2.8);}
+  if(promoted.has(name))rep+=2.5;if(relegated.has(name))rep-=3.5;
+  rep=Math.max(20,Math.min(100,rep));f.reputation=+rep.toFixed(1);
+  const oldStrength=Number(club.strength)||60;
+  const desired=oldStrength+(rep-oldStrength)*.12+(promoted.has(name)?1.4:0)-(relegated.has(name)?1.8:0);
+  club.strength=Math.max(35,Math.min(92,Math.round(desired*10)/10));
+  // Annual transfer budget is based on club scale, revenue, cash and sporting outcome; not a fixed starter value.
+  const transferBase=div==='Premier League'?Math.max(4,revenue*18):div==='Championship'?Math.max(1.2,revenue*9):div==='League One'?Math.max(.35,revenue*6):Math.max(.12,revenue*4.5);
+  const transferFactor=Math.max(.45,Math.min(1.55,.72+cash/100))*resultFactor;
+  const transfer=+Math.max(.1,Math.min(div==='Premier League'?180:div==='Championship'?45:div==='League One'?12:5,transferBase*transferFactor)).toFixed(2);
+  f.transferBudget=transfer;club.budget=transfer;
+  f.lastSeasonReview={season:Number(previousSeason)||Number(appState.seasonYear)-1,rank,total,division:div,promoted:promoted.has(name),relegated:relegated.has(name),weeklyIncomeM:revenue,wageBill,wageBudget:target,transferBudget:transfer,reputation:f.reputation};
+  if(isUser){appState.budget=Math.max(0,Number(appState.budget)||0);f.transferBudget=appState.budget;club.budget=appState.budget;}
+ }
+ appState.financeVersion=FINANCE_VERSION;appState.wagePolicyVersion=WAGE_POLICY_VERSION;
 }
 const YOUTH_ACADEMY_TARGETS={GK:3,DEF:8,MID:8,ATT:6};
 function makeYouthProspect(clubName,division,idx,season,forcedPos=null){
@@ -951,11 +1021,13 @@ function promoteYouthPlayer(id){
  appState.squad.push(player);if(!Array.isArray(appState.worldSquads[appState.club]))appState.worldSquads[appState.club]=[];appState.worldSquads[appState.club].push({...player,attributes:{...(player.attributes||{})}});
  appState.youthAcademies[clubName].splice(ix,1);appState.log.push(`${youth.name} (${youth.pos}) er hentet opp fra juniorstallen etter beslutning fra manageren.`);save();render();
 }
-function weeklyOperatingRevenueM(division,strength=60){
- // Simplified weekly average of broadcast, sponsorship, matchday and commercial income.
- const base=division==='Premier League'?1.55:division==='Championship'?.34:division==='League One'?.12:.065;
- const level=Math.max(.72,Math.min(1.25,.82+(Number(strength||60)-60)*.012));
- return +(base*level).toFixed(3);
+function weeklyOperatingRevenueM(division,strength=60,clubName=''){
+ // Balanced weekly average: broadcast, sponsorship/commercial and matchday receipts.
+ const base=division==='Premier League'?1.22:division==='Championship'?.255:division==='League One'?.092:.048;
+ const level=Math.max(.68,Math.min(1.30,.80+(Number(strength||60)-60)*.010));
+ const capacity=clubStadiumCapacity(clubName,division),stadium=Math.max(.68,Math.min(1.32,Math.pow(capacity/30000,.34)));
+ const commercial=clubCommercialFactor(clubName,strength);
+ return +(base*level*stadium*commercial).toFixed(3);
 }
 function processWeeklyClubEconomy(){
  initClubFinances();
@@ -965,7 +1037,7 @@ function processWeeklyClubEconomy(){
   const finance=appState.clubFinances[club.name]||(appState.clubFinances[club.name]=baselineFinance(club.name,club.strength,clubDivision(club)));
   const roster=i===userIndex?(appState.squad||[]):(appState.worldSquads?.[i]||[]);
   const weeklyK=roster.reduce((sum,p)=>sum+(Number(p.wage)||0),0),weeklyM=weeklyK/1000;
-  const revenueM=weeklyOperatingRevenueM(clubDivision(club),club.strength),netM=+(revenueM-weeklyM).toFixed(3);
+  const revenueM=weeklyOperatingRevenueM(clubDivision(club),club.strength,club.name),netM=+(revenueM-weeklyM).toFixed(3);
   finance.weeklyIncomeM=revenueM;finance.wageBill=weeklyK;finance.weeklyNetM=netM;finance.weeklyEconomyInitialized=true;
   if(i===userIndex){
    appState.budget=+(Number(appState.budget||0)+netM).toFixed(2);
@@ -985,7 +1057,7 @@ function processWeeklyClubEconomy(){
   for(const club of league.rows||[]){
    const finance=appState.clubFinances[club.name]||(appState.clubFinances[club.name]=baselineFinance(club.name,club.strength,division));
    let roster=[];for(const group of Object.values(appState.eflPlayerDatabase?.[division]||{}))if(Array.isArray(group)&&group.length&&group[0]?.clubName===club.name){roster=group;break;}
-   const weeklyK=roster.reduce((sum,p)=>sum+(Number(p.wage)||0),0),revenueM=weeklyOperatingRevenueM(division,club.strength),netM=+(revenueM-weeklyK/1000).toFixed(3);
+   const weeklyK=roster.reduce((sum,p)=>sum+(Number(p.wage)||0),0),revenueM=weeklyOperatingRevenueM(division,club.strength,club.name),netM=+(revenueM-weeklyK/1000).toFixed(3);
    if(!finance.weeklyEconomyInitializedBefore)club.budget=Number.isFinite(Number(club.budget))?Number(club.budget):Number(finance.transferBudget)||.2;
    club.budget=Math.max(.05,+(Number(club.budget||0)+netM).toFixed(2));finance.transferBudget=club.budget;finance.weeklyIncomeM=revenueM;finance.wageBill=weeklyK;finance.weeklyNetM=netM;finance.weeklyEconomyInitializedBefore=true;
   }
@@ -995,7 +1067,7 @@ function payWeeklyWages(){processWeeklyClubEconomy();}
 function youthPotentialLabel(p){const v=Number(p.potential)||0;return v>=90?'Stortalent':v>=80?'Stort talent':v>=70?'Lovende talent':'Utviklingsspiller';}
 function financePage(){
  const f=getClubFinance();
- const income=Number.isFinite(Number(f.weeklyIncomeM))?Number(f.weeklyIncomeM):weeklyOperatingRevenueM(f.division||clubDivision(currentClub()),currentClub().strength);
+ const income=Number.isFinite(Number(f.weeklyIncomeM))?Number(f.weeklyIncomeM):weeklyOperatingRevenueM(f.division||clubDivision(currentClub()),currentClub().strength,currentClub().name);
  const wageBillK=(appState.squad||[]).reduce((sum,p)=>sum+(Number(p.wage)||0),0);
  const wageExpenseM=wageBillK/1000;
  const netM=+(income-wageExpenseM).toFixed(3);
@@ -1004,7 +1076,7 @@ function financePage(){
  const underPressure=Number(appState.budget)<0||wageBillK>wageBudgetK;
  const status=underPressure?'Under press':'Stabil';
  return `<div class="hero"><div class="eyebrow">Club management · ${seasonLabel()}</div><h1>Økonomi</h1><p>${esc(currentClub().name)} · Oversikt over overgangsbudsjett, lønnsramme og ukentlig drift.</p><div class="squad-summary"><span class="pill ${underPressure?'':'green'}">${status}</span><span class="pill">${wageUse}% av lønnsrammen brukt</span></div><div class="grid"><div class="stat"><small>Overgangsbudsjett</small><strong>${money(appState.budget)}</strong></div><div class="stat"><small>Netto drift / uke</small><strong class="${netM<0?'negative':'positive'}">${money(netM)}</strong></div><div class="stat"><small>Driftsinntekter / uke</small><strong>${money(income)}</strong></div></div></div>
- <section class="card"><div class="section-title"><h2>Ukentlig drift</h2><span class="pill">${status}</span></div><div class="player"><div style="flex:1"><strong>Driftsinntekter</strong><div class="player-meta">TV, sponsor, kampdag og kommersielle inntekter</div></div><b>${money(income)}/uke</b></div><div class="player"><div style="flex:1"><strong>Lønnsutgifter</strong><div class="player-meta">Samlet lønn for førstelaget</div></div><b>${money(wageExpenseM)}/uke</b></div><div class="player"><div style="flex:1"><strong>Netto drift</strong><div class="player-meta">Inntekter minus lønnsutgifter, før overgangsgebyrer</div></div><b class="${netM<0?'negative':'positive'}">${money(netM)}/uke</b></div><div class="notice">Driftsinntektene er en forenklet modell basert på divisjon og klubbens styrke. Overgangsgebyrer påvirker overgangsbudsjettet direkte.</div></section>
+ <section class="card"><div class="section-title"><h2>Ukentlig drift</h2><span class="pill">${status}</span></div><div class="player"><div style="flex:1"><strong>Driftsinntekter</strong><div class="player-meta">TV, sponsor, kommersielt salg og stadionbaserte kampdagsinntekter</div></div><b>${money(income)}/uke</b></div><div class="player"><div style="flex:1"><strong>Lønnsutgifter</strong><div class="player-meta">Samlet lønn for førstelaget</div></div><b>${money(wageExpenseM)}/uke</b></div><div class="player"><div style="flex:1"><strong>Netto drift</strong><div class="player-meta">Inntekter minus lønnsutgifter, før overgangsgebyrer</div></div><b class="${netM<0?'negative':'positive'}">${money(netM)}/uke</b></div><div class="notice">Modellert inntekt bygger på divisjon, klubbens kommersielle størrelse og stadionkapasitet (${clubStadiumCapacity(currentClub().name,clubDivision(currentClub())).toLocaleString('nb-NO')} plasser). Faktisk oppmøte og billettpriser er forenklet i denne spillmodellen. Overgangsgebyrer påvirker overgangsbudsjettet direkte.</div></section>
  <section class="card"><div class="section-title"><h2>Lønnsramme</h2><span class="pill">${wageUse}% brukt</span></div><div class="player"><div style="flex:1"><strong>Lønnsbudsjett</strong><div class="player-meta">Klubbens ukentlige lønnsramme</div></div><b>${money(wageBudgetK/1000)}/uke</b></div><div class="player"><div style="flex:1"><strong>Tilgjengelig lønnsrom</strong><div class="player-meta">Før lønnsrammen overskrides</div></div><b>${money((wageBudgetK-wageBillK)/1000)}/uke</b></div><div style="height:10px;background:#0b1422;border:1px solid var(--line);border-radius:99px;overflow:hidden;margin:12px 0"><div style="height:100%;width:${Math.max(0,Math.min(100,wageUse))}%;background:${underPressure?'var(--red)':'var(--green)'};border-radius:99px"></div></div><p class="muted" style="margin:0">${underPressure?'Lønnskostnadene ligger over rammen eller klubbens budsjett er negativt. Vurder salg eller lavere lønnsforpliktelser.':'Lønnsutgiftene ligger innenfor den beregnede lønnsrammen.'}</p></section>
  <section class="card"><div class="section-title"><h2>Turneringspremier</h2><span class="pill">${(appState.prizeLedger||[]).filter(x=>Number(x.season)===Number(appState.seasonYear)).length} utbetalinger</span></div><p class="muted">Premiepenger føres direkte til overgangsbudsjettet. Deltakelse, resultater og plassering gir ekstra inntekter; beløpene er en balansert spillmodell, ikke en offisiell økonomisk simulering.</p>${(()=>{const rows=(appState.prizeLedger||[]).filter(x=>Number(x.season)===Number(appState.seasonYear)).slice().reverse();const total=rows.reduce((a,x)=>a+(Number(x.amount)||0),0);return `<div class="player"><div style="flex:1"><strong>Premiepenger denne sesongen</strong><div class="player-meta">Deltakelse, seire, avansement og ligaplassering</div></div><b class="positive">+${money(total)}</b></div>${rows.slice(0,10).map(x=>`<div class="player"><div style="flex:1"><strong>${esc(x.label)}</strong><div class="player-meta">${esc(x.detail||'Turneringspremie')}</div></div><b class="positive">+${money(x.amount)}</b></div>`).join('')||'<p class="muted">Premiepenger vises her etter turneringskamper og sesongslutt.</p>'}`})()}</section>
  <section class="card"><div class="section-title"><h2>Overgangsbudsjett</h2><span class="pill">${money(appState.budget)}</span></div><p class="muted">Dette er beløpet klubben kan bruke på overgangsgebyrer. Spillerlønninger føres separat som ukentlige driftsutgifter.</p><button class="primary" style="width:100%" onclick="setPage('transfers')">Gå til overgangsmarkedet →</button></section>`;
@@ -2408,7 +2480,7 @@ function moveClubsBetweenDivisions(){
 }
 function buildGenericRosterForClub(club,index,strength){
  const positions=['GK','GK','DEF','DEF','DEF','DEF','DEF','DEF','MID','MID','MID','MID','MID','MID','ATT','ATT','ATT','ATT','ATT','ATT','DEF','MID','ATT','MID','GK'];
- return positions.map((pos,i)=>{const rating=Math.max(42,Math.min(83,Math.round(strength+(stableSeed(`${club.name}|${i}`)%13)-6)));return {id:index*1000+i+1,name:`${club.name} ${pos==='GK'?'Keeper':pos==='DEF'?'Defender':pos==='MID'?'Midfielder':'Forward'} ${i+1}`,pos,role:defaultRoleFor(`${club.name}-${i}`,pos,i),naturalPositions:naturalPositionsFor(`${club.name}-${i}`,pos,defaultRoleFor(`${club.name}-${i}`,pos,i)),rating,attributes:generateAttributes(pos,rating),potential:Math.min(92,rating+(i%5)+2),age:19+(i*7%16),value:Math.max(.2,+((rating-40)**2/120).toFixed(1)),wage:Math.max(2,Math.round((rating-40)*.8)),fitness:100,morale:72,form:6.5,goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,injured:0,suspended:0,clubIndex:index,source:'Generated lower-division squad'}});
+ return positions.map((pos,i)=>{const rating=Math.max(42,Math.min(83,Math.round(strength+(stableSeed(`${club.name}|${i}`)%13)-6)));return {id:index*1000+i+1,name:`${club.name} ${pos==='GK'?'Keeper':pos==='DEF'?'Defender':pos==='MID'?'Midfielder':'Forward'} ${i+1}`,pos,role:defaultRoleFor(`${club.name}-${i}`,pos,i),naturalPositions:naturalPositionsFor(`${club.name}-${i}`,pos,defaultRoleFor(`${club.name}-${i}`,pos,i)),rating,attributes:generateAttributes(pos,rating),potential:Math.min(92,rating+(i%5)+2),age:19+(i*7%16),value:Math.max(.2,+((rating-40)**2/120).toFixed(1)),wage:Math.max(2,Math.round((rating-40)*.62)),fitness:100,morale:72,form:6.5,goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,injured:0,suspended:0,clubIndex:index,source:'Generated lower-division squad'}});
 }
 function processMidweekCompetitions(round){
  initDomesticCompetitions();if(appState.lastDomesticRound===round)return;
@@ -2557,7 +2629,7 @@ function startNewSeason(){
  const finalTable=sortedTable();
  awardLeaguePositionPrize(finalTable);
  appState.lastSeasonSummary={season:seasonLabel(),division:clubDivision(currentClub()),club:currentClub().name,rank:finalTable.findIndex(t=>t.name===currentClub().name)+1,champion:finalTable[0].name,points:currentClubRecord().pts,cupWinners:Object.fromEntries(Object.entries(appState.cupCompetitions||{}).map(([k,v])=>[k,v.champion])),europeanWinners:Object.fromEntries(Object.entries(appState.europeanCompetitions||{}).map(([k,v])=>[k,v.champion]))};
- const lower=appState.lowerLeagues||{};const sortedLower={};Object.entries(lower).forEach(([div,data])=>{sortedLower[div]=[...data.rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));});const pl=finalTable;appState.lastSeasonSummary.promoted={toChampionship:sortedLower.Championship?.slice(0,3).map(x=>x.name)||[],toLeagueOne:sortedLower['League One']?.slice(0,3).map(x=>x.name)||[],toLeagueTwo:sortedLower['League Two']?.slice(0,3).map(x=>x.name)||[]};appState.lastSeasonSummary.europeanPlaces={championsLeague:pl.slice(0,4).map(x=>x.name),europaLeague:pl.slice(4,6).map(x=>x.name),conferenceLeague:pl.slice(6,8).map(x=>x.name)};
+ const lower=appState.lowerLeagues||{};const sortedLower={};Object.entries(lower).forEach(([div,data])=>{sortedLower[div]=[...data.rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));});const financeRankings={};[...finalTable,...Object.values(sortedLower).flat()].forEach((row,i,allRows)=>{});for(const [div,rows] of Object.entries({'Premier League':finalTable,...sortedLower})){rows.forEach((row,i)=>financeRankings[row.name]={rank:i+1,total:rows.length,division:div});}const pl=finalTable;appState.lastSeasonSummary.promoted={toChampionship:sortedLower.Championship?.slice(0,3).map(x=>x.name)||[],toLeagueOne:sortedLower['League One']?.slice(0,3).map(x=>x.name)||[],toLeagueTwo:sortedLower['League Two']?.slice(0,3).map(x=>x.name)||[]};appState.lastSeasonSummary.europeanPlaces={championsLeague:pl.slice(0,4).map(x=>x.name),europaLeague:pl.slice(4,6).map(x=>x.name),conferenceLeague:pl.slice(6,8).map(x=>x.name)};
  const movement=moveClubsBetweenDivisions();
  appState.lastSeasonSummary.movement=movement;
  appState.seasonYear=(Number(appState.seasonYear)||2026)+1;
@@ -2570,7 +2642,7 @@ function startNewSeason(){
  appState.squad.forEach(p=>{p.goals=0;p.assists=0;p.apps=0;p.minutes=0;p.yellowCards=0;p.redCards=0;p.chancesCreated=0;p.injured=0;p.suspended=0;p.fitness=Math.max(85,p.fitness||90);p.form=6.5;p.morale=Math.max(60,Math.min(95,(p.morale||75)+Math.round(Math.random()*6-3)))});
  if(Array.isArray(appState.worldSquads))appState.worldSquads[appState.club]=(appState.squad||[]).map(p=>({...p,attributes:{...(p.attributes||{})}}));
  appState.activeDivision=clubDivision(CLUBS[appState.club]);appState.table=activeLeagueClubs().map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
- appState.fixtures=[];ensureFixtures();appState.domesticVersion=0;appState.europeanCompetitions=null;appState.europeanSeason=null;appState.cupCompetitions=null;appState.domesticCalendar=[];appState.lastDomesticRound=0;initDomesticCompetitions();initClubFinances(true);adjustWageBudgetsForNewSeason(finalTable,Number(appState.seasonYear)-1);ensureYouthAcademies(true);save();render();
+ appState.fixtures=[];ensureFixtures();appState.domesticVersion=0;appState.europeanCompetitions=null;appState.europeanSeason=null;appState.cupCompetitions=null;appState.domesticCalendar=[];appState.lastDomesticRound=0;initDomesticCompetitions();reviewAllClubFinancesForNewSeason(financeRankings,Number(appState.seasonYear)-1,movement);adjustWageBudgetsForNewSeason(finalTable,Number(appState.seasonYear)-1);ensureYouthAcademies(true);save();render();
 }
 
 function startNewCareer(){
@@ -3573,7 +3645,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.12 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.14 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{const ok=save();let b=document.getElementById("saveBtn");b.textContent=ok?"✓ Lagret":"⚠ Lagring feilet";setTimeout(()=>b.textContent="▣ Lagre",1800)});
 // Load public reference sources before the first database build; the game remains playable without them.
