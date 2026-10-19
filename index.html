@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.25 — Touchline</title>
+<title>CM Mobile v2.27 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -223,7 +223,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(min-width:600px){.tactics-training-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.25</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.27</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -600,7 +600,7 @@ function playerDatabaseStatusHTML(players){
  const unknown=rows.filter(p=>!Number.isFinite(p.age)).length;
  const globals=PLAYER_REFERENCE_STATUS.globalLoaded?`Bredt Transfermarkt-register: ${PLAYER_REFERENCE_STATUS.globalPlayers} relevante profiler · snapshot ${PLAYER_REFERENCE_STATUS.globalSourceDate||TM_GLOBAL_REFERENCE_CUTOFF}`:'Bredt Transfermarkt-register er ikke lastet i denne nettleserøkten';
  const coverage=PLAYER_REFERENCE_STATUS.globalLoaded?`Kildeprofildekning: ${PLAYER_REFERENCE_STATUS.eflClubsWithProfiles||0}/72 EFL-klubber og ${PLAYER_REFERENCE_STATUS.europeanClubsWithProfiles||0}/108 europacupdeltakere har minst 12 profiler i snapshotet.`:'Kildeprofildekning beregnes etter at nettregisteret er lastet.';
- return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.25</strong><div class="player-meta">${esc(sourceLabel)} · ${esc(tmLabel)} · ${esc(globals)}.</div><div class="player-meta">${esc(coverage)}</div><div class="player-meta">Denne troppen: ${esc(ageLabel)} · ${unknown} med ukjent alder · ${tm} med Transfermarkt-profilfelt · ${fpl} med FPL-statistikk.</div><div class="player-meta">Fødselsdatoer brukes til å beregne alder per 22. august ${Number(appState.seasonYear)||2026}. Ukjent alder vises heller enn et tilfeldig estimat. Snapshot 6. juli 2026 gir ikke bekreftet klubbtilhørighet etter datoen. Ferdigheter er spillmodell-estimater.</div></div>`;
+ return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.27</strong><div class="player-meta">${esc(sourceLabel)} · ${esc(tmLabel)} · ${esc(globals)}.</div><div class="player-meta">${esc(coverage)}</div><div class="player-meta">Denne troppen: ${esc(ageLabel)} · ${unknown} med ukjent alder · ${tm} med Transfermarkt-profilfelt · ${fpl} med FPL-statistikk.</div><div class="player-meta">Fødselsdatoer brukes til å beregne alder per 22. august ${Number(appState.seasonYear)||2026}. Ukjent alder vises heller enn et tilfeldig estimat. Snapshot 6. juli 2026 gir ikke bekreftet klubbtilhørighet etter datoen. Ferdigheter er spillmodell-estimater.</div></div>`;
 }
 function squadDiagnosticsPanel(players){
  const rows=Array.isArray(players)?players:[];
@@ -2254,7 +2254,7 @@ function ensureEuropeanCompetitions(reset=false){
  if(hasLeagueData){
   Object.values(appState.europeanCompetitions).forEach(c=>{if(!c.knockout)c.knockout={stageIndex:0,activeStage:null,history:[],playoffWinners:[]};});
   Object.keys(EUROPEAN_LEAGUE_GAMEWEEKS).forEach(name=>alignUpcomingEuropeanWeeks(appState.europeanCompetitions[name],name));
-  appState.europeanDatabaseVersion=9;
+  appState.europeanDatabaseVersion=10;
   return;
  }
  const table=sortedTable();
@@ -2275,14 +2275,19 @@ function ensureEuropeanCompetitions(reset=false){
  const prior=appState.lastSeasonSummary?.europeanPlaces||{};
  const activeIsPremier=clubDivision(CLUBS[appState.club])==='Premier League';
  const premierTable=activeIsPremier?table.filter(r=>clubDivision(CLUBS.find(c=>c.name===r.name))==='Premier League').map(r=>r.name):[];
+ // England's simplified league-phase allocation: 5 Champions League, 3 Europa League,
+ // 1 Conference League. Allocate each club once, using the latest completed league table
+ // first; saved qualifier lists are only a fallback when a live table is unavailable.
  const english=CLUBS.filter(c=>clubDivision(c)==='Premier League').sort((a,b)=>{const ai=premierTable.indexOf(a.name),bi=premierTable.indexOf(b.name);if(ai>=0&&bi>=0)return ai-bi;if(ai>=0)return -1;if(bi>=0)return 1;return b.strength-a.strength||a.name.localeCompare(b.name)}).map(c=>c.name);
  const validPLNames=list=>(Array.isArray(list)?list:[]).filter(n=>CLUBS.some(c=>c.name===n&&clubDivision(c)==='Premier League'));
- const fallbackCL=validPLNames(prior.championsLeague).concat(premierTable.slice(0,4),english);
- const fallbackEL=validPLNames(prior.europaLeague).concat(premierTable.slice(4,8),english);
- const fallbackConf=validPLNames(prior.conferenceLeague).concat(premierTable.slice(8,12),english);
  const usedEnglish=new Set();
- const pickEnglish=(list)=>{const out=[];for(const n of list.concat(english)){if(!n||usedEnglish.has(n)||!CLUBS.some(c=>c.name===n&&clubDivision(c)==='Premier League'))continue;out.push(n);usedEnglish.add(n);if(out.length===4)break;}return out;};
- const clNames=pickEnglish(fallbackCL),elNames=pickEnglish(fallbackEL),confNames=pickEnglish(fallbackConf);
+ const pickEnglish=(preferred,count)=>{const out=[];for(const n of [...preferred,...english]){if(!n||usedEnglish.has(n)||!CLUBS.some(c=>c.name===n&&clubDivision(c)==='Premier League'))continue;out.push(n);usedEnglish.add(n);if(out.length===count)break;}return out;};
+ const clNames=pickEnglish(premierTable.length?premierTable.slice(0,5):validPLNames(prior.championsLeague),5);
+ const faWinner=appState.cupCompetitions?.['FA Cup']?.champion;
+ const eflWinner=appState.cupCompetitions?.['EFL Cup']?.champion;
+ const leagueOrder=premierTable.length?premierTable:english;
+ const elNames=pickEnglish([...(faWinner?[faWinner]:[]),...leagueOrder.slice(5),...validPLNames(prior.europaLeague)],3);
+ const confNames=pickEnglish([...(eflWinner?[eflWinner]:[]),...leagueOrder.slice(5),...validPLNames(prior.conferenceLeague)],1);
  const makeComp=(name,englishNames,foreignPool,matchdays,weeks)=>{
   const names=Number(appState.seasonYear)===2026&&UEFA_2026_27[name]?[...UEFA_2026_27[name]]:[...englishNames,...foreignPool.map(t=>t.name)];
   const teams=[...new Map(names.map(n=>{const fromForeign=foreignPool.find(t=>t.name===n);return [n,toTeam(n,fromForeign?'Europe':'Premier League')]})).values()];
@@ -2299,7 +2304,7 @@ function ensureEuropeanCompetitions(reset=false){
   'Europa League':makeComp('Europa League',elNames,EUROPA_LEAGUE_POOL,8,EUROPEAN_LEAGUE_GAMEWEEKS['Europa League']),
   'Conference League':makeComp('Conference League',confNames,CONFERENCE_LEAGUE_POOL,6,EUROPEAN_LEAGUE_GAMEWEEKS['Conference League'])
  };
- appState.europeanSeason=appState.seasonYear;appState.europeanDatabaseVersion=9;
+ appState.europeanSeason=appState.seasonYear;appState.europeanDatabaseVersion=10;
 }
 
 function simulateEuropeanStage(comp,week){
@@ -2686,7 +2691,7 @@ function startNewSeason(){
  const finalTable=sortedTable();
  awardLeaguePositionPrize(finalTable);
  appState.lastSeasonSummary={season:seasonLabel(),division:clubDivision(currentClub()),club:currentClub().name,rank:finalTable.findIndex(t=>t.name===currentClub().name)+1,champion:finalTable[0].name,points:currentClubRecord().pts,cupWinners:Object.fromEntries(Object.entries(appState.cupCompetitions||{}).map(([k,v])=>[k,v.champion])),europeanWinners:Object.fromEntries(Object.entries(appState.europeanCompetitions||{}).map(([k,v])=>[k,v.champion]))};
- const lower=appState.lowerLeagues||{};const sortedLower={};Object.entries(lower).forEach(([div,data])=>{sortedLower[div]=[...data.rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));});const financeRankings={};[...finalTable,...Object.values(sortedLower).flat()].forEach((row,i,allRows)=>{});for(const [div,rows] of Object.entries({'Premier League':finalTable,...sortedLower})){rows.forEach((row,i)=>financeRankings[row.name]={rank:i+1,total:rows.length,division:div});}const pl=finalTable;appState.lastSeasonSummary.promoted={toChampionship:[],toLeagueOne:[],toLeagueTwo:[]};appState.lastSeasonSummary.europeanPlaces={championsLeague:pl.slice(0,4).map(x=>x.name),europaLeague:pl.slice(4,6).map(x=>x.name),conferenceLeague:pl.slice(6,8).map(x=>x.name)};
+ const lower=appState.lowerLeagues||{};const sortedLower={};Object.entries(lower).forEach(([div,data])=>{sortedLower[div]=[...data.rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));});const financeRankings={};[...finalTable,...Object.values(sortedLower).flat()].forEach((row,i,allRows)=>{});for(const [div,rows] of Object.entries({'Premier League':finalTable,...sortedLower})){rows.forEach((row,i)=>financeRankings[row.name]={rank:i+1,total:rows.length,division:div});}const pl=finalTable;appState.lastSeasonSummary.promoted={toChampionship:[],toLeagueOne:[],toLeagueTwo:[]};appState.lastSeasonSummary.europeanPlaces={championsLeague:pl.slice(0,5).map(x=>x.name),europaLeague:pl.slice(5,8).map(x=>x.name),conferenceLeague:pl.slice(8,9).map(x=>x.name)};
  const movement=moveClubsBetweenDivisions();
  appState.lastSeasonSummary.movement=movement;appState.lastSeasonSummary.promoted={toChampionship:[...(movement.promoted?.Championship||[])],toLeagueOne:[...(movement.promoted?.['League One']||[])],toLeagueTwo:[...(movement.promoted?.['League Two']||[])]};
  appState.seasonYear=(Number(appState.seasonYear)||2026)+1;
@@ -3767,7 +3772,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.25 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.27 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{const ok=save();let b=document.getElementById("saveBtn");b.textContent=ok?"✓ Lagret":"⚠ Lagring feilet";setTimeout(()=>b.textContent="▣ Lagre",1800)});
 // Load public reference sources before the first database build; the game remains playable without them.
