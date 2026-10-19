@@ -1,25 +1,21 @@
-# CM Mobile v2.04 — Touchline Edition
+# CM Mobile v2.05 — Touchline Edition
 
-## Nytt i v2.04 — ryddigere grensesnitt
+## Nytt i v2.05 — mer presist overgangssøk
 
-### Spillerstall
-- Fjernet teknisk spillerkildestatus fra den vanlige startsiden og fra toppen av spillerstallen.
-- Spillerkort viser nå alder, markedsverdi og lønn uten gjentatte tekniske forklaringer om hvordan alderen ble beregnet.
-- Utvidede spillerkort prioriterer ferdigheter, posisjoner, potensial, moral, kampform og statistikk. Rå fødselsdato og kildeetikett vises ikke lenger i det vanlige spillerkortet.
-- Teknisk datakvalitet er fortsatt tilgjengelig nederst på spillerstallsiden under det lukkede panelet «Spillinformasjon og diagnostikk».
-- Diagnostikkpanelet beholder samlet kilde-/dekningstatus og gir en egen utvidbar kontrolliste med fødselsdato og kilde for hver spiller.
+- La til sammenleggbart «Avansert søk» i overgangsmarkedet, slik at grunnvisningen fortsatt er ryddig på mobil.
+- Aldersfilter med nedre og øvre grense. Spillere uten registrert alder utelates når et aldersfilter er aktivt.
+- Eksakt posisjon/rolle, blant annet RB (høyreback), LB, LCB, CB, RCB, vingback, DM, CM, AM, LW, RW og ST. Filteret sjekker primærrolle og registrerte naturlige posisjoner.
+- Maksimal overgangssum og minimumspotensial.
+- Filtrene kombineres med fritekstsøk, bred posisjonsgruppe, spillertilgjengelighet og sortering.
+- «Nullstill avanserte filtre» fjerner bare de avanserte kriteriene.
 
-### Videreført fra v2.03
-- Klubbløst overgangsmarked som oppdateres ved sesongskifte.
-- Juniorakademi med 25 spillere fordelt på 3 keepere, 8 forsvarere, 8 midtbanespillere og 6 angripere.
-- Fire ukers pre-season og tre treningsformasjoner.
-- Spilletid påvirker utvikling og aldersrelatert nedgang.
-- Ingen automatisk juniorforfremmelse ved pensjonering.
-- Sammenleggbar egen overgangsliste som beholder brukerens åpne/lukkede valg.
-- Komprimert karrierelagring med støtte for eldre ukomprimerte JSON-lagringer.
+## Videreført fra v2.04
+- Teknisk spillerdata skjult i sammenleggbart diagnostikkpanel.
+- Klubbløst overgangsmarked, juniorakademi, pre-season, treningsformasjoner, utviklingsregler og karrierelagring.
+- Egen overgangsliste beholdes sammenleggbar, med åpen/lukket status når spillere legges ut for salg.
 
 ## Testing
-- Versjonsmerking kontrollert for v2.04.
-- HTML-/JavaScript-syntaks testes før levering.
-- UI-endringene flytter diagnostikk ut av normal visning uten å slette kilde- eller aldersdataene som brukes til kontroll.
-- En full ende-til-ende-test av alle karrieresituasjoner på publisert GitHub Pages er ikke garantert.
+- JavaScript-syntaks kontrollert med Node.js.
+- Avanserte filtre testet sammen med markedets eksisterende søk og sortering i Chromium.
+- Filtrene er kontrollert for aldersgrenser, rollefiltrering, prisgrense, potensial og nullstilling.
+- Full testing av alle karrieresituasjoner på publisert GitHub Pages er ikke garantert.
