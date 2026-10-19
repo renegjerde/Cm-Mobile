@@ -1,0 +1,93 @@
+﻿Club,Division,ImportedNamedPlayers,MatchesInEmbeddedProfileArchive,FictionalSlotsTo25,CoverageStatus
+AFC Bournemouth,Premier League,25,25,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Arsenal,Premier League,25,24,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Aston Villa,Premier League,25,25,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Brentford,Premier League,25,23,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Brighton & Hove Albion,Premier League,25,24,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Chelsea,Premier League,25,24,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Coventry City,Premier League,25,19,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Crystal Palace,Premier League,25,24,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Everton,Premier League,25,18,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Fulham,Premier League,25,25,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Hull City,Premier League,25,23,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Ipswich Town,Premier League,25,24,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Leeds United,Premier League,25,24,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Liverpool,Premier League,25,24,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Manchester City,Premier League,25,25,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Manchester United,Premier League,25,25,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Newcastle United,Premier League,25,25,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Nottingham Forest,Premier League,25,25,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Sunderland,Premier League,25,23,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Tottenham Hotspur,Premier League,25,24,0,Existing embedded curated list; full official 2026/27 Premier League squad validation still pending
+Birmingham City,Championship,25,20,0,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Blackburn Rovers,Championship,23,14,2,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Bolton Wanderers,Championship,25,14,0,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Bristol City,Championship,25,12,0,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Burnley,Championship,24,9,1,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Cardiff City,Championship,21,13,4,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Charlton Athletic,Championship,25,13,0,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Derby County,Championship,24,12,1,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Lincoln City,Championship,9,0,16,Partial official EFL 2026/27 senior-list extraction embedded; remaining slots are fictional until the full list is imported
+Middlesbrough,Championship,24,15,1,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Millwall,Championship,7,1,18,Partial official EFL 2026/27 senior-list extraction embedded; remaining slots are fictional until the full list is imported
+Norwich City,Championship,24,5,1,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Portsmouth,Championship,22,6,3,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Preston North End,Championship,24,6,1,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Queens Park Rangers,Championship,24,17,1,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Sheffield United,Championship,9,0,16,Partial official EFL 2026/27 senior-list extraction embedded; remaining slots are fictional until the full list is imported
+Southampton,Championship,24,20,1,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Stoke City,Championship,8,1,17,Partial official EFL 2026/27 senior-list extraction embedded; remaining slots are fictional until the full list is imported
+Swansea City,Championship,24,15,1,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Watford,Championship,22,6,3,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+West Bromwich Albion,Championship,23,5,2,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+West Ham United,Championship,8,3,17,Partial official EFL 2026/27 senior-list extraction embedded; remaining slots are fictional until the full list is imported
+Wolverhampton Wanderers,Championship,8,0,17,Partial official EFL 2026/27 senior-list extraction embedded; remaining slots are fictional until the full list is imported
+Wrexham,Championship,21,1,4,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+AFC Wimbledon,League One,14,0,11,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Barnsley,League One,4,3,21,Official EFL 2026/27 list not yet fully imported; legacy seed only
+Blackpool,League One,6,1,19,Partial official EFL 2026/27 senior-list extraction embedded; remaining slots are fictional until the full list is imported
+Bradford City,League One,21,1,4,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Bromley,League One,16,5,9,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Burton Albion,League One,18,5,7,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Cambridge United,League One,18,2,7,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Doncaster Rovers,League One,22,3,3,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Huddersfield Town,League One,21,5,4,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Leicester City,League One,15,3,10,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Leyton Orient,League One,21,11,4,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Luton Town,League One,1,0,24,Partial official EFL 2026/27 senior-list extraction embedded; remaining slots are fictional until the full list is imported
+Mansfield Town,League One,22,2,3,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Milton Keynes Dons,League One,20,0,5,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Notts County,League One,22,1,3,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Oxford United,League One,18,1,7,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Peterborough United,League One,17,0,8,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Plymouth Argyle,League One,19,1,6,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Reading,League One,20,0,5,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Sheffield Wednesday,League One,17,1,8,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Stockport County,League One,21,2,4,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Stevenage,League One,18,1,7,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Wigan Athletic,League One,16,1,9,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Wycombe Wanderers,League One,18,3,7,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Accrington Stanley,League Two,20,3,5,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Barnet,League Two,0,0,25,Official EFL 2026/27 list not yet imported; game currently fills this squad with fictional players
+Bristol Rovers,League Two,19,4,6,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Cheltenham Town,League Two,15,3,10,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Chesterfield,League Two,20,0,5,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Colchester United,League Two,19,1,6,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Crewe Alexandra,League Two,21,0,4,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Crawley Town,League Two,17,0,8,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Exeter City,League Two,14,5,11,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Fleetwood Town,League Two,6,1,19,Partial official EFL 2026/27 senior-list extraction embedded; remaining slots are fictional until the full list is imported
+Gillingham,League Two,16,0,9,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Grimsby Town,League Two,17,0,8,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Newport County,League Two,21,4,4,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Northampton Town,League Two,19,7,6,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Oldham Athletic,League Two,19,3,6,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Port Vale,League Two,22,9,3,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Rochdale,League Two,19,2,6,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Rotherham United,League Two,18,8,7,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Salford City,League Two,22,6,3,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Shrewsbury Town,League Two,19,5,6,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Swindon Town,League Two,21,6,4,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Tranmere Rovers,League Two,19,7,6,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+Walsall,League Two,20,7,5,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated
+York City,League Two,21,5,4,Official EFL 2026/27 senior list fully embedded; individual profiles/attributes may be estimated

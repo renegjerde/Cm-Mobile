@@ -1,36 +1,39 @@
-# CM Mobile v2.30
+# CM Mobile v2.32
 
-## Endringer i v2.30
+## Hva er nytt
 
-- Gjeninnført hele det innebygde, offline spillerprofilarkivet fra den tidligere v1.96-byggen: **50,100 profiler** (snapshotdato 6. juli 2026). Profilene inneholder fødselsdato og øvrige referansefelt der kilden har dem.
-- Spillerarkivet brukes til å matche navn med fødselsdato, posisjon, foretrukket fot, høyde og markedsverdi. Ingen nettforespørsel er nødvendig.
-- Viktig datakvalitetsretting: profilarkivets historiske `currentClubName` brukes **ikke** lenger som fasit for å sette spillere inn i en 2026/27-tropp. En tropp må bygges fra en eksplisitt navneliste; et navnetreff i profilarkivet brukes kun til å berike spilleropplysninger.
-- EFL-klubber som allerede har kuraterte seed-navn får nå disse i en ny, urørt preseason-karriere før den fiktive resten av troppen fylles. Eksisterende sesonger blir ikke byttet ut hvis ligaen allerede er spilt.
-- Spillerdatabaseversjonen er økt til 11, og EFL-databasens versjon til 7 for å kjøre riktige migreringer.
-- Lagt ved `ROSTER_COVERAGE_v2.30.csv`, en ærlig oversikt over hvor mange navngitte spillere som er kuratert per engelsk klubb, hvor mange kan matches mot profilarkivet, og hvor mange plasser fortsatt er fiktive.
+- EFL-divisjonene er oppdatert til det faktiske 2026/27-oppsettet: 24 klubber i hver av Championship, League One og League Two. Dette inkluderer blant annet Wolves, West Ham og Lincoln i Championship, Sheffield Wednesday/Oxford/Leicester i League One og Exeter/Northampton/Port Vale/Rotherham/Shrewsbury i League Two.
+- Spillerlisten er utvidet fra 29 til **61 fullstendig importerte offisielle EFL-seniorlister**, pluss **9 delvise navneuttrekk** fra samme offisielle EFL-publikasjon. Barnet mangler fortsatt en importert seniorliste; Barnsley beholder foreløpig bare et eldre seed-navnegrunnlag. Tre klubber som ikke lenger er i EFL for 2026/27 (Barrow, Harrogate Town og Forest Green Rovers) er tatt ut av EFL-divisjonene.
+- De bekreftede spillerne i de importerte listene blir beholdt. Manglende plasser er tydelig merket som fiktive spillere; ingen spiller presenteres med «ca. 24 år» eller annen omtrentlig alder.
+- Når en offisiell seniorliste finnes, brukes bare navn fra den eksplisitte listen som bevis på medlemskap i 2026/27-troppen. Historiske `currentClubName`-felt i Transfermarkt-profilarkivet brukes ikke som fasit for klubbtilhørighet.
+- For klubber som fortsatt mangler full offisiell liste, brukes ikke historisk klubbtilknytning til å fylle troppen. Bare eldre, eksplisitte seed-navn beholdes (tydelig merket som ubekreftet); resten er fiktive spillere. Profilarkivet beriker navnetreff, men bestemmer ikke hvem som tilhører klubben denne sesongen.
+- Spillerenes profilopplysninger matches lokalt mot det innebygde, offline profilarkivet når navnematchen er trygg. Ingen ekstern nettforespørsel trengs under spilling.
+- `PLAYER_DB_VERSION` er økt til 12 og `EFL_DB_VERSION` til 9 for å utløse riktige oppdateringer i urørte preseason-karrierer. Karriere som allerede er spilt blir ikke automatisk overskrevet.
 
-## Hva dette ikke løser ennå
+## Dekning per nå
 
-Dette er et viktig databasefundament, men det er **ikke** en ferdig, sesongverifisert database med ekte spillertropper for alle 92 engelske klubber. Profilarkivet på 50 100 rader er historisk og inkluderer også tidligere spiller-/klubbtilknytninger; det må ikke forveksles med dagens spillerstall. Premier League-listene og de eksisterende EFL-seedene er fortsatt ujevnt dekket, og den vedlagte CSV-en viser hullene eksplisitt.
+- Engelske klubber i spillet: 92 totalt (20 Premier League + 72 EFL).
+- EFL-seniorlister: 61 fullstendige, 9 delvise, 2 som fortsatt mangler full import (Barnet og Barnsley).
+- Full offisiell kontroll av de 20 Premier League-troppene gjenstår fortsatt.
+- Delvise uttrekk er merket som delvise. Dette er en mellomversjon – den skal ikke omtales som komplett spillerdata for alle 92 klubber.
 
-Neste datasteg er å legge inn en egen `2026/27`-troppstabell med eksplisitte klubber og spiller-ID-er, bygget fra en kilde som tillater gjenbruk. Den bør valideres for 92 unike klubber, spillerduplikater, klubbtilhørighet, fødselsdato, posisjon og troppsstørrelse før den tas i bruk. Etter at en karriere starter, er alle disse dataene innebygd og spillet kjører offline.
+## Kilder
 
-## Kilde og begrensninger
+- EFL, *EFL Squad List 2026/27 & U21 Registered Contract Players*, publisert september 2026: https://images.gc.eflservices.co.uk/c0eadad0-aba0-11f1-ab8f-c3717d4e1e2b.pdf
+- EFL offisielle 2026/27-fixtureoversikt: https://www.efl.com/news/2026/june/25/the-2026-27-efl-fixtures-are-here/
+- Transfermarkt datasett (CC0) brukt bare som historisk profilreferanse: https://github.com/dcaribou/transfermarkt-datasets
 
-- `dcaribou/transfermarkt-datasets`: https://github.com/dcaribou/transfermarkt-datasets
-- Kildens README oppgir CC0 for datasettressursene, men varsler at innsamling/oppdateringer er satt på pause og at 2026/27-troppene ikke er dekket; snapshotet stopper 6. juli 2026.
-- Arkivet brukes derfor som historisk profilreferanse, ikke som fasit for gjeldende tropp.
-- Spillerens ferdigheter og potensial er fortsatt estimater i spillets modell med mindre de er spesifikt satt i spilldatabasen.
+## Tester
 
-## Teststatus
+- JavaScript-syntaks for begge script-blokkene.
+- ZIP-integritet.
+- Node-basert test av alle 72 EFL-klubber: 25 spillere pr. klubb, ingen duplikater i en tropp og alle eksplisitt importerte offisielle navn beholdt.
+- Testresultat: 1 800 spillerplasser; 1 298 navn fra offisielle EFL-lister beholdt, 498 tydelig fiktive spillere og 4 legacy seed-navn med klubbtilhørighet uttrykkelig ubekreftet.
+- Full interaktiv browser-test og full offisiell kontroll av alle 92 klubber er fortsatt utestående.
 
-- Embedded archive: 50,100 unike profil-ID-er; hver rad har en fødselsdato.
-- EFL clubs in roster audit: 72.
-- English clubs in roster audit: 92 (Premier League + de tre EFL-divisjonene).
-- JavaScript-syntaks og ZIP-integritet må kontrolleres før publisering; full sesongverifisering av 92 faktiske tropper gjenstår.
+## Innhold
 
-## Filer
-
-- `index.html` – hele spillet med innebygd spillerprofilarkiv
-- `README.md` – versjonsnotater
-- `ROSTER_COVERAGE_v2.30.csv` – dekningsrevisjon for de 92 engelske klubbene
+- `index.html` – hele spillet, inkludert det innebygde spillerprofilarkivet.
+- `README.md` – versjonsnotater.
+- `ROSTER_2026_27_EFL_OFFICIAL.json` – EFL-navnelister og status per klubb.
+- `ROSTER_COVERAGE_v2.32.csv` – dekningsrapport for 92 engelske klubber.
