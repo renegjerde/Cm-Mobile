@@ -1,50 +1,41 @@
-# CM Mobile v2.02
+# CM Mobile v2.03 — Touchline Edition
 
-## v2.02 – overgangsliste beholder valgt tilstand
-- «Din overgangsliste» husker om brukeren har den åpen eller lukket.
-- Når en spiller legges ut for salg eller tas av markedet, beholdes den valgte tilstanden etter at overgangssiden tegnes på nytt.
-- Dette gjør det mulig å legge flere spillere ut for salg etter hverandre uten å åpne seksjonen på nytt.
-- Seksjonen er fortsatt lukket som standard ved en ny sidelasting/ny økt.
+## Nytt i v2.03
 
-## Prioriterte endringer
+### Klubbløse spillere / overgangsmarked
+- Eksisterende klubbløse spillere beholdes mellom sesongene i stedet for at listen slettes og bygges helt på nytt når den blir liten.
+- Ved nytt sesongskifte oppdateres alderen i den eksisterende frie spillerpoolen, spillere over 37 år fjernes, og det opprettes 20 nye klubbløse spillere.
+- Juniorer som går ut av akademiet fordi de er blitt eldre enn 18 år, frigjøres til det klubbløse markedet dersom de har vært minst én hel sesong i juniorstallen.
 
-### 1. Fire ukers pre-season
-- Nye karrierer starter med fire pre-season-uker før første obligatoriske ligakamp.
-- Hver uke avsluttes fra Oversikt eller Taktikk. Ligarunden står på uke 1 gjennom hele oppkjøringen.
-- I perioden kan manageren hente og selge spillere. Spillerne restituerer seg, og laget bygger gradvis samspill og formasjonskunnskap.
-- Seriekamper kan ikke startes mens pre-season pågår.
-- Når en sesong er ferdig, starter neste sesong med fire nye pre-season-uker.
-- Eldre lagringer med sesongen allerede i gang blir ikke sendt bakover i kalenderen. En urørt lagring på første ligarunde blir migrert til pre-season; ellers gjelder endringen fra neste sesong.
+### Juniorakademi
+- Managerens klubb har en struktur på 25 spillere fordelt på 3 keepere, 8 forsvarere, 8 midtbanespillere og 6 angripere.
+- Akademiet får en blanding av sjeldne stortalenter, store talenter, lovende talenter og utviklingsspillere.
+- Andre klubber har et mindre akademi/pipeline for å begrense størrelsen på spillverdenen og lagringsdataene.
+- Ledige plasser fylles bare ved sesongskifte; de fylles ikke automatisk midt i sesongen.
+- En junior kan ikke hentes opp av manageren før han har vært minst én hel sesong i akademiet. Opprykk krever en uttrykkelig handling og bekreftelse fra manageren.
+- Når en junior blir eldre enn 18 år etter å ha oppfylt minimumstiden, frigis spilleren på fri transfer i stedet for å bli lagt automatisk i A-stallen.
+- Kvalifiserte juniorer i andre klubbers akademier kan bli kjøpt, og AI-klubber kan gi bud på kvalifiserte spillere i managerens akademi.
 
-### 2. Tre formasjoner i trening
-- Manageren velger tre ulike formasjoner under Taktikk.
-- Formasjonene bygges gradvis inn gjennom pre-season og kampsesongen.
-- Formasjonen som faktisk brukes i kamp, får en ekstra erfaringsøkning.
-- Assistentens anbefaling velger bare blant de tre formasjonene manageren har satt opp. Manageren kan fortsatt overstyre og velge en annen formasjon til den enkelte kampen.
+### Lagring
+- Karrieredata lagres komprimert (`CMZ1:`) for å redusere belastningen på nettleserens lokale lagring.
+- Eldre, ukomprimerte JSON-lagringer kan fortsatt leses.
+- Lagreknappen varsler dersom lagringen faktisk feiler.
 
-### 3. Spilletid, utvikling og aldring
-- Unge spillere med potensial utvikler seg med større sannsynlighet når de får kampminutter. Benk og manglende spilletid gir betydelig lavere utviklingsmulighet.
-- For eldre spillere reduserer høy spilletid fra forrige sesong sannsynligheten for ferdighetsfall. Naturlig aldersnedgang er fortsatt mulig.
-- Utvikling og aldring beregnes gradvis; én kamp gir ikke automatisk en stor ferdighetsøkning.
+### Videreført fra tidligere versjoner
+- Fire ukers pre-season.
+- Tre treningsformasjoner med gradvis innarbeiding.
+- Spilletid påvirker utvikling og aldersrelatert nedgang.
+- Ingen automatisk juniorforfremmelse ved pensjonering.
+- Sammenleggbar egen overgangsliste som beholder brukerens åpne/lukkede valg.
 
-### 4. Pensjonering og junioropprykk
-- Spillere som legger opp fjernes fra troppen uten at det genereres automatiske «Academy Promotion/Prospect»-erstattere.
-- En ledig plass i troppen blir stående åpen til manageren foretar en beslutning.
-- Juniorstallen har en egen «Hent opp til førstelaget»-handling for spillere som er minst 16 år. Spilleren flyttes fra juniorstallen til førstelaget først etter bekreftelse.
-- Manageren kan i stedet fylle plassen via overgangsmarkedet.
+## Testing
 
-## Videreført fra v2.00
-- Sammenleggbar «Din overgangsliste» på overgangssiden, lukket som standard.
-- Spillermarkedsfilter og søk.
-- Avgrenset, innebygd spillerregister og funksjonen «Roter troppen».
+Kontrollert i Chromium med en mobil viewport:
+- JavaScript-syntaks for begge scriptblokkene.
+- Juniorfordeling 3–8–8–6 og totalt 25 i managerens akademi.
+- Aldersgrense, minimumstid og frigjøring på fri transfer ved sesongskifte.
+- Ingen automatisk påfyll av juniorstallen midt i sesongen.
+- Kjøp og salg av kvalifiserte akademispillere.
+- Komprimering/dekomprimering og lesing av eldre JSON-lagring.
 
-## Teststatus
-- Kontrollert at HTML-markupen inkluderer en vedvarende tilstandsvariabel på accordionen, og at `listPlayerForTransfer()` kan kalle `render()` uten å tilbakestille åpen/lukket status.
-- JavaScript-syntaks kontrollert med Node.js.
-- JavaScript-syntaks kontrollert med Node.js.
-- 13 isolerte logikk- og UI-markup-tester bestått: pre-season-progresjon, uendret ligarunde, formasjonsvalg/erfaring, junioropprykk, tomme plasser ved pensjonering og blokkering av obligatorisk kamp under pre-season.
-- Full visuell nettlesertest av hele spillet er ikke bekreftet. Test gjerne en kopi av karrierelagringen før videre bruk.
-
-## Pakkeinnhold
-- `CM_Mobile_v2.01/index.html`
-- `CM_Mobile_v2.01/README.md`
+Dette er isolerte nettleser- og logikktester, ikke en full ende-til-ende-test av alle karrieresituasjoner på publisert GitHub Pages.
