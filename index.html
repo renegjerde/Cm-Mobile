@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.14 — Touchline</title>
+<title>CM Mobile v2.15 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -222,7 +222,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(min-width:600px){.tactics-training-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.14</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.15</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -599,7 +599,7 @@ function playerDatabaseStatusHTML(players){
  const unknown=rows.filter(p=>!Number.isFinite(p.age)).length;
  const globals=PLAYER_REFERENCE_STATUS.globalLoaded?`Bredt Transfermarkt-register: ${PLAYER_REFERENCE_STATUS.globalPlayers} relevante profiler · snapshot ${PLAYER_REFERENCE_STATUS.globalSourceDate||TM_GLOBAL_REFERENCE_CUTOFF}`:'Bredt Transfermarkt-register er ikke lastet i denne nettleserøkten';
  const coverage=PLAYER_REFERENCE_STATUS.globalLoaded?`Kildeprofildekning: ${PLAYER_REFERENCE_STATUS.eflClubsWithProfiles||0}/72 EFL-klubber og ${PLAYER_REFERENCE_STATUS.europeanClubsWithProfiles||0}/108 europacupdeltakere har minst 12 profiler i snapshotet.`:'Kildeprofildekning beregnes etter at nettregisteret er lastet.';
- return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.14</strong><div class="player-meta">${esc(sourceLabel)} · ${esc(tmLabel)} · ${esc(globals)}.</div><div class="player-meta">${esc(coverage)}</div><div class="player-meta">Denne troppen: ${esc(ageLabel)} · ${unknown} med ukjent alder · ${tm} med Transfermarkt-profilfelt · ${fpl} med FPL-statistikk.</div><div class="player-meta">Fødselsdatoer brukes til å beregne alder per 22. august ${Number(appState.seasonYear)||2026}. Ukjent alder vises heller enn et tilfeldig estimat. Snapshot 6. juli 2026 gir ikke bekreftet klubbtilhørighet etter datoen. Ferdigheter er spillmodell-estimater.</div></div>`;
+ return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.15</strong><div class="player-meta">${esc(sourceLabel)} · ${esc(tmLabel)} · ${esc(globals)}.</div><div class="player-meta">${esc(coverage)}</div><div class="player-meta">Denne troppen: ${esc(ageLabel)} · ${unknown} med ukjent alder · ${tm} med Transfermarkt-profilfelt · ${fpl} med FPL-statistikk.</div><div class="player-meta">Fødselsdatoer brukes til å beregne alder per 22. august ${Number(appState.seasonYear)||2026}. Ukjent alder vises heller enn et tilfeldig estimat. Snapshot 6. juli 2026 gir ikke bekreftet klubbtilhørighet etter datoen. Ferdigheter er spillmodell-estimater.</div></div>`;
 }
 function squadDiagnosticsPanel(players){
  const rows=Array.isArray(players)?players:[];
@@ -1138,7 +1138,9 @@ function setTrainingFormation(slot,value){
  ensureCareerSystems();slot=Number(slot);if(!Number.isInteger(slot)||slot<0||slot>2||!AVAILABLE_FORMATIONS.includes(value))return;
  const duplicate=appState.trainingFormations.findIndex((f,i)=>f===value&&i!==slot);
  if(duplicate>=0){alert("Velg tre ulike formasjoner. Denne formasjonen er allerede valgt i en annen treningsplass.");render();return;}
- appState.trainingFormations[slot]=value;appState.recommendationRound=null;save();render();
+ appState.trainingFormations[slot]=value;
+ if(!appState.trainingFormations.includes(appState.formation)){appState.formation=appState.trainingFormations[0];appState.selectedXI=null;}
+ appState.recommendationRound=null;appState.recommendationInfo=null;save();render();
 }
 function assistantFormationChoice(opponentFormation){
  ensureCareerSystems();const matchup=recommendFormation(opponentFormation);
@@ -1388,7 +1390,28 @@ function selectionScore(p){
  return roleCandidateScore(p,p.assignedRole||p.role||defaultRoleFor(p.name,p.pos,0));
 }
 function buildRecommendedXI(formation){
- return buildRoleBasedXI(appState.squad,formation);
+ const opponentIndex=getNextOpponentIndex();
+ const ourStrength=Number(teamPower(appState.club)||currentClub().strength);
+ const opponentStrength=Number(teamPower(opponentIndex)||CLUBS[opponentIndex]?.strength||65);
+ const gap=ourStrength-opponentStrength;
+ const previous=new Set((Array.isArray(appState.lastStartingXI)?appState.lastStartingXI:[]).map(String));
+ const available=eligibleSquad(appState.squad).slice();
+ const chosen=[];
+ const slots=roleSlotsForFormation(formation);
+ // Against a clearly weaker opponent, rest a few regular starters. Rotate more only for a substantial mismatch.
+ const rotationTarget=gap>=16?7:gap>=11?5:gap>=7?3:0;
+ const ordered=slots.map((role,index)=>({role,index}));
+ for(const {role} of ordered){
+  let pool=available.filter(p=>!chosen.some(q=>String(q.id)===String(p.id))&&(role==='GK'?p.pos==='GK':p.pos!=='GK'));
+  if(!pool.length)continue;
+  pool.sort((a,b)=>{
+   const score=p=>roleCandidateScore(p,role)+(previous.has(String(p.id))&&chosen.filter(q=>previous.has(String(q.id))).length<11-rotationTarget?-12:0)+(Number(p.fitness??80)<72?-8:0);
+   return score(b)-score(a);
+  });
+  const best=pool[0];best.assignedRole=role;chosen.push(best);
+ }
+ // Avoid over-rotating if the reserves are materially weaker: retain the strongest eligible XI unless the opponent is clearly inferior.
+ return assignTacticalRoles(chosen,formation);
 }
 function rotateStartingXI(){
  const available=eligibleSquad(appState.squad).slice();
@@ -1473,9 +1496,9 @@ function tactics(){
  const unavailableCount=appState.squad.filter(p=>!canPlay(p)).length;
  const mentalLabels={Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"};
  return `<div class="hero tactics-hero"><div class="eyebrow">Match preparation · ${seasonLabel()}</div><h1>Laguttak og taktikk</h1><p>Sett formasjonen, velg mentalitet og klargjør startelleveren.</p><div class="hero-actions"><span class="pill green">${xi.length}/11 valgt</span><span class="pill">Reserver: ${bench.length}</span><span class="pill ${unavailableCount?'warning':'green'}">${unavailableCount?`${unavailableCount} utilgjengelig`:'Alle tilgjengelige'}</span></div></div>
- <section class="card tactics-quick-controls"><div class="field"><label>FORMASJON I NESTE KAMP</label><select id="formation" onchange="appState.formation=this.value;appState.selectedXI=null;save();render()">${AVAILABLE_FORMATIONS.map(f=>`<option value="${esc(f)}" ${appState.formation===f?'selected':''}>${esc(f)}</option>`).join('')}</select></div><div class="field"><label>MENTALITET</label><select id="tactic" onchange="appState.tactic=this.value;save()">${["Defensive","Balanced","Attacking","High press"].map(f=>`<option value="${f}" ${appState.tactic===f?"selected":""}>${mentalLabels[f]}</option>`).join('')}</select></div><button type="button" style="width:100%;margin:3px 0 0;border-color:#7e9c70;background:#1b382c;color:#bdf0ad;font-weight:850" onclick="rotateStartingXI()">🔄 Roter troppen</button><p class="tactics-mini-status">Prioriterer spillere som ikke startet forrige kamp. Skadde og suspenderte spillere utelates.</p></section>
+ <section class="card tactics-quick-controls"><div class="field"><label>FORMASJON I NESTE KAMP</label><select id="formation" onchange="appState.formation=this.value;appState.selectedXI=null;appState.recommendationRound=null;appState.recommendationInfo=null;save();render()">${appState.trainingFormations.map(f=>`<option value="${esc(f)}" ${appState.formation===f?'selected':''}>${esc(f)}</option>`).join('')}</select></div><div class="field"><label>MENTALITET</label><select id="tactic" onchange="appState.tactic=this.value;save()">${["Defensive","Balanced","Attacking","High press"].map(f=>`<option value="${f}" ${appState.tactic===f?"selected":""}>${mentalLabels[f]}</option>`).join('')}</select></div><button type="button" style="width:100%;margin:3px 0 0;border-color:#7e9c70;background:#1b382c;color:#bdf0ad;font-weight:850" onclick="rotateStartingXI()">🔄 Roter troppen</button><p class="tactics-mini-status">Prioriterer spillere som ikke startet forrige kamp. Skadde og suspenderte spillere utelates.</p></section>
+ <section class="card assistant-match-plan" style="border-color:#647b52;background:linear-gradient(145deg,#192b2b,#142236);margin-bottom:12px"><div class="section-title"><h2>🤖 Assistentens kampplan</h2><span class="pill green">Klargjort automatisk</span></div><div class="player"><div style="flex:1"><strong>Formasjon · ${esc(appState.formation)}</strong><div class="player-meta">Motstander: ${esc(opponentName)} · ${esc(opponentFormation)} · Mentalitet ${mentalLabels[appState.tactic]||'Balansert'}</div></div><span class="pill">${xi.length}/11</span></div><p class="muted" style="margin:8px 0">Assistenten har satt opp formasjon og startellever fra lagets tre innarbeidede systemer. ${(()=>{const prev=new Set((appState.lastStartingXI||[]).map(String));const rotated=xi.filter(p=>!prev.has(String(p.id))).length;const gap=Number(teamPower(appState.club)||currentClub().strength)-Number(teamPower(opponentIndex)||CLUBS[opponentIndex].strength);return gap>=7?`Mot en svakere motstander vurderes rotasjon; ${rotated} spillere startet ikke sist.`:`Ingen stor rotasjon forventes mot denne motstanderen.`})()}</p><button type="button" class="ghost" style="width:100%" onclick="applyPreMatchRecommendation(true);render()">Be assistenten vurdere på nytt</button></section>
  <section class="card"><div class="section-title"><h2>Startellever</h2><small>${xi.length}/11 spillere</small></div><div class="tactics-pitch-card"><div class="pitch-direction">▲ ANGREP</div>${pitch()}</div><button class="primary" style="width:100%;margin:12px 0 4px" onclick="playMatch()">${appState.pendingCupMatch?`🏆 Avspark – ${esc(appState.pendingCupMatch.competition)}`:'⚽ Avspark – bruk valgt startellever'}</button>
- <details class="tactics-accordion" data-tactics-panel="assistant" ${tacticsPanelState.assistant?'open':''} ontoggle="setTacticsPanelOpen('assistant',this.open)"><summary><span>🤖 Assistentens anbefaling</span><span class="tactics-summary-meta">Motstander: ${esc(opponentName)} · ${esc(opponentFormation)}</span></summary><div class="tactics-accordion-body"><div class="notice" style="margin-top:0"><p style="margin:0 0 6px">Anbefalt formasjon (fra sesongtreningen): <strong>${esc(assistantSuggestedFormation)}</strong> · mentalitet <strong>${mentalLabels[appState.tactic]||'Balansert'}</strong>.</p><p class="muted" style="margin:0 0 10px">Assistenten vurderer motstander, posisjoner, ferdigheter, form og fysisk tilstand, og velger blant de tre treningsformasjonene.</p><button type="button" onclick="applyPreMatchRecommendation(true);render()">Bruk anbefalingen på nytt</button></div></div></details>
  <details class="tactics-accordion" data-tactics-panel="training" ${tacticsPanelState.training?'open':''} ontoggle="setTacticsPanelOpen('training',this.open)"><summary><span>⚙️ Formasjoner i sesongtrening</span><span class="tactics-summary-meta">3 valgte · ${AVAILABLE_FORMATIONS.length} muligheter</span></summary>${trainingSummary()}</details>
  <details class="tactics-accordion" data-tactics-panel="availability" ${tacticsPanelState.availability?'open':''} ontoggle="setTacticsPanelOpen('availability',this.open)"><summary><span>🩹 Skader og suspensjoner</span><span class="tactics-summary-meta">${unavailableCount?`${unavailableCount} ute`:'Ingen fravær'}</span></summary><div class="tactics-accordion-body">${disciplinarySummary()}</div></details>
  <div class="section-title"><h2>Velg spillere</h2><small>sortert etter taktisk rolle</small></div><p class="muted" style="font-size:11px">Trykk på listene for å velge hvem som starter. Skadde og suspenderte spillere kan ikke velges.</p><div class="section-title"><h2>Keeper</h2></div>${slotControls(xi.filter(p=>p.assignedRole==='GK'))}<div class="section-title"><h2>Forsvar</h2></div>${slotControls(xi.filter(p=>['LB','LCB','CB','RCB','RB','LWB','RWB'].includes(p.assignedRole)))}<div class="section-title"><h2>Midtbane</h2></div>${slotControls(xi.filter(p=>['DM','CM','LM','RM'].includes(p.assignedRole)))}<div class="section-title"><h2>Angrep</h2></div>${slotControls(xi.filter(p=>['LW','AM','RW','ST'].includes(p.assignedRole)))}<div class="section-title"><h2>Reserver</h2><small>sortert etter taktisk rolle</small></div>${["GK","DEF","MID","ATT"].map(pos=>{const ps=bench.filter(p=>p.pos===pos);return ps.length?`<div class="lineup-section-title">${posLabels[pos]}</div>${ps.map(p=>`<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span> · ${p.rating}</div>${playerDetail(p)}</div><div class="lineup-player-side"><strong>${p.rating}</strong><span>${p.fitness}%</span></div></div>`).join("")}`:""}).join("")}<button class="primary" style="width:100%;margin-top:12px" onclick="playMatch()">${appState.pendingCupMatch?`🏆 Avspark – ${esc(appState.pendingCupMatch.competition)}`:'⚽ Avspark – bruk valgt startellever'}</button></section>`;
@@ -3645,7 +3668,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.14 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.15 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{const ok=save();let b=document.getElementById("saveBtn");b.textContent=ok?"✓ Lagret":"⚠ Lagring feilet";setTimeout(()=>b.textContent="▣ Lagre",1800)});
 // Load public reference sources before the first database build; the game remains playable without them.

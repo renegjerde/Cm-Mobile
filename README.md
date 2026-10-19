@@ -1,16 +1,14 @@
-# CM Mobile v2.14 — Dynamic Club Economy
+# CM Mobile v2.15 — Assistant-led tactics
 
-## Changes in v2.14
-- Added an annual finance review for all clubs across the Premier League, Championship, League One and League Two.
-- Club revenue is recalculated from division, strength, commercial profile and stadium capacity.
-- Wage budgets are reviewed using income, squad wage bill, cash position, sporting rank, and promotion/relegation status.
-- Transfer budgets are recalculated annually for AI clubs and tied to division, revenue, cash and sporting outcome.
-- Club reputation and strength now evolve gradually with league performance and promotion/relegation.
-- Fixed season rollover so club finance data is not blindly reset immediately before the annual review.
-- Preserves the manager's existing cash balance; user club wage budget is reviewed separately.
+## Changes in v2.15
+- The match formation selector is restricted to the three formations chosen by the manager in season training.
+- Changing the three-formations toolkit safely moves the active match formation back into the toolkit if necessary.
+- The assistant prepares the formation, mentality and starting XI when the tactics screen is opened for a fixture, using only the manager's three selected formations.
+- The assistant's match plan is shown prominently above the pitch instead of being buried below the lineup.
+- Against a clearly weaker opponent, the recommended XI gives preference to players who did not start the previous match and to players with better fitness. The rotation threshold scales with the strength difference.
+- Manual lineup edits remain available after the assistant's initial selection.
 
 ## Notes
-- Financial values are a game-balance model, not an audited simulation of real club accounts.
-- Stadium capacities are explicit for the listed larger clubs; other clubs use division-based estimated capacities.
-- The annual review uses league standings captured before tables reset.
-- Existing career data is retained; financial policy data migrates when the new version is loaded.
+- Rotation is a heuristic based on squad strength, previous starters, role suitability and fitness; it is not a guarantee that exactly a fixed number of players will be rotated.
+- Existing career saves and squad data are retained.
+- JavaScript syntax was checked. A full browser playthrough is still needed to validate the complete match flow on mobile.
