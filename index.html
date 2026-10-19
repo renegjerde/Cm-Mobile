@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.15 — Touchline</title>
+<title>CM Mobile v2.16 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -222,7 +222,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(min-width:600px){.tactics-training-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.15</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.16</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -599,7 +599,7 @@ function playerDatabaseStatusHTML(players){
  const unknown=rows.filter(p=>!Number.isFinite(p.age)).length;
  const globals=PLAYER_REFERENCE_STATUS.globalLoaded?`Bredt Transfermarkt-register: ${PLAYER_REFERENCE_STATUS.globalPlayers} relevante profiler · snapshot ${PLAYER_REFERENCE_STATUS.globalSourceDate||TM_GLOBAL_REFERENCE_CUTOFF}`:'Bredt Transfermarkt-register er ikke lastet i denne nettleserøkten';
  const coverage=PLAYER_REFERENCE_STATUS.globalLoaded?`Kildeprofildekning: ${PLAYER_REFERENCE_STATUS.eflClubsWithProfiles||0}/72 EFL-klubber og ${PLAYER_REFERENCE_STATUS.europeanClubsWithProfiles||0}/108 europacupdeltakere har minst 12 profiler i snapshotet.`:'Kildeprofildekning beregnes etter at nettregisteret er lastet.';
- return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.15</strong><div class="player-meta">${esc(sourceLabel)} · ${esc(tmLabel)} · ${esc(globals)}.</div><div class="player-meta">${esc(coverage)}</div><div class="player-meta">Denne troppen: ${esc(ageLabel)} · ${unknown} med ukjent alder · ${tm} med Transfermarkt-profilfelt · ${fpl} med FPL-statistikk.</div><div class="player-meta">Fødselsdatoer brukes til å beregne alder per 22. august ${Number(appState.seasonYear)||2026}. Ukjent alder vises heller enn et tilfeldig estimat. Snapshot 6. juli 2026 gir ikke bekreftet klubbtilhørighet etter datoen. Ferdigheter er spillmodell-estimater.</div></div>`;
+ return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.16</strong><div class="player-meta">${esc(sourceLabel)} · ${esc(tmLabel)} · ${esc(globals)}.</div><div class="player-meta">${esc(coverage)}</div><div class="player-meta">Denne troppen: ${esc(ageLabel)} · ${unknown} med ukjent alder · ${tm} med Transfermarkt-profilfelt · ${fpl} med FPL-statistikk.</div><div class="player-meta">Fødselsdatoer brukes til å beregne alder per 22. august ${Number(appState.seasonYear)||2026}. Ukjent alder vises heller enn et tilfeldig estimat. Snapshot 6. juli 2026 gir ikke bekreftet klubbtilhørighet etter datoen. Ferdigheter er spillmodell-estimater.</div></div>`;
 }
 function squadDiagnosticsPanel(players){
  const rows=Array.isArray(players)?players:[];
@@ -1867,7 +1867,7 @@ const EFL_DB_VERSION=5;const EFL_POSITIONS=['GK','GK','GK','LB','LB','CB','CB','
 }
 function makeLowerFixtures(rows){const ids=rows.map((_,i)=>i);let arr=[...ids],rounds=[];for(let r=0;r<ids.length-1;r++){let games=[];for(let i=0;i<ids.length/2;i++){let a=arr[i],b=arr[arr.length-1-i];games.push(r%2?[b,a]:[a,b]);}rounds.push(games);const fixed=arr[0],rest=arr.slice(1);rest.unshift(rest.pop());arr=[fixed,...rest];}return [...rounds,...rounds.map(gs=>gs.map(([a,b])=>[b,a]))]}
 function addGenericResult(rows,a,b,ga,gb){const A=rows[a],B=rows[b];if(!A||!B)return;A.p++;B.p++;A.gf+=ga;A.ga+=gb;B.gf+=gb;B.ga+=ga;if(ga>gb){A.w++;A.pts+=3;B.l++}else if(ga<gb){B.w++;B.pts+=3;A.l++}else{A.d++;B.d++;A.pts++;B.pts++}}
-function seededScore(a,b,seed){const rng=seededRandom(seed);const diff=(a-b)/13;const goalsA=Math.min(6,Math.max(0,Math.round(1.25+diff*.7+rng()*2.2)));const goalsB=Math.min(6,Math.max(0,Math.round(1.15-diff*.65+rng()*2.1)));return [goalsA,goalsB]}
+function seededScore(a,b,seed){const rng=seededRandom(seed);const diff=Number(a||65)-Number(b||65);const lambdaA=clamp(1.38+diff*.022,0.35,2.75),lambdaB=clamp(1.12-diff*.022,0.3,2.5);const poisson=lambda=>{const limit=Math.exp(-lambda);let k=0,product=1;do{k++;product*=Math.max(.000001,rng())}while(product>limit&&k<9);return Math.min(7,k-1)};return [poisson(lambdaA),poisson(lambdaB)]}
 function simulateLowerLeaguesThroughRound(round){Object.entries(appState.lowerLeagues||{}).forEach(([div,data])=>{const target=Math.min(46,Math.floor(round*46/38));while(data.playedRounds<target){const games=data.fixtures[data.playedRounds]||[];games.forEach(([a,b],i)=>{const [ga,gb]=seededScore(data.rows[a].strength,data.rows[b].strength,stableSeed(`${seasonLabel()}|${div}|${data.playedRounds}|${a}|${b}`));addGenericResult(data.rows,a,b,ga,gb)});data.playedRounds++;}})}
 // Partial, curated real-player layer for major European clubs. Names are based on published 2025/26 first-team squad/line-up sources; unnamed squad places remain clearly generic.
 const INTERNATIONAL_REAL_PLAYERS={
@@ -2769,18 +2769,18 @@ function simulateMatch(powerA,powerB,homeA,playersA=[],playersB=[],formationA="4
  // Minute-by-minute chance generation. Goal probability depends on chance quality, finishing,
  // relative attack/defence and goalkeeper strength.
  for(let m=1;m<=90;m++){
-  const chancesThisMinute=(Math.random()<0.19?1:0)+(Math.random()<0.018?1:0);
+  const chancesThisMinute=(Math.random()<0.155?1:0)+(Math.random()<0.012?1:0);
   for(let k=0;k<chancesThisMinute;k++){
-   const side=Math.random()<Math.max(.22,Math.min(.78,.5+(attackA-defenseB-(attackB-defenseA))*.012))?"A":"B";
+   const side=Math.random()<Math.max(.22,Math.min(.78,.5+(attackA-defenseB-(attackB-defenseA))*.008))?"A":"B";
    const xi=side==="A"?xiA:xiB, attack=side==="A"?attackA:attackB, defence=side==="A"?defenseB:defenseA, keeper=side==="A"?gkB:gkA;
    const attackers=xi.filter(p=>p.pos==="ATT"||p.pos==="MID");
    const shooter=weightedPick(attackers,attackers.map(p=>Math.max(1,p.rating-45)*(p.pos==="ATT"?1.6:p.pos==="MID"?.75:0.15)));
    const finishing=shooter?shooter.rating:65;
-   const quality=Math.max(.025,Math.min(.85,.12+(attack-defence)*.009+(finishing-65)*.006+(Math.random()*.22)));
+   const quality=Math.max(.025,Math.min(.85,.105+(attack-defence)*.0065+(finishing-65)*.0045+(Math.random()*.19)));
    const onTarget=Math.random()<Math.max(.12,Math.min(.82,.28+(finishing-60)*.012));
    if(side==="A"){stats.shotsA++;if(onTarget)stats.onA++}else{stats.shotsB++;if(onTarget)stats.onB++}
    const savedByKeeper=Math.max(.05,Math.min(.75,.32+(keeper-65)*.012));
-   const scored=onTarget&&Math.random()<quality*(1-savedByKeeper)*2.5;
+   const scored=onTarget&&Math.random()<quality*(1-savedByKeeper)*2.25;
    let event={minute:m,side,type:"chance",player:shooter?.name||"Angriper",onTarget,quality:+quality.toFixed(2)};
    if(scored){
     scoreA+=side==="A"?1:0;scoreB+=side==="B"?1:0;
@@ -2792,9 +2792,9 @@ function simulateMatch(powerA,powerB,homeA,playersA=[],playersB=[],formationA="4
    chanceList.push(event);
   }
   const incident=(type,prob,reason)=>{if(Math.random()>=prob)return;const side=Math.random()<.5?"A":"B",xi=side==="A"?xiA:xiB;const candidates=xi.filter(p=>p.pos!=="GK");const player=weightedPick(candidates,candidates.map(p=>Math.max(1,(p.attributes?.defending||p.rating||60)-35)));events.push({minute:m,side,type,player:player?.name||"Spiller",playerId:player?.id??null,reason});};
-  incident("yellow",.006,"Gult kort");
-  incident("red",.0015,"Rødt kort");
-  incident("injury",.0018,"Skade");
+  incident("yellow",.039,"Gult kort");
+  incident("red",.0012,"Rødt kort");
+  incident("injury",.0024,"Skade");
  }
  events.push(...chanceList.filter(e=>e.type==="goal"));
  stats.possessionA=Math.max(30,Math.min(70,Math.round(50+(attackA-attackB)*.6+(homeA?3:-3))));
@@ -3668,7 +3668,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.15 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.16 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{const ok=save();let b=document.getElementById("saveBtn");b.textContent=ok?"✓ Lagret":"⚠ Lagring feilet";setTimeout(()=>b.textContent="▣ Lagre",1800)});
 // Load public reference sources before the first database build; the game remains playable without them.
