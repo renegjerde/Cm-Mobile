@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.06 — Touchline</title>
+<title>CM Mobile v2.07 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -202,9 +202,27 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .squad-empty{padding:24px 10px;text-align:center;color:var(--muted)}
 
 .transfer-list-accordion>summary.section-title{margin:2px 0}.transfer-list-accordion>summary h2{font-size:15px}.cup-accordion>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px}.cup-accordion>summary::-webkit-details-marker{display:none}.cup-accordion>summary:after{content:'⌄';font-size:20px;color:var(--muted);margin-left:auto}.cup-accordion[open]>summary:after{content:'⌃'}.cup-accordion>summary h2{margin:0}.cup-accordion{overflow:hidden}.cup-accordion .section-title{margin-bottom:8px}.cup-accordion>.player{padding:9px 10px;margin:6px 0;gap:8px;align-items:center}.cup-accordion .player-meta{line-height:1.35}.cup-accordion>p.muted{margin:6px 0 10px}.cup-accordion .pill{white-space:nowrap}.cup-accordion .notice{margin:8px 0;padding:10px}
+
+.tactics-accordion{margin:9px 0;border:1px solid var(--line);border-radius:12px;background:#122033;overflow:hidden}
+.tactics-accordion>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;font-weight:800;font-size:13px}
+.tactics-accordion>summary::-webkit-details-marker{display:none}
+.tactics-accordion>summary:after{content:'⌄';font-size:19px;color:var(--muted);margin-left:auto;flex:0 0 auto}
+.tactics-accordion[open]>summary:after{content:'⌃'}
+.tactics-accordion .tactics-summary-meta{font-size:11px;font-weight:500;color:var(--muted);text-align:right}
+.tactics-accordion .tactics-accordion-body{padding:0 12px 12px}
+.tactics-accordion .notice{margin:0 0 8px}
+.tactics-accordion .field:last-child{margin-bottom:0}
+.tactics-quick-controls{padding:12px}
+.tactics-quick-controls .field{margin:2px 0 10px}
+.tactics-quick-controls .field:last-child{margin-bottom:0}
+.tactics-mini-status{font-size:11px;color:var(--muted);margin:4px 0 0}
+.tactics-pitch-card{background:linear-gradient(180deg,#17452f,#123622);border:1px solid #2b6848;border-radius:12px;padding:10px 8px;text-align:center}
+.tactics-pitch-card .pitch-direction{font-size:10px;color:#b5e6bf;letter-spacing:.08em}
+.tactics-training-grid{display:grid;grid-template-columns:1fr;gap:4px}
+@media(min-width:600px){.tactics-training-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.06</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.07</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -581,7 +599,7 @@ function playerDatabaseStatusHTML(players){
  const unknown=rows.filter(p=>!Number.isFinite(p.age)).length;
  const globals=PLAYER_REFERENCE_STATUS.globalLoaded?`Bredt Transfermarkt-register: ${PLAYER_REFERENCE_STATUS.globalPlayers} relevante profiler · snapshot ${PLAYER_REFERENCE_STATUS.globalSourceDate||TM_GLOBAL_REFERENCE_CUTOFF}`:'Bredt Transfermarkt-register er ikke lastet i denne nettleserøkten';
  const coverage=PLAYER_REFERENCE_STATUS.globalLoaded?`Kildeprofildekning: ${PLAYER_REFERENCE_STATUS.eflClubsWithProfiles||0}/72 EFL-klubber og ${PLAYER_REFERENCE_STATUS.europeanClubsWithProfiles||0}/108 europacupdeltakere har minst 12 profiler i snapshotet.`:'Kildeprofildekning beregnes etter at nettregisteret er lastet.';
- return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.06</strong><div class="player-meta">${esc(sourceLabel)} · ${esc(tmLabel)} · ${esc(globals)}.</div><div class="player-meta">${esc(coverage)}</div><div class="player-meta">Denne troppen: ${esc(ageLabel)} · ${unknown} med ukjent alder · ${tm} med Transfermarkt-profilfelt · ${fpl} med FPL-statistikk.</div><div class="player-meta">Fødselsdatoer brukes til å beregne alder per 22. august ${Number(appState.seasonYear)||2026}. Ukjent alder vises heller enn et tilfeldig estimat. Snapshot 6. juli 2026 gir ikke bekreftet klubbtilhørighet etter datoen. Ferdigheter er spillmodell-estimater.</div></div>`;
+ return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.07</strong><div class="player-meta">${esc(sourceLabel)} · ${esc(tmLabel)} · ${esc(globals)}.</div><div class="player-meta">${esc(coverage)}</div><div class="player-meta">Denne troppen: ${esc(ageLabel)} · ${unknown} med ukjent alder · ${tm} med Transfermarkt-profilfelt · ${fpl} med FPL-statistikk.</div><div class="player-meta">Fødselsdatoer brukes til å beregne alder per 22. august ${Number(appState.seasonYear)||2026}. Ukjent alder vises heller enn et tilfeldig estimat. Snapshot 6. juli 2026 gir ikke bekreftet klubbtilhørighet etter datoen. Ferdigheter er spillmodell-estimater.</div></div>`;
 }
 function squadDiagnosticsPanel(players){
  const rows=Array.isArray(players)?players:[];
@@ -613,14 +631,34 @@ function rolePenalty(p,targetRole){
  return 15;
 }
 function positionAdjustedRating(p,targetRole){return Math.max(30,Number(p.rating||60)-rolePenalty(p,targetRole));}
+const FORMATION_TEMPLATES={
+ "4-3-3":{slots:["GK","LB","LCB","RCB","RB","DM","CM","CM","LW","ST","RW"],rows:[["LW","ST","RW"],["DM","CM","CM"],["LB","LCB","RCB","RB"]]},
+ "4-4-2":{slots:["GK","LB","LCB","RCB","RB","LM","CM","CM","RM","ST","ST"],rows:[["ST","ST"],["LM","CM","CM","RM"],["LB","LCB","RCB","RB"]]},
+ "4-2-3-1":{slots:["GK","LB","LCB","RCB","RB","DM","DM","LW","AM","RW","ST"],rows:[["ST"],["LW","AM","RW"],["DM","DM"],["LB","LCB","RCB","RB"]]},
+ "3-5-2":{slots:["GK","LCB","CB","RCB","LWB","DM","CM","CM","RWB","ST","ST"],rows:[["ST","ST"],["LWB","DM","CM","CM","RWB"],["LCB","CB","RCB"]]},
+ "4-1-4-1":{slots:["GK","LB","LCB","RCB","RB","DM","LM","CM","CM","RM","ST"],rows:[["ST"],["LM","CM","CM","RM"],["DM"],["LB","LCB","RCB","RB"]]},
+ "4-1-2-1-2":{slots:["GK","LB","LCB","RCB","RB","DM","CM","CM","AM","ST","ST"],rows:[["ST","ST"],["AM"],["CM","CM"],["DM"],["LB","LCB","RCB","RB"]]},
+ "4-3-1-2":{slots:["GK","LB","LCB","RCB","RB","CM","CM","CM","AM","ST","ST"],rows:[["ST","ST"],["AM"],["CM","CM","CM"],["LB","LCB","RCB","RB"]]},
+ "4-2-2-2":{slots:["GK","LB","LCB","RCB","RB","DM","DM","AM","AM","ST","ST"],rows:[["ST","ST"],["AM","AM"],["DM","DM"],["LB","LCB","RCB","RB"]]},
+ "4-5-1":{slots:["GK","LB","LCB","RCB","RB","LM","CM","DM","CM","RM","ST"],rows:[["ST"],["LM","CM","DM","CM","RM"],["LB","LCB","RCB","RB"]]},
+ "4-3-2-1":{slots:["GK","LB","LCB","RCB","RB","DM","CM","CM","AM","AM","ST"],rows:[["ST"],["AM","AM"],["DM","CM","CM"],["LB","LCB","RCB","RB"]]},
+ "4-2-4":{slots:["GK","LB","LCB","RCB","RB","CM","CM","LW","RW","ST","ST"],rows:[["ST","ST"],["LW","RW"],["CM","CM"],["LB","LCB","RCB","RB"]]},
+ "4-4-1-1":{slots:["GK","LB","LCB","RCB","RB","LM","CM","CM","RM","AM","ST"],rows:[["ST"],["AM"],["LM","CM","CM","RM"],["LB","LCB","RCB","RB"]]},
+ "4-1-3-2":{slots:["GK","LB","LCB","RCB","RB","DM","LM","CM","RM","ST","ST"],rows:[["ST","ST"],["LM","CM","RM"],["DM"],["LB","LCB","RCB","RB"]]},
+ "4-2-1-3":{slots:["GK","LB","LCB","RCB","RB","DM","CM","AM","LW","ST","RW"],rows:[["LW","ST","RW"],["AM"],["DM","CM"],["LB","LCB","RCB","RB"]]},
+ "3-4-3":{slots:["GK","LCB","CB","RCB","LM","CM","CM","RM","LW","ST","RW"],rows:[["LW","ST","RW"],["LM","CM","CM","RM"],["LCB","CB","RCB"]]},
+ "3-4-2-1":{slots:["GK","LCB","CB","RCB","LWB","CM","CM","RWB","AM","AM","ST"],rows:[["ST"],["AM","AM"],["LWB","CM","CM","RWB"],["LCB","CB","RCB"]]},
+ "3-4-1-2":{slots:["GK","LCB","CB","RCB","LWB","CM","CM","RWB","AM","ST","ST"],rows:[["ST","ST"],["AM"],["LWB","CM","CM","RWB"],["LCB","CB","RCB"]]},
+ "3-1-4-2":{slots:["GK","LCB","CB","RCB","DM","LM","CM","CM","RM","ST","ST"],rows:[["ST","ST"],["LM","CM","CM","RM"],["DM"],["LCB","CB","RCB"]]},
+ "3-5-1-1":{slots:["GK","LCB","CB","RCB","LWB","DM","CM","CM","RWB","AM","ST"],rows:[["ST"],["AM"],["LWB","DM","CM","CM","RWB"],["LCB","CB","RCB"]]},
+ "5-3-2":{slots:["GK","LWB","LCB","CB","RCB","RWB","DM","CM","CM","ST","ST"],rows:[["ST","ST"],["DM","CM","CM"],["LWB","LCB","CB","RCB","RWB"]]},
+ "5-4-1":{slots:["GK","LWB","LCB","CB","RCB","RWB","LM","CM","CM","RM","ST"],rows:[["ST"],["LM","CM","CM","RM"],["LWB","LCB","CB","RCB","RWB"]]},
+ "5-2-3":{slots:["GK","LWB","LCB","CB","RCB","RWB","DM","CM","LW","ST","RW"],rows:[["LW","ST","RW"],["DM","CM"],["LWB","LCB","CB","RCB","RWB"]]},
+ "5-2-1-2":{slots:["GK","LWB","LCB","CB","RCB","RWB","DM","CM","AM","ST","ST"],rows:[["ST","ST"],["AM"],["DM","CM"],["LWB","LCB","CB","RCB","RWB"]]}
+};
 function roleSlotsForFormation(formation){
- const slots={
-  '4-2-3-1':['GK','LB','LCB','RCB','RB','DM','DM','LW','AM','RW','ST'],
-  '4-3-3':['GK','LB','LCB','RCB','RB','DM','CM','CM','LW','ST','RW'],
-  '4-4-2':['GK','LB','LCB','RCB','RB','LM','CM','CM','RM','ST','ST'],
-  '3-5-2':['GK','LCB','CB','RCB','LWB','DM','CM','CM','RWB','ST','ST']
- };
- return slots[formation]||slots['4-3-3'];
+ const template=FORMATION_TEMPLATES[formation]||FORMATION_TEMPLATES["4-3-3"];
+ return template.slots;
 }
 function roleSkillScore(p,targetRole){
  const a=p.attributes||{};
@@ -968,7 +1006,9 @@ function money(n){const v=Number(n)||0;const a=Math.abs(v);return (v<0?"£-":"£
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function currentClub(){return CLUBS[appState.club]||CLUBS[3]}
 function seasonLabel(){const y=Number(appState.seasonYear)||2026;return `${y}/${String(y+1).slice(-2)}`}
-const AVAILABLE_FORMATIONS=["4-3-3","4-4-2","4-2-3-1","3-5-2"];
+const AVAILABLE_FORMATIONS=Object.keys(FORMATION_TEMPLATES);
+const tacticsPanelState={assistant:false,training:false,availability:false};
+function setTacticsPanelOpen(name,isOpen){if(Object.prototype.hasOwnProperty.call(tacticsPanelState,name))tacticsPanelState[name]=!!isOpen;}
 function ensureCareerSystems(){
  if(!appState.formationExperience||typeof appState.formationExperience!=="object")appState.formationExperience={"4-3-3":20,"4-4-2":20,"4-2-3-1":20,"3-5-2":20};
  if(!Array.isArray(appState.trainingFormations)||appState.trainingFormations.length<2){appState.trainingFormations=[appState.formation||"4-3-3","4-2-3-1","4-4-2"];}
@@ -1223,13 +1263,21 @@ function recoverSquadBeforeRound(){
  });
  appState.lastRecoveryRound=appState.week;
 }
-function getOpponentFormation(opponentIndex, roundNumber=appState.week){
- const formations=["4-3-3","4-4-2","4-2-3-1","3-5-2"];
+function getOpponentFormation(opponentIndex,roundNumber=appState.week){
+ const formations=AVAILABLE_FORMATIONS;
  return formations[(opponentIndex*3+roundNumber-1)%formations.length];
 }
 function recommendFormation(opponentFormation){
- // Simple tactical matchup model: vary the shape to contest the opponent's main strength.
- return ({"4-3-3":"4-4-2","4-4-2":"4-2-3-1","4-2-3-1":"3-5-2","3-5-2":"4-3-3"})[opponentFormation]||"4-3-3";
+ const counters={
+  "4-3-3":"4-4-2","4-4-2":"4-2-3-1","4-2-3-1":"3-5-2","3-5-2":"4-3-3",
+  "4-1-4-1":"4-2-2-2","4-1-2-1-2":"4-3-3","4-3-1-2":"4-1-4-1",
+  "4-2-2-2":"4-1-4-1","4-5-1":"4-2-3-1","4-3-2-1":"4-4-2",
+  "4-2-4":"5-3-2","4-4-1-1":"4-3-3","4-1-3-2":"4-2-3-1",
+  "4-2-1-3":"5-3-2","3-4-3":"4-2-3-1","3-4-2-1":"4-4-2",
+  "3-4-1-2":"4-1-4-1","3-1-4-2":"4-3-3","3-5-1-1":"4-4-2",
+  "5-3-2":"4-3-3","5-4-1":"4-2-3-1","5-2-3":"4-4-2","5-2-1-2":"4-3-3"
+ };
+ return counters[opponentFormation]||"4-3-3";
 }
 function selectionScore(p){
  return roleCandidateScore(p,p.assignedRole||p.role||defaultRoleFor(p.name,p.pos,0));
@@ -1296,7 +1344,9 @@ function recordTeamContinuity(){
 }
 function tactics(){
  ensureCareerSystems();
- if(appState.preseasonActive)return `<div class="hero"><div class="eyebrow">Pre-season · ${seasonLabel()}</div><h1>Ingen obligatorisk kamp ennå</h1><p>Pre-season uke ${Number(appState.preseasonWeek)||1} av ${Number(appState.preseasonWeeks)||4}. Bruk tiden på overganger og taktisk trening før ligaen starter.</p><div class="hero-actions"><button class="primary" onclick="advancePreseasonWeek()">Fullfør pre-seasonuke ${Number(appState.preseasonWeek)||1} →</button><button onclick="setPage('transfers')">Gå til overgangsmarkedet</button></div></div><section class="card"><div class="section-title"><h2>Velg formasjoner laget skal trene på</h2><small>Tre ulike systemer</small></div><p class="muted">Alle tre bygges gradvis inn. Assistenten kan bruke dem før kamp; formasjonen som faktisk brukes, får ekstra erfaring.</p>${[0,1,2].map(i=>`<div class="field"><label>${i===0?'Primærformasjon':`Alternativ ${i}`}</label><select aria-label="Treningsformasjon ${i+1}" onchange="setTrainingFormation(${i},this.value)">${AVAILABLE_FORMATIONS.map(f=>`<option value="${f}" ${appState.trainingFormations[i]===f?'selected':''}>${f} · erfaring ${formationFamiliarity(f)}%</option>`).join('')}</select></div>`).join('')}</section>${panel("Formasjonsfamiliaritet",appState.trainingFormations.map(f=>`<div class="player"><div style="flex:1"><strong>${esc(f)}</strong><div class="player-meta">Innarbeiding ${formationFamiliarity(f)}%</div></div><div class="rating">${formationFamiliarity(f)}%</div></div>`).join(''))}`;
+ const trainingFields=()=>`<div class="tactics-training-grid">${[0,1,2].map(i=>`<div class="field"><label>${i===0?'Primærformasjon':`Alternativ ${i}`}</label><select aria-label="Treningsformasjon ${i+1}" onchange="setTrainingFormation(${i},this.value)">${AVAILABLE_FORMATIONS.map(f=>`<option value="${esc(f)}" ${appState.trainingFormations[i]===f?'selected':''}>${esc(f)} · erfaring ${formationFamiliarity(f)}%</option>`).join('')}</select></div>`).join('')}</div>`;
+ const trainingSummary=()=>`<div class="tactics-accordion-body"><p class="muted" style="margin:0 0 10px">Tren tre ulike systemer gjennom sesongen. Alle får gradvis erfaring, mens formasjonen som brukes i kamp får ekstra progresjon. Assistenten holder seg til disse tre.</p>${trainingFields()}<div class="grid" style="margin:10px 0 0;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px"><div class="stat"><small>Samspill i laget</small><strong>${Number(appState.teamCohesion??25)}%</strong></div><div class="stat"><small>Aktuell formasjon</small><strong>${formationFamiliarity(appState.formation)}%</strong></div></div>${panel('Innarbeiding av valgte formasjoner',appState.trainingFormations.map(f=>`<div class="player"><div style="flex:1"><strong>${esc(f)}</strong><div class="player-meta">Innarbeiding</div></div><div class="rating">${formationFamiliarity(f)}%</div></div>`).join(''))}</div>`;
+ if(appState.preseasonActive)return `<div class="hero"><div class="eyebrow">Pre-season · ${seasonLabel()}</div><h1>Ingen obligatorisk kamp ennå</h1><p>Uke ${Number(appState.preseasonWeek)||1} av ${Number(appState.preseasonWeeks)||4}. Juster troppen og bygg lagets taktiske forståelse før sesongstart.</p><div class="hero-actions"><button class="primary" onclick="advancePreseasonWeek()">Fullfør pre-seasonuke ${Number(appState.preseasonWeek)||1} →</button><button onclick="setPage('transfers')">Overgangsmarked</button></div></div><section class="card"><div class="section-title"><h2>Pre-season</h2><small>Trening og restitusjon</small></div><p class="muted">Overganger, restitusjon og trening fortsetter uten å flytte ligarunden.</p><details class="tactics-accordion" data-tactics-panel="training" ${tacticsPanelState.training?'open':''} ontoggle="setTacticsPanelOpen('training',this.open)"><summary><span>⚙️ Formasjoner i sesongtrening</span><span class="tactics-summary-meta">3 valgte · 23 muligheter</span></summary>${trainingSummary()}</details></section>`;
  if(!appState.pendingCupMatch)recoverSquadBeforeRound();
  applyPreMatchRecommendation();
  const xi=currentStartingXI();
@@ -1304,26 +1354,25 @@ function tactics(){
  const roleLabels={GK:"Keeper",LB:"Venstreback",LCB:"Venstre midtstopper",CB:"Midtstopper",RCB:"Høyre midtstopper",RB:"Høyreback",LWB:"Venstre vingback",RWB:"Høyre vingback",DM:"Defensiv midtbane",CM:"Sentral midtbane",LM:"Venstre midtbane",RM:"Høyre midtbane",LW:"Venstre ving",AM:"Offensiv midtbane",RW:"Høyre ving",ST:"Spiss"};
  const posLabels={GK:"Keepere",DEF:"Forsvar",MID:"Midtbane",ATT:"Angrep"};
  const slotControls=(players)=>players.map(p=>{const slot=xi.findIndex(x=>String(x.id)===String(p.id));const targetRole=p.assignedRole||'CM';const pool=eligibleSquad(appState.squad).filter(x=>canPlay(x)&&(targetRole==='GK'?x.pos==='GK':x.pos!=='GK')).sort((a,b)=>roleCandidateScore(b,targetRole)-roleCandidateScore(a,targetRole));return `<div class="field" style="margin:6px 0"><label>${roleLabels[targetRole]||targetRole}</label><select aria-label="Velg spiller til ${esc((roleLabels[targetRole]||targetRole).toLowerCase())}" onchange="setStartingPlayer(${slot},this.value)">${pool.map(x=>`<option value="${esc(String(x.id))}" ${String(x.id)===String(p.id)?"selected":""}>${esc(x.name)} · ${x.rating} · ${ROLE_BY_SIDE[x.role]||x.role||x.pos} · ${positionAdjustedRating(x,targetRole)} i rolle</option>`).join("")}</select>${playerDetail(p)}<div style="margin-top:6px;font-size:12px;color:${canPlay(p)?'var(--muted)':'var(--red)'}">${availabilityStatus(p)} · Naturlig tilpasning: ${Math.max(30,100-rolePenalty(p,targetRole)*5)}%</div></div>`}).join('');
- const roleOrder={
-  '4-2-3-1':[['ST'],['LW','AM','RW'],['DM','DM'],['LB','LCB','RCB','RB']],
-  '4-3-3':[['LW','ST','RW'],['DM','CM','CM'],['LB','LCB','RCB','RB']],
-  '4-4-2':[['ST','ST'],['LM','CM','CM','RM'],['LB','LCB','RCB','RB']],
-  '3-5-2':[['ST','ST'],['LWB','DM','CM','CM','RWB'],['LCB','CB','RCB']]
- };
- const roleRows=roleOrder[appState.formation]||roleOrder['4-3-3'];
- const pitchRows=roleRows.map(rowRoles=>rowRoles.map(role=>xi.find(p=>p.assignedRole===role && !p._pitchUsed)).filter(Boolean));
- // Use slot-order assignment for duplicate roles (e.g. two DMs/CMs) without reusing players.
+ const roleRows=(FORMATION_TEMPLATES[appState.formation]||FORMATION_TEMPLATES['4-3-3']).rows;
  const roleUsed=new Set();
- const stablePitchRows=roleRows.map(rowRoles=>rowRoles.map(role=>{
-  const p=xi.find(x=>x.assignedRole===role&&!roleUsed.has(String(x.id)));
-  if(p)roleUsed.add(String(p.id));
-  return p;
- }).filter(Boolean));
- const pitchLine=(players)=>`<div style="display:flex;justify-content:space-evenly;align-items:flex-start;gap:3px;margin:10px 0">${players.map(p=>`<div style="flex:1;min-width:0;text-align:center"><div style="font-size:20px;color:#eaf4ff">●</div><small style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.name.split(" ").slice(-1)[0])}</small><strong style="font-size:11px;color:var(--green)">${positionAdjustedRating(p,p.assignedRole)}</strong><small style="display:block;font-size:9px;color:${p.fitness<65?'#ffaaaa':'var(--muted)'}">${esc(ROLE_BY_SIDE[p.assignedRole]||p.pos)} · ⚡${p.fitness}%</small></div>`).join('')}</div>`;
+ const stablePitchRows=roleRows.map(rowRoles=>rowRoles.map(role=>{const p=xi.find(x=>x.assignedRole===role&&!roleUsed.has(String(x.id)));if(p)roleUsed.add(String(p.id));return p;}).filter(Boolean));
+ const pitchLine=(players)=>`<div style="display:flex;justify-content:space-evenly;align-items:flex-start;gap:3px;margin:10px 0">${players.map(p=>`<div style="flex:1;min-width:0;text-align:center"><div style="font-size:20px;color:#eaf4ff">●</div><small style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.name.split(" ").slice(-1)[0])}</small><strong style="font-size:11px;color:var(--green)">${positionAdjustedRating(p,p.assignedRole)}</strong><small style="display:block;font-size:9px;color:${p.fitness<65?'#ffaaaa':'var(--muted)'}">${esc(roleLabels[p.assignedRole]||ROLE_BY_SIDE[p.assignedRole]||p.pos)} · ⚡${p.fitness}%</small></div>`).join('')}</div>`;
  const pitch=()=>`${stablePitchRows.map(row=>pitchLine(row)).join('')}<div style="margin-top:8px;text-align:center">🧤 ${gk.map(p=>`${esc(p.name)} · ${p.rating}`).join(', ')||'Ingen keeper'}</div>`;
  const playerDetail=(p)=>`<div class="player-meta">${p.pos==="GK"?`Keepergrep ${p.attributes.handling} · Reflekser ${p.attributes.reflexes} · Posisjonering ${p.attributes.positioning}`:p.pos==="DEF"?`Forsvar ${p.attributes.defending} · Styrke ${p.attributes.strength} · Hurtighet ${p.attributes.pace}`:p.pos==="MID"?`Pasninger ${p.attributes.passing} · Kreativitet ${p.attributes.creativity} · Utholdenhet ${p.attributes.stamina}`:`Avslutninger ${p.attributes.finishing} · Hurtighet ${p.attributes.pace} · Teknikk ${p.attributes.technique}`}</div><div class="fitness-track"><div class="fitness-fill" style="width:${p.fitness}%;background:${p.fitness<60?'#e48787':p.fitness<78?'#e8c875':'var(--green)'}"></div></div>`;
  const bench=eligibleSquad(appState.squad).filter(p=>!xi.some(q=>String(q.id)===String(p.id)));
- return `<div class="hero"><div class="eyebrow">Match preparation</div><h1>Laguttak og taktikk</h1><p>Velg startelleveren før avspark. Form og utholdenhet vises for hver spiller. Utholdenhet er en egen ferdighet og påvirker hvor raskt spilleren blir sliten i kampen. Fysisk form bygges gradvis opp mellom kampene; spillere med høy utholdenhet restituerer seg raskere, mens spillere som starter ofte kan trenge hvile.</p><div class="hero-actions"><span class="pill green">${xi.length}/11 valgt</span><span class="pill">Reserver: ${bench.length}</span></div></div><section class="card"><div class="notice" style="margin-top:0"><strong>🤖 Assistentens anbefaling</strong><p style="margin:6px 0">Motstander: ${esc(appState.pendingCupMatch?(appState.pendingCupMatch.homeTeam.clubIndex===appState.club?appState.pendingCupMatch.awayTeam.name:appState.pendingCupMatch.homeTeam.name):CLUBS[getNextOpponentIndex()].name)} · ${appState.pendingCupMatch?esc(appState.pendingCupMatch.competition)+' · ':''}forventet formasjon <strong>${appState.pendingCupMatch?'4-3-3':getOpponentFormation(getNextOpponentIndex(),appState.week)}</strong>.</p><p style="margin:6px 0">Foreslått oppsett: <strong>${appState.formation}</strong> · mentalitet <strong>${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</strong>. Elleveren er valgt ut fra posisjon, ferdigheter, form og fysisk tilstand.</p><button type="button" onclick="applyPreMatchRecommendation(true);render()">Bruk anbefalingen på nytt</button></div>${disciplinarySummary()}<div class="notice"><strong>🤝 Samspill og formasjonserfaring</strong><p style="margin:6px 0">Erfaring med ${esc(appState.formation)}: <strong>${formationFamiliarity()}%</strong> · Samspill i laget: <strong>${Number(appState.teamCohesion??25)}%</strong></p><div style="height:7px;background:var(--line);border-radius:8px;overflow:hidden;margin:5px 0 10px"><div style="height:100%;width:${formationFamiliarity()}%;background:var(--green)"></div></div><p style="margin:6px 0;font-size:12px">Formasjonserfaring gir nå bare en liten bonus eller ulempe (omtrent −0,7 til +1,0 ratingpoeng). Samspill vurderes separat. Du kan derfor bytte formasjon uten at laget straffes hardt; stabilitet gir fortsatt en moderat fordel.</p></div><div class="notice"><strong>⚙️ Formasjoner i trening</strong><p class="muted" style="margin:5px 0 10px">Velg tre ulike formasjoner laget skal øve på gjennom sesongen. Alle tre blir gradvis bedre innarbeidet; systemet du bruker i kamp får ekstra erfaring, og assistenten velger bare blant disse tre.</p><div class="grid" style="grid-template-columns:1fr;gap:8px">${[0,1,2].map(i=>`<div class="field"><label>${i===0?'Primærformasjon':`Alternativ ${i}`}</label><select aria-label="Treningsformasjon ${i+1}" onchange="setTrainingFormation(${i},this.value)">${AVAILABLE_FORMATIONS.map(f=>`<option value="${f}" ${appState.trainingFormations[i]===f?'selected':''}>${f} · erfaring ${formationFamiliarity(f)}%</option>`).join('')}</select></div>`).join('')}</div></div><div class="field"><label>FORMASJON I NESTE KAMP</label><select id="formation" onchange="appState.formation=this.value;appState.selectedXI=null;save();render()">${["4-4-2","4-3-3","4-2-3-1","3-5-2"].map(f=>`<option ${appState.formation===f?"selected":""}>${f}</option>`).join("")}</select></div><div class="field"><label>MENTALITET</label><select id="tactic" onchange="appState.tactic=this.value;save()">${["Defensive","Balanced","Attacking","High press"].map(f=>`<option value="${f}" ${appState.tactic===f?"selected":""}>${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[f]}</option>`).join("")}</select></div><button type="button" style="width:100%;margin:4px 0 12px;border-color:#7e9c70;background:#1b382c;color:#bdf0ad;font-weight:850" onclick="rotateStartingXI()">🔄 Roter troppen</button><p class="muted" style="font-size:11px;margin:0 0 12px">Velger en ny startellever med prioritet til spillere som ikke startet forrige kamp. Skadde og suspenderte spillere utelates.</p><div class="section-title"><h2>Startellever</h2><small>${xi.length}/11 spillere</small></div><div style="background:linear-gradient(180deg,#17452f,#123622);border:1px solid #2b6848;border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:#b5e6bf">▲ ANGREP</div>${pitch()}</div><button class="primary" style="width:100%;margin:12px 0 18px" onclick="playMatch()">${appState.pendingCupMatch?`🏆 Avspark – ${esc(appState.pendingCupMatch.competition)}`:'⚽ Avspark – bruk valgt startellever'}</button><div class="section-title"><h2>Velg spillere</h2><small>sortert etter taktisk rolle</small></div><p class="muted" style="font-size:11px">Trykk på listene for å velge hvem som starter. Skadde og suspenderte spillere kan ikke velges.</p><div class="section-title"><h2>Keeper</h2></div>${slotControls(xi.filter(p=>p.assignedRole==='GK'))}<div class="section-title"><h2>Forsvar</h2></div>${slotControls(xi.filter(p=>['LB','LCB','CB','RCB','RB','LWB','RWB'].includes(p.assignedRole)))}<div class="section-title"><h2>Midtbane</h2></div>${slotControls(xi.filter(p=>['DM','CM','LM','RM'].includes(p.assignedRole)))}<div class="section-title"><h2>Angrep</h2></div>${slotControls(xi.filter(p=>['LW','AM','RW','ST'].includes(p.assignedRole)))}<div class="section-title"><h2>Reserver</h2><small>sortert etter taktisk rolle</small></div>${["GK","DEF","MID","ATT"].map(pos=>{const ps=bench.filter(p=>p.pos===pos);return ps.length?`<div class="lineup-section-title">${posLabels[pos]}</div>${ps.map(p=>`<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span> · ${p.rating}</div>${playerDetail(p)}</div><div class="lineup-player-side"><strong>${p.rating}</strong><span>${p.fitness}%</span></div></div>`).join("")}`:""}).join("")}<button class="primary" style="width:100%;margin-top:12px" onclick="playMatch()">${appState.pendingCupMatch?`🏆 Avspark – ${esc(appState.pendingCupMatch.competition)}`:'⚽ Avspark – bruk valgt startellever'}</button></section>`;
+ const opponentIndex=getNextOpponentIndex();
+ const opponentName=appState.pendingCupMatch?(appState.pendingCupMatch.homeTeam.clubIndex===appState.club?appState.pendingCupMatch.awayTeam.name:appState.pendingCupMatch.homeTeam.name):CLUBS[opponentIndex].name;
+ const opponentFormation=appState.pendingCupMatch?'4-3-3':getOpponentFormation(opponentIndex,appState.week);
+ const unavailableCount=appState.squad.filter(p=>!canPlay(p)).length;
+ const mentalLabels={Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"};
+ return `<div class="hero tactics-hero"><div class="eyebrow">Match preparation · ${seasonLabel()}</div><h1>Laguttak og taktikk</h1><p>Sett formasjonen, velg mentalitet og klargjør startelleveren.</p><div class="hero-actions"><span class="pill green">${xi.length}/11 valgt</span><span class="pill">Reserver: ${bench.length}</span><span class="pill ${unavailableCount?'warning':'green'}">${unavailableCount?`${unavailableCount} utilgjengelig`:'Alle tilgjengelige'}</span></div></div>
+ <section class="card tactics-quick-controls"><div class="field"><label>FORMASJON I NESTE KAMP</label><select id="formation" onchange="appState.formation=this.value;appState.selectedXI=null;save();render()">${AVAILABLE_FORMATIONS.map(f=>`<option value="${esc(f)}" ${appState.formation===f?'selected':''}>${esc(f)}</option>`).join('')}</select></div><div class="field"><label>MENTALITET</label><select id="tactic" onchange="appState.tactic=this.value;save()">${["Defensive","Balanced","Attacking","High press"].map(f=>`<option value="${f}" ${appState.tactic===f?"selected":""}>${mentalLabels[f]}</option>`).join('')}</select></div><button type="button" style="width:100%;margin:3px 0 0;border-color:#7e9c70;background:#1b382c;color:#bdf0ad;font-weight:850" onclick="rotateStartingXI()">🔄 Roter troppen</button><p class="tactics-mini-status">Prioriterer spillere som ikke startet forrige kamp. Skadde og suspenderte spillere utelates.</p></section>
+ <section class="card"><div class="section-title"><h2>Startellever</h2><small>${xi.length}/11 spillere</small></div><div class="tactics-pitch-card"><div class="pitch-direction">▲ ANGREP</div>${pitch()}</div><button class="primary" style="width:100%;margin:12px 0 4px" onclick="playMatch()">${appState.pendingCupMatch?`🏆 Avspark – ${esc(appState.pendingCupMatch.competition)}`:'⚽ Avspark – bruk valgt startellever'}</button>
+ <details class="tactics-accordion" data-tactics-panel="assistant" ${tacticsPanelState.assistant?'open':''} ontoggle="setTacticsPanelOpen('assistant',this.open)"><summary><span>🤖 Assistentens anbefaling</span><span class="tactics-summary-meta">${esc(opponentName)} · ${esc(opponentFormation)}</span></summary><div class="tactics-accordion-body"><div class="notice" style="margin-top:0"><p style="margin:0 0 6px">Foreslått oppsett: <strong>${esc(appState.formation)}</strong> · mentalitet <strong>${mentalLabels[appState.tactic]||'Balansert'}</strong>.</p><p class="muted" style="margin:0 0 10px">Assistenten vurderer motstander, posisjoner, ferdigheter, form og fysisk tilstand, og velger blant de tre treningsformasjonene.</p><button type="button" onclick="applyPreMatchRecommendation(true);render()">Bruk anbefalingen på nytt</button></div></div></details>
+ <details class="tactics-accordion" data-tactics-panel="training" ${tacticsPanelState.training?'open':''} ontoggle="setTacticsPanelOpen('training',this.open)"><summary><span>⚙️ Formasjoner i sesongtrening</span><span class="tactics-summary-meta">3 valgte · ${AVAILABLE_FORMATIONS.length} muligheter</span></summary>${trainingSummary()}</details>
+ <details class="tactics-accordion" data-tactics-panel="availability" ${tacticsPanelState.availability?'open':''} ontoggle="setTacticsPanelOpen('availability',this.open)"><summary><span>🩹 Skader og suspensjoner</span><span class="tactics-summary-meta">${unavailableCount?`${unavailableCount} ute`:'Ingen fravær'}</span></summary><div class="tactics-accordion-body">${disciplinarySummary()}</div></details>
+ <div class="section-title"><h2>Velg spillere</h2><small>sortert etter taktisk rolle</small></div><p class="muted" style="font-size:11px">Trykk på listene for å velge hvem som starter. Skadde og suspenderte spillere kan ikke velges.</p><div class="section-title"><h2>Keeper</h2></div>${slotControls(xi.filter(p=>p.assignedRole==='GK'))}<div class="section-title"><h2>Forsvar</h2></div>${slotControls(xi.filter(p=>['LB','LCB','CB','RCB','RB','LWB','RWB'].includes(p.assignedRole)))}<div class="section-title"><h2>Midtbane</h2></div>${slotControls(xi.filter(p=>['DM','CM','LM','RM'].includes(p.assignedRole)))}<div class="section-title"><h2>Angrep</h2></div>${slotControls(xi.filter(p=>['LW','AM','RW','ST'].includes(p.assignedRole)))}<div class="section-title"><h2>Reserver</h2><small>sortert etter taktisk rolle</small></div>${["GK","DEF","MID","ATT"].map(pos=>{const ps=bench.filter(p=>p.pos===pos);return ps.length?`<div class="lineup-section-title">${posLabels[pos]}</div>${ps.map(p=>`<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span> · ${p.rating}</div>${playerDetail(p)}</div><div class="lineup-player-side"><strong>${p.rating}</strong><span>${p.fitness}%</span></div></div>`).join("")}`:""}).join("")}<button class="primary" style="width:100%;margin-top:12px" onclick="playMatch()">${appState.pendingCupMatch?`🏆 Avspark – ${esc(appState.pendingCupMatch.competition)}`:'⚽ Avspark – bruk valgt startellever'}</button></section>`;
 }
 function ensureTransferPool(){
  if(!Array.isArray(appState.freeAgents))appState.freeAgents=[];
@@ -2560,15 +2609,17 @@ function effectivePlayerRating(engine,p){
 }
 function roleWeight(p,kind,formation){
  const pos=p.pos;
+ const slots=(FORMATION_TEMPLATES[formation]||FORMATION_TEMPLATES['4-3-3']).slots;
+ const forwardCount=slots.filter(r=>['LW','RW','ST'].includes(r)).length;
+ const attackingMidCount=slots.filter(r=>r==='AM').length;
+ const defenderCount=slots.filter(r=>['LB','LCB','CB','RCB','RB','LWB','RWB'].includes(r)).length;
  if(kind==="attack"){
-  let w=pos==="ATT"?1.29:pos==="MID"?0.88:pos==="DEF"?0.20:0.03;
-  if(formation==="4-4-2"&&pos==="ATT")w=1.36;
-  if(formation==="4-3-3"&&pos==="ATT")w=1.42;
-  if(formation==="3-5-2"&&pos==="MID")w=1.0;
-  if(formation==="4-2-3-1"&&pos==="MID")w=1.0;
-  return w;
+  if(pos==="ATT")return 1.12+forwardCount*.075+attackingMidCount*.015;
+  if(pos==="MID")return .82+slots.filter(r=>['DM','CM','LM','RM','AM'].includes(r)).length*.025;
+  if(pos==="DEF")return defenderCount>=5?.24:defenderCount===3?.16:.20;
+  return .03;
  }
- if(kind==="defense")return pos==="GK"?1.15:pos==="DEF"?1.2:pos==="MID"?.58:.18;
+ if(kind==="defense")return pos==="GK"?1.15:pos==="DEF"?(defenderCount>=5?1.28:defenderCount===3?1.08:1.2):pos==="MID"?.58:.18;
  return 1;
 }
 function weightedTeamRating(engine,side,kind){
@@ -2583,8 +2634,11 @@ function weightedTeamRating(engine,side,kind){
 }
 function tacticalShapeBonus(engine,side,kind){
  const formation=side==="A"?engine.formationA:engine.formationB;
- if(kind==="attack")return formation==="4-3-3"?1.1:formation==="3-5-2"?.45:formation==="4-2-3-1"?.65:0;
- if(kind==="defense")return formation==="3-5-2"?.9:formation==="4-2-3-1"?.45:formation==="4-4-2"?.2:0;
+ const slots=(FORMATION_TEMPLATES[formation]||FORMATION_TEMPLATES['4-3-3']).slots;
+ const defenders=slots.filter(r=>['LB','LCB','CB','RCB','RB','LWB','RWB'].includes(r)).length;
+ const advanced=slots.filter(r=>['LW','RW','ST','AM'].includes(r)).length;
+ if(kind==="attack")return formation==="4-3-3"?1.1:formation==="3-5-2"?.45:formation==="4-2-3-1"?.65:Math.max(-.15,Math.min(.8,(advanced-2)*.22+(formation==='4-2-4'?.2:0)));
+ if(kind==="defense")return formation==="3-5-2"?.9:formation==="4-2-3-1"?.45:formation==="4-4-2"?.2:defenders>=5?.75:defenders===3?-.2:0;
  return 0;
 }
 function averageRating(players,filter){const list=players.filter(filter);return list.length?list.reduce((s,p)=>s+p.rating,0)/list.length:65}
@@ -2737,6 +2791,7 @@ function maybeManagerTactics(engine,minute){
    const commentary=document.getElementById('liveCommentary');if(commentary)commentary.textContent=`Assistentens forslag: ${reason.toLowerCase()}. Vurder ${desired} og ${tactic==='Attacking'?'offensiv':tactic==='Defensive'?'defensiv':'balansert'} mentalitet.`;
    continue;
   }
+  if(isUser&&desired!==current&&!appState.trainingFormations.includes(desired)){const opponentSide=side==='A'?'B':'A';const opponentShape=getManagerSideFormation(engine,opponentSide);desired=assistantFormationChoice(opponentShape);reason+='; assistenten velger et innarbeidet system';}
   if(desired!==current)setManagerSideFormation(engine,side,desired);
   if(isUser){appState.tactic=tactic;const sel=document.getElementById('liveTacticSelect');if(sel)sel.value=tactic;}
   else{if(!engine.sideTactics)engine.sideTactics={A:'Balanced',B:'Balanced'};engine.sideTactics[side]=tactic;}
@@ -3392,7 +3447,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.06 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
+function render(){ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.07 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{const ok=save();let b=document.getElementById("saveBtn");b.textContent=ok?"✓ Lagret":"⚠ Lagring feilet";setTimeout(()=>b.textContent="▣ Lagre",1800)});
 // Load public reference sources before the first database build; the game remains playable without them.
