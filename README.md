@@ -1,4 +1,10 @@
-# CM Mobile v2.01
+# CM Mobile v2.02
+
+## v2.02 – overgangsliste beholder valgt tilstand
+- «Din overgangsliste» husker om brukeren har den åpen eller lukket.
+- Når en spiller legges ut for salg eller tas av markedet, beholdes den valgte tilstanden etter at overgangssiden tegnes på nytt.
+- Dette gjør det mulig å legge flere spillere ut for salg etter hverandre uten å åpne seksjonen på nytt.
+- Seksjonen er fortsatt lukket som standard ved en ny sidelasting/ny økt.
 
 ## Prioriterte endringer
 
@@ -33,6 +39,8 @@
 - Avgrenset, innebygd spillerregister og funksjonen «Roter troppen».
 
 ## Teststatus
+- Kontrollert at HTML-markupen inkluderer en vedvarende tilstandsvariabel på accordionen, og at `listPlayerForTransfer()` kan kalle `render()` uten å tilbakestille åpen/lukket status.
+- JavaScript-syntaks kontrollert med Node.js.
 - JavaScript-syntaks kontrollert med Node.js.
 - 13 isolerte logikk- og UI-markup-tester bestått: pre-season-progresjon, uendret ligarunde, formasjonsvalg/erfaring, junioropprykk, tomme plasser ved pensjonering og blokkering av obligatorisk kamp under pre-season.
 - Full visuell nettlesertest av hele spillet er ikke bekreftet. Test gjerne en kopi av karrierelagringen før videre bruk.
