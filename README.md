@@ -1,23 +1,36 @@
-# CM Mobile v2.27 — European qualification
+# CM Mobile v2.30
 
-## Changes in v2.27
-- Fixed the English club allocation across European league phases so the same Premier League club cannot be assigned to more than one UEFA competition.
-- Uses a simplified English allocation of 5 Champions League places, 3 Europa League places and 1 Conference League place.
-- Gives FA Cup and EFL Cup winners priority for Europa League and Conference League places respectively; if a winner already qualifies for a higher competition, the next eligible league club fills the vacancy.
-- Prioritizes the latest available Premier League table for qualification; saved season qualifier lists are fallback data only.
-- Bumped the European competition database version so saved v2.26 league-phase data is rebuilt with the corrected allocation.
-- Updated the season summary's baseline league-position ranges to 5 Champions League, 3 Europa League and 1 Conference League place.
+## Endringer i v2.30
 
-## Scope and limitations
-- This is a game-friendly approximation of English qualification, not a complete UEFA access-list implementation. It does not yet model European Performance Spots, titleholder bonus places, qualifying rounds, or every association-specific rule.
-- League-phase participants remain based on the game's club pools and season data; this change corrects English club allocation and duplicate assignments rather than fully licensing every European club list.
-- Promotion/relegation changes from v2.26 are retained.
+- Gjeninnført hele det innebygde, offline spillerprofilarkivet fra den tidligere v1.96-byggen: **50,100 profiler** (snapshotdato 6. juli 2026). Profilene inneholder fødselsdato og øvrige referansefelt der kilden har dem.
+- Spillerarkivet brukes til å matche navn med fødselsdato, posisjon, foretrukket fot, høyde og markedsverdi. Ingen nettforespørsel er nødvendig.
+- Viktig datakvalitetsretting: profilarkivets historiske `currentClubName` brukes **ikke** lenger som fasit for å sette spillere inn i en 2026/27-tropp. En tropp må bygges fra en eksplisitt navneliste; et navnetreff i profilarkivet brukes kun til å berike spilleropplysninger.
+- EFL-klubber som allerede har kuraterte seed-navn får nå disse i en ny, urørt preseason-karriere før den fiktive resten av troppen fylles. Eksisterende sesonger blir ikke byttet ut hvis ligaen allerede er spilt.
+- Spillerdatabaseversjonen er økt til 11, og EFL-databasens versjon til 7 for å kjøre riktige migreringer.
+- Lagt ved `ROSTER_COVERAGE_v2.30.csv`, en ærlig oversikt over hvor mange navngitte spillere som er kuratert per engelsk klubb, hvor mange kan matches mot profilarkivet, og hvor mange plasser fortsatt er fiktive.
 
-## Files
-- `index.html` — playable game.
-- `README.md` — version notes.
+## Hva dette ikke løser ennå
 
-## Validation
-- Inline JavaScript syntax checked with Node.js.
-- ZIP integrity checked after packaging.
-- A full browser playthrough is still needed to validate competition initialization and a complete season rollover in the live app.
+Dette er et viktig databasefundament, men det er **ikke** en ferdig, sesongverifisert database med ekte spillertropper for alle 92 engelske klubber. Profilarkivet på 50 100 rader er historisk og inkluderer også tidligere spiller-/klubbtilknytninger; det må ikke forveksles med dagens spillerstall. Premier League-listene og de eksisterende EFL-seedene er fortsatt ujevnt dekket, og den vedlagte CSV-en viser hullene eksplisitt.
+
+Neste datasteg er å legge inn en egen `2026/27`-troppstabell med eksplisitte klubber og spiller-ID-er, bygget fra en kilde som tillater gjenbruk. Den bør valideres for 92 unike klubber, spillerduplikater, klubbtilhørighet, fødselsdato, posisjon og troppsstørrelse før den tas i bruk. Etter at en karriere starter, er alle disse dataene innebygd og spillet kjører offline.
+
+## Kilde og begrensninger
+
+- `dcaribou/transfermarkt-datasets`: https://github.com/dcaribou/transfermarkt-datasets
+- Kildens README oppgir CC0 for datasettressursene, men varsler at innsamling/oppdateringer er satt på pause og at 2026/27-troppene ikke er dekket; snapshotet stopper 6. juli 2026.
+- Arkivet brukes derfor som historisk profilreferanse, ikke som fasit for gjeldende tropp.
+- Spillerens ferdigheter og potensial er fortsatt estimater i spillets modell med mindre de er spesifikt satt i spilldatabasen.
+
+## Teststatus
+
+- Embedded archive: 50,100 unike profil-ID-er; hver rad har en fødselsdato.
+- EFL clubs in roster audit: 72.
+- English clubs in roster audit: 92 (Premier League + de tre EFL-divisjonene).
+- JavaScript-syntaks og ZIP-integritet må kontrolleres før publisering; full sesongverifisering av 92 faktiske tropper gjenstår.
+
+## Filer
+
+- `index.html` – hele spillet med innebygd spillerprofilarkiv
+- `README.md` – versjonsnotater
+- `ROSTER_COVERAGE_v2.30.csv` – dekningsrevisjon for de 92 engelske klubbene
