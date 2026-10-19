@@ -1,16 +1,9 @@
-# CM Mobile v2.11
+# CM Mobile v2.12
 
-## Endringer siden v2.09
-- Navigering mellom hovedfanene starter nå øverst på siden.
-- Gjelder både trykk i hovedmenyen og programmatisk sidebytte, uten å hoppe til toppen ved vanlige oppdateringer på samme fane.
-- Beholder eksisterende karrieredata og spillfunksjoner.
+## UEFA-regler for ligafasen
+- Lag fra samme nasjon/forbund trekkes ikke mot hverandre i ligafasen.
+- Hvert lag kan møte maksimalt to motstandere fra samme andre nasjon.
+- Oppsettet regenereres for å håndheve reglene i nye og eksisterende lagrede sesonger.
+- Sluttspillstrekningen følger separate regler; nasjonale motstandere kan møtes fra utslagsfasen.
 
-## Kontroll
-- JavaScript-syntaks kontrollert.
-- ZIP-struktur kontrollert: versjonsmappe med `index.html` og `README.md`.
-- Scroll-oppførselen er kontrollert i koden; test også på den publiserte GitHub Pages-siden.
-
-
-## v2.11 – Taktisk assistent
-- Assistentens anbefalte formasjon vises eksplisitt som en av de tre valgte treningsformasjonene.
-- Motstanderens formasjon er tydelig merket som motstanderinfo, slik at den ikke forveksles med anbefalingen.
+Basert på CM Mobile v2.11. ZIP-en inneholder `index.html` og denne README-filen.
