@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.07 — Touchline</title>
+<title>CM Mobile v2.08 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -222,7 +222,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(min-width:600px){.tactics-training-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.07</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.08</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -599,7 +599,7 @@ function playerDatabaseStatusHTML(players){
  const unknown=rows.filter(p=>!Number.isFinite(p.age)).length;
  const globals=PLAYER_REFERENCE_STATUS.globalLoaded?`Bredt Transfermarkt-register: ${PLAYER_REFERENCE_STATUS.globalPlayers} relevante profiler · snapshot ${PLAYER_REFERENCE_STATUS.globalSourceDate||TM_GLOBAL_REFERENCE_CUTOFF}`:'Bredt Transfermarkt-register er ikke lastet i denne nettleserøkten';
  const coverage=PLAYER_REFERENCE_STATUS.globalLoaded?`Kildeprofildekning: ${PLAYER_REFERENCE_STATUS.eflClubsWithProfiles||0}/72 EFL-klubber og ${PLAYER_REFERENCE_STATUS.europeanClubsWithProfiles||0}/108 europacupdeltakere har minst 12 profiler i snapshotet.`:'Kildeprofildekning beregnes etter at nettregisteret er lastet.';
- return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.07</strong><div class="player-meta">${esc(sourceLabel)} · ${esc(tmLabel)} · ${esc(globals)}.</div><div class="player-meta">${esc(coverage)}</div><div class="player-meta">Denne troppen: ${esc(ageLabel)} · ${unknown} med ukjent alder · ${tm} med Transfermarkt-profilfelt · ${fpl} med FPL-statistikk.</div><div class="player-meta">Fødselsdatoer brukes til å beregne alder per 22. august ${Number(appState.seasonYear)||2026}. Ukjent alder vises heller enn et tilfeldig estimat. Snapshot 6. juli 2026 gir ikke bekreftet klubbtilhørighet etter datoen. Ferdigheter er spillmodell-estimater.</div></div>`;
+ return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.08</strong><div class="player-meta">${esc(sourceLabel)} · ${esc(tmLabel)} · ${esc(globals)}.</div><div class="player-meta">${esc(coverage)}</div><div class="player-meta">Denne troppen: ${esc(ageLabel)} · ${unknown} med ukjent alder · ${tm} med Transfermarkt-profilfelt · ${fpl} med FPL-statistikk.</div><div class="player-meta">Fødselsdatoer brukes til å beregne alder per 22. august ${Number(appState.seasonYear)||2026}. Ukjent alder vises heller enn et tilfeldig estimat. Snapshot 6. juli 2026 gir ikke bekreftet klubbtilhørighet etter datoen. Ferdigheter er spillmodell-estimater.</div></div>`;
 }
 function squadDiagnosticsPanel(players){
  const rows=Array.isArray(players)?players:[];
@@ -794,6 +794,7 @@ function attributeMarkup(p){
 }
 
 const FINANCE_VERSION=1;
+const WAGE_POLICY_VERSION=1;
 function divisionForClubName(name){
  const registered=CLUBS.find(c=>c.name===name);if(registered)return clubDivision(registered);
  for(const [div,names] of Object.entries(EFL_DIVISIONS))if(names.includes(name))return div;
@@ -828,6 +829,36 @@ function initClubFinances(force=false){
  });
 }
 function getClubFinance(name=currentClub().name){initClubFinances();return appState.clubFinances[name]||baselineFinance(name,60,divisionForClubName(name));}
+function adjustWageBudgetsForNewSeason(finalTable,previousSeason){
+ // Annual board review: set a new limit from the club's level, revenue, results and financial health.
+ // It never simply matches the current wage bill; overspending is a problem to solve, not a reason to raise the limit.
+ initClubFinances();
+ const rank=Math.max(1,(finalTable||[]).findIndex(t=>t.name===currentClub().name)+1);
+ const prizeTotal=(appState.prizeLedger||[]).filter(x=>Number(x.season)===Number(previousSeason)).reduce((sum,x)=>sum+(Number(x.amount)||0),0);
+ const f=getClubFinance(),div=clubDivision(currentClub()),income=weeklyOperatingRevenueM(div,currentClub().strength);
+ const oldBudget=Math.max(1,Number(f.wageBudget)||1),wageBill=(appState.squad||[]).reduce((sum,p)=>sum+(Number(p.wage)||0),0);
+ const cash=Number(appState.budget)||0;
+ const divisionBase=div==='Premier League'?450:div==='Championship'?125:div==='League One'?42:18;
+ const strength=Math.max(.65,Math.pow(Math.max(35,Number(currentClub().strength)||60)/65,2.15));
+ let target=divisionBase*strength*(.78+(stableSeed(currentClub().name+' wages')%45)/100);
+ // Financial capacity matters: operating income and a positive balance can support growth.
+ const incomeFactor=Math.max(.68,Math.min(1.28,.82+income/(div==='Premier League'?3.5:div==='Championship'?.85:div==='League One'?.32:.18)));
+ const cashFactor=cash<0?.78:cash<5?.9:cash>60?1.12:cash>25?1.06:1;
+ const prizeFactor=1+Math.min(.12,prizeTotal/250)*.12;
+ const resultFactor=rank===1?1.08:rank<=4?1.05:rank<=8?1.025:rank>=18&&div==='Premier League'?.94:1;
+ target*=incomeFactor*cashFactor*prizeFactor*resultFactor;
+ // Limit annual movement except for promotion/relegation, where division economics change sharply.
+ const oldDiv=appState.lastSeasonSummary?.division||f.division||div,divisionChanged=oldDiv!==div;
+ if(!divisionChanged)target=Math.max(oldBudget*.88,Math.min(oldBudget*1.18,target));
+ else target=Math.max(target,divisionBase*strength*.72);
+ target=Math.max(8,Math.round(target));
+ f.division=div;f.wageBudget=target;f.wageBill=wageBill;f.wageBudgetReviewedSeason=Number(appState.seasonYear)||2027;f.wageBudgetReview={previousBudget:oldBudget,newBudget:target,division:div,weeklyIncomeM:income,prizeIncome:prizeTotal,rank,cash,reason:divisionChanged?'divisjonsskifte og ny økonomisk vurdering':'årlig vurdering av inntekter, resultater og økonomisk status'};
+ f.financialStatus=wageBill>target?'under-pressure':'stable';
+ appState.log=appState.log||[];
+ appState.log.push(`Styret har vurdert lønnsrammen for ${seasonLabel()}: ${target}k/uke (${target>=oldBudget?'+':''}${target-oldBudget}k/uke). Vurderingen bygger på divisjon, inntekter, premiepenger, sluttplassering og økonomisk status.`);
+ if(wageBill>target)appState.log.push(`Styreadvarsel: lønnskostnadene er ${Math.round((wageBill-target))}k/uke over den nye lønnsrammen. Rammen økes ikke automatisk for å dekke overskridelsen.`);
+ appState.wagePolicyVersion=WAGE_POLICY_VERSION;
+}
 const YOUTH_ACADEMY_TARGETS={GK:3,DEF:8,MID:8,ATT:6};
 function makeYouthProspect(clubName,division,idx,season,forcedPos=null){
  const rng=seededRandom(stableSeed(`youth|${clubName}|${season}|${idx}|${forcedPos||'ANY'}`));
@@ -975,6 +1006,7 @@ function financePage(){
  return `<div class="hero"><div class="eyebrow">Club management · ${seasonLabel()}</div><h1>Økonomi</h1><p>${esc(currentClub().name)} · Oversikt over overgangsbudsjett, lønnsramme og ukentlig drift.</p><div class="squad-summary"><span class="pill ${underPressure?'':'green'}">${status}</span><span class="pill">${wageUse}% av lønnsrammen brukt</span></div><div class="grid"><div class="stat"><small>Overgangsbudsjett</small><strong>${money(appState.budget)}</strong></div><div class="stat"><small>Netto drift / uke</small><strong class="${netM<0?'negative':'positive'}">${money(netM)}</strong></div><div class="stat"><small>Driftsinntekter / uke</small><strong>${money(income)}</strong></div></div></div>
  <section class="card"><div class="section-title"><h2>Ukentlig drift</h2><span class="pill">${status}</span></div><div class="player"><div style="flex:1"><strong>Driftsinntekter</strong><div class="player-meta">TV, sponsor, kampdag og kommersielle inntekter</div></div><b>${money(income)}/uke</b></div><div class="player"><div style="flex:1"><strong>Lønnsutgifter</strong><div class="player-meta">Samlet lønn for førstelaget</div></div><b>${money(wageExpenseM)}/uke</b></div><div class="player"><div style="flex:1"><strong>Netto drift</strong><div class="player-meta">Inntekter minus lønnsutgifter, før overgangsgebyrer</div></div><b class="${netM<0?'negative':'positive'}">${money(netM)}/uke</b></div><div class="notice">Driftsinntektene er en forenklet modell basert på divisjon og klubbens styrke. Overgangsgebyrer påvirker overgangsbudsjettet direkte.</div></section>
  <section class="card"><div class="section-title"><h2>Lønnsramme</h2><span class="pill">${wageUse}% brukt</span></div><div class="player"><div style="flex:1"><strong>Lønnsbudsjett</strong><div class="player-meta">Klubbens ukentlige lønnsramme</div></div><b>${money(wageBudgetK/1000)}/uke</b></div><div class="player"><div style="flex:1"><strong>Tilgjengelig lønnsrom</strong><div class="player-meta">Før lønnsrammen overskrides</div></div><b>${money((wageBudgetK-wageBillK)/1000)}/uke</b></div><div style="height:10px;background:#0b1422;border:1px solid var(--line);border-radius:99px;overflow:hidden;margin:12px 0"><div style="height:100%;width:${Math.max(0,Math.min(100,wageUse))}%;background:${underPressure?'var(--red)':'var(--green)'};border-radius:99px"></div></div><p class="muted" style="margin:0">${underPressure?'Lønnskostnadene ligger over rammen eller klubbens budsjett er negativt. Vurder salg eller lavere lønnsforpliktelser.':'Lønnsutgiftene ligger innenfor den beregnede lønnsrammen.'}</p></section>
+ <section class="card"><div class="section-title"><h2>Turneringspremier</h2><span class="pill">${(appState.prizeLedger||[]).filter(x=>Number(x.season)===Number(appState.seasonYear)).length} utbetalinger</span></div><p class="muted">Premiepenger føres direkte til overgangsbudsjettet. Deltakelse, resultater og plassering gir ekstra inntekter; beløpene er en balansert spillmodell, ikke en offisiell økonomisk simulering.</p>${(()=>{const rows=(appState.prizeLedger||[]).filter(x=>Number(x.season)===Number(appState.seasonYear)).slice().reverse();const total=rows.reduce((a,x)=>a+(Number(x.amount)||0),0);return `<div class="player"><div style="flex:1"><strong>Premiepenger denne sesongen</strong><div class="player-meta">Deltakelse, seire, avansement og ligaplassering</div></div><b class="positive">+${money(total)}</b></div>${rows.slice(0,10).map(x=>`<div class="player"><div style="flex:1"><strong>${esc(x.label)}</strong><div class="player-meta">${esc(x.detail||'Turneringspremie')}</div></div><b class="positive">+${money(x.amount)}</b></div>`).join('')||'<p class="muted">Premiepenger vises her etter turneringskamper og sesongslutt.</p>'}`})()}</section>
  <section class="card"><div class="section-title"><h2>Overgangsbudsjett</h2><span class="pill">${money(appState.budget)}</span></div><p class="muted">Dette er beløpet klubben kan bruke på overgangsgebyrer. Spillerlønninger føres separat som ukentlige driftsutgifter.</p><button class="primary" style="width:100%" onclick="setPage('transfers')">Gå til overgangsmarkedet →</button></section>`;
 }
 
@@ -1010,6 +1042,7 @@ const AVAILABLE_FORMATIONS=Object.keys(FORMATION_TEMPLATES);
 const tacticsPanelState={assistant:false,training:false,availability:false};
 function setTacticsPanelOpen(name,isOpen){if(Object.prototype.hasOwnProperty.call(tacticsPanelState,name))tacticsPanelState[name]=!!isOpen;}
 function ensureCareerSystems(){
+ appState.prizeLedger=Array.isArray(appState.prizeLedger)?appState.prizeLedger:[];
  if(!appState.formationExperience||typeof appState.formationExperience!=="object")appState.formationExperience={"4-3-3":20,"4-4-2":20,"4-2-3-1":20,"3-5-2":20};
  if(!Array.isArray(appState.trainingFormations)||appState.trainingFormations.length<2){appState.trainingFormations=[appState.formation||"4-3-3","4-2-3-1","4-4-2"];}
  const clean=[];for(const f of appState.trainingFormations){if(AVAILABLE_FORMATIONS.includes(f)&&!clean.includes(f))clean.push(f);}
@@ -1851,6 +1884,52 @@ function shootoutScore(homeStrength,awayStrength){
  if(h===a){if(Number(homeStrength||60)>=Number(awayStrength||60))h++;else a++;}
  return {home:h,away:a};
 }
+const COMPETITION_PRIZES={
+ 'Premier League':{participation:0,win:0,draw:0,places:[0,35,28,23,19,16,14,12,10,8,7,6,5,4,3,2,1]},
+ 'Championship':{participation:0,win:0,draw:0,places:[0,8,6,5,4,3,2,1]},
+ 'League One':{participation:0,win:0,draw:0,places:[0,2.5,2,1.5,1,.8,.6,.4]},
+ 'League Two':{participation:0,win:0,draw:0,places:[0,1.5,1.2,.9,.7,.5,.3,.2]},
+ 'FA Cup':{participation:0.15,win:0.25,draw:0,rounds:{1:0.05,2:0.08,3:0.15,4:0.25,5:0.4,6:0.75,7:1.5,8:3.9}},
+ 'EFL Cup':{participation:0.1,win:0.12,draw:0,rounds:{1:0.03,2:0.05,3:0.1,4:0.15,5:0.25,6:0.5,7:1.0}},
+ 'Champions League':{participation:2.1,win:1.8,draw:0.6,rounds:{playoff:1.0,round16:10,quarter:11,semi:13,final:18,champion:25}},
+ 'Europa League':{participation:1.1,win:0.9,draw:0.3,rounds:{playoff:0.5,round16:2.5,quarter:4.2,semi:5.5,final:7,champion:8}},
+ 'Conference League':{participation:0.6,win:0.5,draw:0.18,rounds:{playoff:0.3,round16:1.2,quarter:2,semi:3,final:4,champion:5}}
+};
+function awardCompetitionPrize(label,amount,uniqueKey,detail=''){
+ amount=Number(amount)||0;if(amount<=0)return false;
+ appState.prizeLedger=appState.prizeLedger||[];const key=`${Number(appState.seasonYear)||2026}|${uniqueKey}`;
+ if(appState.prizeLedger.some(x=>x.key===key))return false;
+ appState.prizeLedger.push({key,season:Number(appState.seasonYear)||2026,label,amount,detail,week:Number(appState.week)||1});
+ appState.budget=+(Number(appState.budget||0)+amount).toFixed(2);
+ const finance=getClubFinance();finance.transferBudget=appState.budget;const own=CLUBS[appState.club];if(own)own.budget=appState.budget;
+ appState.log=appState.log||[];appState.log.push(`Premieinntekt: ${label}${detail?` (${detail})`:''} +${money(amount)}.`);
+ return true;
+}
+function awardUserCompetitionMatch(competition,roundNo,homeName,awayName,ga,gb,winnerName,isLeaguePhase=false,isKnockout=false){
+ const prize=COMPETITION_PRIZES[competition];if(!prize)return;
+ const user=currentClub().name,userPlayed=homeName===user||awayName===user;if(!userPlayed)return;
+ const base=competition==='FA Cup'||competition==='EFL Cup'?'cup':competition==='Premier League'||competition==='Championship'||competition==='League One'||competition==='League Two'?'league':'europe';
+ awardCompetitionPrize(`${competition} deltakelsespremie`,prize.participation,`${competition}|participation`,'sesongdeltakelse');
+ if(isLeaguePhase&&base==='europe'){
+  const goalsFor=homeName===user?ga:gb,goalsAgainst=homeName===user?gb:ga;
+  if(goalsFor>goalsAgainst)awardCompetitionPrize(`${competition} · seier i ligafasen`,prize.win,`${competition}|league-win|${roundNo}` ,`runde ${roundNo}`);
+  else if(goalsFor===goalsAgainst)awardCompetitionPrize(`${competition} · uavgjort i ligafasen`,prize.draw,`${competition}|league-draw|${roundNo}`,`runde ${roundNo}`);
+ }else if(base==='cup'&&winnerName===user){
+  const round=Number(roundNo)||1;const amount=Number(prize.rounds?.[round])||prize.win||0;
+  awardCompetitionPrize(`${competition} · avansement`,amount,`${competition}|round|${round}`,`runde ${round}`);
+ }else if(isKnockout&&winnerName===user){
+  const round=Number(roundNo)||1;const stageAmount=round>=4?prize.rounds?.champion:round===3?prize.rounds?.semi:round===2?prize.rounds?.quarter:prize.rounds?.round16;
+  awardCompetitionPrize(`${competition} · sluttspillavansement`,Number(stageAmount)||prize.win,`${competition}|knockout|${round}`,`runde ${round}`);
+ }
+}
+function awardLeaguePositionPrize(finalTable){
+ const rank=(finalTable||[]).findIndex(t=>t.name===currentClub().name)+1;const division=clubDivision(currentClub());
+ const table=COMPETITION_PRIZES[division];
+ const participation=division==='Premier League'?2:division==='Championship'?.5:division==='League One'?.15:.08;
+ awardCompetitionPrize(`${division} · deltakelsespremie`,participation,`${division}|league-participation`,'sesongdeltakelse');
+ const amount=Number(table?.places?.[rank])||0;
+ if(amount>0)awardCompetitionPrize(`${division} · ${rank}. plass`,amount,`${division}|final-position`,`sluttplass ${rank}`);
+}
 function finishPendingCupMatch(engine,ga,gb){
  const pending=appState.pendingCupMatch;if(!pending)return null;
  if(pending.isEuropeanKnockout===true)return finishEuropeanKnockoutUserMatch(engine,ga,gb,pending);
@@ -1864,6 +1943,7 @@ function finishPendingCupMatch(engine,ga,gb){
   comp.leagueRound=Math.max(Number(comp.leagueRound)||0,pending.roundNo);comp.stage=comp.leagueRound;
   if(comp.leagueRound>=comp.matchdays){comp.phase='knockout';comp.leaguePhaseComplete=true;}
   appState.domesticCalendar=appState.domesticCalendar||[];appState.domesticCalendar.push({week:pending.scheduledWeek||appState.week,competition:pending.competition,...userResult});
+  awardUserCompetitionMatch(pending.competition,pending.roundNo,homeName,awayName,ga,gb,winner,true,false);
   const text=`${pending.competition} · Ligafase runde ${pending.roundNo}: ${homeName} ${score} ${awayName}. ${winner==='Uavgjort'?'Uavgjort.':`${winner} vant.`}`;
   appState.log.push(text);appState.pendingCupMatch=null;
   return {winner,score,resultText:text,competition:pending.competition,isLeaguePhase:true};
@@ -1895,6 +1975,7 @@ function finishPendingCupMatch(engine,ga,gb){
   cup.round=pending.roundNo;
   if(cup.teams.length===1)cup.champion=cup.teams[0].name;
  }
+ awardUserCompetitionMatch(pending.competition,pending.roundNo,pending.homeTeam.name,pending.awayTeam.name,ga,gb,winnerTeam.name,false,pending.isEuropeanKnockout===true);
  appState.domesticCalendar=appState.domesticCalendar||[];
  appState.domesticCalendar.push({week:pending.scheduledWeek||appState.week,competition:pending.competition,...userResult});
  const text=`${pending.competition} · ${pending.homeTeam.name} ${score} ${pending.awayTeam.name}. Videre: ${winnerTeam.name}.`;
@@ -2244,6 +2325,7 @@ function finishEuropeanKnockoutUserMatch(engine,ga,gb,pending){
  const leg=Number(pending.knockoutLeg)||1,home=pending.homeTeam,away=pending.awayTeam;
  const result=buildEuropeanKnockoutResult(comp,stage,tie,leg,home,away,ga,gb,engine);
  if(stage.key==='final'&&ga===gb){const pen=shootoutScore(home.strength,away.strength);const penWinner=pen.home>pen.away?home:away;result.score=`${ga}–${gb} (${pen.home}–${pen.away} str.)`;result.decidedByPenalties=true;result.penaltyScore=pen;result.penaltyWinner=penWinner.name;result.winner=penWinner.name;}
+ awardUserCompetitionMatch(pending.competition,stage.index+1||1,home.name,away.name,ga,gb,result.winner,false,true);
  recordEuropeanKnockoutLeg(comp,stage,tie,leg,home,away,ga,gb,result);stage.legResults=stage.legResults||{};stage.legResults[leg]=stage.legResults[leg]||[];stage.legResults[leg].push(result);comp.results.push(result);
  appState.domesticCalendar=appState.domesticCalendar||[];appState.domesticCalendar.push({week:pending.scheduledWeek||appState.week,competition:pending.competition,...result});
  appState.log.push(`${comp.name} · ${stage.name} ${leg===1?'første':'andre'} kamp: ${home.name} ${result.score} ${away.name}.`);
@@ -2431,7 +2513,8 @@ function startNewSeason(){
  if(!seasonCompleted()){alert("Spill ferdig sesongen før du starter en ny.");return}
  if(!confirm(`Starte sesongen ${Number(appState.seasonYear)+1}/${String(Number(appState.seasonYear)+2).slice(-2)}? Klubben og troppen beholdes, mens tabell og sesongstatistikk nullstilles.`))return;
  const finalTable=sortedTable();
- appState.lastSeasonSummary={season:seasonLabel(),club:currentClub().name,rank:finalTable.findIndex(t=>t.name===currentClub().name)+1,champion:finalTable[0].name,points:currentClubRecord().pts,cupWinners:Object.fromEntries(Object.entries(appState.cupCompetitions||{}).map(([k,v])=>[k,v.champion])),europeanWinners:Object.fromEntries(Object.entries(appState.europeanCompetitions||{}).map(([k,v])=>[k,v.champion]))};
+ awardLeaguePositionPrize(finalTable);
+ appState.lastSeasonSummary={season:seasonLabel(),division:clubDivision(currentClub()),club:currentClub().name,rank:finalTable.findIndex(t=>t.name===currentClub().name)+1,champion:finalTable[0].name,points:currentClubRecord().pts,cupWinners:Object.fromEntries(Object.entries(appState.cupCompetitions||{}).map(([k,v])=>[k,v.champion])),europeanWinners:Object.fromEntries(Object.entries(appState.europeanCompetitions||{}).map(([k,v])=>[k,v.champion]))};
  const lower=appState.lowerLeagues||{};const sortedLower={};Object.entries(lower).forEach(([div,data])=>{sortedLower[div]=[...data.rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));});const pl=finalTable;appState.lastSeasonSummary.promoted={toChampionship:sortedLower.Championship?.slice(0,3).map(x=>x.name)||[],toLeagueOne:sortedLower['League One']?.slice(0,3).map(x=>x.name)||[],toLeagueTwo:sortedLower['League Two']?.slice(0,3).map(x=>x.name)||[]};appState.lastSeasonSummary.europeanPlaces={championsLeague:pl.slice(0,4).map(x=>x.name),europaLeague:pl.slice(4,6).map(x=>x.name),conferenceLeague:pl.slice(6,8).map(x=>x.name)};
  const movement=moveClubsBetweenDivisions();
  appState.lastSeasonSummary.movement=movement;
@@ -2445,7 +2528,7 @@ function startNewSeason(){
  appState.squad.forEach(p=>{p.goals=0;p.assists=0;p.apps=0;p.minutes=0;p.yellowCards=0;p.redCards=0;p.chancesCreated=0;p.injured=0;p.suspended=0;p.fitness=Math.max(85,p.fitness||90);p.form=6.5;p.morale=Math.max(60,Math.min(95,(p.morale||75)+Math.round(Math.random()*6-3)))});
  if(Array.isArray(appState.worldSquads))appState.worldSquads[appState.club]=(appState.squad||[]).map(p=>({...p,attributes:{...(p.attributes||{})}}));
  appState.activeDivision=clubDivision(CLUBS[appState.club]);appState.table=activeLeagueClubs().map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
- appState.fixtures=[];ensureFixtures();appState.domesticVersion=0;appState.europeanCompetitions=null;appState.europeanSeason=null;appState.cupCompetitions=null;appState.domesticCalendar=[];appState.lastDomesticRound=0;initDomesticCompetitions();initClubFinances(true);ensureYouthAcademies(true);save();render();
+ appState.fixtures=[];ensureFixtures();appState.domesticVersion=0;appState.europeanCompetitions=null;appState.europeanSeason=null;appState.cupCompetitions=null;appState.domesticCalendar=[];appState.lastDomesticRound=0;initDomesticCompetitions();initClubFinances(true);adjustWageBudgetsForNewSeason(finalTable,Number(appState.seasonYear)-1);ensureYouthAcademies(true);save();render();
 }
 
 function startNewCareer(){
@@ -3447,7 +3530,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  timer=setInterval(clockTick,tickMs);
 }
 function setPage(p){appState.page=p;render()}
-function render(){ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.07 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
+function render(){ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.09 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save()}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{const ok=save();let b=document.getElementById("saveBtn");b.textContent=ok?"✓ Lagret":"⚠ Lagring feilet";setTimeout(()=>b.textContent="▣ Lagre",1800)});
 // Load public reference sources before the first database build; the game remains playable without them.
