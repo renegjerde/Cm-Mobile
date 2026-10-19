@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.22 — Touchline</title>
+<title>CM Mobile v2.24 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -101,10 +101,11 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .live-match-controls .speed-label{color:var(--muted);font-size:12px;margin-left:auto}
 .live-match-controls select{border:1px solid var(--line);background:#203149;color:var(--text);border-radius:10px;padding:9px 10px;font-weight:700;font-size:13px;max-width:160px}
 .live-match-controls .tactic-label{font-size:12px;color:var(--muted)}
-@keyframes goalFlashHome{0%,100%{box-shadow:inset 0 0 0 0 rgba(0,0,0,0)}15%,55%{box-shadow:inset 0 0 0 999px rgba(190,35,45,.26)}}
-@keyframes goalFlashAway{0%,100%{box-shadow:inset 0 0 0 0 rgba(0,0,0,0)}15%,55%{box-shadow:inset 0 0 0 999px rgba(48,83,170,.30)}}
-.goal-flash-home{animation:goalFlashHome .95s ease-out}
-.goal-flash-away{animation:goalFlashAway .95s ease-out}
+@keyframes goalFlashHome{0%,18%,36%,54%,72%{box-shadow:inset 0 0 0 999px color-mix(in srgb,var(--goal-color,#9be27d) 42%,transparent);color:#fff;text-shadow:0 0 14px var(--goal-color,#9be27d)}9%,27%,45%,63%,81%,100%{box-shadow:inset 0 0 0 0 transparent;text-shadow:none}}
+@keyframes goalFlashAway{0%,18%,36%,54%,72%{box-shadow:inset 0 0 0 999px color-mix(in srgb,var(--goal-color,#9be27d) 42%,transparent);color:#fff;text-shadow:0 0 14px var(--goal-color,#9be27d)}9%,27%,45%,63%,81%,100%{box-shadow:inset 0 0 0 0 transparent;text-shadow:none}}
+.goal-flash-home,.goal-flash-away{animation:goalFlashHome .6s steps(1,end) 5;border-color:var(--goal-color,#9be27d)!important}
+.goal-flash-text{animation:goalTextFlash .6s steps(1,end) 5;border-color:var(--goal-color,#9be27d)!important}
+@keyframes goalTextFlash{0%,18%,36%,54%,72%{background:var(--goal-color,#9be27d);color:#101820;box-shadow:0 0 22px color-mix(in srgb,var(--goal-color,#9be27d) 70%,transparent)}9%,27%,45%,63%,81%,100%{background:#1b2b3e;color:#d8e5f2;box-shadow:none}}
 .live-goal-score{animation:scorePop .42s ease-out}
 @keyframes scorePop{0%{transform:scale(1)}45%{transform:scale(1.16);color:var(--green)}100%{transform:scale(1)}}
 .live-paused{color:#ffd27d!important}
@@ -222,7 +223,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(min-width:600px){.tactics-training-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.22</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.24</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -599,7 +600,7 @@ function playerDatabaseStatusHTML(players){
  const unknown=rows.filter(p=>!Number.isFinite(p.age)).length;
  const globals=PLAYER_REFERENCE_STATUS.globalLoaded?`Bredt Transfermarkt-register: ${PLAYER_REFERENCE_STATUS.globalPlayers} relevante profiler · snapshot ${PLAYER_REFERENCE_STATUS.globalSourceDate||TM_GLOBAL_REFERENCE_CUTOFF}`:'Bredt Transfermarkt-register er ikke lastet i denne nettleserøkten';
  const coverage=PLAYER_REFERENCE_STATUS.globalLoaded?`Kildeprofildekning: ${PLAYER_REFERENCE_STATUS.eflClubsWithProfiles||0}/72 EFL-klubber og ${PLAYER_REFERENCE_STATUS.europeanClubsWithProfiles||0}/108 europacupdeltakere har minst 12 profiler i snapshotet.`:'Kildeprofildekning beregnes etter at nettregisteret er lastet.';
- return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.22</strong><div class="player-meta">${esc(sourceLabel)} · ${esc(tmLabel)} · ${esc(globals)}.</div><div class="player-meta">${esc(coverage)}</div><div class="player-meta">Denne troppen: ${esc(ageLabel)} · ${unknown} med ukjent alder · ${tm} med Transfermarkt-profilfelt · ${fpl} med FPL-statistikk.</div><div class="player-meta">Fødselsdatoer brukes til å beregne alder per 22. august ${Number(appState.seasonYear)||2026}. Ukjent alder vises heller enn et tilfeldig estimat. Snapshot 6. juli 2026 gir ikke bekreftet klubbtilhørighet etter datoen. Ferdigheter er spillmodell-estimater.</div></div>`;
+ return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.24</strong><div class="player-meta">${esc(sourceLabel)} · ${esc(tmLabel)} · ${esc(globals)}.</div><div class="player-meta">${esc(coverage)}</div><div class="player-meta">Denne troppen: ${esc(ageLabel)} · ${unknown} med ukjent alder · ${tm} med Transfermarkt-profilfelt · ${fpl} med FPL-statistikk.</div><div class="player-meta">Fødselsdatoer brukes til å beregne alder per 22. august ${Number(appState.seasonYear)||2026}. Ukjent alder vises heller enn et tilfeldig estimat. Snapshot 6. juli 2026 gir ikke bekreftet klubbtilhørighet etter datoen. Ferdigheter er spillmodell-estimater.</div></div>`;
 }
 function squadDiagnosticsPanel(players){
  const rows=Array.isArray(players)?players:[];
@@ -1633,7 +1634,7 @@ function processAILeagueTransfers(week=appState.week){
   if(appState.clubFinances?.[CLUBS[buyer.i].name])appState.clubFinances[CLUBS[buyer.i].name].transferBudget=CLUBS[buyer.i].budget;
   if(appState.clubFinances?.[CLUBS[seller.i].name])appState.clubFinances[CLUBS[seller.i].name].transferBudget=CLUBS[seller.i].budget;
   if(!Array.isArray(appState.worldSquads[buyer.i]))appState.worldSquads[buyer.i]=[];appState.worldSquads[buyer.i].push(incoming);
-  appState.transferHistory.push({type:'ai',playerName:out.name,from:CLUBS[seller.i]?.name||'Ukjent klubb',to:CLUBS[buyer.i]?.name||'Ukjent klubb',fee:actualFee,week,position:pos});
+  appState.transferHistory.push({type:'ai',playerName:out.name,from:CLUBS[seller.i]?.name||'Ukjent klubb',to:CLUBS[buyer.i]?.name||'Ukjent klubb',fee:actualFee,week,seasonYear:Number(appState.seasonYear)||2026,position:pos});
   moved.push({playerName:out.name,from:seller.i,to:buyer.i,fee:actualFee,position:pos});
   if(!Array.isArray(appState.aiTransferActivity))appState.aiTransferActivity=[];appState.aiTransferActivity.push({playerName:out.name,from:CLUBS[seller.i]?.name,to:CLUBS[buyer.i]?.name,fee:actualFee,week,season:seasonLabel(),position:pos});
   if(appState.aiTransferActivity.length>500)appState.aiTransferActivity=appState.aiTransferActivity.slice(-500);
@@ -1758,7 +1759,10 @@ function respondTransferOffer(offerId,action){
 function buildTransferWindowReport(closedWeek){
  const windowStart=closedWeek===2?1:19;
  const clubName=CLUBS[appState.club]?.name||currentClub().name;
- const windowHistory=(appState.transferHistory||[]).filter(t=>Number(t.week)>=windowStart&&Number(t.week)<=closedWeek);
+ const reportSeason=Number(appState.seasonYear)||2026;
+ // A window report is strictly scoped to the season and the specific window that just closed.
+ // Legacy entries without seasonYear are intentionally excluded so old saves cannot accumulate transfers from earlier seasons.
+ const windowHistory=(appState.transferHistory||[]).filter(t=>Number(t.seasonYear)===reportSeason&&Number(t.week)>=windowStart&&Number(t.week)<=closedWeek);
  // The report for the manager must only count transfers involving the managed club.
  const history=windowHistory.filter(t=>t.type!=='ai'&&(t.from===clubName||t.to===clubName));
  const arrivals=history.filter(t=>t.to===clubName&&t.from!==clubName);
@@ -3275,7 +3279,9 @@ function advanceLiveEngine(engine,minute){
   const quality=clamp(.14+(teamAttack-opponentDefense)*.005+(finishing-65)*.003+Math.random()*.14,.035,.52);
   const onTarget=Math.random()<clamp(.31+(finishing-60)*.012,.16,.82);
   if(side==="A"){engine.stats.shotsA++;if(onTarget)engine.stats.onA++}else{engine.stats.shotsB++;if(onTarget)engine.stats.onB++}
-  const event={minute,side,type:"chance",player:shooter?.name||"Angriper",playerId:shooter?.id||null,onTarget,quality:+quality.toFixed(2)};
+  const creatorPool=xi.filter(p=>p.id!==shooter?.id&&(p.pos==="MID"||p.pos==="ATT"));
+  const creator=creatorPool.length?weightedPick(creatorPool,creatorPool.map(p=>Math.max(1,effectivePlayerRating(engine,p)-40)*(p.pos==="MID"?1.25:0.8))):null;
+  const event={minute,side,type:"chance",player:shooter?.name||"Angriper",playerId:shooter?.id||null,creator:creator?.name||null,creatorId:creator?.id||null,onTarget,quality:+quality.toFixed(2)};
   if(shooter&&engine.performance[String(shooter.id)])engine.performance[String(shooter.id)].shots++;
   const keeperSave=clamp(.32+(keeperRating-65)*.012,.08,.72);
   if(onTarget&&Math.random()<quality*(1-keeperSave)*1.35){
@@ -3360,23 +3366,48 @@ function playMatch(){
  requestAnimationFrame(()=>window.scrollTo(0,0));
  setTimeout(()=>window.scrollTo(0,0),40);
 }
+function clubPrimaryColor(name){
+ const n=String(name||'').toLowerCase();
+ const colors=[
+  [/manchester united|liverpool|arsenal|nottingham forest|bayern|roma|benfica|sunderland/,'#e53945'],
+  [/manchester city|ipswich|leicester|porto|everton|napoli|lazio|real sociedad/,'#58a6e7'],
+  [/chelsea|leeds|brighton|crystal palace|psg|schalke|inter|fenerbahçe/,'#3979e8'],
+  [/tottenham|real madrid|juventus|newcastle|fulham|sporting/,'#dce8f6'],
+  [/borussia dortmund|norwich|watford|yellow/,'#f4d33e'],
+  [/aston villa|west ham|burnley|brentford|atletico/,'#d94d58'],
+  [/wolves|wolverhampton|hull|orange/,'#f29b38'],
+  [/forest|nottingham/,'#e53945'],
+  [/celtic|green|sporting cp/,'#38bd78']
+ ];
+ for(const [re,color] of colors)if(re.test(n))return color;
+ let hash=0;for(let i=0;i<n.length;i++)hash=(hash*31+n.charCodeAt(i))|0;
+ return `hsl(${Math.abs(hash)%360} 72% 62%)`;
+}
 function matchCommentary(e,c,opp,home){
  const club=e.side==="user"?c.name:opp.name;
  const opponent=e.side==="user"?opp.name:c.name;
+ const name=e.player||e.scorer||'spilleren';
  if(e.type==="goal"){
   const lines=[
-   `${e.scorer} finner nettmaskene! ${club} jubler!`,
-   `MÅL! ${e.scorer} setter sjansen og sender ${club} til himmels.`,
-   `Der sitter den! ${e.scorer} scorer for ${club}.`,
-   `${e.scorer} dukker opp på rett sted til rett tid. Mål!`
+   `MÅÅÅL! ${e.scorer||name} setter den i nettet for ${club}!`,
+   `${e.scorer||name} dukker opp når det gjelder – ${club} tar jubelscenene!`,
+   `Der sitter den! ${e.scorer||name} avslutter angrepet klinisk for ${club}${e.assist?`, etter en lekker pasning fra ${e.assist}`:''}!`,
+   `${club} bryter gjennom! ${e.scorer||name} scorer${e.assist?` etter forarbeid fra ${e.assist}`:''}!`,
+   `Nydelig angrep av ${club}! ${e.scorer||name} sender ballen forbi keeper${e.assist?`, med ${e.assist} som arkitekt`:''}!`
   ];
   return lines[Math.floor(Math.random()*lines.length)];
  }
- if(e.type==="yellow")return `Gult kort til ${e.player||"en spiller"} fra ${club}. Dommeren setter ned foten.`;
- if(e.type==="red")return `RØDT KORT! ${e.player||"En spiller"} fra ${club} må forlate banen.`;
- if(e.type==="injury")return `Spillet stoppes. En spiller fra ${club} trenger behandling.`;
- if(e.type==="chance")return `${club} kommer til avslutning, men ${opponent} holder stand.`;
- return `Det skjer ting ute på banen mellom ${c.name} og ${opp.name}.`;
+ if(e.type==="yellow")return e.reason==="Andre gule kort"?`Det er slutt for ${name}! Det andre gule kortet betyr rødt – ${club} må klare seg med ti mann.`:`Dommeren finner fram kortet: gult til ${name} fra ${club} etter en sen eller unødvendig forseelse.`;
+ if(e.type==="red")return e.secondYellow?`${name} får sitt andre gule – og dermed rødt kort! ${club} er redusert til ti mann.`:`RØDT KORT! ${name} fra ${club} sendes av banen. Nå må laget omstille seg umiddelbart.`;
+ if(e.type==="injury")return `${name} blir liggende etter duellen. Medisinsk støtteapparat må inn for ${club}${e.reason?` (${e.reason.toLowerCase()})`:''}.`;
+ if(e.type==="chance"){
+  const passer=e.creator&&e.creator!==name?`${e.creator} finner ${name} med en presis pasning. `:'';
+  if(e.onTarget&&e.quality>=.32)return `${passer}${name} får en stor mulighet! Skuddet går på mål – keeper må reagere raskt for ${opponent}.`;
+  if(e.onTarget)return `${passer}${name} prøver seg fra avslutningsposisjon! Skuddet går på mål, men keeper hos ${opponent} holder stand.`;
+  if(e.quality>=.30)return `${passer}${name} kommer til en lovende sjanse, men avslutningen går like utenfor. ${club} nærmer seg!`;
+  return `${passer}${name} prøver lykken, men ${opponent} får blokkert eller ryddet unna. Angrepet er ikke helt overbevisende.`;
+ }
+ return `${club} og ${opponent} kjemper om initiativet – neste duell kan bli viktig.`;
 }
 // European club crests (football-data.org crest CDN). Unknown clubs use generated initials.
 const EUROPEAN_LOGOS = {
@@ -3487,7 +3518,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  possession.textContent=`${statsHome}% – ${statsAway}%`;
  let currentMinute=0, eventIndex=0, visibleGoals=0;
  let currentHome=0,currentAway=0, shotsHome=0,shotsAway=0,onHome=0,onAway=0;
- let paused=false, matchFinished=false, timer=null, tickMs=300;
+ let paused=false, matchFinished=false, timer=null, tickMs=300, goalThisTick=false;
  eventContainer.innerHTML="";
  commentary.textContent=openerLines[Math.floor(Math.random()*openerLines.length)];
  headline.textContent="Avspark!";
@@ -3511,6 +3542,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   possession.textContent=`${Math.round(statsHome)}% – ${Math.round(statsAway)}%`;
   shots.textContent=homeStat(liveHomeShots,liveAwayShots);
   onTarget.textContent=homeStat(liveHomeOnTarget,liveAwayOnTarget);
+  goalThisTick=false;
   for(const e of newEvents){
    const isUser=(e.side==='A'?engine.a:engine.b)===appState.club;
    const displaySide=isUser?'user':'opp';
@@ -3522,13 +3554,18 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    let title=e.type==='goal'?esc(e.scorer):esc(e.player||(e.type==='chance'?'Avslutning':'Spiller'));
    let sub=e.type==='goal'?(e.assist?'Mål · Assist: '+esc(e.assist):'Mål'):e.type==='yellow'?'Gult kort · '+esc(e.reason||'Forseelse'):e.type==='red'?(e.secondYellow?'Rødt kort · Andre gule kort':'Rødt kort · '+esc(e.reason||'Utvist')):e.type==='injury'?'Skade':e.type==='chance'?(e.onTarget?'Skudd på mål':'Avslutning utenfor mål'):'Hendelse';
    if(e.type==='goal'){
+    goalThisTick=true;
     goalCount++;
     const homeScorer=e.side==='A';
     if(homeScorer)currentHome++;else currentAway++;
     headline.innerHTML=`${esc(e.scorer)} scorer!<br><span class="headline-team">${esc(teamName)}</span>`;
     score.textContent=`${currentHome} – ${currentAway}`;
-    const matchCard=score.closest('.card');
-    if(matchCard){matchCard.classList.remove('goal-flash-home','goal-flash-away');void matchCard.offsetWidth;matchCard.classList.add(homeScorer?'goal-flash-home':'goal-flash-away');score.classList.remove('live-goal-score');void score.offsetWidth;score.classList.add('live-goal-score')}
+    const matchCard=score.closest('.hero')||score.closest('.card');
+    const scorerColor=clubPrimaryColor(homeScorer?homeName:awayName);
+    if(matchCard){matchCard.style.setProperty('--goal-color',scorerColor);matchCard.classList.remove('goal-flash-home','goal-flash-away');void matchCard.offsetWidth;matchCard.classList.add(homeScorer?'goal-flash-home':'goal-flash-away');}
+    commentary.style.setProperty('--goal-color',scorerColor);commentary.classList.remove('goal-flash-text');void commentary.offsetWidth;commentary.classList.add('goal-flash-text');
+    headline.style.setProperty('--goal-color',scorerColor);headline.classList.remove('goal-flash-text');void headline.offsetWidth;headline.classList.add('goal-flash-text');
+    score.classList.remove('live-goal-score');void score.offsetWidth;score.classList.add('live-goal-score')
    }
    // Shots remain in match statistics, but the event feed only shows goals, cards and injuries.
    if(e.type==='chance'){commentary.textContent=matchCommentary(displayEvent,c,opp,home);continue}
@@ -3546,19 +3583,20 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   engine.ga=engine.ga||0;engine.gb=engine.gb||0;
   currentHome=engine.ga;currentAway=engine.gb;
   score.textContent=`${currentHome} – ${currentAway}`;
-  // Small narrative beats keep the clock alive between major events.
-  if(currentMinute===15)commentary.textContent="Et kvarter spilt. Lagene leter etter rom mellom leddene.";
-  if(currentMinute===30)commentary.textContent="En halvtime nærmer seg – hvem tør å ta mer risiko?";
+  // Narrative beats only fill quiet minutes; never overwrite a live event or goal reaction.
+  const hasCommentaryEvent=newEvents.some(e=>['goal','chance','yellow','red','injury'].includes(e.type));
+  if(!hasCommentaryEvent&&currentMinute===15)commentary.textContent="Et kvarter spilt. Lagene leter etter rom mellom leddene.";
+  if(!hasCommentaryEvent&&currentMinute===30)commentary.textContent="En halvtime nærmer seg – hvem tør å ta mer risiko?";
   if(currentMinute===45){
-   headline.textContent="Pause";commentary.textContent=`Pause! ${currentHome}–${currentAway}. Gjør bytter og taktiske endringer før andre omgang.`;
+   if(!hasCommentaryEvent){headline.textContent="Pause";commentary.textContent=`Pause! ${currentHome}–${currentAway}. Gjør bytter og taktiske endringer før andre omgang.`;}
    paused=true;if(timer)clearInterval(timer);timer=null;status.textContent="PAUSE · HT";pauseBtn.textContent="▶ Start andre omgang";pauseBtn.classList.add('live-paused');
    const hp=document.getElementById('halftimePanel');if(hp)hp.style.display='block';
    const hbtn=document.getElementById('halftimeLineupBtn');if(hbtn)hbtn.onclick=()=>openLineupNow();
    const startBtn=document.getElementById('startSecondHalfBtn');if(startBtn)startBtn.onclick=()=>{const panel=document.getElementById('halftimePanel');if(panel)panel.style.display='none';paused=false;pauseBtn.textContent='Ⅱ Pause';pauseBtn.classList.remove('live-paused');status.textContent="LIVE · 45'";headline.textContent='Andre omgang';commentary.textContent='Andre omgang er i gang. Nå skal kampen avgjøres.';timer=setInterval(clockTick,tickMs);};
   }
-  if(currentMinute===46)commentary.textContent="Andre omgang er i gang. Nå skal kampen avgjøres.";
-  if(currentMinute===60)commentary.textContent="Siste halvtimen starter. Slitne bein kan gi nye muligheter.";
-  if(currentMinute===75)commentary.textContent="Et kvarter igjen. Nå kan hver eneste situasjon bli avgjørende.";
+  if(!hasCommentaryEvent&&currentMinute===46)commentary.textContent="Andre omgang er i gang. Nå skal kampen avgjøres.";
+  if(!hasCommentaryEvent&&currentMinute===60)commentary.textContent="Siste halvtimen starter. Slitne bein kan gi nye muligheter.";
+  if(!hasCommentaryEvent&&currentMinute===75)commentary.textContent="Et kvarter igjen. Nå kan hver eneste situasjon bli avgjørende.";
   if(engine.isCupMatch&&!engine.isLeaguePhase&&currentMinute===90&&!engine.extraTimeStarted&&europeanKnockoutNeedsExtraTime(engine)){engine.extraTimeStarted=true;headline.textContent='Uavgjort – ekstraomganger';commentary.textContent=engine.isEuropeanKnockout&&engine.knockoutStageKey!=='final'?`Det står uavgjort sammenlagt etter 90 minutter. ${engine.teamNames?.A||'Hjemmelaget'} ${engine.ga}–${engine.gb} ${engine.teamNames?.B||'bortelaget'} i returoppgjøret. Det spilles ekstraomganger.`:`Det står ${engine.ga}–${engine.gb}. Kampen går til ekstraomganger.`;status.textContent="EKSTRAOMGANGER";}
   const finishThisMatch=engine.isCupMatch&&!engine.isLeaguePhase?(engine.extraTimeStarted?currentMinute>=120:(currentMinute>=90&&!europeanKnockoutNeedsExtraTime(engine))):currentMinute>=90;
   if(finishThisMatch){
@@ -3705,7 +3743,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.22 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.24 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{const ok=save();let b=document.getElementById("saveBtn");b.textContent=ok?"✓ Lagret":"⚠ Lagring feilet";setTimeout(()=>b.textContent="▣ Lagre",1800)});
 // Load public reference sources before the first database build; the game remains playable without them.
