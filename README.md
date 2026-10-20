@@ -1,11 +1,16 @@
-# CM Mobile v2.64 — Europacup-kalender og sesongsimulering
+## v2.65 — Startskjerm og klubboversikt
+- Mer kompakt, mobiltilpasset manageroversikt.
+- Tydelig hovedhandling og snarveier til Tropp, Overganger og Økonomi.
+- Klubbøkonomi, ukelønn og kampstatus samlet i små statuskort.
+
+# CM Mobile v2.65 — Europacup-kalender og sesongsimulering
 
 ## Endringer
 - Utslagsrundene blir kun opprettet når forrige runde er fullført; ingen kamp spilles direkte ved opprettelse av runden.
 - Den ukentlige kalenderen er eneste sted som starter første- og returoppgjør.
 - Europacupenes utslagsrunder bruker uker 24–25, 27–28, 30–31 og 33–34.
 - Finalen skjer etter managerens siste hjemlige ligarunde: spilluke 38 for Premier League, spilluke 46 for EFL-karrierer.
-- Helsesongsimulering og avviksrapport ligger i `EUROPEAN_KNOCKOUT_SIMULATION_v2.64.md`; maskinlesbare resultater og testharness følger i samme mappe.
+- Helsesongsimulering og avviksrapport ligger i `EUROPEAN_KNOCKOUT_SIMULATION_v2.65.md`; maskinlesbare resultater og testharness følger i samme mappe.
 
 ---
 
