@@ -1,16 +1,18 @@
-# CM Mobile v2.73 — Touchline Edition
+# CM Mobile v2.74 — Touchline Edition
 
-## Nytt i v2.73
-- Du kan endre den valgte spillerens taktiske rolle fra panelet som åpnes ved å trykke på spilleren i banevisningen.
-- Egne roller lagres per spiller, vises med en etikett i banevisningen og beholdes gjennom vanlig navigasjon og ny rendering.
-- Spillere som får en rolle utenfor grunnformasjonen, flyttes til relevant linje i den tilpassede banevisningen.
-- «Automatisk» tilbakestiller den valgte spilleren til formasjonens standardrolle.
-- Lagbalansepanelet viser flere advarsler om rolleendringer utenfor standardformasjonen og om skjev fordeling av angrep/midtbanespillere.
-- Når formasjon eller automatisk startellever endres, nullstilles manuelle rollevalg med hensikt.
+## Taktikk: fri baneplassering
+- Startelleverens 11 spillere vises på en vertikal, mobiltilpasset fotballbane.
+- Dra markører med touch eller mus. Posisjon lagres automatisk med karrieren.
+- Når en spiller flyttes, avledes en taktisk rolle fra området på banen. Rollen brukes av den eksisterende kampmotoren.
+- Trykk på markører for å åpne bytte-/rollepanelet; trykk på to spillere for å bytte startspillere.
+- «Tilbakestill banen» fjerner den frie plasseringen og egendefinerte rolleoverstyringer.
+- Enkelte lagbalansevarsler sjekker om markører står for tett eller om spillere er flyttet ut av grunnformasjonen.
+- Formasjonsbytte, rotasjon og ny assistentanbefaling nullstiller fri plassering for å unngå at koordinater overføres til feil system.
 
-## Kontroller
+## Publisering
+Pakken har en versjonsmappe med `index.html`, `README.md` og endringsrapporter. GitHub Pages publiserer fra `main`-branchens rot dersom det er slik repoet ditt er satt opp; pakkens `CM_Mobile_v2.74/index.html` og live rotfil er to ulike steder.
+
+## Teststatus
 - JavaScript-syntaks kontrollert med Node.js.
-- ZIP-arkivet validert.
-- Full visuell nettleser- og mobiltest er ikke utført.
-
-Pakken inneholder `index.html`, `README.md` og endringsrapporter. Publisering av versjonsmappen er separat fra GitHub Pages sin rotfil dersom nettstedet fortsatt publiserer fra `main`-grenens rot.
+- ZIP-integritet kontrollert.
+- Utfører en Chromium-røyketest av start/karriere og taktikkvisningen der tilgjengelig; full sesong-/matchsimulering er ikke en komplett ende-til-ende-test.
