@@ -154,9 +154,17 @@ Validering: JavaScript-syntaks og ZIP-integritet kontrollert. Ingen full nettles
 - `LOAN_ECONOMY_AND_EFL_DEVELOPMENT_v2.58.md` — endringer, avgrensninger og testresultater
 
 
-## v2.59 — Utlån og troppsintegritet
+## v2.60 — Utlån og troppsintegritet
 
 - Retur og tilbakekalling bruker spillerens stabile karriere-ID for å unngå dupliserte spillere.
 - Tilbakekalling fra Premier League-klubb fjerner spilleren fra riktig kildetropp.
 - Lønnsfordelingen mellom moderklubb og mottaker videreføres.
-- Se `LOAN_LIFECYCLE_AND_ROSTER_INTEGRITY_v2.59.md` for endringer og testavgrensninger.
+- Se `LOAN_LIFECYCLE_AND_ROSTER_INTEGRITY_v2.60.md` for endringer og testavgrensninger.
+
+
+## v2.60 – Lån inn fra EFL
+
+- Spillere fra EFL-klubber kan lånes inn via overgangsmarkedet.
+- Låneavtalen lagrer EFL-divisjon og moderklubb, og spilleren returnerer til riktig EFL-tropp når avtalen utløper.
+- Låneavgift trekkes fra brukerklubbens budsjett; EFL-klubbens budsjetter endres ikke fordi det ikke finnes en tilsvarende full EFL-finansmodell.
+- Sesongslutt bruker EFLs 46 runder ved lån inn fra EFL.
