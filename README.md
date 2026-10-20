@@ -16,3 +16,10 @@ Pakken har en versjonsmappe med `index.html`, `README.md` og endringsrapporter. 
 - JavaScript-syntaks kontrollert med Node.js.
 - ZIP-integritet kontrollert.
 - Utfører en Chromium-røyketest av start/karriere og taktikkvisningen der tilgjengelig; full sesong-/matchsimulering er ikke en komplett ende-til-ende-test.
+
+
+## v2.75 — parallelle karrierer
+- Gjeninnført knappen «Start ny karriere» på oversikten.
+- Ny knapp «Karrierer» i toppfeltet lar deg åpne tidligere lagringer og bytte mellom dem.
+- Opptil fire karrierer lagres separat i samme nettleserprofil. Inaktive karrierer kan slettes for å frigjøre plass. Eldre `cmMobileSave` importeres automatisk første gang og brukes videre som lagringsplass for den første karrieren, så oppgraderingen ikke dobler lagringsforbruket.
+- Se `CAREER_SLOTS_AND_START_BUTTON_v2.75.md` for begrensninger og kontrollpunkter.
