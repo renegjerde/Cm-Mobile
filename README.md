@@ -1,16 +1,16 @@
-# CM Mobile v2.72 — Touchline Edition
+# CM Mobile v2.73 — Touchline Edition
 
-## Nytt i v2.72
-- Dra-og-slipp bytte mellom spillere i banevisningen på enheter med pekestøtte for HTML drag-and-drop (typisk desktop).
-- På mobil: trykk på én spiller og deretter en annen for å bytte dem direkte. Trykk på en spiller én gang og velg en reserve i byttepanelet for å gjøre et ordinært spillerbytte.
-- Ny «Lagbalanse»-boks varsler om svak rollepassform, lav kondisjon og enkelte tydelige skjevheter i lagets posisjonsfordeling.
-- Eksisterende lagring og kampmotor er beholdt; ingen ny lagringsversjon er nødvendig.
+## Nytt i v2.73
+- Du kan endre den valgte spillerens taktiske rolle fra panelet som åpnes ved å trykke på spilleren i banevisningen.
+- Egne roller lagres per spiller, vises med en etikett i banevisningen og beholdes gjennom vanlig navigasjon og ny rendering.
+- Spillere som får en rolle utenfor grunnformasjonen, flyttes til relevant linje i den tilpassede banevisningen.
+- «Automatisk» tilbakestiller den valgte spilleren til formasjonens standardrolle.
+- Lagbalansepanelet viser flere advarsler om rolleendringer utenfor standardformasjonen og om skjev fordeling av angrep/midtbanespillere.
+- Når formasjon eller automatisk startellever endres, nullstilles manuelle rollevalg med hensikt.
 
 ## Kontroller
 - JavaScript-syntaks kontrollert med Node.js.
-- ZIP-arkivets integritet kontrollert.
-- Statisk kontroll av nye handler og visningsfragmenter gjennomført.
-- Full interaktiv nettleser- og mobiltest er ikke utført. Drag-and-drop kan variere mellom nettlesere; mobilens trykk-for-bytte er den primære berøringsflyten.
+- ZIP-arkivet validert.
+- Full visuell nettleser- og mobiltest er ikke utført.
 
-## Viktig
-Varslene er heuristikker basert på spillets rollefit, kondisjon og tildelte roller. De er ikke en full taktisk simulering og bør ses som praktiske signaler, ikke fasit.
+Pakken inneholder `index.html`, `README.md` og endringsrapporter. Publisering av versjonsmappen er separat fra GitHub Pages sin rotfil dersom nettstedet fortsatt publiserer fra `main`-grenens rot.
