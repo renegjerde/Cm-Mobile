@@ -1,0 +1,35 @@
+{
+  "version": "2.46",
+  "change": "squad-based team power for match calculations",
+  "tests": {
+    "monotonic_team_quality": {
+      "weak_55": 54.625,
+      "balanced_65": 65.375,
+      "strong_75": 76.125,
+      "passed": true
+    },
+    "injury_and_positional_availability": {
+      "healthy_squad": 65.375,
+      "five_unavailable_key_players": 57.775,
+      "passed": true
+    },
+    "goalkeeper_quality": {
+      "standard_keeper": 65.375,
+      "improved_keeper": 69.36227272727272,
+      "passed": true
+    },
+    "bench_depth": {
+      "strong_bench": 70.2762987012987,
+      "passed": true
+    }
+  },
+  "syntax_checks": {
+    "inline_script_blocks": 2,
+    "all_passed": true
+  },
+  "limits": [
+    "Isolated helper test harness; not full browser QA.",
+    "Automatic EFL league tables still use seededScore rather than the full player-based match engine.",
+    "Club ratings are player-rating-derived for match calculations where a roster is available; fallback club estimates remain when no roster is available."
+  ]
+}

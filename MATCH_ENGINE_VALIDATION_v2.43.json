@@ -1,0 +1,99 @@
+{
+  "version": "v2.43",
+  "test_type": "isolated Node full-season simulation using the production simulateMatch function with test-only simplified lineup/player stubs",
+  "teams": 20,
+  "matches_per_season": 380,
+  "seasons": 3,
+  "seeded_results": [
+    {
+      "seed": 12345,
+      "matches": 380,
+      "goalsPerMatch": 2.879,
+      "homeWinRate": 0.418,
+      "drawRate": 0.184,
+      "awayWinRate": 0.397,
+      "top4": [
+        "Club 2",
+        "Club 3",
+        "Club 5",
+        "Club 1"
+      ],
+      "bottom3": [
+        "Club 18",
+        "Club 19",
+        "Club 20"
+      ],
+      "pointsRange": [
+        17,
+        98
+      ],
+      "goalDifferenceRange": [
+        -81,
+        102
+      ],
+      "strengthRankCorrelation": 0.962
+    },
+    {
+      "seed": 54321,
+      "matches": 380,
+      "goalsPerMatch": 2.737,
+      "homeWinRate": 0.429,
+      "drawRate": 0.195,
+      "awayWinRate": 0.376,
+      "top4": [
+        "Club 1",
+        "Club 4",
+        "Club 3",
+        "Club 2"
+      ],
+      "bottom3": [
+        "Club 19",
+        "Club 20",
+        "Club 17"
+      ],
+      "pointsRange": [
+        16,
+        101
+      ],
+      "goalDifferenceRange": [
+        -65,
+        81
+      ],
+      "strengthRankCorrelation": 0.958
+    },
+    {
+      "seed": 20261020,
+      "matches": 380,
+      "goalsPerMatch": 2.65,
+      "homeWinRate": 0.429,
+      "drawRate": 0.205,
+      "awayWinRate": 0.366,
+      "top4": [
+        "Club 1",
+        "Club 3",
+        "Club 2",
+        "Club 4"
+      ],
+      "bottom3": [
+        "Club 16",
+        "Club 18",
+        "Club 20"
+      ],
+      "pointsRange": [
+        20,
+        103
+      ],
+      "goalDifferenceRange": [
+        -56,
+        72
+      ],
+      "strengthRankCorrelation": 0.967
+    }
+  ],
+  "limitations": [
+    "Synthetic team strengths and near-uniform player attributes; not the full browser app or actual embedded club squads.",
+    "Test-only lineup/role stubs replace the app lineup selection and UI state.",
+    "This validates the regular simulateMatch scoring function, not the live match engine or lower-league seededScore function."
+  ],
+  "change": "Goal conversion multiplier in regular simulateMatch increased from 1.95 to 2.2 after season batches showed 2.38–2.51 goals per match; this targets a more plausible overall scoring rate while checking that league strength still predicts table position."
+}

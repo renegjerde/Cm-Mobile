@@ -1,0 +1,135 @@
+{
+  "version": "2.45",
+  "season": "2026/27",
+  "testScope": "Production EFL_DIVISIONS, eflClubStrengthEstimate, makeLowerFixtures, seededScore, addGenericResult. Deterministic full double round-robin tests; no browser UI.",
+  "ratingCoverage": {
+    "Championship": {
+      "clubs": 24,
+      "ratings": 24,
+      "min": 58,
+      "max": 72
+    },
+    "League One": {
+      "clubs": 24,
+      "ratings": 24,
+      "min": 52,
+      "max": 68
+    },
+    "League Two": {
+      "clubs": 24,
+      "ratings": 24,
+      "min": 47,
+      "max": 62
+    }
+  },
+  "runs": [
+    {
+      "division": "Championship",
+      "seed": 12345,
+      "matches": 552,
+      "goalsPerMatch": 2.431,
+      "homeWinPct": 43.1,
+      "drawPct": 24.1,
+      "awayWinPct": 32.8,
+      "strengthTableRankCorrelation": 0.45,
+      "minStrength": 58,
+      "maxStrength": 72
+    },
+    {
+      "division": "Championship",
+      "seed": 54321,
+      "matches": 552,
+      "goalsPerMatch": 2.562,
+      "homeWinPct": 45.5,
+      "drawPct": 25.7,
+      "awayWinPct": 28.8,
+      "strengthTableRankCorrelation": 0.636,
+      "minStrength": 58,
+      "maxStrength": 72
+    },
+    {
+      "division": "Championship",
+      "seed": 20261020,
+      "matches": 552,
+      "goalsPerMatch": 2.437,
+      "homeWinPct": 39.5,
+      "drawPct": 26.4,
+      "awayWinPct": 34.1,
+      "strengthTableRankCorrelation": 0.329,
+      "minStrength": 58,
+      "maxStrength": 72
+    },
+    {
+      "division": "League One",
+      "seed": 12345,
+      "matches": 552,
+      "goalsPerMatch": 2.553,
+      "homeWinPct": 39.9,
+      "drawPct": 26.3,
+      "awayWinPct": 33.9,
+      "strengthTableRankCorrelation": 0.523,
+      "minStrength": 52,
+      "maxStrength": 68
+    },
+    {
+      "division": "League One",
+      "seed": 54321,
+      "matches": 552,
+      "goalsPerMatch": 2.585,
+      "homeWinPct": 41.1,
+      "drawPct": 23,
+      "awayWinPct": 35.9,
+      "strengthTableRankCorrelation": 0.436,
+      "minStrength": 52,
+      "maxStrength": 68
+    },
+    {
+      "division": "League One",
+      "seed": 20261020,
+      "matches": 552,
+      "goalsPerMatch": 2.527,
+      "homeWinPct": 46.6,
+      "drawPct": 25.9,
+      "awayWinPct": 27.5,
+      "strengthTableRankCorrelation": 0.529,
+      "minStrength": 52,
+      "maxStrength": 68
+    },
+    {
+      "division": "League Two",
+      "seed": 12345,
+      "matches": 552,
+      "goalsPerMatch": 2.582,
+      "homeWinPct": 40.6,
+      "drawPct": 27,
+      "awayWinPct": 32.4,
+      "strengthTableRankCorrelation": 0.538,
+      "minStrength": 47,
+      "maxStrength": 62
+    },
+    {
+      "division": "League Two",
+      "seed": 54321,
+      "matches": 552,
+      "goalsPerMatch": 2.475,
+      "homeWinPct": 44.6,
+      "drawPct": 26.3,
+      "awayWinPct": 29.2,
+      "strengthTableRankCorrelation": 0.585,
+      "minStrength": 47,
+      "maxStrength": 62
+    },
+    {
+      "division": "League Two",
+      "seed": 20261020,
+      "matches": 552,
+      "goalsPerMatch": 2.516,
+      "homeWinPct": 43.8,
+      "drawPct": 24.5,
+      "awayWinPct": 31.7,
+      "strengthTableRankCorrelation": 0.43,
+      "minStrength": 47,
+      "maxStrength": 62
+    }
+  ]
+}

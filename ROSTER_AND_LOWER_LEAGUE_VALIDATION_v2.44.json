@@ -1,0 +1,254 @@
+{
+  "version": "v2.44",
+  "roster_integrity": {
+    "premier_league_clubs": 20,
+    "premier_league_names": 459,
+    "efl_clubs": 72,
+    "efl_names": 1479,
+    "all_english_clubs": 92,
+    "total_roster_names": 1938,
+    "unique_exact_names": 1936,
+    "duplicate_names": {
+      "reece james": [
+        {
+          "division": "Premier League",
+          "club": "Chelsea",
+          "name": "Reece James"
+        },
+        {
+          "division": "EFL",
+          "club": "Sheffield Wednesday",
+          "name": "Reece James"
+        }
+      ],
+      "ben davies": [
+        {
+          "division": "Premier League",
+          "club": "Tottenham Hotspur",
+          "name": "Ben Davies"
+        },
+        {
+          "division": "EFL",
+          "club": "Bolton Wanderers",
+          "name": "Ben Davies"
+        }
+      ]
+    },
+    "clubs_under_20_names": {
+      "Everton": 19,
+      "Newcastle United": 19,
+      "AFC Wimbledon": 14,
+      "Barnsley": 18,
+      "Bromley": 16,
+      "Burton Albion": 18,
+      "Cambridge United": 18,
+      "Leicester City": 15,
+      "Luton Town": 18,
+      "Oxford United": 18,
+      "Peterborough United": 17,
+      "Plymouth Argyle": 19,
+      "Sheffield Wednesday": 17,
+      "Stevenage": 18,
+      "Wigan Athletic": 16,
+      "Wycombe Wanderers": 18,
+      "Bristol Rovers": 19,
+      "Cheltenham Town": 15,
+      "Colchester United": 19,
+      "Crawley Town": 17,
+      "Exeter City": 14,
+      "Fleetwood Town": 18,
+      "Gillingham": 16,
+      "Grimsby Town": 17,
+      "Northampton Town": 19,
+      "Oldham Athletic": 19,
+      "Rochdale": 19,
+      "Rotherham United": 18,
+      "Shrewsbury Town": 19,
+      "Tranmere Rovers": 19
+    },
+    "embedded_profile_name_matches": 842,
+    "official_roster_name_profile_matches": 822
+  },
+  "lower_league_season_tests": [
+    {
+      "division": "Championship",
+      "seed": 12345,
+      "teams": 24,
+      "matches": 552,
+      "goalsPerMatch": 2.476,
+      "homeWinRate": 0.417,
+      "drawRate": 0.263,
+      "awayWinRate": 0.321,
+      "strengthRankCorrelation": 0.025,
+      "strengthRange": [
+        59,
+        67
+      ],
+      "pointsRange": [
+        40,
+        80
+      ]
+    },
+    {
+      "division": "Championship",
+      "seed": 54321,
+      "teams": 24,
+      "matches": 552,
+      "goalsPerMatch": 2.536,
+      "homeWinRate": 0.457,
+      "drawRate": 0.259,
+      "awayWinRate": 0.284,
+      "strengthRankCorrelation": 0.358,
+      "strengthRange": [
+        59,
+        67
+      ],
+      "pointsRange": [
+        43,
+        83
+      ]
+    },
+    {
+      "division": "Championship",
+      "seed": 20261020,
+      "teams": 24,
+      "matches": 552,
+      "goalsPerMatch": 2.466,
+      "homeWinRate": 0.399,
+      "drawRate": 0.277,
+      "awayWinRate": 0.324,
+      "strengthRankCorrelation": 0.39,
+      "strengthRange": [
+        59,
+        67
+      ],
+      "pointsRange": [
+        49,
+        78
+      ]
+    },
+    {
+      "division": "League One",
+      "seed": 12345,
+      "teams": 24,
+      "matches": 552,
+      "goalsPerMatch": 2.583,
+      "homeWinRate": 0.418,
+      "drawRate": 0.283,
+      "awayWinRate": 0.299,
+      "strengthRankCorrelation": 0.473,
+      "strengthRange": [
+        52,
+        60
+      ],
+      "pointsRange": [
+        45,
+        92
+      ]
+    },
+    {
+      "division": "League One",
+      "seed": 54321,
+      "teams": 24,
+      "matches": 552,
+      "goalsPerMatch": 2.567,
+      "homeWinRate": 0.391,
+      "drawRate": 0.257,
+      "awayWinRate": 0.351,
+      "strengthRankCorrelation": 0.581,
+      "strengthRange": [
+        52,
+        60
+      ],
+      "pointsRange": [
+        41,
+        86
+      ]
+    },
+    {
+      "division": "League One",
+      "seed": 20261020,
+      "teams": 24,
+      "matches": 552,
+      "goalsPerMatch": 2.536,
+      "homeWinRate": 0.449,
+      "drawRate": 0.274,
+      "awayWinRate": 0.277,
+      "strengthRankCorrelation": 0.378,
+      "strengthRange": [
+        52,
+        60
+      ],
+      "pointsRange": [
+        48,
+        83
+      ]
+    },
+    {
+      "division": "League Two",
+      "seed": 12345,
+      "teams": 24,
+      "matches": 552,
+      "goalsPerMatch": 2.551,
+      "homeWinRate": 0.408,
+      "drawRate": 0.274,
+      "awayWinRate": 0.319,
+      "strengthRankCorrelation": 0.204,
+      "strengthRange": [
+        45,
+        53
+      ],
+      "pointsRange": [
+        45,
+        87
+      ]
+    },
+    {
+      "division": "League Two",
+      "seed": 54321,
+      "teams": 24,
+      "matches": 552,
+      "goalsPerMatch": 2.516,
+      "homeWinRate": 0.446,
+      "drawRate": 0.264,
+      "awayWinRate": 0.29,
+      "strengthRankCorrelation": 0.071,
+      "strengthRange": [
+        45,
+        53
+      ],
+      "pointsRange": [
+        42,
+        78
+      ]
+    },
+    {
+      "division": "League Two",
+      "seed": 20261020,
+      "teams": 24,
+      "matches": 552,
+      "goalsPerMatch": 2.534,
+      "homeWinRate": 0.449,
+      "drawRate": 0.243,
+      "awayWinRate": 0.308,
+      "strengthRankCorrelation": 0.437,
+      "strengthRange": [
+        45,
+        53
+      ],
+      "pointsRange": [
+        44,
+        87
+      ]
+    }
+  ],
+  "limitations": [
+    "Lower-league tests use production seededScore and makeLowerFixtures with synthetic/hash-derived strengths; not player-level match simulation.",
+    "Profile archive matches are by exact name only; absence of a match does not mean the roster name is false, and presence does not prove current club affiliation.",
+    "Headless Chromium startup timed out during app initialization; no browser smoke-test pass is claimed."
+  ],
+  "browser_smoke_test": {
+    "status": "TIMED_OUT",
+    "details": "Headless Chromium --dump-dom did not complete within the execution timeout; not counted as a pass."
+  }
+}
