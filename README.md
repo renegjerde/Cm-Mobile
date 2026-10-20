@@ -1,3 +1,12 @@
+# CM Mobile v2.62
+
+## Endring i denne versjonen
+- Overgangslisten er gjort mer kompakt på mobil. Spillerinformasjon står samlet til venstre, mens «Legg ut for salg» og «Lån ut» ligger i en ryddig, smal handlingskolonne.
+- Redusert vertikal luft og knappestørrelser uten å endre handlingene eller lagringsnøkkelen.
+- Beholder oppstartsreparasjonen fra v2.61.
+
+Se `TRANSFER_LIST_MOBILE_LAYOUT_v2.62.md` for detaljene.
+
 # CM Mobile v2.57 — Touchline
 
 ## Hva er nytt
