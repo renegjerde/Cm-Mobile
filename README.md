@@ -1,17 +1,16 @@
-# CM Mobile v2.71
+# CM Mobile v2.72 — Touchline Edition
 
-## Nytt i v2.71
-- Rollepassform vises direkte på banevisningen med fargekoder.
-- Byttepanelet viser rollepassform i prosent og merker de tre høyest rangerte alternativene.
-- Anbefalingene tar hensyn til spillets eksisterende vurdering av rolle, ferdigheter, form og tilgjengelighet.
+## Nytt i v2.72
+- Dra-og-slipp bytte mellom spillere i banevisningen på enheter med pekestøtte for HTML drag-and-drop (typisk desktop).
+- På mobil: trykk på én spiller og deretter en annen for å bytte dem direkte. Trykk på en spiller én gang og velg en reserve i byttepanelet for å gjøre et ordinært spillerbytte.
+- Ny «Lagbalanse»-boks varsler om svak rollepassform, lav kondisjon og enkelte tydelige skjevheter i lagets posisjonsfordeling.
+- Eksisterende lagring og kampmotor er beholdt; ingen ny lagringsversjon er nødvendig.
 
-## Tidligere endringer
-- v2.70: Klikkbar banevisning for å velge plass og bytte spillere.
-- v2.69: Forbedret kampvisning.
-- v2.68: Klubbmerker i neste kamp-kort og NaN-rettelse.
+## Kontroller
+- JavaScript-syntaks kontrollert med Node.js.
+- ZIP-arkivets integritet kontrollert.
+- Statisk kontroll av nye handler og visningsfragmenter gjennomført.
+- Full interaktiv nettleser- og mobiltest er ikke utført. Drag-and-drop kan variere mellom nettlesere; mobilens trykk-for-bytte er den primære berøringsflyten.
 
-## Publisering
-Pakk ut ZIP-filen. Den inneholder mappen `CM_Mobile_v2.71` med `index.html` og `README.md`. For GitHub Pages som publiserer fra `main`-roten må den nye `index.html` kopieres til publiseringsroten; versjonsmappen er arkivkopien. Ta vare på eksisterende karrierelagring.
-
-## Teststatus
-JavaScript-syntaks og ZIP-integritet er kontrollert. Ingen full visuell mobiltest eller full karrieretest er utført. Rollefit-prosenten er en spillintern indikator, ikke en ekstern fasit.
+## Viktig
+Varslene er heuristikker basert på spillets rollefit, kondisjon og tildelte roller. De er ikke en full taktisk simulering og bør ses som praktiske signaler, ikke fasit.
