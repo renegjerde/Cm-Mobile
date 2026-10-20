@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.62 — Touchline</title>
+<title>CM Mobile v2.64 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -222,7 +222,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .tactics-training-grid{display:grid;grid-template-columns:1fr;gap:4px}
 @media(min-width:600px){.tactics-training-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
-/* v2.62: compact, balanced transfer-list actions on mobile */
+/* v2.64: compact, balanced transfer-list actions on mobile */
 .transfer-list-accordion>.transfer-list-player{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px 2px;margin:0;border-bottom:1px solid var(--line,#26364a)}
 .transfer-list-player-info{min-width:0}
 .transfer-list-player-info .player-name{font-size:14px;line-height:1.35;overflow-wrap:anywhere}
@@ -2930,6 +2930,7 @@ function processEuropeanCompetitions(round){
   comp.leagueRound=matchdayIndex+1;comp.stage=comp.leagueRound;
   if(comp.leagueRound>=comp.matchdays){comp.phase='knockout';comp.leaguePhaseComplete=true;if(!appState.pendingCupMatch)startEuropeanKnockout(comp.name);}
  });
+ processScheduledEuropeanKnockouts(round);
 }
 
 
@@ -2940,6 +2941,31 @@ const EUROPEAN_KNOCKOUT_STAGES=[
  {key:'semifinal',name:'Semifinaler',label:'Start semifinaler'},
  {key:'final',name:'Finale',label:'Spill finalen'}
 ];
+// European knockout stage order. Calendar timing is defined below; creating a stage does not play a match.
+// v2.64: European knockout legs are scheduled, not started recursively.
+// For a PL manager the final follows GW38; for an EFL manager it follows the 46-round league.
+const EUROPEAN_KNOCKOUT_CALENDAR={
+ playoff:[24,25], round16:[27,28], quarterfinal:[30,31], semifinal:[33,34], final:[]
+};
+function europeanKnockoutWeekFor(stageKey,leg=1){
+ if(stageKey==='final'){
+  const domesticEnd=typeof activeLeagueRoundCount==='function'?(Number(activeLeagueRoundCount())||38):38;
+  return Math.max(38,domesticEnd);
+ }
+ const weeks=EUROPEAN_KNOCKOUT_CALENDAR[stageKey]||[];
+ return weeks[Math.max(0,Math.min(weeks.length-1,Number(leg)-1))]??null;
+}
+function processScheduledEuropeanKnockouts(week){
+ Object.values(appState.europeanCompetitions||{}).forEach(comp=>{
+  if(!comp||comp.format!=='league'||comp.finished||appState.pendingCupMatch?.competition===comp.name)return;
+  const stage=comp.knockout?.activeStage;if(!stage||stage.complete)return;
+  const leg=stage.key==='final'?1:(Number(stage.leg)||1);
+  const dueWeek=europeanKnockoutWeekFor(stage.key,leg);
+  if(dueWeek===null||Number(week)!==Number(dueWeek))return;
+  processEuropeanKnockoutLeg(comp,leg);
+ });
+}
+
 function europeanTeamWithSeed(comp,name,seed){
  const source=(comp.teams||[]).find(t=>t.name===name);return source?{...source,leagueSeed:Number(seed)||source.leagueSeed||99}:null;
 }
@@ -3026,7 +3052,7 @@ function processEuropeanKnockoutLeg(comp,leg){
  if(stage.key==='final'){
   const tie=stage.ties[0];if(tie&&!tie.winner){setEuropeanKnockoutWinner(comp,tie,true);}finishEuropeanKnockoutStage(comp);return;
  }
- if(leg===1){processEuropeanKnockoutLeg(comp,2);return;}
+ if(leg===1){stage.leg=2;return;}
  stage.ties.forEach(t=>setEuropeanKnockoutWinner(comp,t,true));finishEuropeanKnockoutStage(comp);
 }
 function finishEuropeanKnockoutStage(comp){
@@ -3046,23 +3072,26 @@ function finishEuropeanKnockoutStage(comp){
 }
 function startEuropeanKnockout(name){
  ensureEuropeanCompetitions();const comp=appState.europeanCompetitions?.[name];if(!comp||comp.format!=='league')return;
- if(Number(comp.leagueRound)<Number(comp.matchdays)){appState.log.push(`${name}: ligafasen er ikke ferdig ennå.`);save();render();return;}
+ if(Number(comp.leagueRound)<Number(comp.matchdays)){appState.log.push(`${name}: ligafasen er ikke ferdig ennå.`);return;}
  comp.leaguePhaseComplete=true;comp.phase='knockout';
- if(comp.finished){save();render();return;}
+ if(comp.finished)return;
  if(!comp.knockout)comp.knockout={stageIndex:0,activeStage:null,history:[],playoffWinners:[]};
- if(comp.knockout.activeStage&&!comp.knockout.activeStage.complete){save();render();return;}
- const stageIndex=Number(comp.knockout.stageIndex)||0;if(stageIndex>=EUROPEAN_KNOCKOUT_STAGES.length){save();render();return;}
+ if(comp.knockout.activeStage&&!comp.knockout.activeStage.complete)return;
+ const stageIndex=Number(comp.knockout.stageIndex)||0;if(stageIndex>=EUROPEAN_KNOCKOUT_STAGES.length)return;
  const definition=EUROPEAN_KNOCKOUT_STAGES[stageIndex];
  const ties=buildEuropeanKnockoutTies(comp,stageIndex);
  comp.knockout.activeStage={key:definition.key,name:definition.name,stageIndex,ties,leg:1,legResults:{1:[],2:[]},complete:false};
- appState.log.push(`${name}: ${definition.name} startet med ${ties.length} oppgjør.`);
- processEuropeanKnockoutLeg(comp,1);save();render();
+ const scheduledWeek=europeanKnockoutWeekFor(definition.key,1);
+ appState.log.push(`${name}: ${definition.name} er satt opp med ${ties.length} oppgjør. Første kamp spilles i spilluke ${scheduledWeek}.`);
+ // Do not play here. The weekly scheduler is the sole authority for when legs happen.
+ return comp.knockout.activeStage;
 }
+
 function finishEuropeanKnockoutUserMatch(engine,ga,gb,pending){
  const comp=appState.europeanCompetitions?.[pending.competition];const stage=comp?.knockout?.activeStage;const tie=stage?.ties?.find(t=>t.id===pending.knockoutTieId);
  if(!comp||!stage||!tie)return null;
  const leg=Number(pending.knockoutLeg)||1,home=pending.homeTeam,away=pending.awayTeam;
- const result=buildEuropeanKnockoutResult(comp,stage,tie,leg,home,away,ga,gb,engine);
+ const result=buildEuropeanKnockoutResult(comp,stage,tie,leg,home,away,ga,gb,engine);result.week=Number(pending.scheduledWeek)||Number(result.week)||Number(appState.week);
  if(stage.key==='final'&&ga===gb){const pen=shootoutScore(home.strength,away.strength);const penWinner=pen.home>pen.away?home:away;result.score=`${ga}–${gb} (${pen.home}–${pen.away} str.)`;result.decidedByPenalties=true;result.penaltyScore=pen;result.penaltyWinner=penWinner.name;result.winner=penWinner.name;}
  awardUserCompetitionMatch(pending.competition,stage.index+1||1,home.name,away.name,ga,gb,result.winner,false,true);
  recordEuropeanKnockoutLeg(comp,stage,tie,leg,home,away,ga,gb,result);stage.legResults=stage.legResults||{};stage.legResults[leg]=stage.legResults[leg]||[];stage.legResults[leg].push(result);comp.results.push(result);
@@ -3071,7 +3100,7 @@ function finishEuropeanKnockoutUserMatch(engine,ga,gb,pending){
  appState.pendingCupMatch=null;
  if(stage.key==='final'){
   setEuropeanKnockoutWinner(comp,tie,true);finishEuropeanKnockoutStage(comp);
- }else if(leg===1){processEuropeanKnockoutLeg(comp,2);}
+ }else if(leg===1){stage.leg=2;appState.log.push(`${comp.name} · ${stage.name}: returoppgjøret er satt til uke ${europeanKnockoutWeekFor(stage.key,2)}.`);}
  else{stage.ties.forEach(t=>setEuropeanKnockoutWinner(comp,t,true));finishEuropeanKnockoutStage(comp);}
  save();return {winner:tie.winner?.name||result.winner,score:result.score,resultText:appState.log[appState.log.length-1],competition:comp.name,isEuropeanKnockout:true};
 }
@@ -4518,7 +4547,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){normalizeTransferHistory();const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.62 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){normalizeTransferHistory();const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.64 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{const ok=save();let b=document.getElementById("saveBtn");b.textContent=ok?"✓ Lagret":"⚠ Lagring feilet";setTimeout(()=>b.textContent="▣ Lagre",1800)});
 // Bootstrap from the embedded offline profile snapshot only. No player-data network requests.
