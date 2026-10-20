@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.69 — Touchline</title>
+<title>CM Mobile v2.67 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -26,7 +26,6 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(min-width:600px){main{padding:20px 18px 95px}.hero{padding:23px}.hero h1{font-size:31px}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
 /* v2.67: focused mobile home dashboard */
-/* v2.69: live match screen hierarchy and crest-led scoreline */
 .home-hero{padding:16px;margin-bottom:10px;background:linear-gradient(135deg,#1b3046,#132136 72%,#183126)}
 .home-clubline{display:flex;align-items:center;gap:12px;min-width:0}
 .home-crest{width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;border-radius:13px;background:#243950;border:1px solid #40546a;font-size:24px;overflow:hidden}
@@ -187,26 +186,6 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .lineup-footer button{flex:1}
 @media(max-width:380px){.live-score-hero .live-score{font-size:31px}.live-score-hero .score-club{font-size:11px}}
 
-
-/* v2.69 live match screen polish */
-.live-score-crest-layout{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;margin:14px 0 12px;padding:14px 10px;background:linear-gradient(135deg,#101c2d,#17283a);border-color:#405670;box-shadow:inset 0 1px 0 #ffffff08}
-.live-score-crest-layout .score-side{display:flex;min-width:0;flex-direction:column;align-items:center;gap:5px;text-align:center}
-.live-score-crest-layout .score-side.away{align-items:center}
-.live-score-crest{width:48px;height:48px;border-radius:13px;display:grid;place-items:center;background:#24364b;border:1px solid #41566f;box-shadow:0 4px 12px #0002}
-.live-score-crest img{max-width:38px;max-height:38px}
-.live-score-crest .club-badge-fallback{border:0;background:transparent;box-shadow:none;font-size:13px}
-.live-score-crest-layout .score-club{width:100%;font-size:12px;line-height:1.25;text-align:center!important;overflow-wrap:anywhere;color:#eef4fc}
-.live-score-crest-layout .score-side small{font-size:9px;font-weight:850;letter-spacing:.12em;color:var(--muted)}
-.live-score-crest-layout .score-center{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:88px}
-.live-score-crest-layout .live-score{font-size:clamp(32px,8vw,42px);font-weight:950;letter-spacing:-.06em}
-.live-score-crest-layout .score-divider{font-size:8px;font-weight:850;letter-spacing:.12em;color:var(--muted);white-space:nowrap}
-.commentary-heading{display:flex;align-items:center;gap:7px;margin:12px 0 6px;padding:0 2px;color:#a5b5c8;font-size:10px;letter-spacing:.1em}
-.commentary-heading strong{font-size:10px;color:#9be27d}
-.commentary-heading span:last-child{margin-left:auto;letter-spacing:.03em;color:#8193a8}
-.commentary-live-dot{width:7px;height:7px;border-radius:50%;background:#9be27d;box-shadow:0 0 8px #9be27d66;flex:0 0 auto}
-.live-commentary{position:relative;border-radius:13px!important;border:1px solid #354a62!important;background:linear-gradient(135deg,#1a2a3f,#152337)!important;line-height:1.48!important;font-size:14px!important;padding:14px!important;min-height:66px;box-shadow:inset 3px 0 0 #4c6b83}
-@media(max-width:370px){.live-score-crest-layout{gap:4px;padding:11px 6px}.live-score-crest{width:42px;height:42px}.live-score-crest img{max-width:33px;max-height:33px}.live-score-crest-layout .score-center{min-width:76px}.live-score-crest-layout .score-club{font-size:11px}.live-score-crest-layout .live-score{font-size:30px}}
-
 /* v1.22 squad browser */
 .squad-toolbar{display:grid;grid-template-columns:1fr auto;gap:8px;margin:12px 0}
 .squad-search{width:100%;min-width:0;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:#17263a;color:var(--text)}
@@ -285,7 +264,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.69</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.68</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -4344,13 +4323,8 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    <button type="button" data-speed="150" aria-pressed="false">4×</button>
    <span class="speed-label" id="liveSpeedLabel">Tempo · 2×</span>
   </div>
-  <div class="live-score-hero live-score-crest-layout">
-   <div class="score-side home"><div class="live-score-crest">${clubBadgeMarkup(homeClub,38)}</div><div class="score-club">${homeName}</div><small>HJEMME</small></div>
-   <div class="score-center"><div id="liveScore" class="live-score">0 – 0</div><span class="score-divider">STILLING</span></div>
-   <div class="score-side away"><div class="live-score-crest">${clubBadgeMarkup(awayClub,38)}</div><div class="score-club">${awayName}</div><small>BORTE</small></div>
-  </div>
+  <div class="live-score-hero"><div class="score-club">${homeName}</div><div id="liveScore" class="live-score">0 – 0</div><div class="score-club">${awayName}</div></div>
   <button type="button" class="lineup-open" id="openLineupBtn">♟ Bytter / taktikk · Lagoppstilling</button>
-  <div class="commentary-heading"><span class="commentary-live-dot"></span><strong>SISTE SITUASJON</strong><span id="commentaryMinute">KAMPSTART</span></div>
   <div id="liveCommentary" class="live-commentary">${openerLines[Math.floor(Math.random()*openerLines.length)]}</div>
   <div id="halftimePanel" class="notice" style="display:none"><strong>Pause – lagprat</strong><p style="margin:6px 0 10px">Gjør bytter og endre taktikk før andre omgang. Bytter i pausen bruker ikke et av de tre stoppvinduene, men teller mot grensen på fem spillere.</p><div class="hero-actions"><button type="button" id="halftimeLineupBtn">Bytter / taktikk</button><button type="button" class="primary" id="startSecondHalfBtn">Start andre omgang →</button></div></div>
  </div>
@@ -4583,7 +4557,6 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   pauseBtn.textContent=paused?"▶ Fortsett":"Ⅱ Pause";
   pauseBtn.classList.toggle("live-paused",paused);
   status.textContent=paused?`PAUSE · ${currentMinute}'`:`LIVE · ${currentMinute}'`;
-  const commentaryMinute=document.getElementById('commentaryMinute');if(commentaryMinute)commentaryMinute.textContent=currentMinute<=45&&currentMinute>0?`${currentMinute}' · 1. OMGANG`:currentMinute>45&&currentMinute<=90?`${currentMinute}' · 2. OMGANG`:currentMinute>90?`${currentMinute}' · EKSTRA`:currentMinute===0?'KAMPSTART':'PAUSE';
   if(paused){if(timer)clearInterval(timer);timer=null;}
   else{timer=setInterval(clockTick,tickMs);}
  });
@@ -4628,7 +4601,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){normalizeTransferHistory();const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.69 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){normalizeTransferHistory();const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.68 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{const ok=save();let b=document.getElementById("saveBtn");b.textContent=ok?"✓ Lagret":"⚠ Lagring feilet";setTimeout(()=>b.textContent="▣ Lagre",1800)});
 // Bootstrap from the embedded offline profile snapshot only. No player-data network requests.

@@ -11,11 +11,3 @@ Pakk ut ZIP-filen og erstatt `index.html` i roten av GitHub Pages `main`-grenen.
 
 ## Teststatus
 Kontrollert JavaScript-syntaks, ZIP-integritet og statisk tilstedeværelse av endringene. Ingen full nettleser-/mobiltest eller full sesongtest er utført. Klubblogoer for Premier League-lag bruker spillets eksisterende bildeadresser; klubber uten en definert logo viser et kort klubbmerke basert på initialer.
-
-
-## v2.69 – kampskjerm
-- Gjorde stillingsfeltet mer kamporientert med klubbmerker, hjem/borte-merking og tydeligere score-hierarki.
-- La til «Siste situasjon»-etikett med løpende kampminutt ved kommentaren.
-- Strammet opp kommentarfeltet for bedre lesbarhet på mobil.
-- Endret kun presentasjon på kampskjermen; kampmotor, lagringsformat og karrieredata er ikke tilsiktet endret.
-- Kontrollert JavaScript-syntaks og ZIP-integritet. Ikke full visuell test i mobilnettleser.
