@@ -1,4 +1,4 @@
-# CM Mobile v2.74 — Touchline Edition
+# CM Mobile v2.78 — Player Age Integrity
 
 ## Taktikk: fri baneplassering
 - Startelleverens 11 spillere vises på en vertikal, mobiltilpasset fotballbane.
@@ -38,3 +38,17 @@ Pakken har en versjonsmappe med `index.html`, `README.md` og endringsrapporter. 
 - PL squads are no longer truncated at 25 after merging eligible U21 first-team players.
 - The 3-8-8-6 target is treated as a preferred senior-squad shape, never as a reason to omit registered first-team youth.
 - Database version bumped so untouched preseason careers rebuild. Progressed careers retain their established squad/history.
+
+
+## v2.78 — player age integrity
+- Fixed the root cause behind absurd ages such as JJ Gabriel at 30 and Gabriele Biancheri at 31: missing DOBs were previously converted into deterministic fictional ages and then persisted as if meaningful.
+- Added verified DOB entries for a broad set of the PL first-team U21/prospect supplement; season ages are calculated as of 22 August 2026.
+- Real named players without a verified date now show `Alder ikke verifisert`. A separate provisional model age is retained only for internal simulation calculations; it is not presented as a real age.
+- Generated fictional identities can still use a consistent fictional age, but are flagged separately.
+- Removed Biancheri from the Man Utd first-team U21 supplement because Manchester United announced his permanent move to FC Wacker Innsbruck; also removed several clearly outdated club assignments from the supplement and moved Tom Watson to Brighton.
+- `PLAYER_DB_VERSION` bumped to 24. New careers rebuild the untouched preseason database; non-progressed migrations repair old fake-age values. Careers already in progress retain their squads but their displayed DOB-backed ages are repaired on load.
+- Verification: JavaScript syntax, DOB-season-age checks, supplement audit, and ZIP integrity checked. Full-browser visual/season simulation testing remains incomplete.
+
+### Ekstra kontroll v2.78
+
+Isolert aldersmigreringstest bestod fem scenarioer, inkludert reparasjon av JJ Gabriel og Gabriele Biancheri, korrekt alder for Shea Lacey, ukjent alder for navngitte spillere uten verifisert DOB og fortsatt modellert alder for genererte identiteter. Se `PLAYER_AGE_INTEGRITY_v2.78.md` og `U21_AGE_AUDIT_v2.78.csv`. Full nettleser-/mobiltest og full sesongtest er ikke utført.
