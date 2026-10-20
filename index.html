@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.69 — Touchline</title>
+<title>CM Mobile v2.70 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -26,7 +26,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(min-width:600px){main{padding:20px 18px 95px}.hero{padding:23px}.hero h1{font-size:31px}.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
 /* v2.67: focused mobile home dashboard */
-/* v2.69: live match screen hierarchy and crest-led scoreline */
+/* v2.70: live match screen hierarchy and crest-led scoreline */
 .home-hero{padding:16px;margin-bottom:10px;background:linear-gradient(135deg,#1b3046,#132136 72%,#183126)}
 .home-clubline{display:flex;align-items:center;gap:12px;min-width:0}
 .home-crest{width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;border-radius:13px;background:#243950;border:1px solid #40546a;font-size:24px;overflow:hidden}
@@ -188,7 +188,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(max-width:380px){.live-score-hero .live-score{font-size:31px}.live-score-hero .score-club{font-size:11px}}
 
 
-/* v2.69 live match screen polish */
+/* v2.70 live match screen polish */
 .live-score-crest-layout{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;margin:14px 0 12px;padding:14px 10px;background:linear-gradient(135deg,#101c2d,#17283a);border-color:#405670;box-shadow:inset 0 1px 0 #ffffff08}
 .live-score-crest-layout .score-side{display:flex;min-width:0;flex-direction:column;align-items:center;gap:5px;text-align:center}
 .live-score-crest-layout .score-side.away{align-items:center}
@@ -269,6 +269,21 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .tactics-mini-status{font-size:11px;color:var(--muted);margin:4px 0 0}
 .tactics-pitch-card{background:linear-gradient(180deg,#17452f,#123622);border:1px solid #2b6848;border-radius:12px;padding:10px 8px;text-align:center}
 .tactics-pitch-card .pitch-direction{font-size:10px;color:#b5e6bf;letter-spacing:.08em}
+/* v2.70: interactive formation board */
+.tactics-pitch-card .pitch-player{appearance:none;-webkit-appearance:none;border:1px solid transparent;background:transparent;color:#eaf4ff;border-radius:10px;padding:4px 2px;flex:1;min-width:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.2}
+.tactics-pitch-card .pitch-player:active,.tactics-pitch-card .pitch-player.is-selected{background:#ffffff16;border-color:#9cde80}
+.tactics-pitch-card .pitch-player .pitch-dot{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#eaf4ff;color:#17452f;font-size:10px;font-weight:950;border:2px solid #b7d6e9;box-shadow:0 2px 5px #0004}
+.tactics-pitch-card .pitch-player.is-selected .pitch-dot{background:#9cde80;border-color:#f0ffe9}
+.tactics-pitch-card .pitch-player .pitch-name{display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.tactics-pitch-card .pitch-player .pitch-rating{font-size:12px;color:var(--green);font-weight:900}
+.tactics-pitch-card .pitch-player .pitch-role{display:block;font-size:10px;color:#b5c8d7;overflow-wrap:anywhere}
+.pitch-instruction{font-size:12px;color:#c0d4e0;margin:8px 0 2px}
+.pitch-swap-panel{border:1px solid #58724d;background:#182d2a;border-radius:12px;padding:12px;margin:10px 0}
+.pitch-swap-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:9px}
+.pitch-swap-options button{min-width:0;text-align:left;padding:9px 10px;font-size:12px;line-height:1.3;overflow-wrap:anywhere}
+.pitch-swap-options button strong{display:block;color:var(--green);margin-top:3px}
+@media(min-width:520px){.pitch-swap-options{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
 .tactics-training-grid{display:grid;grid-template-columns:1fr;gap:4px}
 @media(min-width:600px){.tactics-training-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
@@ -285,7 +300,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.69</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.70</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><button class="ghost" id="saveBtn" title="Lagre karriere">▣ Lagre</button></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -1770,6 +1785,16 @@ function setStartingPlayer(slot,id){
  if(duplicate>=0)xi[duplicate]=old;
  xi[slot]=p;appState.selectedXI=assignTacticalRoles(xi,appState.formation).map(x=>x.id);save();render();
 }
+function selectPitchSlot(slot){
+ const xi=currentStartingXI();if(!Number.isInteger(Number(slot))||!xi[Number(slot)])return;
+ appState.pitchSelectedSlot=Number(slot);save();render();
+}
+function choosePitchReplacement(id){
+ const slot=Number(appState.pitchSelectedSlot);if(!Number.isInteger(slot)||slot<0||slot>10)return;
+ setStartingPlayer(slot,id);appState.pitchSelectedSlot=null;save();render();
+}
+function cancelPitchReplacement(){appState.pitchSelectedSlot=null;save();render();}
+
 function disciplineRecord(p){
  appState.discipline=appState.discipline||{};
  const key=String(p.id);
@@ -1989,8 +2014,9 @@ function tactics(){
  const roleRows=(FORMATION_TEMPLATES[appState.formation]||FORMATION_TEMPLATES['4-3-3']).rows;
  const roleUsed=new Set();
  const stablePitchRows=roleRows.map(rowRoles=>rowRoles.map(role=>{const p=xi.find(x=>x.assignedRole===role&&!roleUsed.has(String(x.id)));if(p)roleUsed.add(String(p.id));return p;}).filter(Boolean));
- const pitchLine=(players)=>`<div style="display:flex;justify-content:space-evenly;align-items:flex-start;gap:3px;margin:10px 0">${players.map(p=>`<div style="flex:1;min-width:0;text-align:center"><div style="font-size:20px;color:#eaf4ff">●</div><small style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.name.split(" ").slice(-1)[0])}</small><strong style="font-size:11px;color:var(--green)">${positionAdjustedRating(p,p.assignedRole)}</strong><small style="display:block;font-size:9px;color:${p.fitness<65?'#ffaaaa':'var(--muted)'}">${esc(roleLabels[p.assignedRole]||ROLE_BY_SIDE[p.assignedRole]||p.pos)} · ⚡${p.fitness}%</small></div>`).join('')}</div>`;
- const pitch=()=>`${stablePitchRows.map(row=>pitchLine(row)).join('')}<div style="margin-top:8px;text-align:center">🧤 ${gk.map(p=>`${esc(p.name)} · ${p.rating}`).join(', ')||'Ingen keeper'}</div>`;
+ const pitchLine=(players)=>`<div style="display:flex;justify-content:space-evenly;align-items:stretch;gap:3px;margin:9px 0">${players.map(p=>{const slot=xi.findIndex(x=>String(x.id)===String(p.id));const selected=Number(appState.pitchSelectedSlot)===slot;return `<button type="button" class="pitch-player ${selected?'is-selected':''}" aria-label="Velg ${esc(p.name)} for spillerbytte" aria-pressed="${selected?'true':'false'}" onclick="selectPitchSlot(${slot})"><span class="pitch-dot">${esc((p.name.split(/\s+/).slice(-1)[0]||p.name).slice(0,2).toUpperCase())}</span><span class="pitch-name">${esc(p.name.split(" ").slice(-1)[0])}</span><strong class="pitch-rating">${positionAdjustedRating(p,p.assignedRole)}</strong><span class="pitch-role" style="color:${p.fitness<65?'#ffaaaa':'#b5c8d7'}">${esc(roleLabels[p.assignedRole]||ROLE_BY_SIDE[p.assignedRole]||p.pos)}<br>⚡${p.fitness}%</span></button>`}).join('')}</div>`;
+ const pitch=()=>`${stablePitchRows.map(row=>pitchLine(row)).join('')}<button type="button" class="pitch-player ${Number(appState.pitchSelectedSlot)===xi.findIndex(p=>p.assignedRole==='GK')?'is-selected':''}" style="width:min(100%,260px);margin:7px auto 0;flex:none;display:flex;flex-direction:row;justify-content:center" onclick="selectPitchSlot(${xi.findIndex(p=>p.assignedRole==='GK')})"><span class="pitch-dot">GK</span><span class="pitch-name" style="width:auto">${gk.map(p=>esc(p.name)).join(', ')||'Ingen keeper'}</span><strong class="pitch-rating">${gk[0]?.rating??'—'}</strong></button>`;
+ const pitchSwapPanel=()=>{const slot=Number(appState.pitchSelectedSlot);if(!Number.isInteger(slot)||!xi[slot])return '';const current=xi[slot],role=current.assignedRole||'CM';const candidates=eligibleSquad(appState.squad).filter(p=>canPlay(p)&&(role==='GK'?p.pos==='GK':p.pos!=='GK')).sort((a,b)=>roleCandidateScore(b,role)-roleCandidateScore(a,role));return `<div class="pitch-swap-panel"><div class="section-title" style="margin:0"><h3 style="margin:0;font-size:15px">Bytt spiller</h3><button type="button" class="ghost" onclick="cancelPitchReplacement()">Avbryt ✕</button></div><p class="muted" style="font-size:12px;margin:7px 0">Valgt plass: <strong>${esc(roleLabels[role]||role)}</strong> · ${esc(current.name)}. Velg en spiller under. Bytter du inn en som allerede starter, bytter spillerne plass med hverandre.</p><div class="pitch-swap-options">${candidates.map(p=>`<button type="button" class="${String(p.id)===String(current.id)?'primary':'ghost'}" onclick="choosePitchReplacement('${String(p.id).replace(/'/g,"\\'")}')" ${String(p.id)===String(current.id)?'disabled':''}>${esc(p.name)}<strong>${p.rating} · ${Math.max(30,100-rolePenalty(p,role)*5)}% rollepassform</strong>${p.pos==='GK'?'Keeper':esc(ROLE_BY_SIDE[p.role]||p.role||p.pos)} · ⚡${p.fitness}%</button>`).join('')}</div></div>`};
  const playerDetail=(p)=>`<div class="player-meta">${p.pos==="GK"?`Keepergrep ${p.attributes.handling} · Reflekser ${p.attributes.reflexes} · Posisjonering ${p.attributes.positioning}`:p.pos==="DEF"?`Forsvar ${p.attributes.defending} · Styrke ${p.attributes.strength} · Hurtighet ${p.attributes.pace}`:p.pos==="MID"?`Pasninger ${p.attributes.passing} · Kreativitet ${p.attributes.creativity} · Utholdenhet ${p.attributes.stamina}`:`Avslutninger ${p.attributes.finishing} · Hurtighet ${p.attributes.pace} · Teknikk ${p.attributes.technique}`}</div><div class="fitness-track"><div class="fitness-fill" style="width:${p.fitness}%;background:${p.fitness<60?'#e48787':p.fitness<78?'#e8c875':'var(--green)'}"></div></div>`;
  const bench=eligibleSquad(appState.squad).filter(p=>!xi.some(q=>String(q.id)===String(p.id)));
  const opponentIndex=getNextOpponentIndex();
@@ -2002,7 +2028,7 @@ function tactics(){
  return `<div class="hero tactics-hero"><div class="eyebrow">Match preparation · ${seasonLabel()}</div><h1>Laguttak og taktikk</h1><p>Sett formasjonen, velg mentalitet og klargjør startelleveren.</p><div class="hero-actions"><span class="pill green">${xi.length}/11 valgt</span><span class="pill">Reserver: ${bench.length}</span><span class="pill ${unavailableCount?'warning':'green'}">${unavailableCount?`${unavailableCount} utilgjengelig`:'Alle tilgjengelige'}</span></div></div>
  <section class="card tactics-quick-controls"><div class="field"><label>FORMASJON I NESTE KAMP</label><select id="formation" onchange="appState.formation=this.value;appState.selectedXI=null;appState.recommendationRound=null;appState.recommendationInfo=null;save();render()">${appState.trainingFormations.map(f=>`<option value="${esc(f)}" ${appState.formation===f?'selected':''}>${esc(f)}</option>`).join('')}</select></div><div class="field"><label>MENTALITET</label><select id="tactic" onchange="appState.tactic=this.value;save()">${["Defensive","Balanced","Attacking","High press"].map(f=>`<option value="${f}" ${appState.tactic===f?"selected":""}>${mentalLabels[f]}</option>`).join('')}</select></div><button type="button" style="width:100%;margin:3px 0 0;border-color:#7e9c70;background:#1b382c;color:#bdf0ad;font-weight:850" onclick="rotateStartingXI()">🔄 Roter troppen</button><p class="tactics-mini-status">Prioriterer spillere som ikke startet forrige kamp. Skadde og suspenderte spillere utelates.</p></section>
  <section class="card assistant-match-plan" style="border-color:#647b52;background:linear-gradient(145deg,#192b2b,#142236);margin-bottom:12px"><div class="section-title"><h2>🤖 Assistentens kampplan</h2><span class="pill green">Klargjort automatisk</span></div><div class="player"><div style="flex:1"><strong>Formasjon · ${esc(appState.formation)}</strong><div class="player-meta">Motstander: ${esc(opponentName)} · ${esc(opponentFormation)} · Mentalitet ${mentalLabels[appState.tactic]||'Balansert'}</div></div><span class="pill">${xi.length}/11</span></div><p class="muted" style="margin:8px 0">Assistenten har satt opp formasjon og startellever fra lagets tre innarbeidede systemer. ${(()=>{const prev=new Set((appState.lastStartingXI||[]).map(String));const rotated=xi.filter(p=>!prev.has(String(p.id))).length;const gap=Number(teamPower(appState.club)||currentClub().strength)-Number(teamPower(opponentIndex)||CLUBS[opponentIndex].strength);return gap>=7?`Mot en svakere motstander vurderes rotasjon; ${rotated} spillere startet ikke sist.`:`Ingen stor rotasjon forventes mot denne motstanderen.`})()}</p><button type="button" class="ghost" style="width:100%" onclick="applyPreMatchRecommendation(true);render()">Be assistenten vurdere på nytt</button></section>
- <section class="card"><div class="section-title"><h2>Startellever</h2><small>${xi.length}/11 spillere</small></div><div class="tactics-pitch-card"><div class="pitch-direction">▲ ANGREP</div>${pitch()}</div><button class="primary" style="width:100%;margin:12px 0 4px" onclick="playMatch()">${appState.pendingCupMatch?`🏆 Avspark – ${esc(appState.pendingCupMatch.competition)}`:'⚽ Avspark – bruk valgt startellever'}</button>
+ <section class="card"><div class="section-title"><h2>Startellever</h2><small>${xi.length}/11 spillere</small></div><div class="tactics-pitch-card"><div class="pitch-direction">▲ ANGREP</div>${pitch()}</div><p class="pitch-instruction">Trykk på en spiller i banevisningen for å bytte direkte fra banen. Velg en reserve eller en annen spiller i startelleveren.</p>${pitchSwapPanel()}<button class="primary" style="width:100%;margin:12px 0 4px" onclick="playMatch()">${appState.pendingCupMatch?`🏆 Avspark – ${esc(appState.pendingCupMatch.competition)}`:'⚽ Avspark – bruk valgt startellever'}</button>
  <details class="tactics-accordion" data-tactics-panel="training" ${tacticsPanelState.training?'open':''} ontoggle="setTacticsPanelOpen('training',this.open)"><summary><span>⚙️ Formasjoner i sesongtrening</span><span class="tactics-summary-meta">3 valgte · ${AVAILABLE_FORMATIONS.length} muligheter</span></summary>${trainingSummary()}</details>
  <details class="tactics-accordion" data-tactics-panel="availability" ${tacticsPanelState.availability?'open':''} ontoggle="setTacticsPanelOpen('availability',this.open)"><summary><span>🩹 Skader og suspensjoner</span><span class="tactics-summary-meta">${unavailableCount?`${unavailableCount} ute`:'Ingen fravær'}</span></summary><div class="tactics-accordion-body">${disciplinarySummary()}</div></details>
  <div class="section-title"><h2>Velg spillere</h2><small>sortert etter taktisk rolle</small></div><p class="muted" style="font-size:11px">Trykk på listene for å velge hvem som starter. Skadde og suspenderte spillere kan ikke velges.</p><div class="section-title"><h2>Keeper</h2></div>${slotControls(xi.filter(p=>p.assignedRole==='GK'))}<div class="section-title"><h2>Forsvar</h2></div>${slotControls(xi.filter(p=>['LB','LCB','CB','RCB','RB','LWB','RWB'].includes(p.assignedRole)))}<div class="section-title"><h2>Midtbane</h2></div>${slotControls(xi.filter(p=>['DM','CM','LM','RM'].includes(p.assignedRole)))}<div class="section-title"><h2>Angrep</h2></div>${slotControls(xi.filter(p=>['LW','AM','RW','ST'].includes(p.assignedRole)))}<div class="section-title"><h2>Reserver</h2><small>sortert etter taktisk rolle</small></div>${["GK","DEF","MID","ATT"].map(pos=>{const ps=bench.filter(p=>p.pos===pos);return ps.length?`<div class="lineup-section-title">${posLabels[pos]}</div>${ps.map(p=>`<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span> · ${p.rating}</div>${playerDetail(p)}</div><div class="lineup-player-side"><strong>${p.rating}</strong><span>${p.fitness}%</span></div></div>`).join("")}`:""}).join("")}<button class="primary" style="width:100%;margin-top:12px" onclick="playMatch()">${appState.pendingCupMatch?`🏆 Avspark – ${esc(appState.pendingCupMatch.competition)}`:'⚽ Avspark – bruk valgt startellever'}</button></section>`;
@@ -4628,7 +4654,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){normalizeTransferHistory();const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.69 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){normalizeTransferHistory();const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.70 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("saveBtn").addEventListener("click",()=>{const ok=save();let b=document.getElementById("saveBtn");b.textContent=ok?"✓ Lagret":"⚠ Lagring feilet";setTimeout(()=>b.textContent="▣ Lagre",1800)});
 // Bootstrap from the embedded offline profile snapshot only. No player-data network requests.
