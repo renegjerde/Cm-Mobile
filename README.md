@@ -1,19 +1,21 @@
-# CM Mobile v2.66
+# CM Mobile v2.68
 
 ## Nytt i denne versjonen
-- Mer konsekvent sidevalg for venstre/høyre back, vingback og ving.
-- Høyere straff for å plassere spillere på motsatt side uten at dette er en naturlig posisjon.
-- Startellever vurderes med formasjon/rolle, skader og suspensjoner, fitness, nylig belastning, forrige startellever og kampens betydning.
-- Rotasjon er mer forsiktig i cupkamper, mot sterke motstandere og når ligasituasjonen tilsier at poeng er særlig viktige.
+- Viser klubblogo/klubbmerke ved begge lag i kortet «Neste ligakamp».
+- Samme kampkort viser klubbmerker for cupkamper og i pre-season viser det valgt klubb.
+- Rettet operatorrekkefølgen som gjorde at antall mulige ligakamper ble vist som `NaN`.
+- Viser en trygg reserveverdi dersom antall spilte ligakamper mangler eller ikke er et tall.
 
 ## Publisering
 Pakk ut ZIP-filen og erstatt `index.html` i roten av GitHub Pages `main`-grenen. Behold eksisterende lagring.
 
 ## Teststatus
-JavaScript-syntaks og isolerte tester av posisjonsstraff/utvalg er kontrollert. Ingen full nettleser- eller helsesongtest er utført.
+Kontrollert JavaScript-syntaks, ZIP-integritet og statisk tilstedeværelse av endringene. Ingen full nettleser-/mobiltest eller full sesongtest er utført. Klubblogoer for Premier League-lag bruker spillets eksisterende bildeadresser; klubber uten en definert logo viser et kort klubbmerke basert på initialer.
 
 
-## v2.67 – troppsrevisjon
-- Fjernet automatisk fiktiv utfylling fra offisielle PL- og EFL-seniorlister.
-- Posisjonsprioritering justert for å unngå at historiske gruppelister overstyrer bedre spillerprofiler.
-- Se `SQUAD_AUDIT_AND_FIX_v2.67.md` for kildegrunnlag og begrensninger.
+## v2.69 – kampskjerm
+- Gjorde stillingsfeltet mer kamporientert med klubbmerker, hjem/borte-merking og tydeligere score-hierarki.
+- La til «Siste situasjon»-etikett med løpende kampminutt ved kommentaren.
+- Strammet opp kommentarfeltet for bedre lesbarhet på mobil.
+- Endret kun presentasjon på kampskjermen; kampmotor, lagringsformat og karrieredata er ikke tilsiktet endret.
+- Kontrollert JavaScript-syntaks og ZIP-integritet. Ikke full visuell test i mobilnettleser.
