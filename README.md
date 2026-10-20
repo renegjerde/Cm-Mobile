@@ -11,3 +11,9 @@ Pakk ut ZIP-filen og erstatt `index.html` i roten av GitHub Pages `main`-grenen.
 
 ## Teststatus
 JavaScript-syntaks og isolerte tester av posisjonsstraff/utvalg er kontrollert. Ingen full nettleser- eller helsesongtest er utført.
+
+
+## v2.67 – troppsrevisjon
+- Fjernet automatisk fiktiv utfylling fra offisielle PL- og EFL-seniorlister.
+- Posisjonsprioritering justert for å unngå at historiske gruppelister overstyrer bedre spillerprofiler.
+- Se `SQUAD_AUDIT_AND_FIX_v2.67.md` for kildegrunnlag og begrensninger.
