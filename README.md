@@ -1,3 +1,31 @@
+# CM Mobile v2.82
+
+## Realistisk skade- og karantenemodell
+
+- Skader har egne typer og varighet i dager, og gir et realistisk antall kommende kamper ute. Datamodellen er kalibrert mot Premier League 2025/26-data: 553 tidstapsskader, 18 261 fraværsdager, ca. 33,0 dager per skade og 3,97 kamper ute i gjennomsnitt.
+- En meningsfull langtidsandel er inkludert: hamstring, kne, leddbånd, brudd og korsbånd kan holde en spiller ute i uker eller måneder. Korsbåndsskade kan i praksis avslutte sesongen.
+- Trening kan også utløse skader, med høyere risiko ved lav kondisjon og utholdenhet. Ukentlige treningsepisoder skjer bare én gang per runde.
+- Direkte rødt kort har forseelsesavhengig karantene: alvorlig takling/voldelig oppførsel 3 kamper, åpenbar målsjanse 1, grovt språk 2 og spytting 6; andre gule kort gir 1 kamp. Gjentatte utvisninger i samme sesong gir én ekstra kamp per tidligere utvisning, og karantener utløst i samme kamp legges sammen.
+- Gule kort har separate cut-off-punkter: PL 5 innen kamp 19, 10 innen 32, 15 ved sesongslutt; EFL 5 innen 19, 10 innen 37, 15 før play-offs. Cupgule kort legges ikke inn i ligagrensene. Cupenes egne gule-kortkarantener er ikke fullt simulert; direkte røde karantener gjelder relevante innenlandske cup-/ligakamper.
+- Skade- og karantenetellere går ned etter fullført konkurransekamp – ikke når man bare åpner taktikkskjermen. AI-klubbenes spillerstaller bevarer også fravær og velger ikke skadde/suspenderte spillere.
+- Eksisterende karrierer beholder pågående fravær. Tidligere tilgjengelighet lagres videre i kamptellere; spillerstall og historikk nullstilles ikke.
+
+## Kontrollert
+
+- 50 000 skadetrekninger: 33,16 dager i gjennomsnitt; 50,4 % over 21 dager; 9,0 % minst 70 dager.
+- 5 000 simulerte kamper: 0,899 skader, 0,112 røde kort og 3,784 gule kort per kamp på tvers av begge lag.
+- Testet PL- og EFL-gulkortgrenser, gjentatte røde kort, andre gule kort, summering av karantener fra samme kamp og at fravær ikke telles ned når skjermen åpnes.
+- JavaScript-syntaks kontrollert; mobilvisning testes i Chromium. Fysisk iPhone og full sesongtest gjenstår.
+
+## Kilder til kalibrering
+
+- Premier Injuries, 2025/26 Premier League season review: https://www.premierinjuries.com/article/2025-26-epl-season-review-analysis
+- My Football Facts, Premier League red/yellow cards by season (2025/26): https://www.myfootballfacts.com/premier-league/all-time-premier-league/discipline/all-time-premier-league-clubs-discipline-tables/
+- FA Handbook 2026/27, Section 9, standard sanctions: https://www.thefa.com/-/media/files/thefaportal/governance-docs/rules-of-the-association/2026-27/section-9---disciplinary-regulations.ashx
+- Premier League, suspensions and card rules: https://www.premierleague.com/en/news/4425344
+
+---
+
 # CM Mobile v2.80 — FA Cup and Carabao Cup realism
 
 ## Taktikk: fri baneplassering

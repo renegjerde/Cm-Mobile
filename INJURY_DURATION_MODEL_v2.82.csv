@@ -1,0 +1,11 @@
+﻿Skadetype,Vekt_prosent,Min_dager,Maks_dager,Modellert_midtpunkt_dager,Omtrent_kamper_ute_midtpunktsvarighet
+Smell / støt,20,2,8,5.0,1
+Muskeloverbelastning,15,6,19,12.5,2
+Ankelovertråkk,12,10,30,20.0,2
+Hamstringskade,15,21,52,36.5,5
+Lyskeskade,9,14,35,24.5,3
+Kneskade,8,28,84,56.0,7
+Leggskade,10,14,35,24.5,3
+Brudd / leddbåndsskade,5,70,210,140.0,18
+Korsbåndsskade,2,180,300,240.0,30
+Fotskade,4,21,56,38.5,5
