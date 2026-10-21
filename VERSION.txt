@@ -1,1 +1,2 @@
-2.84
+CM Mobile v2.85
+Tactical formation override fix

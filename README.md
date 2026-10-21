@@ -1,3 +1,12 @@
+# CM Mobile v2.85 — Touchline
+
+## v2.85 — Formasjonvelgeren lar deg overstyre assistenten
+- Rettet en feil der manuelle formasjonsskifter umiddelbart ble overskrevet når taktikkvisningen ble tegnet på nytt.
+- Det manuelle valget står nå til neste kampuke, eller til du trykker «Be assistenten vurdere på nytt».
+- Assistentens kampkort skiller tydeligere mellom opprinnelig anbefaling og valgt formasjon.
+- Se `TACTICS_FORMATION_OVERRIDE_V2.85.md` for detaljer og teststatus.
+- Kontroll: syntaks for begge innebygde skript og ZIP-integritet bestod. Chromium-røyktesten stoppet på tidsavbrudd, så full interaktiv nettlesertest er ikke bekreftet.
+
 # CM Mobile v2.84
 
 ## Klubblogomer for alle lag
