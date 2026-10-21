@@ -1,4 +1,4 @@
-# CM Mobile v2.79 — Player Age Integrity
+# CM Mobile v2.80 — FA Cup and Carabao Cup realism
 
 ## Taktikk: fri baneplassering
 - Startelleverens 11 spillere vises på en vertikal, mobiltilpasset fotballbane.
@@ -10,7 +10,7 @@
 - Formasjonsbytte, rotasjon og ny assistentanbefaling nullstiller fri plassering for å unngå at koordinater overføres til feil system.
 
 ## Publisering
-Pakken har en versjonsmappe med `index.html`, `README.md` og endringsrapporter. GitHub Pages publiserer fra `main`-branchens rot dersom det er slik repoet ditt er satt opp; pakkens `CM_Mobile_v2.74/index.html` og live rotfil er to ulike steder.
+Pakken har en versjonsmappe med `index.html`, `README.md` og endringsrapporter. GitHub Pages publiserer fra `main`-branchens rot dersom det er slik repoet ditt er satt opp; pakkens `CM_Mobile_v2.80/index.html` og live rotfil er to ulike steder.
 
 ## Teststatus
 - JavaScript-syntaks kontrollert med Node.js.
@@ -64,3 +64,25 @@ Isolert aldersmigreringstest bestod fem scenarioer, inkludert reparasjon av JJ G
 - Verktøy for spillerdiagnostikk viser nå kildebaserte kontra simulerte fødselsdatoer i stedet for å behandle manglende kildedata som manglende spillverden.
 
 Kontrollert: JavaScript-syntaks og ZIP-integritet. En isolert test kjørte 1 992 spilleroppføringer fra PL-senior, PL U21 og EFL gjennom alderslogikken, og kontrollerte også kjent DOB, stabil dato ved overgang og aldring til neste sesong. Profiloppslag var stubbet i testen, så den verifiserer fallback-logikken – ikke alle virkelige profil- eller fødselsdata. Full visuell mobiltest/hel sesongsimulering gjenstår.
+
+## v2.80 — FA Cup / Carabao Cup format and presentation
+
+- Cup entrants are rebuilt from all 20 Premier League teams, all 72 in-game EFL teams, and 32 distinct non-league teams for the FA Cup. Previous cup initialization only used 20 PL teams for the Carabao Cup and added non-league teams to the FA Cup; the 72 EFL teams were missing.
+- FA Cup entry is phased: League One/League Two plus 32 non-league teams enter Round One Proper; Championship and Premier League teams enter Round Three Proper. Simulated counts: 80 teams in Round One, 40 in Round Two, and 64 in Round Three.
+- Carabao Cup entry is phased for 2026/27: four clubs play a preliminary round; the other 68 EFL clubs enter Round One; 11 PL clubs not in Europe join in Round Two; nine PL clubs in Europe join in Round Three.
+- The preliminary ties are Tranmere Rovers–Rochdale and York City–Crawley Town. Early Carabao rounds are regionalized using an approximate in-game north/south club map.
+- Carabao Cup semi-finals use two legs and aggregate scores. Extra time is only used after 90 minutes in the second leg when the aggregate is level; penalties decide a tie still level after extra time.
+- Cup scores retain the match score and show extra-time / penalty outcomes separately rather than fabricating a one-goal score to force a winner.
+- Reworked cup cards display competition-specific round names, progress, teams remaining, recent results, manager's pending fixture and club badges/initial fallbacks.
+- The official calendar is not reproduced day-for-day: cup rounds are mapped to gameweeks. The full FA Cup qualifying pyramid, exact FA Vase/qualifying entries, postponements and TV rescheduling are not simulated.
+- Migration is conservative: untouched cups with no results are rebuilt. A cup with existing results or a pending manager tie keeps its legacy data to protect career history; the new format applies to that competition from a clean start / next season as applicable.
+
+See `DOMESTIC_CUPS_REALISM_v2.80.md` for format assumptions, official 2026/27 references and test coverage.
+
+### Validation v2.80
+
+- Node.js syntax check passed for inline JavaScript.
+- Chromium smoke render of the competitions screen showed both cup cards, stage labels, entrant counts and recent-results section without additional application JavaScript errors. `about:blank` blocked localStorage in this isolated smoke-test setup, so it does not verify persistent browser storage or a full career start.
+- An isolated tournament progression simulation using the actual cup builder / round helpers produced a FA Cup champion through the 8-stage flow and a Carabao Cup champion through the 9-stage flow. Expected counts observed: FA Cup 40, 20, 32, 16, 8, 4, 2, 1 ties; Carabao Cup 2, 35, 23, 16, 8, 4, 2 first legs, 2 second legs, 1 final.
+- Semi-final aggregate scenarios, including extra time and penalties when level, checked in isolated helpers.
+- ZIP integrity and visible version strings checked. Full end-to-end season simulation and user-device visual test remain outstanding.
