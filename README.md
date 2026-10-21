@@ -86,3 +86,10 @@ See `DOMESTIC_CUPS_REALISM_v2.80.md` for format assumptions, official 2026/27 re
 - An isolated tournament progression simulation using the actual cup builder / round helpers produced a FA Cup champion through the 8-stage flow and a Carabao Cup champion through the 9-stage flow. Expected counts observed: FA Cup 40, 20, 32, 16, 8, 4, 2, 1 ties; Carabao Cup 2, 35, 23, 16, 8, 4, 2 first legs, 2 second legs, 1 final.
 - Semi-final aggregate scenarios, including extra time and penalties when level, checked in isolated helpers.
 - ZIP integrity and visible version strings checked. Full end-to-end season simulation and user-device visual test remain outstanding.
+
+
+## v2.81 – Taktikkskjerm med trykkvalg
+- Dra-og-slipp er fjernet fra banevisningen. Trykk på en spiller for å åpne en spillerliste ved markøren.
+- Rollevelgeren følger valgt posisjon; ingen falsk keeperseleksjon når ingen spiller er valgt.
+- Spillerbytte velges fra liste; eksisterende startspillere bytter slot, reserver erstatter valgt starter.
+- Avspark-knappen er flyttet opp i toppkortet. Assistenten fortsetter å velge anbefalt ellever automatisk per ny kampuke.

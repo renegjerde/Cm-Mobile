@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.80 — Touchline</title>
+<title>CM Mobile v2.81 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -348,7 +348,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(max-width:430px){.transfer-list-accordion>.transfer-list-player{grid-template-columns:minmax(0,1fr) 116px;gap:8px;padding:10px 0}.transfer-list-player-actions{width:116px}.transfer-list-player-actions button{font-size:10px;padding:7px 5px;min-height:32px}.transfer-list-player-info .player-name{font-size:13px}.transfer-list-player-info .player-meta{font-size:10px}}
 
 
-/* v2.74: free-position tactical pitch — desktop pointer and mobile touch support */
+/* v2.81: tap-to-select tactics editor — intentionally no drag handlers */
 .tactics-pitch-card{padding:10px 8px}
 .tactics-pitch-field{position:relative;width:100%;height:clamp(410px,125vw,535px);overflow:hidden;border:1px solid #71a786;border-radius:9px;background:linear-gradient(180deg,#1c6540 0%,#195b39 48%,#174d32 100%);isolation:isolate}
 .pitch-markings{position:absolute;inset:9px;border:1px solid #a6d7b4aa;border-radius:2px;pointer-events:none}
@@ -359,9 +359,8 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .pitch-markings .pitch-six-top{position:absolute;left:38%;right:38%;top:0;height:5%;border:1px solid #a6d7b4aa;border-top:0}
 .pitch-markings .pitch-box-bottom{position:absolute;left:25%;right:25%;bottom:0;height:14%;border:1px solid #a6d7b4aa;border-bottom:0}
 .pitch-markings .pitch-six-bottom{position:absolute;left:38%;right:38%;bottom:0;height:5%;border:1px solid #a6d7b4aa;border-bottom:0}
-.pitch-field .pitch-player{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);width:15%;max-width:64px;min-width:40px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:1px;padding:3px 1px 4px;border:1px solid #ffffff24;border-radius:8px;background:#123622e8;color:#eef7ff;line-height:1.1;box-shadow:0 2px 7px #00170d65;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;backdrop-filter:blur(2px)}
+.pitch-field .pitch-player{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);width:15%;max-width:64px;min-width:40px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:1px;padding:3px 1px 4px;border:1px solid #ffffff24;border-radius:8px;background:#123622e8;color:#eef7ff;line-height:1.1;box-shadow:0 2px 7px #00170d65;touch-action:manipulation;user-select:none;-webkit-user-select:none;cursor:pointer;backdrop-filter:blur(2px)}
 .pitch-field .pitch-player:active,.pitch-field .pitch-player.is-selected{background:#254b35f5;border-color:#b9f0a6;box-shadow:0 0 0 2px #9cde8040,0 3px 8px #00170d85}
-.pitch-field .pitch-player.is-position-dragging{z-index:10;cursor:grabbing;opacity:.9;transform:translate(-50%,-50%) scale(1.06);border:2px solid #e5ffd9;box-shadow:0 8px 18px #00170dbb}
 .pitch-field .pitch-dot{display:flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:50%;background:#eaf4ff;color:#17452f;font-size:9px;font-weight:950;border:2px solid #b7d6e9;box-shadow:0 2px 5px #0004;flex:none}
 .pitch-field .pitch-player.fit-good .pitch-dot{border-color:#9cde80}
 .pitch-field .pitch-player.fit-mid .pitch-dot{border-color:#e8c875}
@@ -377,13 +376,30 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .pitch-reset-button{font-size:10px;padding:7px 9px;white-space:nowrap;border:1px solid #74a66b;border-radius:8px;background:#183a2a;color:#d0f6c1}
 .pitch-editor-hint{font-size:10px;line-height:1.4;color:#d0e5d6;margin:6px 2px 0;text-align:left}
 .pitch-field .pitch-role-label{position:absolute;z-index:1;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:.08em;color:#dbf2e0a0;pointer-events:none;white-space:nowrap}
-@media(max-width:380px){.tactics-pitch-field{height:clamp(405px,134vw,510px)}.pitch-field .pitch-player{width:15.5%;min-width:38px}.pitch-field .pitch-dot{width:23px;height:23px}.pitch-field .pitch-name{font-size:8px}.pitch-field .pitch-role{font-size:7px}.pitch-editor-controls .pitch-fit-legend{font-size:9px;gap:6px}}
+.pitch-picker-popover{position:fixed;z-index:10001;display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid #58724d;border-radius:13px;background:linear-gradient(145deg,#172b2c,#101d2d);color:#eef5ff;box-shadow:0 18px 60px #000b;overflow:hidden;box-sizing:border-box;text-align:left}
+.pitch-picker-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex:none}
+.pitch-picker-head>div{min-width:0;display:flex;flex-direction:column;gap:3px}
+.pitch-picker-head strong{font-size:15px}
+.pitch-picker-head small{font-size:11px;color:#b6c8d8}
+.pitch-picker-head button{padding:6px 9px;min-width:34px;flex:none}
+.pitch-picker-role{flex:none;display:flex;flex-direction:column;gap:5px}
+.pitch-picker-role label{font-size:10px;letter-spacing:.04em;color:#b8c9d9;font-weight:850}
+.pitch-picker-role select{width:100%;min-width:0;background:#203149;color:#eef5ff;border:1px solid #405672;border-radius:8px;padding:9px;font-size:12px}
+.pitch-picker-help{font-size:11px;line-height:1.35;color:#b8c9d9;margin:0;flex:none}
+.pitch-picker-list{min-height:0;overflow:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:5px;padding-right:2px}
+.pitch-picker-option{display:flex;flex-direction:column;align-items:stretch;text-align:left;gap:3px;min-width:0;width:100%;padding:8px 9px;border:1px solid #34495e;border-radius:8px;background:#16283b;color:#edf5ff;cursor:pointer;font-size:11px;line-height:1.25}
+.pitch-picker-option.fit-good{border-color:#4b9468;background:#17372b}.pitch-picker-option.fit-mid{border-color:#8e7946;background:#302e22}.pitch-picker-option.fit-low{border-color:#965b5b;background:#342326}
+.pitch-picker-option-main{display:flex;align-items:center;justify-content:space-between;gap:8px}.pitch-picker-option-main strong{font-size:12px;overflow-wrap:anywhere}.pitch-picker-rating{font-weight:900;color:#9cde80;flex:none}
+.pitch-picker-option-meta{color:#c0d4e0;font-size:10px}.pitch-picker-starter{color:#b8c9d9;font-size:10px}.pitch-picker-tag{align-self:flex-start;display:inline-block;font-size:9px;font-weight:900;letter-spacing:.02em;padding:2px 5px;border-radius:4px;background:#26384b;color:#d7e5f3}
+.pitch-picker-option.fit-good .pitch-picker-tag{background:#24543b;color:#bdf0ad}.pitch-picker-option.fit-mid .pitch-picker-tag{background:#514729;color:#ffe4a1}.pitch-picker-option.fit-low .pitch-picker-tag{background:#573333;color:#ffc0c0}
+.tactics-start-top{width:100%;margin-top:10px;min-height:46px;font-weight:900}.tactics-start-note{font-size:11px;line-height:1.35;color:var(--muted);margin:6px 0 0}
+@media(max-width:380px){.tactics-pitch-field{height:clamp(405px,134vw,510px)}.pitch-field .pitch-player{width:15.5%;min-width:38px}.pitch-field .pitch-dot{width:23px;height:23px}.pitch-field .pitch-name{font-size:8px}.pitch-field .pitch-role{font-size:7px}.pitch-editor-controls .pitch-fit-legend{font-size:9px;gap:6px}.pitch-picker-popover{padding:10px}}
 
 .career-manager-panel{width:min(560px,100%);max-height:90vh;overflow:auto;background:var(--panel);color:var(--text);border:1px solid #33445d;border-radius:16px;padding:18px;box-shadow:0 20px 70px #0009}.career-manager-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.career-manager-head h2{font-size:24px;margin:5px 0}.career-manager-head p{margin:0 0 14px;color:var(--muted);font-size:12px}.career-slot-list{display:flex;flex-direction:column;gap:8px}.career-slot-row{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);background:#0e1928;border-radius:11px;padding:11px}.career-slot-copy{min-width:0;display:flex;flex-direction:column;gap:3px}.career-slot-copy strong{font-size:13px;overflow-wrap:anywhere}.career-slot-copy small{color:var(--muted);font-size:10px}.career-manager-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}.career-slot-actions{display:flex;align-items:center;gap:5px;flex-shrink:0}.career-slot-actions button{padding:8px;font-size:11px}.danger-muted{background:transparent;color:#f0a0a0;border-color:#6d4148}.career-manager-note{font-size:10px;color:var(--muted);margin:12px 0 0}.home-new-career-button{border-color:#40546a;background:#162538;font-weight:750}.home-clubline .home-crest img{object-fit:contain;width:42px;height:42px}
 @media(max-width:410px){.header-actions{gap:4px}.header-action{padding:7px 7px;font-size:10px}.career-manager-panel{padding:13px}.career-slot-row{align-items:flex-start}.career-slot-row>button{padding:8px;font-size:11px}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.80</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.81</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -1185,7 +1201,7 @@ function buildRealSquad(clubIndex){
 }
 function buildWorldDatabase(){return CLUBS.map((c,i)=>buildRealSquad(i))}
 function auditPLRosterDuplicates(){const seen=new Map(),dupes=[];REAL_ROSTERS&&Object.entries(REAL_ROSTERS).forEach(([club,groups])=>Object.values(groups).forEach(list=>String(list||'').split('|').filter(Boolean).forEach(name=>{if(seen.has(name))dupes.push({name,first:seen.get(name),duplicate:club});else seen.set(name,club)})));return dupes}
-const appState={page:"home",club:3,week:1,played:0,seasonYear:2026,formation:"4-3-3",tactic:"Balanced",selectedXI:null,tacticalRoleOverrides:{},tacticalPositionRoleOverrides:{},tacticalPositions:{},pitchSelectedSlot:null,log:[],transferTab:"market",squad:[],table:[],budget:0,started:false,positionChanges:{},lastSeasonSummary:null,lastRecoveryRound:null,formationExperience:{"4-3-3":20,"4-4-2":20,"4-2-3-1":20,"3-5-2":20},trainingFormations:["4-3-3","4-2-3-1","4-4-2"],preseasonActive:false,preseasonWeek:1,preseasonWeeks:4,teamCohesion:25,lastStartingXI:[],lastMatchWasRotated:false,rotationRequested:false,injuryReport:[],discipline:{},medicalHistory:[],lineupRoleVersion:2,managerMode:"needed"};
+const appState={page:"home",club:3,week:1,played:0,seasonYear:2026,formation:"4-3-3",tactic:"Balanced",selectedXI:null,tacticalRoleOverrides:{},tacticalPositionRoleOverrides:{},tacticalPositions:{},pitchSelectedSlot:null,pitchPickerAnchor:null,tacticsInteractionVersion:3,log:[],transferTab:"market",squad:[],table:[],budget:0,started:false,positionChanges:{},lastSeasonSummary:null,lastRecoveryRound:null,formationExperience:{"4-3-3":20,"4-4-2":20,"4-2-3-1":20,"3-5-2":20},trainingFormations:["4-3-3","4-2-3-1","4-4-2"],preseasonActive:false,preseasonWeek:1,preseasonWeeks:4,teamCohesion:25,lastStartingXI:[],lastMatchWasRotated:false,rotationRequested:false,injuryReport:[],discipline:{},medicalHistory:[],lineupRoleVersion:2,managerMode:"needed"};
 // v2.75: separate, automatically saved career slots with one-time migration from the legacy single-save key.
 const CAREER_SLOT_INDEX_KEY="cmMobileCareerSlotsV1";
 const ACTIVE_CAREER_SLOT_KEY="cmMobileActiveCareerSlotV1";
@@ -1608,6 +1624,14 @@ function ensureCareerSystems(){
  if(!appState.tacticalRoleOverrides||typeof appState.tacticalRoleOverrides!=="object"||Array.isArray(appState.tacticalRoleOverrides))appState.tacticalRoleOverrides={};
  if(!appState.tacticalPositionRoleOverrides||typeof appState.tacticalPositionRoleOverrides!=="object"||Array.isArray(appState.tacticalPositionRoleOverrides))appState.tacticalPositionRoleOverrides={};
  if(!appState.tacticalPositions||typeof appState.tacticalPositions!=="object"||Array.isArray(appState.tacticalPositions))appState.tacticalPositions={};
+ // v2.81: remove legacy free-drag coordinates. Selection-based editing uses formation slots instead.
+ if(Number(appState.tacticsInteractionVersion||0)<3){
+  appState.tacticalPositions={};
+  appState.tacticalPositionRoleOverrides={};
+  appState.pitchSelectedSlot=null;
+  appState.pitchPickerAnchor=null;
+  appState.tacticsInteractionVersion=3;
+ }
  if(!appState.formationExperience||typeof appState.formationExperience!=="object")appState.formationExperience={"4-3-3":20,"4-4-2":20,"4-2-3-1":20,"3-5-2":20};
  if(!Array.isArray(appState.trainingFormations)||appState.trainingFormations.length<2){appState.trainingFormations=[appState.formation||"4-3-3","4-2-3-1","4-4-2"];}
  const clean=[];for(const f of appState.trainingFormations){if(AVAILABLE_FORMATIONS.includes(f)&&!clean.includes(f))clean.push(f);}
@@ -2039,89 +2063,58 @@ function currentStartingXI(){
  const xi=defaultStartingXI();appState.selectedXI=xi.map(p=>p.id);return xi;
 }
 function setStartingPlayer(slot,id){
- const xi=currentStartingXI();const p=eligibleSquad(appState.squad).find(x=>String(x.id)===String(id));if(!p)return;
+ const xi=currentStartingXI();slot=Number(slot);
+ if(!Number.isInteger(slot)||slot<0||slot>10)return;
+ const p=eligibleSquad(appState.squad).find(x=>String(x.id)===String(id));if(!p)return;
  const old=xi[slot];if(!old)return;
+ const slots=roleSlotsForFormation(appState.formation);
+ const targetRole=old.assignedRole||slots[slot]||'CM';
  const duplicate=xi.findIndex((x,i)=>i!==slot&&String(x.id)===String(p.id));
- if(!appState.tacticalRoleOverrides||typeof appState.tacticalRoleOverrides!=="object")appState.tacticalRoleOverrides={};
- delete appState.tacticalRoleOverrides[String(old.id)];
- delete appState.tacticalRoleOverrides[String(p.id)];
- if(duplicate>=0){delete appState.tacticalRoleOverrides[String(xi[duplicate].id)];xi[duplicate]=old;}
- xi[slot]=p;syncPitchRoleOverridesForXI(xi);appState.selectedXI=assignTacticalRoles(xi,appState.formation).map(x=>x.id);save();render();
-}
-let pitchRepositionGesture=null;
-let ignorePitchClickUntil=0;
-function selectPitchSlot(slot){
- if(Date.now()<ignorePitchClickUntil)return;
- const xi=currentStartingXI();slot=Number(slot);if(!Number.isInteger(slot)||!xi[slot])return;
- const selected=Number(appState.pitchSelectedSlot);
- // On touch screens, tapping a second starter swaps the two players directly.
- if(Number.isInteger(selected)&&selected>=0&&selected<=10&&selected!==slot&&xi[selected]&&xi[slot]){
-  const targetId=xi[slot].id;setStartingPlayer(selected,targetId);appState.pitchSelectedSlot=null;save();render();return;
- }
- appState.pitchSelectedSlot=slot;save();render();
-}
-function pitchRoleFromCoordinates(x,y,p){
- x=Math.max(0,Math.min(100,Number(x)||50));y=Math.max(0,Math.min(100,Number(y)||50));
- if(p&&p.pos==='GK')return 'GK';
- // Coordinates are measured from our attacking end (top) to our own goal (bottom).
- if(y<=23)return x<33?'LW':x>67?'RW':'ST';
- if(y<=38)return x<24?'LM':x>76?'RM':'AM';
- if(y<=54){if(x<19)return 'LM';if(x>81)return 'RM';return y>=49?'DM':'CM';}
- if(y<=66){if(x<21)return 'LWB';if(x>79)return 'RWB';if(x<42)return 'LCB';if(x>58)return 'RCB';return (p&&['DM','CM','CB','LCB','RCB'].includes(p.assignedRole))?p.assignedRole:'DM';}
- if(x<25)return 'LB';if(x<44)return 'LCB';if(x>77)return 'RB';if(x>57)return 'RCB';return x<50?'LCB':'RCB';
-}
-function syncPitchRoleOverridesForXI(xi){
+ const displacedRole=duplicate>=0?(xi[duplicate].assignedRole||slots[duplicate]||'CM'):null;
+ if(!appState.tacticalRoleOverrides||typeof appState.tacticalRoleOverrides!=='object')appState.tacticalRoleOverrides={};
  if(!appState.tacticalPositionRoleOverrides||typeof appState.tacticalPositionRoleOverrides!=='object')appState.tacticalPositionRoleOverrides={};
+ // A role belongs to the slot on the pitch. When a starter is selected for another slot,
+ // the two players exchange slots and inherit the corresponding roles.
+ [old,p].forEach(q=>{delete appState.tacticalRoleOverrides[String(q.id)];delete appState.tacticalPositionRoleOverrides[String(q.id)];});
+ if(duplicate>=0){
+  const displaced=xi[duplicate];delete appState.tacticalRoleOverrides[String(displaced.id)];delete appState.tacticalPositionRoleOverrides[String(displaced.id)];
+  xi[duplicate]=old;
+ }
+ xi[slot]=p;
+ const assignRoleAtSlot=(player,index,role)=>{
+  if(!player||!TACTICAL_ROLE_KEYS.includes(role))return;
+  const base=slots[index]||defaultRoleFor(player.name,player.pos,index);
+  if((player.pos==='GK')!==(role==='GK'))return;
+  if(role!==base)appState.tacticalRoleOverrides[String(player.id)]=role;
+  else delete appState.tacticalRoleOverrides[String(player.id)];
+ };
+ assignRoleAtSlot(p,slot,targetRole);
+ if(duplicate>=0)assignRoleAtSlot(old,duplicate,displacedRole);
+ appState.tacticalPositions={};
  appState.tacticalPositionRoleOverrides={};
- const positions=appState.tacticalPositions&&typeof appState.tacticalPositions==='object'?appState.tacticalPositions:{};
- Object.keys(positions).forEach(key=>{
-  const slot=Number(key),position=positions[key],p=Number.isInteger(slot)&&slot>=0&&slot<11?xi[slot]:null;
-  if(!p||!position||!Number.isFinite(Number(position.x))||!Number.isFinite(Number(position.y)))return;
-  const id=String(p.id);delete appState.tacticalRoleOverrides[id];
-  appState.tacticalPositionRoleOverrides[id]=pitchRoleFromCoordinates(position.x,position.y,p);
- });
+ appState.selectedXI=assignTacticalRoles(xi,appState.formation).map(x=>x.id);
+ appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;
+ save();render();
 }
-function startPitchReposition(event,slot){
- if(event.button!==undefined&&event.button!==0)return;
- const button=event.currentTarget,field=button&&button.closest('.tactics-pitch-field');
- if(!button||!field)return;
- if(pitchRepositionGesture)finishPitchReposition(null,true);
- pitchRepositionGesture={slot:Number(slot),button,field,pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,dragging:false};
- document.addEventListener('pointermove',movePitchReposition,{passive:false});
- document.addEventListener('pointerup',endPitchReposition);
- document.addEventListener('pointercancel',cancelPitchReposition);
+function validPitchSelectedSlot(){
+ if(appState.pitchSelectedSlot===null||appState.pitchSelectedSlot===undefined||appState.pitchSelectedSlot==='')return null;
+ const slot=Number(appState.pitchSelectedSlot);
+ return Number.isInteger(slot)&&slot>=0&&slot<11?slot:null;
 }
-function movePitchReposition(event){
- const g=pitchRepositionGesture;if(!g||event.pointerId!==g.pointerId)return;
- const dx=event.clientX-g.startX,dy=event.clientY-g.startY;
- if(!g.dragging&&Math.hypot(dx,dy)>=7){g.dragging=true;g.button.classList.add('is-position-dragging');}
- if(!g.dragging)return;
- event.preventDefault();
- const rect=g.field.getBoundingClientRect();if(!rect.width||!rect.height)return;
- const x=Math.max(8,Math.min(92,(event.clientX-rect.left)/rect.width*100));
- const y=Math.max(7,Math.min(93,(event.clientY-rect.top)/rect.height*100));
- g.button.style.left=x+'%';g.button.style.top=y+'%';
+function selectPitchSlot(slot,button){
+ const xi=currentStartingXI();slot=Number(slot);if(!Number.isInteger(slot)||slot<0||slot>10||!xi[slot])return;
+ // Capture the clicked marker's viewport point before render replaces the DOM.
+ let x=(typeof window!=='undefined'?window.innerWidth:390)/2;
+ let y=(typeof window!=='undefined'?window.innerHeight:700)/2;
+ if(button&&typeof button.getBoundingClientRect==='function'){
+  const rect=button.getBoundingClientRect();x=rect.left+rect.width/2;y=rect.top+Math.min(rect.height/2,28);
+ }
+ appState.pitchSelectedSlot=slot;
+ appState.pitchPickerAnchor={x:Math.round(x),y:Math.round(y)};
+ save();render();
 }
-function removePitchPointerListeners(){document.removeEventListener('pointermove',movePitchReposition);document.removeEventListener('pointerup',endPitchReposition);document.removeEventListener('pointercancel',cancelPitchReposition);}
-function finishPitchReposition(event,cancelled=false){
- const g=pitchRepositionGesture;if(!g)return;
- removePitchPointerListeners();pitchRepositionGesture=null;
- g.button.classList.remove('is-position-dragging');
- if(cancelled||!g.dragging)return;
- const rect=g.field.getBoundingClientRect();if(!rect.width||!rect.height)return;
- const clientX=event&&Number.isFinite(event.clientX)?event.clientX:g.startX;
- const clientY=event&&Number.isFinite(event.clientY)?event.clientY:g.startY;
- const x=Math.max(8,Math.min(92,(clientX-rect.left)/rect.width*100));
- const y=Math.max(7,Math.min(93,(clientY-rect.top)/rect.height*100));
- if(!appState.tacticalPositions||typeof appState.tacticalPositions!=='object')appState.tacticalPositions={};
- appState.tacticalPositions[String(g.slot)]={x:Math.round(x*10)/10,y:Math.round(y*10)/10};
- const xi=currentStartingXI();syncPitchRoleOverridesForXI(xi);appState.selectedXI=xi.map(p=>p.id);appState.pitchSelectedSlot=g.slot;
- ignorePitchClickUntil=Date.now()+450;save();render();
-}
-function endPitchReposition(event){if(pitchRepositionGesture&&event&&event.pointerId!==pitchRepositionGesture.pointerId)return;finishPitchReposition(event,false);}
-function cancelPitchReposition(event){if(pitchRepositionGesture&&event&&event.pointerId!==pitchRepositionGesture.pointerId)return;finishPitchReposition(event,true);}
 function resetTacticalPitch(){
- appState.tacticalPositions={};appState.tacticalPositionRoleOverrides={};appState.tacticalRoleOverrides={};appState.pitchSelectedSlot=null;
+ appState.tacticalPositions={};appState.tacticalPositionRoleOverrides={};appState.tacticalRoleOverrides={};appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;
  appState.selectedXI=currentStartingXI().map(p=>p.id);save();render();
 }
 function tacticalBalanceWarnings(xi){
@@ -2137,35 +2130,29 @@ function tacticalBalanceWarnings(xi){
  const roleTemplate=roleSlotsForFormation(appState.formation||'4-3-3');
  const customOffTemplate=xi.filter(p=>appState.tacticalRoleOverrides&&appState.tacticalRoleOverrides[String(p.id)]&&p.pos!=='GK'&&!roleTemplate.includes(p.assignedRole));
  if(customOffTemplate.length)rows.push({level:customOffTemplate.length>=3?'alert':'warning',text:`${customOffTemplate.length} ${customOffTemplate.length===1?'spiller bruker':'spillere bruker'} en egendefinert rolle utenfor standardformasjonen: ${customOffTemplate.slice(0,3).map(p=>p.name).join(', ')}. Kontroller at laget fortsatt har balanse.`});
- const manualPositions=Object.entries(appState.tacticalPositions||{}).filter(([slot,pos])=>Number.isInteger(Number(slot))&&pos&&Number.isFinite(Number(pos.x))&&Number.isFinite(Number(pos.y)));
- let tight=0;for(let i=0;i<manualPositions.length;i++)for(let j=i+1;j<manualPositions.length;j++){const a=manualPositions[i][1],b=manualPositions[j][1];if(Math.abs(Number(a.x)-Number(b.x))<9&&Math.abs(Number(a.y)-Number(b.y))<10)tight++;}
- if(tight)rows.push({level:tight>=2?'alert':'warning',text:`${tight===1?'To spillere står svært tett':'Flere spillere står svært tett'} i den egendefinerte baneplasseringen. Dra markørene litt fra hverandre.`});
- const movedOutOfTemplate=xi.filter(p=>appState.tacticalPositionRoleOverrides&&appState.tacticalPositionRoleOverrides[String(p.id)]&&!roleTemplate.includes(p.assignedRole));
- if(movedOutOfTemplate.length)rows.push({level:movedOutOfTemplate.length>=3?'alert':'warning',text:`${movedOutOfTemplate.length} ${movedOutOfTemplate.length===1?'spiller er':'spillere er'} flyttet til en rolle utenfor grunnformasjonen. Spillet bruker rollene i kampmotoren, så kontroller balansen.`});
  return rows;
 }
 function choosePitchReplacement(id){
- const slot=Number(appState.pitchSelectedSlot);if(!Number.isInteger(slot)||slot<0||slot>10)return;
- setStartingPlayer(slot,id);appState.pitchSelectedSlot=null;save();render();
+ const slot=validPitchSelectedSlot();if(slot===null)return;
+ setStartingPlayer(slot,id);
 }
-function cancelPitchReplacement(){appState.pitchSelectedSlot=null;save();render();}
+function cancelPitchReplacement(){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;save();render();}
 function setSelectedPitchRole(role){
- const slot=Number(appState.pitchSelectedSlot);
- if(!Number.isInteger(slot)||slot<0||slot>10)return;
+ const slot=validPitchSelectedSlot();if(slot===null)return;
  const xi=currentStartingXI(),p=xi[slot];if(!p)return;
- const overrides=appState.tacticalRoleOverrides&&typeof appState.tacticalRoleOverrides==="object"?appState.tacticalRoleOverrides:{};
+ const overrides=appState.tacticalRoleOverrides&&typeof appState.tacticalRoleOverrides==='object'?appState.tacticalRoleOverrides:{};
  appState.tacticalRoleOverrides=overrides;
- if(role==="__AUTO__"){
-  delete overrides[String(p.id)];delete appState.tacticalPositionRoleOverrides[String(p.id)];
-  if(appState.tacticalPositions)delete appState.tacticalPositions[String(slot)];
+ if(role==='__AUTO__'){
+  delete overrides[String(p.id)];
+  if(appState.tacticalPositionRoleOverrides)delete appState.tacticalPositionRoleOverrides[String(p.id)];
  }else{
-  if(!TACTICAL_ROLE_KEYS.includes(role)){alert("Velg en gyldig taktisk rolle.");return;}
-  if((p.pos==="GK")!==(role==="GK")){alert("Keeperrollen kan bare brukes av en keeper.");return;}
-  overrides[String(p.id)]=role;delete appState.tacticalPositionRoleOverrides[String(p.id)];
+  if(!TACTICAL_ROLE_KEYS.includes(role)){alert('Velg en gyldig taktisk rolle.');return;}
+  if((p.pos==='GK')!==(role==='GK')){alert('Keeperrollen kan bare brukes av en keeper.');return;}
+  overrides[String(p.id)]=role;
+  if(appState.tacticalPositionRoleOverrides)delete appState.tacticalPositionRoleOverrides[String(p.id)];
  }
  appState.pitchSelectedSlot=slot;
- // Recalculate role-derived positioning after the explicit role choice.
- const rebound=currentStartingXI();syncPitchRoleOverridesForXI(rebound);appState.selectedXI=rebound.map(x=>x.id);
+ const rebound=currentStartingXI();appState.selectedXI=rebound.map(x=>x.id);
  save();render();
 }
 
@@ -2422,25 +2409,44 @@ function tactics(){
   stablePitchRows=groups.filter(row=>row.length);
  }
  const pitchPosition=(slot)=>{
-  const manual=appState.tacticalPositions&&appState.tacticalPositions[String(slot)];
-  if(manual&&Number.isFinite(Number(manual.x))&&Number.isFinite(Number(manual.y)))return {x:Math.max(8,Math.min(92,Number(manual.x))),y:Math.max(7,Math.min(93,Number(manual.y))),manual:true};
-  const p=xi[slot];if(!p)return {x:50,y:50,manual:false};
-  if(p.assignedRole==='GK')return {x:50,y:88,manual:false};
+  const p=xi[slot];if(!p)return {x:50,y:50};
+  if(p.assignedRole==='GK')return {x:50,y:88};
   const rowIndex=Math.max(0,stablePitchRows.findIndex(row=>row.some(q=>String(q.id)===String(p.id))));
   const row=stablePitchRows[rowIndex]||[p];
   const column=Math.max(0,row.findIndex(q=>String(q.id)===String(p.id)));
   const x=row.length<=1?50:12+(column/(row.length-1))*76;
   const y=stablePitchRows.length<=1?48:15+(rowIndex/(stablePitchRows.length-1))*55;
-  return {x,y,manual:false};
+  return {x,y};
  };
  const pitchPlayer=(p,slot)=>{
-  const pos=pitchPosition(slot),selected=Number(appState.pitchSelectedSlot)===slot,fitClass=roleFitClass(p,p.assignedRole),fit=roleFitPercent(p,p.assignedRole);
-  const tag=(appState.tacticalRoleOverrides&&appState.tacticalRoleOverrides[String(p.id)])||(appState.tacticalPositionRoleOverrides&&appState.tacticalPositionRoleOverrides[String(p.id)]);
+  const pos=pitchPosition(slot),selected=validPitchSelectedSlot()===slot,fitClass=roleFitClass(p,p.assignedRole),fit=roleFitPercent(p,p.assignedRole);
+  const tag=(appState.tacticalRoleOverrides&&appState.tacticalRoleOverrides[String(p.id)]);
   const initials=p.pos==='GK'?'GK':(p.name.split(/\s+/).slice(-1)[0]||p.name).slice(0,2).toUpperCase();
-  return `<button type="button" class="pitch-player ${selected?'is-selected':''} ${fitClass}" style="left:${pos.x}%;top:${pos.y}%" aria-label="${esc(p.name)}, ${esc(roleLabels[p.assignedRole]||p.assignedRole)}, rollepassform ${fit} prosent. Trykk for bytte/rolle, dra for å flytte." aria-pressed="${selected?'true':'false'}" data-pitch-slot="${slot}" onclick="selectPitchSlot(${slot})" onpointerdown="startPitchReposition(event,${slot})"><span class="pitch-dot">${esc(initials)}</span><span class="pitch-name">${esc(p.name.split(' ').slice(-1)[0])}</span><strong class="pitch-rating">${positionAdjustedRating(p,p.assignedRole)}</strong>${tag?'<span class="pitch-manual-role-tag">EGEN</span>':''}<span class="pitch-role">${esc(roleLabels[p.assignedRole]||ROLE_BY_SIDE[p.assignedRole]||p.pos)}</span><span class="pitch-mini-fit" style="color:${fit>=80?'#9cde80':fit>=55?'#ffe09a':'#ffaaaa'}">${fit}%</span></button>`;
+  return `<button type="button" class="pitch-player ${selected?'is-selected':''} ${fitClass}" style="left:${pos.x}%;top:${pos.y}%" aria-label="${esc(p.name)}, ${esc(roleLabels[p.assignedRole]||p.assignedRole)}, rollepassform ${fit} prosent. Trykk for å velge spiller til denne plassen." aria-pressed="${selected?'true':'false'}" data-pitch-slot="${slot}" onclick="selectPitchSlot(${slot},this)"><span class="pitch-dot">${esc(initials)}</span><span class="pitch-name">${esc(p.name.split(' ').slice(-1)[0])}</span><strong class="pitch-rating">${positionAdjustedRating(p,p.assignedRole)}</strong>${tag?'<span class="pitch-manual-role-tag">EGEN</span>':''}<span class="pitch-role">${esc(roleLabels[p.assignedRole]||ROLE_BY_SIDE[p.assignedRole]||p.pos)}</span><span class="pitch-mini-fit" style="color:${fit>=80?'#9cde80':fit>=55?'#ffe09a':'#ffaaaa'}">${fit}%</span></button>`;
  };
- const pitch=()=>`<div class="tactics-pitch-field pitch-field" id="tacticsPitchField" role="group" aria-label="Fri baneplassering. Dra spillerne med fingeren eller musen."><div class="pitch-markings" aria-hidden="true"><div class="pitch-half-line"></div><div class="pitch-center-circle"></div><div class="pitch-center-spot"></div><div class="pitch-box-top"></div><div class="pitch-six-top"></div><div class="pitch-box-bottom"></div><div class="pitch-six-bottom"></div></div><span class="pitch-role-label" style="top:5%">ANGREP</span><span class="pitch-role-label" style="bottom:5%">EGET MÅL</span>${xi.map((p,slot)=>pitchPlayer(p,slot)).join('')}</div><div class="pitch-editor-controls"><div class="pitch-fit-legend"><span><i style="background:#9cde80"></i>God rollefit</span><span><i style="background:#e8c875"></i>Brukbar</span><span><i style="background:#e48787"></i>Svak</span></div><button type="button" class="pitch-reset-button" onclick="resetTacticalPitch()">↺ Tilbakestill banen</button></div><p class="pitch-editor-hint">Dra spillerne dit du vil ha dem. Plasseringen påvirker rollen som brukes i kampmotoren. Trykk på en spiller for å bytte, endre rolle eller velge reserve.</p>`;
- const pitchSwapPanel=()=>{const slot=Number(appState.pitchSelectedSlot);if(!Number.isInteger(slot)||!xi[slot])return '';const current=xi[slot],role=current.assignedRole||'CM';const candidates=eligibleSquad(appState.squad).filter(p=>canPlay(p)&&(role==='GK'?p.pos==='GK':p.pos!=='GK')&&String(p.id)!==String(current.id)).sort((a,b)=>roleCandidateScore(b,role)-roleCandidateScore(a,role));const recommended=candidates.slice(0,3);return `<div class="pitch-swap-panel"><div class="section-title" style="margin:0"><h3 style="margin:0;font-size:15px">Bytt spiller</h3><button type="button" class="ghost" onclick="cancelPitchReplacement()">Avbryt ✕</button></div><p class="muted" style="font-size:12px;margin:7px 0">Valgt plass: <strong>${esc(roleLabels[role]||role)}</strong> · ${esc(current.name)}. Alternativene sorteres etter rollefit, ferdigheter og form. Velger du en annen starter, bytter spillerne plass med hverandre.</p><div class="pitch-role-editor"><label for="selectedPitchRole">TAKTISK ROLLE</label><select id="selectedPitchRole" aria-label="Endre taktisk rolle for ${esc(current.name)}" onchange="setSelectedPitchRole(this.value)"><option value="__AUTO__" ${appState.tacticalRoleOverrides&&appState.tacticalRoleOverrides[String(current.id)]?'':'selected'}>Automatisk – ${esc(roleLabels[roleSlotsForFormation(appState.formation)[slot]||role])}</option>${(current.pos==='GK'?['GK']:TACTICAL_ROLE_KEYS.filter(r=>r!=='GK')).map(r=>`<option value="${r}" ${appState.tacticalRoleOverrides&&appState.tacticalRoleOverrides[String(current.id)]&&role===r?'selected':''}>${esc(roleLabels[r]||r)}</option>`).join('')}</select><p>Rollevalget lagres på spilleren og flytter ved behov spilleren til en annen linje på banen. Velg «Automatisk» for å gå tilbake til formasjonens standardrolle.</p></div><div class="pitch-swap-options">${candidates.map((p,i)=>{const fit=roleFitPercent(p,role),fitClass=roleFitClass(p,role),isRecommended=i<3;return `<button type="button" class="ghost ${fitClass}" onclick="choosePitchReplacement('${String(p.id).replace(/'/g,"\\'")}')">${isRecommended?`<span class="fit-tag">${i===0?'★ BESTE VALG':i===1?'ANBEFALT':'ANBEFALT'}</span>`:''}<span>${esc(p.name)}</span><span class="fit-percent">Rollefit <strong>${fit}%</strong> · ${roleFitLabel(p,role)}</span><strong>${positionAdjustedRating(p,role)} i rolle · ${p.rating} total</strong><span>${p.pos==='GK'?'Keeper':esc(ROLE_BY_SIDE[p.role]||p.role||p.pos)} · ⚡${p.fitness}%</span></button>`}).join('')||'<p class="muted">Ingen tilgjengelige alternativer for denne plassen.</p>'}</div><p class="pitch-recommendation-note">Fargene viser hvor godt spillerens registrerte posisjoner passer til plassen. Den beste anbefalingen tar også hensyn til ferdigheter og form.</p></div>`};
+ const pitch=()=>`<div class="tactics-pitch-field pitch-field" id="tacticsPitchField" role="group" aria-label="Lagoppstilling. Trykk på en spiller for å velge hvem som skal fylle plassen."><div class="pitch-markings" aria-hidden="true"><div class="pitch-half-line"></div><div class="pitch-center-circle"></div><div class="pitch-center-spot"></div><div class="pitch-box-top"></div><div class="pitch-six-top"></div><div class="pitch-box-bottom"></div><div class="pitch-six-bottom"></div></div><span class="pitch-role-label" style="top:5%">ANGREP</span><span class="pitch-role-label" style="bottom:5%">EGET MÅL</span>${xi.map((p,slot)=>pitchPlayer(p,slot)).join('')}</div><div class="pitch-editor-controls"><div class="pitch-fit-legend"><span><i style="background:#9cde80"></i>God rollefit</span><span><i style="background:#e8c875"></i>Brukbar</span><span><i style="background:#e48787"></i>Svak</span></div><button type="button" class="pitch-reset-button" onclick="resetTacticalPitch()">↺ Tilbakestill roller</button></div><p class="pitch-editor-hint">Trykk på en spiller på banen for å velge hvem som skal spille i den plassen. Ingen dra-og-slipp.</p>`;
+ const pitchSwapPanel=()=>{
+  const slot=validPitchSelectedSlot();if(slot===null||!xi[slot])return '';
+  const current=xi[slot],role=current.assignedRole||roleSlotsForFormation(appState.formation)[slot]||'CM';
+  const eligible=eligibleSquad(appState.squad).filter(p=>canPlay(p)&&(role==='GK'?p.pos==='GK':p.pos!=='GK')&&String(p.id)!==String(current.id));
+  eligible.sort((a,b)=>roleCandidateScore(b,role)-roleCandidateScore(a,role));
+  const anchor=appState.pitchPickerAnchor||{x:(typeof window!=='undefined'?window.innerWidth:390)/2,y:(typeof window!=='undefined'?window.innerHeight:700)/2};
+  const vw=typeof window!=='undefined'?Math.max(320,window.innerWidth):390;
+  const vh=typeof window!=='undefined'?Math.max(480,window.innerHeight):700;
+  const width=Math.min(360,vw-24),height=Math.min(330,Math.max(250,Math.floor(vh*.44)));
+  const bottomReserve=Math.min(90,Math.max(56,Math.round(vh*.1)));
+  const left=Math.max(12,Math.min(vw-width-12,Number(anchor.x)-width/2));
+  const desiredTop=Number(anchor.y)+14+height>vh-bottomReserve-10?Number(anchor.y)-height-14:Number(anchor.y)+14;
+  const top=Math.max(74,Math.min(vh-height-bottomReserve-10,desiredTop));
+  const roleSelect=`<div class="pitch-picker-role"><label for="selectedPitchRole">TAKTISK ROLLE</label><select id="selectedPitchRole" aria-label="Endre taktisk rolle for ${esc(current.name)}" onchange="setSelectedPitchRole(this.value)"><option value="__AUTO__" ${appState.tacticalRoleOverrides&&appState.tacticalRoleOverrides[String(current.id)]?'':'selected'}>Automatisk – ${esc(roleLabels[roleSlotsForFormation(appState.formation)[slot]||role])}</option>${(current.pos==='GK'?['GK']:TACTICAL_ROLE_KEYS.filter(r=>r!=='GK')).map(r=>`<option value="${r}" ${appState.tacticalRoleOverrides&&appState.tacticalRoleOverrides[String(current.id)]&&role===r?'selected':''}>${esc(roleLabels[r]||r)}</option>`).join('')}</select></div>`;
+  const options=eligible.map((p,i)=>{
+   const fit=roleFitPercent(p,role),fitClass=roleFitClass(p,role),starterIndex=xi.findIndex(q=>String(q.id)===String(p.id));
+   const tag=i<3?`<span class="pitch-picker-tag">${i===0?'★ BESTE VALG':'ANBEFALT'}</span>`:'';
+   const starter=starterIndex>=0?`<span class="pitch-picker-starter">Starter · bytter med ${esc(current.name)}</span>`:'<span class="pitch-picker-starter">Reserve</span>';
+   return `<button type="button" class="pitch-picker-option ${fitClass}" onclick="choosePitchReplacement('${String(p.id).replace(/'/g,"\\'")}')">${tag}<span class="pitch-picker-option-main"><strong>${esc(p.name)}</strong><span class="pitch-picker-rating">${positionAdjustedRating(p,role)} i rolle</span></span><span class="pitch-picker-option-meta">Rollefit ${fit}% · ${roleFitLabel(p,role)} · Total ${p.rating} · ⚡${p.fitness}%</span>${starter}</button>`;
+  }).join('');
+  return `<div class="pitch-picker-popover" role="dialog" aria-label="Velg spiller til ${esc(roleLabels[role]||role)}" style="left:${Math.round(left)}px;top:${Math.round(top)}px;width:${Math.round(width)}px;max-height:${Math.round(height)}px"><div class="pitch-picker-head"><div><strong>Velg spiller</strong><small>${esc(roleLabels[role]||role)} · nå: ${esc(current.name)}</small></div><button type="button" class="ghost" onclick="cancelPitchReplacement()" aria-label="Lukk spillerlisten">✕</button></div>${roleSelect}<p class="pitch-picker-help">Velg en spiller fra troppen. Velger du en som allerede starter, bytter de plass.</p><div class="pitch-picker-list">${options||'<p class="muted">Ingen tilgjengelige spillere for denne plassen.</p>'}</div></div>`;
+ };
  const playerDetail=(p)=>`<div class="player-meta">${p.pos==="GK"?`Keepergrep ${p.attributes.handling} · Reflekser ${p.attributes.reflexes} · Posisjonering ${p.attributes.positioning}`:p.pos==="DEF"?`Forsvar ${p.attributes.defending} · Styrke ${p.attributes.strength} · Hurtighet ${p.attributes.pace}`:p.pos==="MID"?`Pasninger ${p.attributes.passing} · Kreativitet ${p.attributes.creativity} · Utholdenhet ${p.attributes.stamina}`:`Avslutninger ${p.attributes.finishing} · Hurtighet ${p.attributes.pace} · Teknikk ${p.attributes.technique}`}</div><div class="fitness-track"><div class="fitness-fill" style="width:${p.fitness}%;background:${p.fitness<60?'#e48787':p.fitness<78?'#e8c875':'var(--green)'}"></div></div>`;
  const bench=eligibleSquad(appState.squad).filter(p=>!xi.some(q=>String(q.id)===String(p.id)));
  const opponentIndex=getNextOpponentIndex();
@@ -2449,10 +2455,10 @@ function tactics(){
  const assistantSuggestedFormation=assistantFormationChoice(opponentFormation);
  const unavailableCount=appState.squad.filter(p=>!canPlay(p)).length;
  const mentalLabels={Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"};
- return `<div class="hero tactics-hero"><div class="eyebrow">Match preparation · ${seasonLabel()}</div><h1>Laguttak og taktikk</h1><p>Sett formasjonen, velg mentalitet og klargjør startelleveren.</p><div class="hero-actions"><span class="pill green">${xi.length}/11 valgt</span><span class="pill">Reserver: ${bench.length}</span><span class="pill ${unavailableCount?'warning':'green'}">${unavailableCount?`${unavailableCount} utilgjengelig`:'Alle tilgjengelige'}</span></div></div>
+ return `<div class="hero tactics-hero"><div class="eyebrow">Match preparation · ${seasonLabel()}</div><h1>Laguttak og taktikk</h1><p>Sett formasjonen, velg mentalitet og klargjør startelleveren.</p><div class="hero-actions"><span class="pill green">${xi.length}/11 valgt</span><span class="pill">Reserver: ${bench.length}</span><span class="pill ${unavailableCount?'warning':'green'}">${unavailableCount?`${unavailableCount} utilgjengelig`:'Alle tilgjengelige'}</span></div><button type="button" class="primary tactics-start-top" onclick="playMatch()">⚽ Avspark – bruk valgt ellever</button><p class="tactics-start-note">Assistentens anbefalte ellever er valgt automatisk. Du kan endre spillerne direkte på banen før avspark.</p></div>
  <section class="card tactics-quick-controls"><div class="field"><label>FORMASJON I NESTE KAMP</label><select id="formation" onchange="appState.formation=this.value;appState.selectedXI=null;appState.tacticalRoleOverrides={};appState.tacticalPositionRoleOverrides={};appState.tacticalPositions={};appState.pitchSelectedSlot=null;appState.recommendationRound=null;appState.recommendationInfo=null;save();render()">${appState.trainingFormations.map(f=>`<option value="${esc(f)}" ${appState.formation===f?'selected':''}>${esc(f)}</option>`).join('')}</select></div><div class="field"><label>MENTALITET</label><select id="tactic" onchange="appState.tactic=this.value;save()">${["Defensive","Balanced","Attacking","High press"].map(f=>`<option value="${f}" ${appState.tactic===f?"selected":""}>${mentalLabels[f]}</option>`).join('')}</select></div><button type="button" style="width:100%;margin:3px 0 0;border-color:#7e9c70;background:#1b382c;color:#bdf0ad;font-weight:850" onclick="rotateStartingXI()">🔄 Roter troppen</button><p class="tactics-mini-status">Prioriterer spillere som ikke startet forrige kamp. Skadde og suspenderte spillere utelates.</p></section>
  <section class="card assistant-match-plan" style="border-color:#647b52;background:linear-gradient(145deg,#192b2b,#142236);margin-bottom:12px"><div class="section-title"><h2>🤖 Assistentens kampplan</h2><span class="pill green">Klargjort automatisk</span></div><div class="player"><div style="flex:1"><strong>Formasjon · ${esc(appState.formation)}</strong><div class="player-meta">Motstander: ${esc(opponentName)} · ${esc(opponentFormation)} · Mentalitet ${mentalLabels[appState.tactic]||'Balansert'}</div></div><span class="pill">${xi.length}/11</span></div><p class="muted" style="margin:8px 0">Assistenten har satt opp formasjon og startellever fra lagets tre innarbeidede systemer. ${(()=>{const prev=new Set((appState.lastStartingXI||[]).map(String));const rotated=xi.filter(p=>!prev.has(String(p.id))).length;const gap=Number(teamPower(appState.club)||currentClub().strength)-Number(teamPower(opponentIndex)||CLUBS[opponentIndex].strength);return gap>=7?`Mot en svakere motstander vurderes rotasjon; ${rotated} spillere startet ikke sist.`:`Ingen stor rotasjon forventes mot denne motstanderen.`})()}</p><button type="button" class="ghost" style="width:100%" onclick="applyPreMatchRecommendation(true);render()">Be assistenten vurdere på nytt</button></section>
- <section class="card"><div class="section-title"><h2>Startellever</h2><small>${xi.length}/11 spillere</small></div><div class="tactics-pitch-card"><div class="pitch-direction">▲ ANGREP</div>${pitch()}</div><p class="pitch-instruction">Du kan dra hver markør fritt på banen med fingeren eller musen. Trykk på en spiller for å bytte med en annen, endre rolle eller velge en reserve. «Tilbakestill banen» fjerner egne plasseringer og går tilbake til formasjonens standardoppsett.</p>${(()=>{const warnings=tacticalBalanceWarnings(xi);return `<div class="pitch-balance-panel"><h3>⚖️ Lagbalanse</h3>${warnings.length?`<div class="pitch-balance-list">${warnings.map(w=>`<div class="pitch-balance-item ${w.level}"><span class="balance-dot"></span><span>${esc(w.text)}</span></div>`).join('')}</div>`:'<div class="pitch-balance-ok">✓ Ingen tydelige rolle- eller balansevarsler akkurat nå.</div>'}</div>`})()}${pitchSwapPanel()}<button class="primary" style="width:100%;margin:12px 0 4px" onclick="playMatch()">${appState.pendingCupMatch?`🏆 Avspark – ${esc(appState.pendingCupMatch.competition)}`:'⚽ Avspark – bruk valgt startellever'}</button>
+ <section class="card"><div class="section-title"><h2>Startellever</h2><small>${xi.length}/11 spillere</small></div><div class="tactics-pitch-card"><div class="pitch-direction">▲ ANGREP</div>${pitch()}</div><p class="pitch-instruction">Trykk på spilleren eller posisjonen på banen. En spillerliste åpnes ved markøren, og valget gjelder bare denne plassen. Assistentens anbefaling endres ikke automatisk av at du åpner listen.</p>${(()=>{const warnings=tacticalBalanceWarnings(xi);return `<div class="pitch-balance-panel"><h3>⚖️ Lagbalanse</h3>${warnings.length?`<div class="pitch-balance-list">${warnings.map(w=>`<div class="pitch-balance-item ${w.level}"><span class="balance-dot"></span><span>${esc(w.text)}</span></div>`).join('')}</div>`:'<div class="pitch-balance-ok">✓ Ingen tydelige rolle- eller balansevarsler akkurat nå.</div>'}</div>`})()}${pitchSwapPanel()}<button class="primary" style="width:100%;margin:12px 0 4px" onclick="playMatch()">${appState.pendingCupMatch?`🏆 Avspark – ${esc(appState.pendingCupMatch.competition)}`:'⚽ Avspark – bruk valgt startellever'}</button>
  <details class="tactics-accordion" data-tactics-panel="training" ${tacticsPanelState.training?'open':''} ontoggle="setTacticsPanelOpen('training',this.open)"><summary><span>⚙️ Formasjoner i sesongtrening</span><span class="tactics-summary-meta">3 valgte · ${AVAILABLE_FORMATIONS.length} muligheter</span></summary>${trainingSummary()}</details>
  <details class="tactics-accordion" data-tactics-panel="availability" ${tacticsPanelState.availability?'open':''} ontoggle="setTacticsPanelOpen('availability',this.open)"><summary><span>🩹 Skader og suspensjoner</span><span class="tactics-summary-meta">${unavailableCount?`${unavailableCount} ute`:'Ingen fravær'}</span></summary><div class="tactics-accordion-body">${disciplinarySummary()}</div></details>
  <div class="section-title"><h2>Velg spillere</h2><small>sortert etter taktisk rolle</small></div><p class="muted" style="font-size:11px">Trykk på listene for å velge hvem som starter. Skadde og suspenderte spillere kan ikke velges.</p><div class="section-title"><h2>Keeper</h2></div>${slotControls(xi.filter(p=>p.assignedRole==='GK'))}<div class="section-title"><h2>Forsvar</h2></div>${slotControls(xi.filter(p=>['LB','LCB','CB','RCB','RB','LWB','RWB'].includes(p.assignedRole)))}<div class="section-title"><h2>Midtbane</h2></div>${slotControls(xi.filter(p=>['DM','CM','LM','RM'].includes(p.assignedRole)))}<div class="section-title"><h2>Angrep</h2></div>${slotControls(xi.filter(p=>['LW','AM','RW','ST'].includes(p.assignedRole)))}<div class="section-title"><h2>Reserver</h2><small>sortert etter taktisk rolle</small></div>${["GK","DEF","MID","ATT"].map(pos=>{const ps=bench.filter(p=>p.pos===pos);return ps.length?`<div class="lineup-section-title">${posLabels[pos]}</div>${ps.map(p=>`<div class="lineup-player"><div><div class="lineup-player-name">${esc(p.name)} <span class="pill">${p.pos}</span> · ${p.rating}</div>${playerDetail(p)}</div><div class="lineup-player-side"><strong>${p.rating}</strong><span>${p.fitness}%</span></div></div>`).join("")}`:""}).join("")}<button class="primary" style="width:100%;margin-top:12px" onclick="playMatch()">${appState.pendingCupMatch?`🏆 Avspark – ${esc(appState.pendingCupMatch.competition)}`:'⚽ Avspark – bruk valgt startellever'}</button></section>`;
@@ -5410,7 +5416,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){normalizeTransferHistory();const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.80 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.81 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 document.getElementById("saveBtn").addEventListener("click",()=>{const ok=save();let b=document.getElementById("saveBtn");b.textContent=ok?"✓ Lagret":"⚠ Lagring feilet";setTimeout(()=>b.textContent="▣ Lagre",1800)});
