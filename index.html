@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.82 — Touchline</title>
+<title>CM Mobile v2.84 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -400,7 +400,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(max-width:410px){.header-actions{gap:4px}.header-action{padding:7px 7px;font-size:10px}.career-manager-panel{padding:13px}.career-slot-row{align-items:flex-start}.career-slot-row>button{padding:8px;font-size:11px}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.83</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.84</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -1713,20 +1713,13 @@ function movementMarkup(change){
 }
 function panel(title,body,right=""){return `<div class="section-title"><h2>${title}</h2>${right}</div><section class="card">${body}</section>`}
 function getNextOpponentIndex(){ensureFixtures();let r=appState.fixtures.find(f=>f.round===appState.week&&!f.played);if(!r){const ids=activeLeagueClubIndices();return ids[(ids.indexOf(appState.club)+1)%ids.length]}let g=r.games.find(x=>x.includes(appState.club));const ids=activeLeagueClubIndices();return g?(g[0]===appState.club?g[1]:g[0]):ids[(ids.indexOf(appState.club)+1)%ids.length]}
-function clubBadgeMarkup(teamOrName){
- const name=typeof teamOrName==='string'?teamOrName:(teamOrName?.name||'');
- const club=CLUBS.find(x=>x.name===name);
- const short=club?.short||(name.split(/\s+/).filter(Boolean).map(x=>x[0]).join('').slice(0,3).toUpperCase())||'⚽';
- if(club?.logo)return `<span class="home-team-badge"><img src="${club.logo}" alt="" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('badge-fallback');this.parentElement.textContent='${short}'"></span>`;
- return `<span class="home-team-badge badge-fallback" aria-label="${esc(name)}">${esc(short)}</span>`;
-}
 function home(){
  const c=currentClub(),t=currentClubRecord(),next=CLUBS[getNextOpponentIndex()],done=seasonCompleted();
  const rank=sortedTable().findIndex(x=>x.name===c.name)+1;
  const division=appState.activeDivision||clubDivision(c);
  const primary=appState.preseasonActive?`<button class="primary home-primary" onclick="advancePreseasonWeek()">▶ Fullfør oppkjøringsuke ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}</button>`:appState.pendingCupMatch?`<button class="primary home-primary" onclick="startPendingCupMatch()">🏆 Forbered ${esc(appState.pendingCupMatch.competition)}-kamp</button>`:done?`<button class="primary home-primary" onclick="setPage('season')">Se sesongoppsummering →</button>`:`<button class="primary home-primary" onclick="setPage('tactics')">▶ Sett opp laget</button>`;
  const status=appState.preseasonActive?`Pre-season · uke ${Number(appState.preseasonWeek)||1} av ${Number(appState.preseasonWeeks)||4}`:done?`Sesongen ${seasonLabel()} er ferdig`:`${division} · Runde ${appState.week}`;
- const crest=c.logo?`<img src="${c.logo}" alt="${esc(c.name)}-logo" loading="lazy" onerror="this.parentElement.textContent='${c.short}'">`:c.crest||'⚽';
+ const crest=clubBadgeMarkup(c,42);
  const opponentFixture=appState.fixtures.find(f=>f.round===appState.week&&!f.played);
  const matchup=opponentFixture?.games.find(g=>g.includes(appState.club));
  const homeGame=matchup?matchup[0]===appState.club:true;
@@ -5367,14 +5360,73 @@ const EUROPEAN_LOGOS = {
  'FC Porto':503,'SL Benfica':1903,'Sporting CP':498,'SC Braga':561,'Braga':561,'FC Twente Enschede':676,'Celta de Vigo':558,'Villarreal CF':94,'Sunderland AFC':71
 };
 
-function clubBadgeMarkup(club,size=42){
- const name=club?.name||'Klubb';
- const short=club?.short||name.split(/\s+/).map(x=>x[0]).join('').slice(0,3).toUpperCase();
- const logo=club?.logo||((EUROPEAN_LOGOS[name]||EUROPEAN_LOGOS[club?.name])?`https://crests.football-data.org/${EUROPEAN_LOGOS[name]||EUROPEAN_LOGOS[club?.name]}.svg`: '');
- const safeName=esc(name);
- if(logo)return `<img src="${esc(logo)}" alt="${safeName}-logo" loading="lazy" style="width:${size}px;height:${size}px;object-fit:contain" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="club-badge-fallback" style="display:none;width:${size}px;height:${size}px">${esc(short)}</span>`;
- const hue=stableSeed(name)%360;
- return `<span class="club-badge-fallback" role="img" aria-label="${safeName} klubbmerke" title="${safeName}" style="width:${size}px;height:${size}px;--badge-hue:${hue}">${esc(short)}</span>`;
+// Official crests are used when an in-game team has a known source URL/ID.
+// Every other club receives a deterministic, inline SVG shield, so the badge is
+// unique, visible offline, and never collapses to a blank box or emoji.
+const EUROPEAN_LOGO_ID_BY_KEY = Object.fromEntries(
+ Object.entries(EUROPEAN_LOGOS).map(([clubName, crestId]) => [normalizedClubKey(clubName), crestId])
+);
+// The 2026/27 English club logo registry provides transparent PNGs for the
+// current 92 PL/EFL clubs. These are remotely loaded; each has the SVG fallback below.
+const ENGLISH_LEAGUE_CLUB_KEYS = new Set([
+ ...CLUBS.map(club=>club.name),
+ ...Object.values(EFL_DIVISIONS||{}).flat()
+].map(normalizedClubKey));
+function englishLeagueLogoUrl(name,key){
+ if(!ENGLISH_LEAGUE_CLUB_KEYS.has(key))return '';
+ let fileBase=String(name||'').replace(/[^A-Za-z0-9]/g,'');
+ if(key==='bournemouth')fileBase='Bournemouth';
+ if(key==='brighton')fileBase='BrightonAndHoveAlbion';
+ return `https://raw.githubusercontent.com/gmorison-aiio/club_logos/main/${fileBase}_ClubLogo.png`;
+}
+function generatedClubCrestDataUri(name, monogram){
+ const safeName=String(name||'Club');
+ const seed=stableSeed(safeName+'|CM-MOBILE-CLUB-CREST-v284');
+ const hue=seed%360;
+ const hue2=(hue+42+(seed%38))%360;
+ const mark=String(monogram||'FC').replace(/[^A-Za-z0-9]/g,'').slice(0,3).toUpperCase()||'FC';
+ const fontSize=mark.length>=3?17:20;
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 70" role="img" aria-label="${esc(safeName)} klubbmerke">
+ <defs>
+  <linearGradient id="shieldFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(${hue},64%,37%)"/><stop offset="1" stop-color="hsl(${hue2},69%,17%)"/></linearGradient>
+  <clipPath id="shieldClip"><path d="M8 6 Q32 0 56 6 L53 39 Q50 55 32 65 Q14 55 11 39 Z"/></clipPath>
+ </defs>
+ <path d="M5 4 Q32 -2 59 4 L56 40 Q52 58 32 68 Q12 58 8 40 Z" fill="#0a1421" stroke="hsl(${hue},65%,78%)" stroke-width="2"/>
+ <g clip-path="url(#shieldClip)">
+  <rect x="7" y="4" width="50" height="64" fill="url(#shieldFill)"/>
+  <path d="M-5 12 L14 2 L68 55 L58 66 Z" fill="#fff" opacity=".12"/>
+  <path d="M17 3 L25 3 L56 42 L53 51 Z" fill="hsl(${hue2},78%,72%)" opacity=".34"/>
+  <path d="M7 14 H57" stroke="#fff" stroke-width="2" opacity=".55"/>
+  <path d="M9 18 H55" stroke="#fff" stroke-width=".7" opacity=".34"/>
+  <circle cx="32" cy="27" r="13" fill="#0b1726" opacity=".48" stroke="#fff" stroke-opacity=".22"/>
+  <text x="32" y="33" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="${fontSize}" font-weight="900" letter-spacing="-.7" fill="#fff" stroke="#0a1421" stroke-width=".5" paint-order="stroke">${esc(mark)}</text>
+  <path d="M17 43 H47" stroke="hsl(${hue},75%,84%)" stroke-width="2"/>
+  <path d="M20 48 H44" stroke="#fff" stroke-width="1" opacity=".7"/>
+ </g>
+ <path d="M8 6 Q32 0 56 6 L53 39 Q50 55 32 65 Q14 55 11 39 Z" fill="none" stroke="#edf4ff" stroke-opacity=".78" stroke-width="1.5"/>
+ <path d="M26 56 L32 59 L38 56" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="1.4" stroke-linecap="round"/>
+ </svg>`;
+ return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
+}
+function clubBadgeMarkup(teamOrName,size=42){
+ const isName=typeof teamOrName==='string';
+ const requestedName=String(isName?teamOrName:(teamOrName?.name||'Klubb')).trim()||'Klubb';
+ const supplied=isName?{}:(teamOrName||{});
+ const requestedKey=normalizedClubKey(requestedName);
+ const registered=Array.isArray(CLUBS)?CLUBS.find(x=>normalizedClubKey(x.name)===requestedKey):null;
+ const short=String(supplied.short||registered?.short||requestedName.split(/\s+/).filter(Boolean).map(x=>x[0]).join('').slice(0,3)||'FC').replace(/[^A-Za-z0-9]/g,'').slice(0,3).toUpperCase()||'FC';
+ const europeanId=EUROPEAN_LOGOS[requestedName]||EUROPEAN_LOGO_ID_BY_KEY[requestedKey];
+ const englishLogo=englishLeagueLogoUrl(requestedName,requestedKey);
+ // Prefer the curated current-season PL/EFL PNG where available; preserve the
+ // older registry URL as a second chance, then use an always-available SVG.
+ const officialLogo=englishLogo||supplied.logo||registered?.logo||(europeanId?`https://crests.football-data.org/${europeanId}.svg`:'');
+ const backupLogo=englishLogo?(supplied.logo||registered?.logo||''):'';
+ const fallback=generatedClubCrestDataUri(requestedName,short);
+ const safeName=esc(requestedName);
+ const px=Math.max(18,Math.min(96,Number(size)||42));
+ const style=`width:${px}px;height:${px}px;object-fit:contain;display:block;flex:0 0 auto`;
+ const sources=[officialLogo,backupLogo,fallback].filter((url,index,list)=>url&&list.indexOf(url)===index);
+ return sources.map((url,index)=>`<img src="${esc(url)}" alt="${safeName}${index===sources.length-1&&url===fallback?' generert':''} klubbmerke" title="${safeName}" ${url===fallback?'':'loading="lazy"'} width="${px}" height="${px}" style="${style};display:${index===0?'block':'none'}" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block'">`).join('');
 }
 function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userEvents,positionChanges={},engine=null,round=null,previousPositions=new Map()){
  const homeName=home?c.name:opp.name, awayName=home?opp.name:c.name;

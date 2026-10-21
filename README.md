@@ -1,6 +1,24 @@
-# CM Mobile v2.83
+# CM Mobile v2.84
 
-## Forsvarsmål, innlegg og dødballer
+## Klubblogomer for alle lag
+
+- Samlet klubbmerkevisning støtter nå både klubbobjekter og rene klubbnavn. Dette retter kall fra blant annet hjemskjerm, cupresultater og kampskjerm.
+- Kjente offisielle klubbmerker brukes fortsatt når URL eller crest-ID finnes. For de 92 PL/EFL-klubbene finnes det nå en direkte bildekobling til et offentlig 2026/27-register med transparente PNG-merker.
+- Alle andre klubber får et eget, deterministisk skjoldmerke som SVG, med farger og monogram utledet fra klubbnavnet. Merket ligger innebygd i HTML-filen og virker derfor også uten nett.
+- For PL/EFL prøves 2026/27-PNG-en først, deretter tidligere registrert URL og til slutt det genererte klubbmerket. Andre eksterne logoer faller også tilbake til et generert merke dersom bildekilden feiler.
+- Hjemmeskjermens managermerke bruker samme visning som kampene og cupene.
+
+**Merk:** v2.84 garanterer at alle klubbnavn som sendes til visningen får et synlig klubbmerke. Det er ikke det samme som å ha autentiske/offisielle klubbvåpen for samtlige lag: offisielle merker brukes der registrerte kilder finnes, mens de øvrige får særpregede, genererte merker inntil ekte logoer legges til. Se `CLUB_BADGE_COVERAGE_v2.84.md`. Kilde for PL/EFL-bildene: https://github.com/gmorison-aiio/club_logos (filene lastes fra nettet, ikke bundlet lokalt).
+
+## Kontrollert v2.84
+
+- JavaScript-syntaks kontrollert med Node.js.
+- Isolert dekningstest av 231 unike klubbnavn fra liga-, cup- og europacupregisteret: alle gir bildekode med fallback. Alle 92 PL/EFL-klubber peker til bildekilder for 2026/27; 128 klubbnavn har en registrert ekstern logokilde totalt.
+- ZIP-integritet kontrollert. Full nettleser-, mobil- og sesongtest gjenstår.
+
+---
+
+## v2.83 — Forsvarsmål, innlegg og dødballer
 
 - Forsvarsspillere kan nå score i kampsimuleringen. Midtstoppere prioriteres ved corner og offensive frispark, med styrke, posisjonering, forsvarsegenskaper og ferdighet som utslagsgivende faktorer.
 - Mål får en beregnet opprinnelse: åpent spill, innlegg, corner eller frispark/dødball. Dette påvirker målscorer og assistvalg, ikke sluttresultatet som er simulert separat.
