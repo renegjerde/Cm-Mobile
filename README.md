@@ -1,4 +1,4 @@
-# CM Mobile v2.78 — Player Age Integrity
+# CM Mobile v2.79 — Player Age Integrity
 
 ## Taktikk: fri baneplassering
 - Startelleverens 11 spillere vises på en vertikal, mobiltilpasset fotballbane.
@@ -52,3 +52,15 @@ Pakken har en versjonsmappe med `index.html`, `README.md` og endringsrapporter. 
 ### Ekstra kontroll v2.78
 
 Isolert aldersmigreringstest bestod fem scenarioer, inkludert reparasjon av JJ Gabriel og Gabriele Biancheri, korrekt alder for Shea Lacey, ukjent alder for navngitte spillere uten verifisert DOB og fortsatt modellert alder for genererte identiteter. Se `PLAYER_AGE_INTEGRITY_v2.78.md` og `U21_AGE_AUDIT_v2.78.csv`. Full nettleser-/mobiltest og full sesongtest er ikke utført.
+
+
+## v2.79 — Aldersmodell for alternativ virkelighet
+
+- Ingen spiller i brukergrensesnittet vises med «Alder ikke verifisert».
+- Når en kildebasert fødselsdato finnes, brukes den.
+- Når DOB mangler, tildeles spilleren en fast, deterministisk simulert fødselsdato og konkret alder. U21-/førstelagstalenter får en aldersmodell i 16–21-intervallet; seniorer får en plausibel modellalder, med en noe eldre kurve for keepere.
+- Simulerte fødselsdatoer følger spilleren ved overgang og gir normal aldring mellom sesonger. De merkes internt som modellerte, ikke kildeverifiserte.
+- Eksisterende lagringer normaliseres ved oppstart; databasens versjoner er oppdatert slik at nye karrierer også får samme regel.
+- Verktøy for spillerdiagnostikk viser nå kildebaserte kontra simulerte fødselsdatoer i stedet for å behandle manglende kildedata som manglende spillverden.
+
+Kontrollert: JavaScript-syntaks og ZIP-integritet. En isolert test kjørte 1 992 spilleroppføringer fra PL-senior, PL U21 og EFL gjennom alderslogikken, og kontrollerte også kjent DOB, stabil dato ved overgang og aldring til neste sesong. Profiloppslag var stubbet i testen, så den verifiserer fallback-logikken – ikke alle virkelige profil- eller fødselsdata. Full visuell mobiltest/hel sesongsimulering gjenstår.

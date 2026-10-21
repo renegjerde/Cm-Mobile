@@ -1,0 +1,6 @@
+﻿Case,DOB source,Rule,UI output
+Known DOB,Embedded curated DOB / reliable offline profile,Calculate exact age at season start,Concrete age in years
+First-team U21 prospect without DOB,No reliable DOB,Stable model age 16–21 and simulated DOB,Concrete age in years
+Senior player without DOB,No reliable DOB,Stable model age 18–34; keeper 21–34,Concrete age in years
+Generated fictional identity,No reliable DOB,Deterministic fictional age and DOB,Concrete age in years
+Older save / invalid age,Migration via refreshPlayerAgeData,Replace unknown/invalid legacy age with stable model DOB,Concrete age in years
