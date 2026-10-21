@@ -400,7 +400,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(max-width:410px){.header-actions{gap:4px}.header-action{padding:7px 7px;font-size:10px}.career-manager-panel{padding:13px}.career-slot-row{align-items:flex-start}.career-slot-row>button{padding:8px;font-size:11px}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.82</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.83</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -3225,6 +3225,8 @@ function lowerLeagueMatchXI(row,division){
  const xi=[];const take=(pos,n)=>{for(let i=0;i<n&&byPos[pos][i];i++)xi.push(byPos[pos][i])};
  take('GK',1);take('DEF',4);take('MID',4);take('ATT',2);
  if(xi.length<11){const used=new Set(xi.map(p=>p.id||p.name));available.filter(p=>!used.has(p.id||p.name)).sort((a,b)=>rosterPlayerPower(b)-rosterPlayerPower(a)).slice(0,11-xi.length).forEach(p=>xi.push(p));}
+ // Offline lower-league squads often only store the broad position; infer a simple back four for match events.
+ const defenders=xi.filter(p=>p.pos==='DEF');defenders.forEach((p,i)=>{if(!['LCB','RCB','CB','LB','RB','LWB','RWB'].includes(matchRoleOf(p)))p.matchRole=['LCB','RCB','LB','RB'][i]||'CB';});
  return xi;
 }
 function ensureCompetitionStat(player,competition){
@@ -3243,9 +3245,16 @@ function lowerLeagueStatRow(data,player,clubName){
  if(!data.playerStats[key])data.playerStats[key]={id:player.id??key,name:player.name||'Ukjent spiller',clubName,pos:player.pos||'MID',apps:0,minutes:0,goals:0,assists:0,yellowCards:0,redCards:0,chancesCreated:0,competitionStats:{}};
  const row=data.playerStats[key];row.competitionStats=row.competitionStats||{};return row;
 }
-function lowerLeagueGoalScorer(xi,rng){
+function lowerLeagueGoalScorer(xi,rng,goalMethod='open-play'){
  if(!xi.length)return null;
- const weighted=xi.map(p=>{const pos=p.pos==='ATT'?4.8:p.pos==='MID'?2.2:p.pos==='DEF'?0.8:0.08;return {p,w:Math.max(.05,pos+Math.max(0,rosterPlayerPower(p)-50)*.045)}});
+ const weighted=xi.map(p=>{
+  const power=rosterPlayerPower(p);
+  let pos=p.pos==='ATT'?4.8:p.pos==='MID'?2.2:p.pos==='DEF'?0.22:0.08;
+  if((goalMethod==='corner'||goalMethod==='free-kick')&&p.pos==='DEF')pos=isCentreBack(p)?8.8:isWideDefender(p)?1.4:3.2;
+  const aerial=((Number(p.attributes?.strength)||60)*.38+(Number(p.attributes?.positioning)||60)*.30+(Number(p.attributes?.defending)||60)*.18+power*.14);
+  const bonus=(goalMethod==='corner'||goalMethod==='free-kick')&&p.pos==='DEF'?(aerial-60)*.045:0;
+  return {p,w:Math.max(.05,pos+Math.max(0,power-50)*.045+bonus)};
+ });
  const total=weighted.reduce((sum,x)=>sum+x.w,0);let n=rng()*total;
  for(const x of weighted){n-=x.w;if(n<=0)return x.p;}return weighted[weighted.length-1].p;
 }
@@ -3256,12 +3265,20 @@ function recordLowerLeagueMatch(data,division,rowA,rowB,ga,gb,seed,roundNo){
  const rng=seededRandom((seed^0x9E3779B9)>>>0),events=[];
  const sides=[{row:rowA,xi:xiA,goals:ga,side:'A'},{row:rowB,xi:xiB,goals:gb,side:'B'}];
  sides.forEach(team=>{for(let i=0;i<team.goals;i++){
-  const scorer=lowerLeagueGoalScorer(team.xi,rng);if(!scorer)continue;
+  const methodRoll=rng();const goalMethod=methodRoll<.18?(rng()<.70?'corner':'free-kick'):methodRoll<.32?'cross':'open-play';
+  const scorer=lowerLeagueGoalScorer(team.xi,rng,goalMethod);if(!scorer)continue;
   const scorerStat=lowerLeagueStatRow(data,scorer,team.row.name);scorerStat.goals++;scorer.goals=(Number(scorer.goals)||0)+1;addCompetitionStat(scorerStat,division,'goals');addCompetitionStat(scorer,division,'goals');
-  const assistPool=team.xi.filter(p=>String(p.id||p.name)!==String(scorer.id||scorer.name)&&(p.pos==='MID'||p.pos==='ATT'));
+  const assistPool=team.xi.filter(p=>String(p.id||p.name)!==String(scorer.id||scorer.name));
   let assist=null;
-  if(assistPool.length&&rng()<.78){assist=assistPool[Math.floor(rng()*assistPool.length)];const assistStat=lowerLeagueStatRow(data,assist,team.row.name);assistStat.assists++;assist.assists=(Number(assist.assists)||0)+1;addCompetitionStat(assistStat,division,'assists');addCompetitionStat(assist,division,'assists');}
-  events.push({minute:Math.floor(1+rng()*90),side:team.side,type:'goal',scorer:scorer.name,scorerId:scorer.id??null,assist:assist?.name||null});
+  if(assistPool.length&&rng()<.80){
+   if(goalMethod==='cross'){
+    const backs=assistPool.filter(isWideDefender);
+    if(backs.length)assist=backs[Math.floor(rng()*backs.length)];
+   }
+   if(!assist){const weighted=assistPool.map(p=>({p,w:p.pos==='MID'?3.0:p.pos==='ATT'?2.4:isWideDefender(p)?1.1:isCentreBack(p)?.45:.7}));const total=weighted.reduce((sum,x)=>sum+x.w,0);let n=rng()*total;for(const x of weighted){n-=x.w;if(n<=0){assist=x.p;break;}}assist=assist||weighted[weighted.length-1]?.p||null;}
+   if(assist){const assistStat=lowerLeagueStatRow(data,assist,team.row.name);assistStat.assists++;assist.assists=(Number(assist.assists)||0)+1;addCompetitionStat(assistStat,division,'assists');addCompetitionStat(assist,division,'assists');}
+  }
+  events.push({minute:Math.floor(1+rng()*90),side:team.side,type:'goal',scorer:scorer.name,scorerId:scorer.id??null,assist:assist?.name||null,goalMethod});
  }});
  events.sort((a,b)=>a.minute-b.minute);
  data.matchLog.push({round:roundNo,home:rowA.name,away:rowB.name,score:`${ga}–${gb}`,ga,gb,events});
@@ -4490,6 +4507,65 @@ function keeperShotStoppingScore(p){
 function chanceCreationScore(p){
  return clamp(matchAttribute(p,"creativity",60)*.48+matchAttribute(p,"passing",60)*.37+matchAttribute(p,"technique",60)*.15,25,99);
 }
+// v2.83: goal origins and position-aware scoring/assists. Tactical roles are used
+// rather than the broad GK/DEF/MID/ATT category so centre-backs and full-backs behave differently.
+function matchRoleOf(p){return String(p?.assignedRole||p?.matchRole||p?.role||'').toUpperCase();}
+function isWideDefender(p){
+ const role=matchRoleOf(p);if(p?.pos!=='DEF')return false;
+ if(['LB','RB','LWB','RWB'].includes(role))return true;
+ return (p?.naturalPositions||[]).some(r=>['LB','RB','LWB','RWB'].includes(String(r).toUpperCase()));
+}
+function isCentreBack(p){
+ const role=matchRoleOf(p);if(p?.pos!=='DEF')return false;
+ if(['LCB','RCB','CB'].includes(role))return true;
+ return (p?.naturalPositions||[]).some(r=>['LCB','RCB','CB'].includes(String(r).toUpperCase()));
+}
+function sampleGoalMethod(random=Math.random){
+ const roll=random();
+ if(roll<.18)return random()<.70?'corner':'free-kick';
+ if(roll<.32)return 'cross';
+ return 'open-play';
+}
+function goalScorerFor(xi,goalMethod,fallback=null,ratingOf=p=>Number(p?.rating)||60){
+ if(goalMethod!=='corner'&&goalMethod!=='free-kick')return fallback?{name:fallback.name,id:fallback.id??null}:null;
+ const candidates=(xi||[]).filter(p=>p&&p.pos!=='GK');
+ if(!candidates.length)return fallback?{name:fallback.name,id:fallback.id??null}:null;
+ const picked=weightedPick(candidates,candidates.map(p=>{
+  const rating=clamp(Number(ratingOf(p))||60,25,99);
+  const aerial=(matchAttribute(p,'strength',60)*.38+matchAttribute(p,'positioning',60)*.27+matchAttribute(p,'defending',60)*.20+rating*.15);
+  if(isCentreBack(p))return Math.max(1,10+(aerial-60)*.13+(rating-60)*.04);
+  if(isWideDefender(p))return Math.max(.5,1.5+(aerial-60)*.035);
+  if(p.pos==='ATT')return Math.max(.8,2.2+(matchAttribute(p,'finishing',60)-60)*.035+(rating-60)*.025);
+  if(p.pos==='MID')return Math.max(.8,1.9+(matchAttribute(p,'strength',60)-60)*.025+(rating-60)*.02);
+  return Math.max(.8,3.8+(aerial-60)*.06);
+ }));
+ return picked?{name:picked.name,id:picked.id??null}:(fallback?{name:fallback.name,id:fallback.id??null}:null);
+}
+function assistForGoal(xi,scorerId,goalMethod,ratingOf=p=>Number(p?.rating)||60,random=Math.random){
+ const squad=(xi||[]).filter(p=>p&&String(p.id)!==String(scorerId));
+ if(!squad.length)return null;
+ // Some goals are unassisted. Cross goals strongly favour a full-/wing-back when one is on the pitch.
+ const assistChance=(goalMethod==='corner'||goalMethod==='free-kick')?.72:goalMethod==='cross'?.88:.80;
+ if(random()>=assistChance)return null;
+ if(goalMethod==='cross'){
+  const wide=squad.filter(isWideDefender);
+  if(wide.length){const p=weightedPick(wide,wide.map(x=>Math.max(1,(Number(ratingOf(x))||60)*.24+matchAttribute(x,'passing',60)*.42+matchAttribute(x,'creativity',60)*.22+matchAttribute(x,'stamina',60)*.12)));if(p)return {name:p.name,id:p.id??null};}
+ }
+ const picked=weightedPick(squad,squad.map(p=>{
+  const rating=clamp(Number(ratingOf(p))||60,25,99);
+  const creation=chanceCreationScore(p);
+  const role=matchRoleOf(p);
+  let weight;
+  if(goalMethod==='corner'||goalMethod==='free-kick'){
+   weight=p.pos==='MID'?3.0:p.pos==='ATT'?2.3:isWideDefender(p)?1.4:isCentreBack(p)?.75:1.0;
+  }else{
+   weight=p.pos==='MID'?3.2:p.pos==='ATT'?2.4:isWideDefender(p)?.55:isCentreBack(p)?.45:.7;
+  }
+  if(['AM','LM','RM','LW','RW'].includes(role))weight*=1.12;
+  return Math.max(.1,weight*(.65+creation/100*.55)*(0.75+rating/100*.35));
+ }));
+ return picked?{name:picked.name,id:picked.id??null}:null;
+}
 
 function createSeededRandom(seed){
  let state=(Number(seed)>>>0)||0x6d2b79f5;
@@ -4540,11 +4616,7 @@ function simulateMatch(powerA,powerB,homeA,playersA=[],playersB=[],formationA="4
   if(picked)return {name:picked.name,id:picked.id};
   return {name:side==="A"?"Angriper":"Spiss",id:null};
  };
- const assistantFor=(xi,scorerId)=>{
-  const candidates=xi.filter(p=>p.id!==scorerId&&(p.pos==="MID"||p.pos==="ATT"));
-  const picked=weightedPick(candidates,candidates.map(p=>Math.max(1,p.rating-35)*(chanceCreationScore(p)/60)*(p.pos==="MID"?1.2:0.9)));
-  return picked?picked.name:null;
- };
+ const assistantFor=(xi,scorerId,goalMethod)=>assistForGoal(xi,scorerId,goalMethod,p=>Number(p.rating)||60)?.name||null;
  const chanceList=[];
  // Minute-by-minute chance generation. Goal probability depends on chance quality, finishing,
  // relative attack/defence and goalkeeper strength.
@@ -4575,10 +4647,11 @@ function simulateMatch(powerA,powerB,homeA,playersA=[],playersB=[],formationA="4
    let event={minute:m,side,type:"chance",player:shooter?.name||"Angriper",onTarget,quality:+quality.toFixed(2)};
    if(scored){
     scoreA+=side==="A"?1:0;scoreB+=side==="B"?1:0;
-    const scorer=scorerFor(xi,side);
-    const scorerObj=shooter?{name:shooter.name,id:shooter.id}:scorer;
-    const assist=assistantFor(xi,scorerObj.id);
-    event={minute:m,side,type:"goal",scorer:scorerObj.name,scorerId:scorerObj.id,assist,score:`${scoreA}–${scoreB}`,onTarget:true,quality:+quality.toFixed(2)};
+    const goalMethod=sampleGoalMethod();
+    const fallback=shooter?{name:shooter.name,id:shooter.id}:scorerFor(xi,side);
+    const scorerObj=goalScorerFor(xi,goalMethod,fallback,p=>Number(p.rating)||60)||fallback;
+    const assist=assistantFor(xi,scorerObj.id,goalMethod);
+    event={minute:m,side,type:"goal",scorer:scorerObj.name,scorerId:scorerObj.id,assist,goalMethod,score:`${scoreA}–${scoreB}`,onTarget:true,quality:+quality.toFixed(2)};
    }
    chanceList.push(event);
   }
@@ -5057,7 +5130,7 @@ function advanceLiveEngine(engine,minute){
   const chosen=weightedPick(candidates,weights);
   return chosen?{name:chosen.name,id:chosen.id}:{name:"Spiller",id:null};
  };
- const assistFor=(xi,id,side)=>{const candidates=xi.filter(p=>p.id!==id&&(p.pos==="MID"||p.pos==="ATT"));const p=weightedPick(candidates,candidates.map(x=>Math.max(1,effectivePlayerRating(engine,x)-35)*(chanceCreationScore(x)/60)*(x.pos==="MID"?1.2:.9)));return p?.name||null};
+ const assistFor=(xi,id,goalMethod)=>assistForGoal(xi,id,goalMethod,p=>effectivePlayerRating(engine,p))?.name||null;
  for(let i=0;i<chances;i++){
   const side=Math.random()<probA?"A":"B";
   const xi=side==="A"?engine.xiA:engine.xiB;
@@ -5080,9 +5153,11 @@ function advanceLiveEngine(engine,minute){
   const keeperSkill=keeper?keeperShotStoppingScore(keeper):keeperRating;
   const keeperSave=clamp(.32+(keeperSkill-65)*.012,.08,.72);
   if(onTarget&&Math.random()<quality*(1-keeperSave)*1.35){
-   const scorer=shooter?{name:shooter.name,id:shooter.id}:scorerFor(xi,side);
+   const goalMethod=sampleGoalMethod();
+   const fallback=shooter?{name:shooter.name,id:shooter.id}:scorerFor(xi,side);
+   const scorer=goalScorerFor(xi,goalMethod,fallback,p=>effectivePlayerRating(engine,p))||fallback;
    if(side==="A")engine.ga++;else engine.gb++;
-   event.type="goal";event.scorer=scorer.name;event.scorerId=scorer.id;event.assist=assistFor(xi,scorer.id,side);event.score=`${engine.ga}–${engine.gb}`;
+   event.type="goal";event.scorer=scorer.name;event.scorerId=scorer.id;event.goalMethod=goalMethod;event.assist=assistFor(xi,scorer.id,goalMethod);event.score=`${engine.ga}–${engine.gb}`;
    if(scorer.id!=null&&engine.performance[String(scorer.id)])engine.performance[String(scorer.id)].goals++;
    if(event.assist){const assister=xi.find(p=>p.name===event.assist);if(assister&&engine.performance[String(assister.id)])engine.performance[String(assister.id)].assists++}
   }
@@ -5246,6 +5321,9 @@ function matchCommentary(e,c,opp,home){
  const opponent=e.side==="user"?opp.name:c.name;
  const name=e.player||e.scorer||'spilleren';
  if(e.type==="goal"){
+  if(e.goalMethod==='cross'&&e.assist)return `INNLEGG FRA KANTEN! ${e.assist} slår ballen inn fra back-/vingbackposisjon, og ${e.scorer||name} setter den i mål for ${club}!`;
+  if(e.goalMethod==='corner')return `CORNER – MÅL! ${e.scorer||name} kommer seg fri i feltet og stanger/slår ballen i nettet for ${club}${e.assist?`, etter corneren fra ${e.assist}`:''}!`;
+  if(e.goalMethod==='free-kick')return `DØDBALLEN SITTER! Frisparket slås inn, og ${e.scorer||name} header eller styrer ballen i mål for ${club}${e.assist?`, med ${e.assist} som servitør`:''}!`;
   const lines=[
    `MÅÅÅL! ${e.scorer||name} setter den i nettet for ${club}!`,
    `${e.scorer||name} dukker opp når det gjelder – ${club} tar jubelscenene!`,
@@ -5425,7 +5503,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    if(e.type==='injury')handleLiveInjury(engine,e,currentMinute);
    let icon=e.type==='goal'?'⚽':e.type==='yellow'?'<span class="card-yellow"></span>':e.type==='red'?'<span class="card-red"></span>':e.type==='injury'?'<span class=\"injury-cross\" aria-label=\"Skade\">✚</span>':'🎯';
    let title=e.type==='goal'?esc(e.scorer):esc(e.player||(e.type==='chance'?'Avslutning':'Spiller'));
-   let sub=e.type==='goal'?(e.assist?'Mål · Assist: '+esc(e.assist):'Mål'):e.type==='yellow'?'Gult kort · '+esc(e.reason||'Forseelse'):e.type==='red'?(e.secondYellow?'Rødt kort · Andre gule kort':'Rødt kort · '+esc(e.reason||'Utvist')):e.type==='injury'?'Skade':e.type==='chance'?(e.onTarget?'Skudd på mål':'Avslutning utenfor mål'):'Hendelse';
+   let sub=e.type==='goal'?(e.goalMethod==='cross'?'Mål etter innlegg'+(e.assist?' · Innlegg/assist: '+esc(e.assist):''):e.goalMethod==='corner'?'Mål etter corner'+(e.assist?' · Assist: '+esc(e.assist):''):e.goalMethod==='free-kick'?'Mål etter frispark/dødball'+(e.assist?' · Assist: '+esc(e.assist):''):(e.assist?'Mål · Assist: '+esc(e.assist):'Mål')):e.type==='yellow'?'Gult kort · '+esc(e.reason||'Forseelse'):e.type==='red'?(e.secondYellow?'Rødt kort · Andre gule kort':'Rødt kort · '+esc(e.reason||'Utvist')):e.type==='injury'?'Skade':e.type==='chance'?(e.onTarget?'Skudd på mål':'Avslutning utenfor mål'):'Hendelse';
    if(e.type==='goal'){
     goalThisTick=true;
     goalCount++;

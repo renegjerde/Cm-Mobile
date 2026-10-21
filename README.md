@@ -1,3 +1,21 @@
+# CM Mobile v2.83
+
+## Forsvarsmål, innlegg og dødballer
+
+- Forsvarsspillere kan nå score i kampsimuleringen. Midtstoppere prioriteres ved corner og offensive frispark, med styrke, posisjonering, forsvarsegenskaper og ferdighet som utslagsgivende faktorer.
+- Mål får en beregnet opprinnelse: åpent spill, innlegg, corner eller frispark/dødball. Dette påvirker målscorer og assistvalg, ikke sluttresultatet som er simulert separat.
+- Backer og vingbacker er nå med i assistutvalget. Ved mål etter innlegg favoriseres en back/vingback som servitør; de kan også få assists fra oppbyggingsspill, men med lavere vekt enn midtbane og angrep.
+- Endringene gjelder både livekampmotoren, automatiserte kampsimuleringer (inkludert europeiske og innenlandske cuper) og spillerstatistikkene i de simulerte lavere divisjonene.
+- Kampkommentarer og hendelseslisten beskriver nå innlegg, corner og frispark/dødball, slik at det blir tydeligere hvordan et mål oppsto.
+
+## Kontrollert
+
+- JavaScript-syntaks kontrollert med Node.js.
+- Headless Chromium-innlasting forsøkt, men tidsavbrøt før DOM-resultat; nettleserbasert ende-til-ende-test er derfor ikke bekreftet.
+- 10 000 isolerte kampsimuleringer med fast 4-3-3-testtropp ga 2,44 mål per kamp, 11,5 % forsvarsmål (10,1 % midtstoppermål) og 17,3 % mål med back/vingback-assist. Dette er en balanseprøve, ikke en full sesongsimulering eller kalibrering mot en bestemt liga; fysisk mobiltest gjenstår.
+
+---
+
 # CM Mobile v2.82
 
 ## Realistisk skade- og karantenemodell
