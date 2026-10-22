@@ -1,4 +1,14 @@
-# CM Mobile v2.87 — større og mer lesbare spillerkort
+# CM Mobile v2.88 — tydelig kampinformasjon på taktikkvisningen
+
+
+## v2.88 — Tydeligere kampinformasjon
+- La til et eget, fremtredende kampkort på laguttakssiden. Motstander og eget lag vises side om side med klubbmerker.
+- Turnering/divisjon vises som overskrift, og kampens runde/fase, dato og hjemme-/bortestatus vises som tydelige detaljer.
+- Kortet støtter ligakamper, FA Cup, EFL Cup og europeiske ligafaser/sluttspill basert på kampdata som allerede ligger i spillet.
+- Assistentens kampplan viser taktisk informasjon separat, slik at motstander og turnering ikke lenger er gjemt i en liten metatekst.
+- Ingen endring i kampmotor, turneringsoppsett, spillerroller eller laguttakslogikk.
+- JavaScript-syntaks kontrollert; full visuell nettlesertest er ikke bekreftet.
+
 
 ## v2.87 — Lesbarhet på taktikkbanen
 - Gjort spillerkortene større i alle formasjoner: større kortbredde, initialsirkel, spillernavn, vurdering, rolle og rollepassform.
