@@ -204,3 +204,12 @@ See `DOMESTIC_CUPS_REALISM_v2.80.md` for format assumptions, official 2026/27 re
 - Rollevelgeren følger valgt posisjon; ingen falsk keeperseleksjon når ingen spiller er valgt.
 - Spillerbytte velges fra liste; eksisterende startspillere bytter slot, reserver erstatter valgt starter.
 - Avspark-knappen er flyttet opp i toppkortet. Assistenten fortsetter å velge anbefalt ellever automatisk per ny kampuke.
+
+
+## v2.90 – Full sesongoppsummering
+
+- Sesongoppsummeringen viser prestasjoner i liga, FA Cup, Carabao Cup og europacupene spilleren faktisk deltok i.
+- Spillerstatistikk viser kamper, minutter, mål, assists, sjanser skapt, gule kort og røde kort for hele troppen.
+- Europa-kvalifiseringen tar hensyn til FA Cup- og Carabao Cup-vinnere, uten å tildele samme klubb flere engelske plasser.
+- Opprykksoversikten viser direkte opprykk og de faktiske playoffplassene fra Championship, League One og League Two før sesongbyttet.
+- Sluttskjermen bruker klubbens aktive divisjon i stedet for hardkodet Premier League.

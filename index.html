@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.89 — Touchline</title>
+<title>CM Mobile v2.90 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -438,7 +438,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.87</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.90</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -4351,21 +4351,137 @@ function leaguePlayerStats(){
 }
 
 
+function seasonReviewTableForDivision(division){
+ if(division===(appState.activeDivision||clubDivision(currentClub())))return sortedTable();
+ if(division==='Premier League'){
+  return CLUBS.filter(c=>clubDivision(c)==='Premier League').map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0})).sort((a,b)=>b.strength-a.strength||a.name.localeCompare(b.name));
+ }
+ const data=appState.lowerLeagues?.[division];
+ return [...(data?.rows||[])].sort((a,b)=>(Number(b.pts)||0)-(Number(a.pts)||0)||((Number(b.gf)||0)-(Number(b.ga)||0))-((Number(a.gf)||0)-(Number(a.ga)||0))||(Number(b.strength)||0)-(Number(a.strength)||0));
+}
+function seasonReviewScore(result){
+ if(Number.isFinite(result?.homeGoals)&&Number.isFinite(result?.awayGoals))return {home:Number(result.homeGoals),away:Number(result.awayGoals)};
+ const m=String(result?.score||'').match(/^(\d+)\s*[–-]\s*(\d+)/);return m?{home:Number(m[1]),away:Number(m[2])}:null;
+}
+function seasonReviewMatchRecord(results,clubName){
+ const games=(results||[]).filter(r=>r&&(r.home===clubName||r.away===clubName));let gf=0,ga=0,w=0,d=0,l=0;
+ games.forEach(r=>{const score=seasonReviewScore(r);if(!score)return;const home=r.home===clubName,forGoals=home?score.home:score.away,against=home?score.away:score.home;gf+=forGoals;ga+=against;if(forGoals>against)w++;else if(forGoals<against)l++;else d++;});
+ return {games:games.length,gf,ga,w,d,l};
+}
+function seasonReviewResultLine(record){
+ if(!record||!record.games)return 'Ingen kamper registrert ennå';
+ return `${record.games} kamper · ${record.w} seire, ${record.d} uavgjort, ${record.l} tap · ${record.gf}–${record.ga} mål`;
+}
+function seasonReviewDomesticCupMarkup(name){
+ const cup=appState.cupCompetitions?.[name],clubName=currentClub().name;
+ const displayName=name==='EFL Cup'?'Carabao Cup':name;
+ if(!cup)return `<div class="player"><div><strong>${esc(displayName)}</strong><div class="player-meta">Ingen turneringsdata tilgjengelig</div></div><span class="pill">Ukjent</span></div>`;
+ const results=(cup.results||[]).filter(r=>r&&(r.home===clubName||r.away===clubName));
+ const remains=(cup.teams||[]).some(t=>t?.name===clubName);
+ const record=seasonReviewMatchRecord(results,clubName);
+ let status='Deltok ikke';
+ if(cup.champion===clubName)status='Turneringsvinner';
+ else if(results.length&&!remains){const last=results[results.length-1];const round=Number(last.round)||Number(cup.round)||1;status=`Utslått · ${cupRoundLabel(name,round)}`;}
+ else if(results.length&&remains)status='Fortsatt med i turneringen';
+ else if(remains)status='Deltar · ingen kamp registrert';
+ const badge=cup.champion===clubName?'green':results.length?'':'muted';
+ const stageText=cup.champion===clubName?`Vant ${displayName}`:status;
+ return `<div class="player"><div style="flex:1;min-width:0"><strong>${esc(displayName)}</strong><div class="player-meta">${esc(stageText)}</div><div class="muted" style="font-size:12px;margin-top:3px">${esc(seasonReviewResultLine(record))}</div></div><span class="pill ${badge==='green'?'green':''}">${cup.champion===clubName?'Vinner':results.length?'Spilt':'Status'}</span></div>`;
+}
+function seasonReviewEuropeanMarkup(name){
+ const comp=appState.europeanCompetitions?.[name],clubName=currentClub().name;
+ if(!comp)return `<div class="player"><div style="flex:1"><strong>${esc(name)}</strong><div class="player-meta">Ingen turneringsdata registrert</div></div><span class="pill">—</span></div>`;
+ const teamKnown=(comp.teams||[]).some(t=>t?.name===clubName)||!!(comp.table||[]).some(t=>t?.name===clubName)||(comp.results||[]).some(r=>r&&(r.home===clubName||r.away===clubName));
+ const results=(comp.results||[]).filter(r=>r&&(r.home===clubName||r.away===clubName));
+ const record=seasonReviewMatchRecord(results,clubName);
+ const tableRow=(comp.table||[]).find(t=>t.name===clubName),rank=tableRow?[...comp.table].sort((a,b)=>(Number(b.pts)||0)-(Number(a.pts)||0)||(Number(b.gd)||0)-(Number(a.gd)||0)||(Number(b.gf)||0)-(Number(a.gf)||0)).findIndex(t=>t.name===clubName)+1:0;
+ const activeStage=comp.knockout?.activeStage;
+ const namesInTie=t=>[t?.team1?.name,t?.team2?.name,t?.firstHome?.name,t?.firstAway?.name,t?.team?.name].filter(Boolean).includes(clubName);
+ const activeTie=(activeStage?.ties||[]).find(namesInTie);
+ let status='Deltok ikke',badge='';
+ if(comp.champion===clubName){status='Vant turneringen';badge='green';}
+ else if(activeTie){status=`${activeStage.name||'Sluttspill'} pågår${Number(activeStage.leg)===2?' · returoppgjør':activeStage.key==='final'?' · finale':''}`;}
+ else {
+  const lastKnockout=[...results].reverse().find(r=>r.isEuropeanKnockout&&r.knockoutStageName);
+  if(lastKnockout&&lastKnockout.tieWinner&&lastKnockout.tieWinner!==clubName){status=`Utslått · ${lastKnockout.knockoutStageName}`;}
+  else if(lastKnockout&&lastKnockout.tieWinner===clubName){status=`Videre fra ${lastKnockout.knockoutStageName}`;}
+  else if(comp.leaguePhaseComplete&&tableRow){
+   if(rank<=8)status=`Ligafase: ${rank}. plass · direkte til åttedelsfinale`;
+   else if(rank<=24)status=`Ligafase: ${rank}. plass · playoffplass`;
+   else status=`Ligafase: ${rank}. plass · slått ut`;
+  }else if(tableRow&&Number(tableRow.played)>0)status=`Ligafase pågår · ${rank}. plass, ${Number(tableRow.pts)||0} poeng`;
+  else if(teamKnown)status='Kvalifisert · ingen kamp registrert';
+ }
+ if(!teamKnown&&!results.length&&comp.champion!==clubName)status='Deltok ikke';
+ return `<div class="player"><div style="flex:1;min-width:0"><strong>${esc(name)}</strong><div class="player-meta">${esc(status)}</div><div class="muted" style="font-size:12px;margin-top:3px">${esc(seasonReviewResultLine(record))}${tableRow?` · ${Number(tableRow.pts)||0} poeng i ligafasen`:''}</div></div><span class="pill ${badge==='green'?'green':''}">${badge==='green'?'Vinner':results.length?'Spilt':teamKnown?'Kvalifisert':'—'}</span></div>`;
+}
+function seasonReviewTournamentMarkup(){
+ const clubName=currentClub().name,division=clubDivision(currentClub()),table=sortedTable(),position=table.findIndex(t=>t.name===clubName)+1,rec=currentClubRecord();
+ const leagueRecord={games:Number(rec.p)||Number(rec.w||0)+Number(rec.d||0)+Number(rec.l||0),gf:Number(rec.gf)||0,ga:Number(rec.ga)||0,w:Number(rec.w)||0,d:Number(rec.d)||0,l:Number(rec.l)||0};
+ const europeanNames=['Champions League','Europa League','Conference League'];
+ return `<section class="card"><div class="section-title"><h2>Prestasjoner i alle turneringer</h2><span class="pill">${esc(seasonLabel())}</span></div>
+ <div class="player"><div style="flex:1;min-width:0"><strong>${esc(division)}</strong><div class="player-meta">${position?`${position}. plass av ${table.length} lag`: 'Plassering ikke tilgjengelig'} · ${Number(rec.pts)||0} poeng</div><div class="muted" style="font-size:12px;margin-top:3px">${esc(seasonReviewResultLine(leagueRecord))} · Målforskjell ${leagueRecord.gf-leagueRecord.ga>0?'+':''}${leagueRecord.gf-leagueRecord.ga}</div></div><span class="pill green">Ligasesong</span></div>
+ <div class="section-title" style="margin-top:16px"><h3>Nasjonale cuper</h3><small>FA Cup · Carabao Cup</small></div>${seasonReviewDomesticCupMarkup('FA Cup')}${seasonReviewDomesticCupMarkup('EFL Cup')}
+ <div class="section-title" style="margin-top:16px"><h3>Europacup</h3><small>Turneringsfase og resultat</small></div>${europeanNames.map(seasonReviewEuropeanMarkup).join('')}
+ </section>`;
+}
+function seasonReviewPlayerStatsMarkup(){
+ const keys=[['apps','Kamper'],['minutes','Minutter'],['goals','Mål'],['assists','Assists'],['chancesCreated','Sjanser skapt'],['yellowCards','Gule'],['redCards','Røde']];
+ const players=[...(appState.squad||[])].sort((a,b)=>(Number(b.apps)||0)-(Number(a.apps)||0)||(Number(b.goals)||0)-(Number(a.goals)||0)||(Number(b.assists)||0)-(Number(a.assists)||0)||String(a.name).localeCompare(String(b.name)));
+ const used=players.filter(p=>keys.some(([key])=>(Number(p[key])||0)>0));
+ return `<section class="card"><div class="section-title"><h2>Spillerstatistikk · ${esc(currentClub().name)}</h2><span class="pill">${used.length} spillere med statistikk</span></div><p class="muted" style="margin-top:-4px">Tallene summerer registrerte kamper i liga, cuper og europacuper denne sesongen.</p>${used.length?`<div class="table-wrap"><table><thead><tr><th>Spiller</th>${keys.map(([k,label])=>`<th>${label}</th>`).join('')}</tr></thead><tbody>${used.map(p=>`<tr><td><strong>${esc(p.name)}</strong><div class="muted" style="font-size:11px">${esc(p.pos||'')}</div></td>${keys.map(([k])=>`<td>${Number(p[k])||0}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:'<p class="muted">Det finnes ingen spillerstatistikk registrert for denne sesongen.</p>'}<div class="notice">Kamper og minutter er basert på det spillet har registrert. Kort og sjanser skapt vises der det finnes data; statistikk fra tidligere versjoner rekonstrueres ikke.</div></section>`;
+}
+function seasonReviewEuropeanPlaces(table=sortedTable()){
+ const isActivePremier=clubDivision(currentClub())==='Premier League';
+ const premierTable=isActivePremier?(table||[]).filter(r=>CLUBS.some(c=>c.name===r.name&&clubDivision(c)==='Premier League')).map(r=>r.name):CLUBS.filter(c=>clubDivision(c)==='Premier League').sort((a,b)=>(Number(b.strength)||0)-(Number(a.strength)||0)||a.name.localeCompare(b.name)).map(c=>c.name);
+ const validPremier=name=>CLUBS.some(c=>c.name===name&&clubDivision(c)==='Premier League');
+ const faWinner=appState.cupCompetitions?.['FA Cup']?.champion||null,eflWinner=appState.cupCompetitions?.['EFL Cup']?.champion||null;
+ const used=new Set();
+ const pick=(preferred,count)=>{const out=[];for(const n of [...preferred,...premierTable]){if(!n||used.has(n)||!validPremier(n))continue;used.add(n);out.push(n);if(out.length>=count)break;}return out;};
+ const championsLeague=pick(premierTable.slice(0,5),5);
+ const europaLeague=pick([...(faWinner&&validPremier(faWinner)?[faWinner]:[]),...premierTable.slice(5)],3);
+ const conferenceLeague=pick([...(eflWinner&&validPremier(eflWinner)?[eflWinner]:[]),...premierTable.slice(5)],1);
+ return {championsLeague,europaLeague,conferenceLeague,faWinner,eflWinner,source:isActivePremier?'endelig Premier League-tabell':'anslag basert på klubbnivå fordi Premier League ikke er den aktive ligaen'};
+}
+function seasonReviewEuropeanPlacesMarkup(){
+ const places=seasonReviewEuropeanPlaces(),isActivePremier=clubDivision(currentClub())==='Premier League';
+ const line=(name,teams)=>`<div class="player"><div style="flex:1"><strong>${name}</strong><div class="player-meta">${teams.length?teams.map(esc).join(' · '):'Ingen lag fordelt'}</div></div></div>`;
+ const noteWinner=(cup,winner,league)=>{if(!winner)return '';const alreadyHigher=places.championsLeague.includes(winner)||(league==='conferenceLeague'&&places.europaLeague.includes(winner));const receivesSlot=places[league].includes(winner);const note=alreadyHigher?' er allerede kvalifisert til en høyere turnering; plassen går videre til neste kvalifiserte lag.':receivesSlot?' er med blant de kvalifiserte til '+(league==='europaLeague'?'Europa League':'Conference League')+'.':' påvirker ikke den viste fordelingen fordi klubben ikke er blant de engelske ligalagene i denne beregningen.';return `<p class="muted" style="font-size:12px;margin:4px 0 8px">${esc(cup)}: ${esc(winner)}${note}</p>`;};
+ return `<section class="card"><div class="section-title"><h2>Europa-kvalifisering</h2><span class="pill">${isActivePremier?'Basert på sluttabell og cupvinnere':'Anslag'}</span></div>${line('Champions League',places.championsLeague)}${line('Europa League',places.europaLeague)}${line('Conference League',places.conferenceLeague)}${noteWinner('FA Cup-vinner',places.faWinner,'europaLeague')}${noteWinner('Carabao Cup-vinner',places.eflWinner,'conferenceLeague')}${isActivePremier?'':'<div class="notice">Premier League-tabellen simuleres ikke som en egen aktiv liga i denne karrieren. Europaplassene er derfor et styrkeanslag, ikke en endelig ligaberegning.</div>'}</section>`;
+}
+function seasonReviewPromotionMarkup(){
+ const definitions=[
+  {division:'Championship',destination:'Premier League',automatic:2,playoffStart:3,playoffEnd:8},
+  {division:'League One',destination:'Championship',automatic:2,playoffStart:3,playoffEnd:6},
+  {division:'League Two',destination:'League One',automatic:3,playoffStart:4,playoffEnd:7}
+ ];
+ const section=definitions.map(def=>{
+  const rows=seasonReviewTableForDivision(def.division),data=appState.lowerLeagues?.[def.division];
+  const matchesAvailable=def.division===(appState.activeDivision||clubDivision(currentClub()))?rows.some(r=>(Number(r.p)||0)>0):Number(data?.playedRounds)>0;
+  if(!rows.length||!matchesAvailable)return `<div class="player"><div style="flex:1"><strong>${esc(def.division)} → ${esc(def.destination)}</strong><div class="player-meta">Tabellresultater er ikke tilgjengelige ennå.</div></div></div>`;
+  const direct=rows.slice(0,def.automatic).map(r=>r.name),playoff=rows.slice(def.playoffStart-1,def.playoffEnd).map(r=>r.name);
+  return `<div class="player"><div style="flex:1;min-width:0"><strong>${esc(def.division)} → ${esc(def.destination)}</strong><div class="player-meta"><b>Direkte opprykk:</b> ${direct.length?direct.map(esc).join(' · '):'—'}</div><div class="player-meta" style="margin-top:4px"><b>Playoffplasser:</b> ${playoff.length?playoff.map((n,i)=>`${i+def.playoffStart}. ${esc(n)}`).join(' · '):'—'}</div></div></div>`;
+ }).join('');
+ return `<section class="card"><div class="section-title"><h2>Opprykksoversikt</h2><span class="pill">EFL · før sesongbytte</span></div>${section}<p class="muted" style="font-size:12px;margin:8px 0 0">Direkte opprykk følger tabellplassering. Playoffplassene vises separat; spillet avgjør playoffvinnerne når neste sesong klargjøres.</p></section>`;
+}
 function seasonSummary(){
  if(!seasonCompleted())return `<div class="hero"><div class="eyebrow">Season centre</div><h1>Sesongen pågår</h1><p>Spill ferdig alle rundene før sesongoppsummeringen er tilgjengelig.</p><button class="primary" onclick="setPage('home')">Tilbake til oversikten</button></div>`;
- const table=sortedTable(),record=currentClubRecord(),rank=table.findIndex(t=>t.name===currentClub().name)+1;
- const leaders=[...appState.squad].sort((a,b)=>(b.goals||0)-(a.goals||0)||(b.assists||0)-(a.assists||0));
- const scorer=leaders[0];
- const resultLabel=rank===1?"Seriemester!":rank<=4?"En sterk sesong!":rank<=6?"En solid plassering.":rank>=activeLeagueClubs().length-2?"En tøff sesong.":"Sesongen er over.";
- return `<div class="hero"><div class="hero-mark">🏆</div><div class="eyebrow">Season review · ${seasonLabel()}</div><h1>${resultLabel}</h1><p>${esc(currentClub().name)} avslutter sesongen på ${rank}. plass i Premier League.</p><div class="hero-actions"><button class="primary" onclick="startNewSeason()">Start ny sesong →</button><button onclick="setPage('home')">Til oversikten</button></div></div>
- <div class="grid"><div class="stat"><small>Sluttplass</small><strong>${rank}. <span class="muted" style="font-size:12px">/ ${activeLeagueClubs().length}</span></strong></div><div class="stat"><small>Poeng</small><strong>${record.pts}</strong></div><div class="stat"><small>Seire · Uavgjort · Tap</small><strong>${record.w}–${record.d}–${record.l}</strong></div><div class="stat"><small>Målforskjell</small><strong>${record.gf-record.ga>0?"+":""}${record.gf-record.ga}</strong></div></div>
- ${panel("Seriemester",`<div class="row"><div class="club"><div class="crest">🏆</div><div><h3>${esc(table[0].name)}</h3><p>${table[0].w} seire · ${table[0].pts} poeng</p></div></div><span class="pill green">1. plass</span></div>`)}
- ${panel("Sesongens toppscorer i klubben",scorer?`<div class="row"><div><strong>${esc(scorer.name)}</strong><div class="muted" style="font-size:12px">${playerAgeText(scorer)} · ${scorer.apps||0} kamper · ${scorer.assists||0} assist</div></div><div class="rating">${scorer.goals||0} mål</div></div>`:`<div class="muted">Ingen spillerstatistikk tilgjengelig.</div>`)}
- ${panel("Karrierearkiv",`<div class="grid"><div class="stat"><small>Arkiverte sesonger</small><strong>${(appState.squad||[]).reduce((m,p)=>Math.max(m,(p.careerHistory||[]).length),0)}</strong></div><div class="stat"><small>Karrieremål · ${scorer?esc(scorer.name):'Ingen spiller'}</small><strong>${scorer?((Number(scorer.careerStats?.goals)||0)+(Number(scorer.goals)||0)):0}</strong></div></div><div class="muted">Sesongstatistikk arkiveres ved overgang til ny sesong. Spillere beholder karrieretall når de bytter klubb.</div>`)}
- <div class="section-title"><h2>Endelig ligatabell</h2><small>${seasonLabel()}</small></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>V</th><th>U</th><th>T</th><th>MF</th><th>P</th></tr></thead><tbody>${table.map((r,i)=>`<tr class="${r.name===currentClub().name?"you":""}"><td>${i+1}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf-r.ga>0?"+":""}${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join("")}</tbody></table></div>
- <section class="card"><div class="section-title"><h2>Europa-kvalifisering</h2><span class="pill">Basert på ligaplassering</span></div><div class="player"><div><strong>Champions League</strong><div class="player-meta">${(appState.lastSeasonSummary?.europeanPlaces?.championsLeague||table.slice(0,4).map(x=>x.name)).map(esc).join(' · ')}</div></div></div><div class="player"><div><strong>Europa League</strong><div class="player-meta">${(appState.lastSeasonSummary?.europeanPlaces?.europaLeague||table.slice(4,5).map(x=>x.name)).map(esc).join(' · ')}</div></div></div><div class="player"><div><strong>Conference League</strong><div class="player-meta">${(appState.lastSeasonSummary?.europeanPlaces?.conferenceLeague||table.slice(5,6).map(x=>x.name)).map(esc).join(' · ')}</div></div></div></section>
- <section class="card"><div class="section-title"><h2>Opprykksoversikt</h2><span class="pill">EFL</span></div>${Object.entries(appState.lastSeasonSummary?.promoted||{}).map(([div,names])=>`<div class="player"><div><strong>${div==='toChampionship'?'Til Championship':div==='toLeagueOne'?'Til League One':'Til League Two'}</strong><div class="player-meta">${names.map(esc).join(' · ')||'Tabell ikke tilgjengelig'}</div></div></div>`).join('')}</section>
- <div class="notice">Når du starter neste sesong, beholdes klubben, troppen, spillernes ferdigheter og overgangsbudsjettet. Sesongstatistikken nullstilles, og spillerne blir ett år eldre. Europa-plassene og opprykksoversikten registreres i sesongrapporten; opprykk og nedrykk gjennomføres automatisk, inkludert playoff-vinnere i alle tre EFL-divisjonene.</div><button class="primary" style="width:100%;margin:6px 0 18px" onclick="startNewSeason()">Start ${Number(appState.seasonYear)+1}/${String(Number(appState.seasonYear)+2).slice(-2)}-sesongen →</button>`;
+ const table=sortedTable(),record=currentClubRecord(),division=clubDivision(currentClub()),rank=table.findIndex(t=>t.name===currentClub().name)+1;
+ const leaders=[...(appState.squad||[])].sort((a,b)=>(Number(b.goals)||0)-(Number(a.goals)||0)||(Number(b.assists)||0)-(Number(a.assists)||0));
+ const scorer=leaders[0],assistLeader=[...(appState.squad||[])].sort((a,b)=>(Number(b.assists)||0)-(Number(a.assists)||0)||(Number(b.goals)||0)-(Number(a.goals)||0))[0];
+ const appearanceLeader=[...(appState.squad||[])].sort((a,b)=>(Number(b.apps)||0)-(Number(a.apps)||0))[0];
+ const resultLabel=rank===1?'Seriemester!':rank<=4?'En sterk sesong!':rank<=6?'En solid plassering.':rank>=table.length-2?'En tøff sesong.':'Sesongen er over.';
+ return `<div class="hero"><div class="hero-mark">🏆</div><div class="eyebrow">Season review · ${esc(seasonLabel())}</div><h1>${resultLabel}</h1><p>${esc(currentClub().name)} avslutter sesongen på ${rank}. plass i ${esc(division)}.</p><div class="hero-actions"><button class="primary" onclick="startNewSeason()">Start ny sesong →</button><button onclick="setPage('home')">Til oversikten</button></div></div>
+ <div class="grid"><div class="stat"><small>Sluttplass</small><strong>${rank}. <span class="muted" style="font-size:12px">/ ${table.length}</span></strong></div><div class="stat"><small>Poeng</small><strong>${Number(record.pts)||0}</strong></div><div class="stat"><small>Seire · Uavgjort · Tap</small><strong>${record.w}–${record.d}–${record.l}</strong></div><div class="stat"><small>Målforskjell</small><strong>${record.gf-record.ga>0?'+':''}${record.gf-record.ga}</strong></div></div>
+ ${panel('Seriemester',`<div class="row"><div class="club"><div class="crest">🏆</div><div><h3>${esc(table[0]?.name||'Ukjent')}</h3><p>${table[0]?.w||0} seire · ${table[0]?.pts||0} poeng</p></div></div><span class="pill green">1. plass</span></div>`)}
+ <section class="card"><div class="section-title"><h2>Individuelle høydepunkter</h2><span class="pill">${esc(division)}</span></div><div class="grid"><div class="stat"><small>Toppscorer</small><strong>${scorer?esc(scorer.name):'—'}</strong><span>${scorer?`${Number(scorer.goals)||0} mål`:''}</span></div><div class="stat"><small>Flest assists</small><strong>${assistLeader?esc(assistLeader.name):'—'}</strong><span>${assistLeader?`${Number(assistLeader.assists)||0} assists`:''}</span></div><div class="stat"><small>Flest kamper</small><strong>${appearanceLeader?esc(appearanceLeader.name):'—'}</strong><span>${appearanceLeader?`${Number(appearanceLeader.apps)||0} kamper`:''}</span></div></div></section>
+ ${seasonReviewTournamentMarkup()}
+ ${seasonReviewPlayerStatsMarkup()}
+ ${panel('Karrierearkiv',`<div class="grid"><div class="stat"><small>Arkiverte sesonger</small><strong>${(appState.squad||[]).reduce((m,p)=>Math.max(m,(p.careerHistory||[]).length),0)}</strong></div><div class="stat"><small>Karrieremål · ${scorer?esc(scorer.name):'Ingen spiller'}</small><strong>${scorer?((Number(scorer.careerStats?.goals)||0)+(Number(scorer.goals)||0)):0}</strong></div></div><div class="muted">Sesongstatistikk arkiveres ved overgang til ny sesong. Spillere beholder karrieretall når de bytter klubb.</div>`)}
+ <div class="section-title"><h2>Endelig ligatabell · ${esc(division)}</h2><small>${esc(seasonLabel())}</small></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>V</th><th>U</th><th>T</th><th>MF</th><th>P</th></tr></thead><tbody>${table.map((r,i)=>`<tr class="${r.name===currentClub().name?'you':''}"><td>${i+1}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.gf-r.ga>0?'+':''}${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join('')}</tbody></table></div>
+ ${seasonReviewEuropeanPlacesMarkup()}
+ ${seasonReviewPromotionMarkup()}
+ <div class="notice">Når du starter neste sesong, beholdes klubben, troppen, spillernes ferdigheter og overgangsbudsjettet. Sesongstatistikken nullstilles, spillerne blir ett år eldre, og opprykk/nedrykk gjennomføres automatisk. Oversikten over playofflagene viser hvilke lag som kvalifiserte seg til playoff før sesongbyttet.</div><button class="primary" style="width:100%;margin:6px 0 18px" onclick="startNewSeason()">Start ${Number(appState.seasonYear)+1}/${String(Number(appState.seasonYear)+2).slice(-2)}-sesongen →</button>`;
 }
 function processCareerAgeing(){
  const season=Number(appState.seasonYear)||2026;
@@ -4464,8 +4580,8 @@ function startNewSeason(){
  if(!confirm(`Starte sesongen ${Number(appState.seasonYear)+1}/${String(Number(appState.seasonYear)+2).slice(-2)}? Klubben og troppen beholdes, mens tabell og sesongstatistikk nullstilles.`))return;
  const finalTable=sortedTable();
  awardLeaguePositionPrize(finalTable);
- appState.lastSeasonSummary={season:seasonLabel(),division:clubDivision(currentClub()),club:currentClub().name,rank:finalTable.findIndex(t=>t.name===currentClub().name)+1,champion:finalTable[0].name,points:currentClubRecord().pts,cupWinners:Object.fromEntries(Object.entries(appState.cupCompetitions||{}).map(([k,v])=>[k,v.champion])),europeanWinners:Object.fromEntries(Object.entries(appState.europeanCompetitions||{}).map(([k,v])=>[k,v.champion]))};
- const lower=appState.lowerLeagues||{};const sortedLower={};Object.entries(lower).forEach(([div,data])=>{sortedLower[div]=[...data.rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));});const financeRankings={};[...finalTable,...Object.values(sortedLower).flat()].forEach((row,i,allRows)=>{});for(const [div,rows] of Object.entries({'Premier League':finalTable,...sortedLower})){rows.forEach((row,i)=>financeRankings[row.name]={rank:i+1,total:rows.length,division:div});}const pl=finalTable;appState.lastSeasonSummary.promoted={toChampionship:[],toLeagueOne:[],toLeagueTwo:[]};appState.lastSeasonSummary.europeanPlaces={championsLeague:pl.slice(0,5).map(x=>x.name),europaLeague:pl.slice(5,8).map(x=>x.name),conferenceLeague:pl.slice(8,9).map(x=>x.name)};
+ appState.lastSeasonSummary={season:seasonLabel(),division:clubDivision(currentClub()),club:currentClub().name,rank:finalTable.findIndex(t=>t.name===currentClub().name)+1,champion:finalTable[0]?.name||'Ukjent',points:currentClubRecord().pts,cupWinners:Object.fromEntries(Object.entries(appState.cupCompetitions||{}).map(([k,v])=>[k,v.champion])),europeanWinners:Object.fromEntries(Object.entries(appState.europeanCompetitions||{}).map(([k,v])=>[k,v.champion]))};
+ const lower=appState.lowerLeagues||{};const sortedLower={};Object.entries(lower).forEach(([div,data])=>{sortedLower[div]=[...data.rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));});const financeRankings={};[...finalTable,...Object.values(sortedLower).flat()].forEach((row,i,allRows)=>{});for(const [div,rows] of Object.entries({'Premier League':finalTable,...sortedLower})){rows.forEach((row,i)=>financeRankings[row.name]={rank:i+1,total:rows.length,division:div});}appState.lastSeasonSummary.promoted={toChampionship:[],toLeagueOne:[],toLeagueTwo:[]};appState.lastSeasonSummary.europeanPlaces=seasonReviewEuropeanPlaces(finalTable);
  const careerArchiveResult=archivePlayerSeasonStats();appState.lastSeasonSummary.careerArchive=careerArchiveResult;
  const movement=moveClubsBetweenDivisions();
  appState.lastSeasonSummary.movement=movement;appState.lastSeasonSummary.promoted={toChampionship:[...(movement.promoted?.Championship||[])],toLeagueOne:[...(movement.promoted?.['League One']||[])],toLeagueTwo:[...(movement.promoted?.['League Two']||[])]};
@@ -5881,7 +5997,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.87 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.90 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 document.getElementById("saveBtn").addEventListener("click",()=>{const ok=save();let b=document.getElementById("saveBtn");b.textContent=ok?"✓ Lagret":"⚠ Lagring feilet";setTimeout(()=>b.textContent="▣ Lagre",1800)});
