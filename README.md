@@ -1,4 +1,11 @@
-# CM Mobile v2.93 — Sorterbar spillerstatistikk
+# CM Mobile v2.94 — Justert O/N-merke i ligatabeller
+
+## v2.94 — Renere plassering av opprykks-/nedrykksstatus
+- O- og N-merker vises nå visuelt til venstre for plasseringstallet i divisjonstabeller, hovedtabellen og sesongens endelige ligatabell.
+- Statusmerket legges i en fast posisjon i første celle, slik at tallet ikke flytter seg sidelengs når en klubb blir matematisk klar for opprykk eller nedrykk.
+- Ingen endringer i beregningen av tabellplassering, opprykk, playoff eller nedrykk.
+
+# CM Mobile v2.94 — Justert O/N-merke i ligatabeller
 
 ## v2.93 — Klikkbare sorteringskolonner
 - Spillerstatistikken på sesongoppsummeringen kan sorteres ved å klikke på alle kolonneoverskriftene: spiller, kamper, minutter, mål, assists, sjanser skapt, gule kort og røde kort.
