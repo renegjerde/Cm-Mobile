@@ -52,6 +52,24 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .home-next .home-next-action{width:100%;margin-top:12px}
 .home-section{margin-top:12px}.home-section .section-title{margin-top:14px}
 .home-news-row{padding:9px 0;border-bottom:1px solid #26364a;font-size:12px}.home-news-row:last-child{border-bottom:0}
+
+.home-important-alerts{margin:0 0 12px;border:1px solid #5a4a2e;border-radius:14px;background:linear-gradient(110deg,rgba(60,46,27,.45),rgba(20,32,51,.96));padding:13px}
+.home-important-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.home-important-head h2{margin:0;font-size:15px;display:flex;align-items:center;gap:8px}
+.home-important-count{font-size:10px;font-weight:850;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:5px 8px;background:#553823;color:#ffd38a;white-space:nowrap}
+.home-alert-list{display:grid;gap:8px}
+.home-alert{display:flex;align-items:flex-start;gap:10px;padding:11px;border-radius:10px;border:1px solid #3b4c60;background:rgba(17,29,45,.82);min-width:0}
+.home-alert.urgent{border-color:#8b5731;background:rgba(75,45,25,.36)}
+.home-alert-icon{flex:0 0 30px;height:30px;display:grid;place-items:center;border-radius:8px;background:#263a50;font-size:16px}
+.home-alert.urgent .home-alert-icon{background:#653d24}
+.home-alert-copy{min-width:0;flex:1}
+.home-alert-copy strong{display:block;font-size:12px;font-weight:850;line-height:1.4;color:#f1f5fb}
+.home-alert-copy p{margin:3px 0 0;font-size:11px;color:#b8c8d9;line-height:1.45;overflow-wrap:anywhere}
+.home-alert-actions{display:flex;flex-direction:column;gap:5px;flex:0 0 auto}
+.home-alert-actions button{font-size:11px;padding:7px 9px;min-height:30px;white-space:nowrap}
+.home-alert-label{display:block;font-size:9px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:#ffcb7f;margin-bottom:3px}
+.home-alert.unread .home-alert-copy strong:after{content:' NY';font-size:9px;color:#9be27d;margin-left:5px}
+@media(max-width:420px){.home-alert{flex-wrap:wrap}.home-alert-actions{width:100%;flex-direction:row}.home-alert-actions button{flex:1}}
 @media(min-width:600px){.home-hero{padding:20px}.home-metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.home-primary{width:auto}.home-hero-actions{display:flex;gap:8px}.home-hero-actions .home-primary{flex:1}}
 
 
@@ -450,7 +468,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.96</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.97</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -1763,6 +1781,69 @@ function movementMarkup(change){
 }
 function panel(title,body,right=""){return `<div class="section-title"><h2>${title}</h2>${right}</div><section class="card">${body}</section>`}
 function getNextOpponentIndex(){ensureFixtures();let r=appState.fixtures.find(f=>f.round===appState.week&&!f.played);if(!r){const ids=activeLeagueClubIndices();return ids[(ids.indexOf(appState.club)+1)%ids.length]}let g=r.games.find(x=>x.includes(appState.club));const ids=activeLeagueClubIndices();return g?(g[0]===appState.club?g[1]:g[0]):ids[(ids.indexOf(appState.club)+1)%ids.length]}
+function queueManagerNotification(id,title,message,page='home',severity='normal'){
+ if(!Array.isArray(appState.managerNotifications))appState.managerNotifications=[];
+ if(appState.managerNotifications.some(n=>n.id===id))return;
+ appState.managerNotifications.push({id,title,message,page,severity,read:false,createdAt:Date.now()});
+ if(appState.managerNotifications.length>60)appState.managerNotifications=appState.managerNotifications.slice(-60);
+}
+function classifyManagerLog(message){
+ const text=String(message||'');const lower=text.toLocaleLowerCase('no');
+ // Active bids get their own actionable cards and should not appear a second time as generic news.
+ if(/har lagt inn bud på|vist interesse og lagt inn bud|nytt bud mottatt/.test(lower))return null;
+ if(/skade|skadet|suspend|rødt kort|må ut med/.test(lower))return {title:'Troppsvarsel',page:'squad',severity:'urgent',icon:'✚'};
+ if(/budsjett|økonom|styret|lønnsramme|finans/.test(lower))return {title:'Økonomi og styre',page:'finance',severity:'urgent',icon:'£'};
+ if(/overgang|kontrakt|solgt|motkrav|lån|signert|budet fra/.test(lower))return {title:'Overgangsnytt',page:'transfers',severity:'normal',icon:'⇄'};
+ if(/opprykk|nedrykk|cup|finale|kvalif|playoff|turnering|mester/.test(lower))return {title:'Turneringsnytt',page:'competitions',severity:'normal',icon:'🏆'};
+ if(/styre|manager|avskjed|sparken|forventning|målsetting/.test(lower))return {title:'Melding fra styret',page:'finance',severity:'urgent',icon:'▣'};
+ return null;
+}
+function syncManagerNotifications(){
+ if(!Array.isArray(appState.managerNotifications))appState.managerNotifications=[];
+ const log=Array.isArray(appState.log)?appState.log:[];
+ const rawCursor=appState.managerNotificationLogCursor;
+ if(!Number.isFinite(Number(rawCursor))){
+  // Do not surface every old log entry when an existing save first opens this version.
+  appState.managerNotificationLogCursor=log.length;
+ }else{
+  let cursor=Math.max(0,Math.floor(Number(rawCursor)));
+  if(cursor>log.length)cursor=log.length;
+  for(let i=cursor;i<log.length;i++){
+   const message=String(log[i]||'');const category=classifyManagerLog(message);if(!category)continue;
+   queueManagerNotification(`log-${i}`,category.title,message,category.page,category.severity);
+  }
+  appState.managerNotificationLogCursor=log.length;
+ }
+ // Pending bids are always represented as actionable items in the overview, not as dismissible generic notices.
+ const pendingIds=new Set((appState.transferOffers||[]).filter(o=>o.status==='pending').map(o=>String(o.id)));
+ appState.managerNotifications=appState.managerNotifications.filter(n=>!(n.type==='offer'&&!pendingIds.has(String(n.sourceId))));
+ if(appState.managerNotifications.length>60)appState.managerNotifications=appState.managerNotifications.slice(-60);
+}
+function markManagerNotificationRead(id){
+ const note=(appState.managerNotifications||[]).find(n=>n.id===id);if(note)note.read=true;save();render();
+}
+function openManagerNotification(id){
+ const note=(appState.managerNotifications||[]).find(n=>n.id===id);if(!note)return;
+ note.read=true;const target=['home','squad','transfers','finance','competitions','league','season'].includes(note.page)?note.page:'home';save();setPage(target);
+}
+function importantDashboardAlerts(){
+ syncManagerNotifications();
+ const pendingOffers=(appState.transferOffers||[]).filter(o=>o.status==='pending').sort((a,b)=>(Number(b.createdAt)||0)-(Number(a.createdAt)||0));
+ const injured=(appState.squad||[]).filter(p=>Number(p.injured)>0);
+ const suspended=(appState.squad||[]).filter(p=>Number(p.suspended)>0);
+ const notices=(appState.managerNotifications||[]).filter(n=>!n.read).slice(-5).reverse();
+ const cup=appState.pendingCupMatch;
+ const activeCount=pendingOffers.length+injured.length+suspended.length+(cup?1:0);
+ if(!activeCount&&!notices.length)return '';
+ const rows=[];
+ pendingOffers.forEach(o=>rows.push(`<article class="home-alert urgent"><div class="home-alert-icon">📩</div><div class="home-alert-copy"><span class="home-alert-label">Bud mottatt · Handling kreves</span><strong>${esc(o.buyerName||'En klubb')} byr ${money(o.amount)} på ${esc(o.playerName||'en spiller')}</strong><p>${o.isYouth?'Bud på juniortalent.':'Vurder budet opp mot spillerens verdi, rolle og troppsbehov.'}${o.star?' Nøkkelspiller.':''}</p></div><div class="home-alert-actions"><button class="primary" onclick="setPage('transfers')">Vurder bud →</button></div></article>`));
+ if(injured.length){const names=injured.slice(0,4).map(p=>p.name).join(', ');rows.push(`<article class="home-alert ${injured.length>=3?'urgent':''}"><div class="home-alert-icon">✚</div><div class="home-alert-copy"><strong>${injured.length} skadet${injured.length===1?' spiller':'e'}</strong><p>${esc(names)}${injured.length>4?` og ${injured.length-4} til`:''}. Kontroller tilgjengeligheten før neste laguttak.</p></div><div class="home-alert-actions"><button onclick="setPage('squad')">Se tropp →</button></div></article>`)}
+ if(suspended.length){const names=suspended.slice(0,4).map(p=>p.name).join(', ');rows.push(`<article class="home-alert urgent"><div class="home-alert-icon">🟥</div><div class="home-alert-copy"><strong>${suspended.length} suspendert${suspended.length===1?' spiller':'e'}</strong><p>${esc(names)}${suspended.length>4?` og ${suspended.length-4} til`:''}. Disse spillerne er ikke tilgjengelige for laguttak.</p></div><div class="home-alert-actions"><button onclick="setPage('squad')">Se tropp →</button></div></article>`)}
+ if(cup){const homeName=cup.homeTeam?.name||cup.homeTeam||'Hjemmelag';const awayName=cup.awayTeam?.name||cup.awayTeam||'Bortelag';rows.push(`<article class="home-alert urgent"><div class="home-alert-icon">🏆</div><div class="home-alert-copy"><span class="home-alert-label">Kamp venter</span><strong>${esc(cup.competition||'Cupkamp')}</strong><p>${esc(homeName)} – ${esc(awayName)}. Kampen venter på deg.</p></div><div class="home-alert-actions"><button class="primary" onclick="startPendingCupMatch()">Forbered kamp →</button></div></article>`)}
+ notices.forEach(n=>rows.push(`<article class="home-alert unread"><div class="home-alert-icon">${n.severity==='urgent'?'⚠':'✉'}</div><div class="home-alert-copy"><strong>${esc(n.title||'Klubbmelding')}</strong><p>${esc(n.message||'En viktig hendelse er registrert.')}</p></div><div class="home-alert-actions"><button onclick="openManagerNotification('${esc(n.id)}')">Åpne →</button><button class="ghost" onclick="markManagerNotificationRead('${esc(n.id)}')" title="Marker som lest">Lest</button></div></article>`));
+ const total=activeCount+notices.length;
+ return `<section class="home-important-alerts" aria-label="Viktige meldinger"><div class="home-important-head"><h2>🔔 Viktige meldinger</h2><span class="home-important-count">${activeCount?`${activeCount} krever handling`:`${notices.length} ulest`}</span></div><div class="home-alert-list">${rows.join('')}</div></section>`;
+}
 function home(){
  const c=currentClub(),t=currentClubRecord(),next=CLUBS[getNextOpponentIndex()],done=seasonCompleted();
  const rank=sortedTable().findIndex(x=>x.name===c.name)+1;
@@ -1780,6 +1861,7 @@ function home(){
  const weeklyIncome=Number(getClubFinance().weeklyIncomeM)||weeklyOperatingRevenueM(getClubFinance().division||division,c.strength);
  const net=weeklyIncome-weeklyWages;
  return `<section class="hero home-hero"><div class="home-clubline"><div class="home-crest">${crest}</div><div class="home-club-copy"><div class="eyebrow">Managerprofil · ${seasonLabel()}</div><h1>${esc(c.name)}</h1><div class="home-seasonline">${esc(status)}</div></div></div><div class="home-status"><span class="pill">${done?'Sluttplass':'Ligaplass'} ${rank}/${activeLeagueClubs().length}</span><span class="pill">${t.pts} poeng</span>${appState.preseasonActive?'<span class="pill green">Overgangsvindu åpent</span>':''}</div><div class="home-hero-actions">${primary}<button class="home-new-career-button" type="button" onclick="startNewCareer()">＋ Start ny karriere</button></div></section>
+ ${importantDashboardAlerts()}
  <div class="home-shortcuts"><button onclick="setPage('squad')">♟ Tropp</button><button onclick="setPage('transfers')">⇄ Overganger</button><button onclick="setPage('finance')">£ Økonomi</button></div>
  <div class="home-metrics"><div class="home-metric"><small>Overgangsbudsjett</small><strong class="positive">${money(appState.budget)}</strong><span class="sub">Tilgjengelig</span></div><div class="home-metric"><small>Lønn per uke</small><strong>${money(weeklyWages)}</strong><span class="sub">${appState.squad.length} spillere i troppen</span></div><div class="home-metric"><small>Spilte ligakamper</small><strong>${Number.isFinite(Number(t.p))?Number(t.p):0}</strong><span class="sub">${done?'Sesong fullført':`Av ${Math.max(0,activeLeagueClubs().length*2-2)} mulige`}</span></div><div class="home-metric"><small>Netto drift / uke</small><strong class="${net<0?'negative':'positive'}">${money(net)}</strong><span class="sub">Lønnsramme ${money(getClubFinance().wageBudget/1000)}/uke</span></div></div>
  <section class="card home-next"><div class="home-next-head"><h2>${esc(nextTitle)}</h2><span class="pill ${appState.preseasonActive?'green':''}">${appState.preseasonActive?'UKE '+(Number(appState.preseasonWeek)||1):done?'FULLFØRT':'GW '+appState.week}</span></div>${nextBody}${nextAction}</section>
@@ -6116,7 +6198,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.96 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.97 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){

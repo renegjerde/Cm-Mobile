@@ -1,18 +1,16 @@
-# CM Mobile v2.96
+# CM Mobile v2.97
 
-## Innhold
-- `index.html` – spillbar, selvstendig versjon av CM Mobile.
-- `README.md` – denne filen.
-- `INTERFACE_POLISH_V2.96.md` – endringsnotater.
+Denne versjonen bygger videre på v2.96 og legger til tydelige, handlingsrettede varsler på oversiktsskjermen.
 
-## Nytt i v2.96
-- Fjernet gjentakende instruksjonsavsnitt fra laguttak, overgangsmarked, juniorstall, økonomi, spillerstatistikk og turneringsoversikter.
-- Beholdt varsler som beskriver en reell tilstand, et avvik eller en beslutning med konsekvenser.
-- Utvidet Spillmanual med taktikk, bytter, trening, overganger/lån, økonomi, cupmodell, statistikk, databegrensninger og lagring.
-- Fjernet tekniske revisjonsbokser fra den vanlige ligavisningen; statuslinjer og viktige tilstandsvarsler er beholdt.
-- Redusert forklaringsboksen under ligatabellen til en diskret statuslinje.
-- Økt kontrast og størrelse på knappen for å starte andre omgang.
-- Oppdatert versjonsmerking til v2.96.
+## Viktige meldinger
+- Ubehandlede overgangsbud vises øverst med spiller, kjøpende klubb og budbeløp, med snarvei til å vurdere budet.
+- Skadde og suspenderte spillere vises med snarvei til troppen.
+- Ventende cupkamper får en direkte handling for å klargjøre kampen.
+- Nye viktige klubbloggmeldinger blir markert ulest og kan åpnes i relevant skjerm eller markeres som lest.
 
-## Lagring
-Karrierer lagres i nettleserens lokale lagring. Ved større versjonsoppgraderinger anbefales det å bruke «Lagre» før du bytter fil.
+Varslene bruker informasjon fra karrieren og viser ikke oppdiktede eksempelmeldinger. Eksisterende karrierer støttes; ubehandlede bud og aktive utilgjengelighetsstatus vises også i eldre lagringer.
+
+## Start
+Åpne `index.html` i nettleseren. Karrieredata lagres lokalt i nettleseren via spillets vanlige lagringsfunksjon. Bruk «Lagre» før du lukker eller bytter karriere.
+
+Se `IMPORTANT_DASHBOARD_NOTICES_V2.97.md` for detaljer om endringen.
