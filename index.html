@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.88 — Touchline</title>
+<title>CM Mobile v2.89 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -79,7 +79,13 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .player-status.bad{background:#42252b;color:#ffaaaa}
 
 
-.live-clock{display:flex;align-items:center;gap:9px;font-weight:850;letter-spacing:.08em;color:var(--green);font-size:12px}
+.live-clock{display:flex;align-items:center;gap:9px;font-weight:850;letter-spacing:.08em;color:var(--green);font-size:12px;flex-wrap:wrap}
+.live-round-label{margin-left:auto;max-width:62%;text-align:right;letter-spacing:.04em;color:#b9ef9c;background:#1d392c;border:1px solid #31563c;border-radius:999px;padding:5px 10px;font-size:11px;line-height:1.25}
+.live-match-context{display:flex;align-items:center;gap:10px;margin:13px 0 9px;padding:11px 13px;border:1px solid #3f5f75;border-left:4px solid var(--green);border-radius:11px;background:linear-gradient(105deg,#1b3041,#17273a);color:#f1f6fd}
+.live-match-context-icon{font-size:20px;flex:0 0 auto}
+.live-match-context-copy{min-width:0;display:flex;flex-direction:column;gap:3px}
+.live-match-context-copy strong{font-size:15px;font-weight:900;line-height:1.2;overflow-wrap:anywhere}
+.live-match-context-copy small{font-size:11px;color:#a9bdd2;letter-spacing:.03em}
 .live-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 0 4px #ef444422;animation:livePulse 1.2s infinite}
 @keyframes livePulse{0%,100%{opacity:1}50%{opacity:.35}}
 .live-score{font-size:42px;font-weight:950;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
@@ -3770,7 +3776,7 @@ function playPendingCupMatch(){
  const homeId=engineIdFor(homeTeam),awayId=engineIdFor(awayTeam);
  const xiA=homeIsUser?currentStartingXI():assignTacticalRoles(createMatchLineup(playersA,'4-3-3',homeTeam.name),'4-3-3');
  const xiB=!homeIsUser?currentStartingXI():assignTacticalRoles(createMatchLineup(playersB,'4-3-3',awayTeam.name),'4-3-3');
- const engine=createLiveEngine(homeId,awayId,homeIsUser,playersA,playersB,xiA,xiB,homeIsUser?appState.formation:'4-3-3',!homeIsUser?appState.formation:'4-3-3',{isCupMatch:true,isLeaguePhase:pending.isEuropeanLeague===true,isEuropeanKnockout:pending.isEuropeanKnockout===true,isDomesticCupSemiFinal:pending.isDomesticCupSemiFinal===true,knockoutStageKey:pending.knockoutStageKey||null,knockoutLeg:pending.knockoutLeg||null,knockoutTieId:pending.knockoutTieId||null,competition:pending.competition,competitionRound:pending.roundNo,teamNames:{A:homeTeam.name,B:awayTeam.name}});
+ const engine=createLiveEngine(homeId,awayId,homeIsUser,playersA,playersB,xiA,xiB,homeIsUser?appState.formation:'4-3-3',!homeIsUser?appState.formation:'4-3-3',{isCupMatch:true,isLeaguePhase:pending.isEuropeanLeague===true,isEuropeanKnockout:pending.isEuropeanKnockout===true,isDomesticCupSemiFinal:pending.isDomesticCupSemiFinal===true,knockoutStageKey:pending.knockoutStageKey||null,knockoutStageName:pending.knockoutStageName||pending.roundLabel||null,roundLabel:pending.roundLabel||null,knockoutLeg:pending.knockoutLeg||null,knockoutTieId:pending.knockoutTieId||null,competition:pending.competition,competitionRound:pending.roundNo,teamNames:{A:homeTeam.name,B:awayTeam.name}});
  const emptyStats={shots:0,shotsAgainst:0,onTarget:0,onTargetAgainst:0,possession:50};
  showMatch(c,opp,0,0,homeIsUser,'',emptyStats,[],[],[],{},engine,null,new Map(sortedTable().map((team,index)=>[team.name,index+1])));
  window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40);
@@ -5541,8 +5547,36 @@ function clubBadgeMarkup(teamOrName,size=42){
  const sources=[officialLogo,backupLogo,fallback].filter((url,index,list)=>url&&list.indexOf(url)===index);
  return sources.map((url,index)=>`<img src="${esc(url)}" alt="${safeName}${index===sources.length-1&&url===fallback?' generert':''} klubbmerke" title="${safeName}" ${url===fallback?'':'loading="lazy"'} width="${px}" height="${px}" style="${style};display:${index===0?'block':'none'}" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block'">`).join('');
 }
+function liveMatchContext(c,engine,round){
+ const roundValue=Number(engine?.competitionRound||round?.round||round||appState.week)||1;
+ let competition='',roundLabel='';
+ if(engine?.isEuropeanKnockout){
+  competition=String(engine.competition||'Europacup');
+  const stageList=Array.isArray(EUROPEAN_KNOCKOUT_STAGES)?EUROPEAN_KNOCKOUT_STAGES:[];
+  const stageName=engine.knockoutStageName||engine.roundLabel||stageList.find(x=>x.key===engine.knockoutStageKey)?.name||'Sluttspill';
+  const leg=Number(engine.knockoutLeg)||1;
+  roundLabel=stageName==='Finale'||engine.knockoutStageKey==='final'?'Finale':`${stageName} · ${leg===1?'første kamp':'returoppgjør'}`;
+ }else if(engine?.isLeaguePhase){
+  competition=String(engine.competition||'Europacup');
+  roundLabel=`Ligafase · runde ${roundValue}`;
+ }else if(engine?.isCupMatch){
+  competition=String(engine.competition||'Cupkamp');
+  if(engine.isDomesticCupSemiFinal&&Number(engine.knockoutLeg)){
+   roundLabel=cupRoundLabel(competition,roundValue);
+  }else if(competition==='FA Cup'||competition==='EFL Cup'){
+   roundLabel=cupRoundLabel(competition,roundValue);
+  }else{
+   roundLabel=String(engine.roundLabel||`Runde ${roundValue}`);
+  }
+ }else{
+  competition=String(clubDivision(c)||c?.division||'Ligakamp');
+  roundLabel=`Runde ${Number(round?.round||round||appState.week)||1}`;
+ }
+ return {competition,roundLabel,season:seasonLabel()};
+}
 function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userEvents,positionChanges={},engine=null,round=null,previousPositions=new Map()){
  const homeName=home?c.name:opp.name, awayName=home?opp.name:c.name;
+ const matchContext=liveMatchContext(c,engine,round);
  const homeClub=home?c:(CLUBS.find(x=>x.name===opp.name)||opp), awayClub=home?(CLUBS.find(x=>x.name===opp.name)||opp):c;
  const homeCrest=clubBadgeMarkup(homeClub,48), awayCrest=clubBadgeMarkup(awayClub,48);
  const domesticPositions=tablePositionMap();
@@ -5566,7 +5600,8 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
  const homeStat=(a,b)=>`${a} – ${b}`;
  document.getElementById("app").innerHTML=`
  <div class="hero">
-  <div class="live-clock"><span class="live-dot"></span><span id="liveStatus">LIVE · 0'</span><span style="margin-left:auto">RUNDE ${appState.week}</span></div>
+  <div class="live-clock"><span class="live-dot"></span><span id="liveStatus">LIVE · 0'</span><span id="liveRoundLabel" class="live-round-label">${esc(matchContext.roundLabel)}</span></div>
+  <div class="live-match-context" aria-label="Turnering og kampfase"><span class="live-match-context-icon" aria-hidden="true">🏆</span><div class="live-match-context-copy"><strong id="liveCompetitionName">${esc(matchContext.competition)}</strong><small id="liveCompetitionSeason">${esc(matchContext.season)} · OFFISIELL KAMP</small></div></div>
   <h1 id="liveHeadline">Avspark!</h1>
   <p id="liveSub">${home?"Hjemmekamp på eget gress":"På bortebane"} · Taktikk: ${({Defensive:"Defensiv",Balanced:"Balansert",Attacking:"Offensiv","High press":"Høyt press"})[appState.tactic]}</p>
   <div class="live-progress"><div id="liveProgressFill" class="live-progress-fill"></div></div>

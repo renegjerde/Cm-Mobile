@@ -1,4 +1,13 @@
-# CM Mobile v2.88 — tydelig kampinformasjon på taktikkvisningen
+# CM Mobile v2.89 — turnering og runde på kampskjermen
+
+## v2.89 — Tydelig kampkontekst under livekampen
+- Kampskjermen viser turneringsnavn/divisjon i et eget, tydelig banner og runde/fase ved LIVE-klokken.
+- Ligakamper viser riktig runde fra kampdataene; FA Cup og EFL Cup viser den faktiske runden, og EFL Cup-semifinalen skiller mellom første kamp og returoppgjør.
+- Europeiske ligafasekamper viser «Ligafase · runde N», mens europeisk sluttspill viser korrekt fase og kampnummer.
+- Rettet at live-kampskjermen tidligere viste den nasjonale spilluken som «RUNDE N» selv for europeiske cupkamper.
+- Ingen endringer i kampmotor, scoremodell, spillerroller eller formasjoner.
+- Se `TACTICS_LIVE_MATCH_COMPETITION_CONTEXT_V2.89.md` for detaljer.
+
 
 
 ## v2.88 — Tydeligere kampinformasjon
