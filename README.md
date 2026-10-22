@@ -1,3 +1,12 @@
+# CM Mobile v2.92 — FA Cup semifinale og finale
+
+## v2.92 — Gjenoppretting av forfalte cuptrinn
+- Rettet at FA Cup kunne bli stående etter kvartfinalen hvis en cupuke ikke ble behandlet akkurat på planlagt uke.
+- Semifinale og finale hentes nå inn automatisk ved cupoversikt, sesongoppsummering og kampukebehandling.
+- Hvis brukeren er involvert i en ventende kamp, bevares kampen som managerkamp; neste sesong kan ikke overskrive en uavklart FA Cup-/Carabao Cup-kamp.
+- Samme gjenopprettingslogikk beskytter Carabao Cupens semifinaleben og finale.
+- Se `FA_CUP_SEMIFINAL_AND_FINAL_CATCHUP_V2.92.md` for detaljer.
+
 # CM Mobile v2.91 — National League, opprykksstatus og nedrykksstatus
 
 ## v2.91 — National League og matematisk opprykk/nedrykk

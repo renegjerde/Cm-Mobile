@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.90 — Touchline</title>
+<title>CM Mobile v2.92 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -3727,7 +3727,7 @@ function finishDomesticCupSemiFinal(engine,ga,gb,pending,cup){
   cup.results.push(...(pending.roundResults||[]),userResult);cup.semiFinalTies=[...(pending.semiOtherTies||[]),tie];cup.teams=(pending.cupTeams||cup.teams||[]).map(t=>({...t}));cup.round=Number(pending.roundNo)||7;cup.started=true;
   awardUserCompetitionMatch(pending.competition,pending.roundNo,homeName,awayName,ga,gb,'TBD',false,false);
   const text=`${pending.competition} · semifinale første kamp: ${homeName} ${score} ${awayName}. Avgjørelsen faller i returoppgjøret.`;
-  appState.domesticCalendar=appState.domesticCalendar||[];appState.domesticCalendar.push({week:pending.scheduledWeek||appState.week,competition:pending.competition,...userResult});appState.log.push(text);appState.pendingCupMatch=null;
+  appState.domesticCalendar=appState.domesticCalendar||[];appState.domesticCalendar.push({week:pending.scheduledWeek||appState.week,competition:pending.competition,...userResult});appState.log.push(text);appState.pendingCupMatch=null;processScheduledDomesticCups(Number(appState.week)||Number(pending.scheduledWeek)||1);
   return {winner:'Avgjøres i returoppgjøret',score,resultText:text,competition:pending.competition,aggregateScore:null};
  }
  const tie=pending.domesticSemiTie,agg=cupAggregateFromSecondLeg(tie,homeName,awayName,ga,gb);aggregateScore=`${agg.team1Goals}–${agg.team2Goals}`;
@@ -3739,7 +3739,7 @@ function finishDomesticCupSemiFinal(engine,ga,gb,pending,cup){
  if(cup.teams.length===1||cup.round>=cupTotalStages(pending.competition)){cup.champion=cup.teams[0]?.name||winnerTeam.name;cup.finished=true;}
  awardUserCompetitionMatch(pending.competition,pending.roundNo,homeName,awayName,ga,gb,winnerTeam.name,false,false);
  const text=`${pending.competition} · semifinale returoppgjør: ${homeName} ${score} ${awayName}. Sammenlagt ${aggregateScore}. Videre: ${winnerTeam.name}.`;
- appState.domesticCalendar=appState.domesticCalendar||[];appState.domesticCalendar.push({week:pending.scheduledWeek||appState.week,competition:pending.competition,...userResult});appState.log.push(text);appState.pendingCupMatch=null;
+ appState.domesticCalendar=appState.domesticCalendar||[];appState.domesticCalendar.push({week:pending.scheduledWeek||appState.week,competition:pending.competition,...userResult});appState.log.push(text);appState.pendingCupMatch=null;processScheduledDomesticCups(Number(appState.week)||Number(pending.scheduledWeek)||1);
  return {winner:winnerTeam.name,score,penaltyScore,resultText:text,competition:pending.competition,aggregateScore};
 }
 function finishPendingCupMatch(engine,ga,gb){
@@ -3787,13 +3787,13 @@ function finishPendingCupMatch(engine,ga,gb){
  }else{
   cup.teams=[...(pending.winners||[]),{...winnerTeam},...(pending.notEntered||[])];
   cup.round=pending.roundNo;
-  if(cup.teams.length===1)cup.champion=cup.teams[0].name;
+  if(cup.teams.length===1){cup.champion=cup.teams[0].name;cup.finished=true;}
  }
  awardUserCompetitionMatch(pending.competition,pending.roundNo,pending.homeTeam.name,pending.awayTeam.name,ga,gb,winnerTeam.name,false,pending.isEuropeanKnockout===true);
  appState.domesticCalendar=appState.domesticCalendar||[];
  appState.domesticCalendar.push({week:pending.scheduledWeek||appState.week,competition:pending.competition,...userResult});
  const text=`${pending.competition} · ${pending.homeTeam.name} ${score} ${pending.awayTeam.name}. Videre: ${winnerTeam.name}.`;
- appState.log.push(text);appState.pendingCupMatch=null;
+ appState.log.push(text);appState.pendingCupMatch=null;processScheduledDomesticCups(Number(appState.week)||Number(pending.scheduledWeek)||1);
  return {winner:winnerTeam.name,score,penaltyScore,resultText:text,competition:pending.competition};
 }
 function startPendingCupMatch(){if(!appState.pendingCupMatch)return;appState.page='tactics';save();render();window.scrollTo(0,0);}
@@ -4286,30 +4286,45 @@ function buildGenericRosterForClub(club,index,strength){
  const positions=['GK','GK','DEF','DEF','DEF','DEF','DEF','DEF','MID','MID','MID','MID','MID','MID','ATT','ATT','ATT','ATT','ATT','ATT','DEF','MID','ATT','MID','GK'];
  return positions.map((pos,i)=>{const rating=Math.max(42,Math.min(83,Math.round(strength+(stableSeed(`${club.name}|${i}`)%13)-6)));return {id:index*1000+i+1,name:`${club.name} ${pos==='GK'?'Keeper':pos==='DEF'?'Defender':pos==='MID'?'Midfielder':'Forward'} ${i+1}`,pos,role:defaultRoleFor(`${club.name}-${i}`,pos,i),naturalPositions:naturalPositionsFor(`${club.name}-${i}`,pos,defaultRoleFor(`${club.name}-${i}`,pos,i)),rating,attributes:generateAttributes(pos,rating),potential:Math.min(92,rating+(i%5)+2),age:19+(i*7%16),value:Math.max(.2,+((rating-40)**2/120).toFixed(1)),wage:Math.max(2,Math.round((rating-40)*.62)),fitness:100,morale:72,form:6.5,goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,injured:0,suspended:0,clubIndex:index,source:'Generated lower-division squad'}});
 }
-function processMidweekCompetitions(round){
- initDomesticCompetitions();if(appState.lastDomesticRound===round)return;
- simulateLowerLeaguesThroughRound(round);
- processEuropeanCompetitions(round);
+function processScheduledDomesticCups(round){
+ const throughWeek=Math.max(0,Number(round)||0);
  for(const [name,weeks] of Object.entries(CUP_CALENDAR)){
-  const idx=weeks.indexOf(round);if(idx<0)continue;
-  const cup=appState.cupCompetitions[name];if(!cup||cup.champion||cup.round>idx)continue;
-  const oldResults=cup.results.length;simulateCupRound(name,idx+1);
-  if(appState.pendingCupMatch?.competition===name)continue;
-  const results=cup.results.slice(oldResults).filter(r=>r.round===idx+1);
-  const userResult=results.find(r=>r.home===currentClub().name||r.away===currentClub().name);
-  if(userResult){
-   appState.domesticCalendar.push({week:round,competition:name,...userResult});
-   // Midweek cup matches use the same match-engine scoring model. Squad fatigue is applied to likely minutes, not uniformly to every player.
-   const featured=appState.squad.filter(p=>p.pos==='GK'||p.rating>=(CLUBS[appState.club].strength-8));
-   appState.squad.forEach((p,i)=>{
-    const likelyStarter=featured.includes(p);const minutes=likelyStarter?(p.pos==='GK'?90:(p.rating>=(CLUBS[appState.club].strength-3)?78:55)):Math.max(0,Math.round(15+stableSeed(p.name+round+name)%26));
-    const stamina=Number(p.attributes?.stamina||65);const load=(minutes/90)*(8+Math.max(0,75-stamina)*.12);
-    p.fitness=Math.max(35,Math.min(100,(p.fitness||85)-Math.round(load)));
-    if(minutes>45&&!p.injured&&Math.random()<(.006+Math.max(0,65-stamina)*.00035))p.injured=1;
-   });
-   appState.log.push(`${name} · ${userResult.home} ${userResult.score} ${userResult.away}. Cupkampen er spilt med kampmotoren; midtukebelastning påvirker restitusjonen.`);
+  const cup=appState.cupCompetitions?.[name];if(!cup||cup.champion)continue;
+  for(let idx=0;idx<weeks.length;idx++){
+   const scheduledWeek=Number(weeks[idx])||0,stageNo=idx+1;
+   if(scheduledWeek>throughWeek)break;
+   if(Number(cup.round||0)>=stageNo)continue;
+   const oldResults=(cup.results||[]).length;
+   simulateCupRound(name,stageNo);
+   // A manager-controlled tie must be played before this cup can advance again.
+   if(appState.pendingCupMatch?.competition===name)break;
+   if(Number(cup.round||0)<stageNo&&!cup.champion)break;
+   const results=(cup.results||[]).slice(oldResults).filter(r=>Number(r.round)===stageNo);
+   const userResult=results.find(r=>r.home===currentClub().name||r.away===currentClub().name);
+   if(userResult){
+    appState.domesticCalendar=appState.domesticCalendar||[];
+    appState.domesticCalendar.push({week:scheduledWeek,competition:name,...userResult});
+    // Midweek cup matches use the same match-engine scoring model. Squad fatigue is applied to likely minutes, not uniformly to every player.
+    const featured=appState.squad.filter(p=>p.pos==='GK'||p.rating>=(CLUBS[appState.club].strength-8));
+    appState.squad.forEach(p=>{
+     const likelyStarter=featured.includes(p);const minutes=likelyStarter?(p.pos==='GK'?90:(p.rating>=(CLUBS[appState.club].strength-3)?78:55)):Math.max(0,Math.round(15+stableSeed(p.name+scheduledWeek+name)%26));
+     const stamina=Number(p.attributes?.stamina||65);const load=(minutes/90)*(8+Math.max(0,75-stamina)*.12);
+     p.fitness=Math.max(35,Math.min(100,(p.fitness||85)-Math.round(load)));
+     if(minutes>45&&!p.injured&&Math.random()<(.006+Math.max(0,65-stamina)*.00035))p.injured=1;
+    });
+    appState.log.push(`${name} · ${userResult.home} ${userResult.score} ${userResult.away}. Cupkampen er spilt med kampmotoren; midtukebelastning påvirker restitusjonen.`);
+   }
   }
  }
+}
+function processMidweekCompetitions(round){
+ initDomesticCompetitions();
+ // A cup match may finish after the calendar hook for this league round has already run.
+ // Always retry due domestic cup stages, even when league processing is already recorded.
+ if(appState.lastDomesticRound===round){processScheduledDomesticCups(round);return;}
+ simulateLowerLeaguesThroughRound(round);
+ processEuropeanCompetitions(round);
+ processScheduledDomesticCups(round);
  appState.lastDomesticRound=round;
 }
 function renderEuropeanCompetitionCard(comp){
@@ -4339,7 +4354,7 @@ function renderDomesticCupCard(name,cup){
  const description=isEfl?'Alle 72 EFL-klubbene deltar. De fire utvalgte lagene spiller innledende runde; 11 PL-klubber kommer inn i runde to, mens de ni PL-klubbene i Europa kommer inn i runde tre. Semifinalene spilles over to kamper.':'124 klubber i denne spillversjonen: 48 fra League One/Two og 32 ikke-ligaklubber starter i første runde. Championship og Premier League kommer inn i tredje runde.';
  return `<section class="card domestic-cup-card ${isEfl?'efl-cup-card':'fa-cup-card'}"><div class="domestic-cup-head"><div class="domestic-cup-emblem">🏆</div><div class="domestic-cup-title"><span class="eyebrow">${esc(tag)} · ${seasonLabel()}</span><h2>${esc(title)}</h2><p>${esc(description)}</p></div><span class="pill ${cup.champion?'green':''}">${cup.champion?'Ferdig':esc(cupRoundLabel(name,current))}</span></div><div class="cup-progress-info"><div><strong>${esc(cupProgressText(cup,name))}</strong><small>${remaining} klubber gjenstår · ${cup.results?.length||0} kamper registrert</small></div><strong class="cup-progress-percent">${progress}%</strong></div><div class="cup-progress-track"><span style="width:${progress}%"></span></div><div class="cup-stage-track">${milestones}</div>${legacyNote}${pendingMarkup}${championMarkup}<details class="cup-results-details" ${recent.length?'open':''}><summary><span>Siste resultater</span><span class="pill">${cup.results?.length||0}</span></summary>${resultRows||'<p class="muted">Ingen resultater ennå. Trekningen kommer fram når den første runden er behandlet.</p>'}</details></section>`;
 }
-function competitions(){initDomesticCompetitions();const cups=appState.cupCompetitions;const divisions=Object.entries(appState.lowerLeagues).map(([name,d])=>{const rows=[...d.rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));const complete=rows.length>0&&rows.every(r=>(Number(r.p)||0)>=46);return `<section class="card"><div class="section-title"><h2>${name}</h2><span class="pill">${d.playedRounds}/46 runder</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${tableZoneClass(name,i+1,rows.length)}"><td>${i+1}${tableMovementBadge(name,r,rows,46,complete)}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join('')}</tbody></table></div>${tableZoneLegend(name)}<div class="muted" style="font-size:11px;margin-top:7px">Opprykk: Championship topp 2 + playoff 3.–6.; League One topp 2 + playoff 3.–6.; League Two topp 3 + playoff 4.–7.; National League-mester + playoff 2.–7. Nedrykk: PL/Championship 3, League One 4, League Two 2 til National League; National League 4 til regionale non-league-divisjoner.</div></section>`});const calendar=(appState.domesticCalendar||[]).slice(-12).reverse();return `<div class="hero"><div class="eyebrow">Domestic competitions · ${seasonLabel()}</div><h1>FA Cup og Carabao Cup</h1><p>Turneringskortene viser runde, fremdrift, gjenstående lag og resultater. FA Cup og Carabao Cup følger nå hver sin inngangsstruktur; managerens egne cupkamper spilles i kampmotoren.</p><div class="grid"><div class="stat"><small>FA Cup</small><strong>${cups['FA Cup'].teams.length||1} lag igjen</strong></div><div class="stat"><small>Carabao Cup</small><strong>${cups['EFL Cup'].teams.length||1} lag igjen</strong></div><div class="stat"><small>FA Cup-trinn</small><strong>${cups['FA Cup'].round}/${cupTotalStages('FA Cup')}</strong></div><div class="stat"><small>Carabao-trinn</small><strong>${cups['EFL Cup'].round}/${cupTotalStages('EFL Cup')}</strong></div></div></div>${renderDomesticCupCard('EFL Cup',cups['EFL Cup'])}${renderDomesticCupCard('FA Cup',cups['FA Cup'])}${Object.values(appState.europeanCompetitions||{}).map(comp=>renderEuropeanCompetitionCard(comp)).join('')}<section class="card"><div class="section-title"><h2>Midtukekalender og belastning</h2><span class="pill">${calendar.length} siste</span></div>${calendar.length?calendar.map(r=>`<div class="player"><div style="flex:1"><strong>Runde ${r.week} · ${esc(r.competition)}</strong><div class="player-meta">${esc(r.home)} ${esc(r.score)} ${esc(r.away)} · Vinner: ${esc(r.winner)}</div></div><span class="pill">${esc(r.roundLabel||'Cupkamp')}</span></div>`).join(''):'<p class="muted">Cupkamper vises her når sesongen går fremover.</p>'}<div class="notice">Cupdatoene er lagt inn som spilluker, ikke eksakte kalenderdatoer. Tidlige Carabao-runder er regionalisert; de eksakte TV-flyttingene og offisielle kampdager er fortsatt forenklet.</div></section>${divisions.join('')}`}
+function competitions(){initDomesticCompetitions();processScheduledDomesticCups(Number(appState.week)||1);const cups=appState.cupCompetitions;const divisions=Object.entries(appState.lowerLeagues).map(([name,d])=>{const rows=[...d.rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));const complete=rows.length>0&&rows.every(r=>(Number(r.p)||0)>=46);return `<section class="card"><div class="section-title"><h2>${name}</h2><span class="pill">${d.playedRounds}/46 runder</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${tableZoneClass(name,i+1,rows.length)}"><td>${i+1}${tableMovementBadge(name,r,rows,46,complete)}</td><td>${esc(r.name)}</td><td>${r.p}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join('')}</tbody></table></div>${tableZoneLegend(name)}<div class="muted" style="font-size:11px;margin-top:7px">Opprykk: Championship topp 2 + playoff 3.–6.; League One topp 2 + playoff 3.–6.; League Two topp 3 + playoff 4.–7.; National League-mester + playoff 2.–7. Nedrykk: PL/Championship 3, League One 4, League Two 2 til National League; National League 4 til regionale non-league-divisjoner.</div></section>`});const calendar=(appState.domesticCalendar||[]).slice(-12).reverse();return `<div class="hero"><div class="eyebrow">Domestic competitions · ${seasonLabel()}</div><h1>FA Cup og Carabao Cup</h1><p>Turneringskortene viser runde, fremdrift, gjenstående lag og resultater. FA Cup og Carabao Cup følger nå hver sin inngangsstruktur; managerens egne cupkamper spilles i kampmotoren.</p><div class="grid"><div class="stat"><small>FA Cup</small><strong>${cups['FA Cup'].teams.length||1} lag igjen</strong></div><div class="stat"><small>Carabao Cup</small><strong>${cups['EFL Cup'].teams.length||1} lag igjen</strong></div><div class="stat"><small>FA Cup-trinn</small><strong>${cups['FA Cup'].round}/${cupTotalStages('FA Cup')}</strong></div><div class="stat"><small>Carabao-trinn</small><strong>${cups['EFL Cup'].round}/${cupTotalStages('EFL Cup')}</strong></div></div></div>${renderDomesticCupCard('EFL Cup',cups['EFL Cup'])}${renderDomesticCupCard('FA Cup',cups['FA Cup'])}${Object.values(appState.europeanCompetitions||{}).map(comp=>renderEuropeanCompetitionCard(comp)).join('')}<section class="card"><div class="section-title"><h2>Midtukekalender og belastning</h2><span class="pill">${calendar.length} siste</span></div>${calendar.length?calendar.map(r=>`<div class="player"><div style="flex:1"><strong>Runde ${r.week} · ${esc(r.competition)}</strong><div class="player-meta">${esc(r.home)} ${esc(r.score)} ${esc(r.away)} · Vinner: ${esc(r.winner)}</div></div><span class="pill">${esc(r.roundLabel||'Cupkamp')}</span></div>`).join(''):'<p class="muted">Cupkamper vises her når sesongen går fremover.</p>'}<div class="notice">Cupdatoene er lagt inn som spilluker, ikke eksakte kalenderdatoer. Tidlige Carabao-runder er regionalisert; de eksakte TV-flyttingene og offisielle kampdager er fortsatt forenklet.</div></section>${divisions.join('')}`}
 
 function tableZoneClass(division,rank,total){
  if(division==='Premier League')return rank>total-3?'table-zone-relegation':'';
@@ -4537,6 +4552,7 @@ function seasonReviewPromotionMarkup(){
  return `<section class="card"><div class="section-title"><h2>Opprykks- og nedrykksoversikt</h2><span class="pill">EFL + National League</span></div>${section}<p class="muted" style="font-size:12px;margin:8px 0 0">O vises for matematisk sikret opprykk og simulert playoffvinner etter 46 runder. N vises når nedrykk er matematisk avgjort. Championship- og League One-playoff spilles mellom plass 3–6; League Two 4–7; National League 2–7.</p></section>`;
 }
 function seasonSummary(){
+ initDomesticCompetitions();processScheduledDomesticCups(Math.max(Number(appState.week)||1,seasonCompleted()?38:1));
  if(!seasonCompleted())return `<div class="hero"><div class="eyebrow">Season centre</div><h1>Sesongen pågår</h1><p>Spill ferdig alle rundene før sesongoppsummeringen er tilgjengelig.</p><button class="primary" onclick="setPage('home')">Tilbake til oversikten</button></div>`;
  const table=sortedTable(),record=currentClubRecord(),division=clubDivision(currentClub()),rank=table.findIndex(t=>t.name===currentClub().name)+1;
  const leaders=[...(appState.squad||[])].sort((a,b)=>(Number(b.goals)||0)-(Number(a.goals)||0)||(Number(b.assists)||0)-(Number(a.assists)||0));
@@ -4649,6 +4665,8 @@ function careerStatsAudit(){
 }
 function startNewSeason(){
  if(!seasonCompleted()){alert("Spill ferdig sesongen før du starter en ny.");return}
+ initDomesticCompetitions();processScheduledDomesticCups(Math.max(Number(appState.week)||1,38));
+ if(appState.pendingCupMatch&&["FA Cup","EFL Cup"].includes(appState.pendingCupMatch.competition)){alert("En nasjonal cupkamp gjenstår. Spill cupkampen før du starter neste sesong.");startPendingCupMatch();return}
  if(!confirm(`Starte sesongen ${Number(appState.seasonYear)+1}/${String(Number(appState.seasonYear)+2).slice(-2)}? Klubben og troppen beholdes, mens tabell og sesongstatistikk nullstilles.`))return;
  const finalTable=sortedTable();
  awardLeaguePositionPrize(finalTable);
