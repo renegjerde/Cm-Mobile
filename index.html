@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.86 — Touchline</title>
+<title>CM Mobile v2.87 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -360,25 +360,25 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .pitch-markings .pitch-six-top{position:absolute;left:38%;right:38%;top:0;height:5%;border:1px solid #a6d7b4aa;border-top:0}
 .pitch-markings .pitch-box-bottom{position:absolute;left:25%;right:25%;bottom:0;height:14%;border:1px solid #a6d7b4aa;border-bottom:0}
 .pitch-markings .pitch-six-bottom{position:absolute;left:38%;right:38%;bottom:0;height:5%;border:1px solid #a6d7b4aa;border-bottom:0}
-.pitch-field .pitch-player{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);width:15%;max-width:64px;min-width:40px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:1px;padding:3px 1px 4px;border:1px solid #ffffff24;border-radius:8px;background:#123622e8;color:#eef7ff;line-height:1.1;box-shadow:0 2px 7px #00170d65;touch-action:manipulation;user-select:none;-webkit-user-select:none;cursor:pointer;backdrop-filter:blur(2px)}
+.pitch-field .pitch-player{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);width:16%;max-width:68px;min-width:42px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;padding:4px 2px 5px;border:1px solid #ffffff24;border-radius:8px;background:#123622e8;color:#eef7ff;line-height:1.12;box-shadow:0 2px 7px #00170d65;touch-action:manipulation;user-select:none;-webkit-user-select:none;cursor:pointer;backdrop-filter:blur(2px)}
 .pitch-field .pitch-player:active,.pitch-field .pitch-player.is-selected{background:#254b35f5;border-color:#b9f0a6;box-shadow:0 0 0 2px #9cde8040,0 3px 8px #00170d85}
-.pitch-field .pitch-dot{display:flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:50%;background:#eaf4ff;color:#17452f;font-size:9px;font-weight:950;border:2px solid #b7d6e9;box-shadow:0 2px 5px #0004;flex:none}
+.pitch-field .pitch-dot{display:flex;align-items:center;justify-content:center;width:27px;height:27px;border-radius:50%;background:#eaf4ff;color:#17452f;font-size:10px;font-weight:950;border:2px solid #b7d6e9;box-shadow:0 2px 5px #0004;flex:none}
 .pitch-field .pitch-player.fit-good .pitch-dot{border-color:#9cde80}
 .pitch-field .pitch-player.fit-mid .pitch-dot{border-color:#e8c875}
 .pitch-field .pitch-player.fit-low .pitch-dot{border-color:#e48787}
 .pitch-field .pitch-player.is-selected .pitch-dot{background:#9cde80;border-color:#f0ffe9}
-/* v2.86: compact cards keep narrow diamond / five-line systems from overlapping. */
-.pitch-field.pitch-field-compact .pitch-player{width:14%;max-width:58px;min-width:34px;padding:2px 1px;gap:0}
-.pitch-field.pitch-field-compact .pitch-dot{width:21px;height:21px;font-size:8px}
-.pitch-field.pitch-field-compact .pitch-name{font-size:8px}
-.pitch-field.pitch-field-compact .pitch-rating{font-size:9px}
-.pitch-field.pitch-field-compact .pitch-role{font-size:7px}
-.pitch-field.pitch-field-compact .pitch-mini-fit{font-size:7px}
-.pitch-field .pitch-name{display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;font-weight:750}
-.pitch-field .pitch-rating{font-size:10px;color:#9cde80;font-weight:950}
-.pitch-field .pitch-role{display:block;width:100%;font-size:8px;color:#b5c8d7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pitch-field .pitch-mini-fit{font-size:8px;font-weight:900;white-space:nowrap}
-.pitch-field .pitch-manual-role-tag{font-size:7px;padding:2px 3px;margin:0}
+/* v2.87: keep denser shapes readable without letting adjacent cards collide. */
+.pitch-field.pitch-field-compact .pitch-player{width:15%;max-width:68px;min-width:41px;padding:3px 2px 4px;gap:1px}
+.pitch-field.pitch-field-compact .pitch-dot{width:25px;height:25px;font-size:9px}
+.pitch-field.pitch-field-compact .pitch-name{font-size:9.5px}
+.pitch-field.pitch-field-compact .pitch-rating{font-size:10.5px}
+.pitch-field.pitch-field-compact .pitch-role{font-size:8px}
+.pitch-field.pitch-field-compact .pitch-mini-fit{font-size:8px}
+.pitch-field .pitch-name{display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:800}
+.pitch-field .pitch-rating{font-size:11px;color:#9cde80;font-weight:950}
+.pitch-field .pitch-role{display:block;width:100%;font-size:8.5px;color:#b5c8d7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pitch-field .pitch-mini-fit{font-size:8.5px;font-weight:900;white-space:nowrap}
+.pitch-field .pitch-manual-role-tag{font-size:8px;padding:2px 4px;margin:0}
 .pitch-editor-controls{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:8px 0 2px}
 .pitch-editor-controls .pitch-fit-legend{justify-content:flex-start;margin:0;flex:1}
 .pitch-reset-button{font-size:10px;padding:7px 9px;white-space:nowrap;border:1px solid #74a66b;border-radius:8px;background:#183a2a;color:#d0f6c1}
@@ -401,13 +401,13 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .pitch-picker-option-meta{color:#c0d4e0;font-size:10px}.pitch-picker-starter{color:#b8c9d9;font-size:10px}.pitch-picker-tag{align-self:flex-start;display:inline-block;font-size:9px;font-weight:900;letter-spacing:.02em;padding:2px 5px;border-radius:4px;background:#26384b;color:#d7e5f3}
 .pitch-picker-option.fit-good .pitch-picker-tag{background:#24543b;color:#bdf0ad}.pitch-picker-option.fit-mid .pitch-picker-tag{background:#514729;color:#ffe4a1}.pitch-picker-option.fit-low .pitch-picker-tag{background:#573333;color:#ffc0c0}
 .tactics-start-top{width:100%;margin-top:10px;min-height:46px;font-weight:900}.tactics-start-note{font-size:11px;line-height:1.35;color:var(--muted);margin:6px 0 0}
-@media(max-width:380px){.tactics-pitch-field{height:clamp(405px,134vw,510px)}.pitch-field .pitch-player{width:15.5%;min-width:38px}.pitch-field .pitch-dot{width:23px;height:23px}.pitch-field .pitch-name{font-size:8px}.pitch-field .pitch-role{font-size:7px}.pitch-editor-controls .pitch-fit-legend{font-size:9px;gap:6px}.pitch-picker-popover{padding:10px}}
+@media(max-width:380px){.tactics-pitch-field{height:clamp(405px,134vw,510px)}.pitch-field .pitch-player{width:15.5%;min-width:38px;padding:3px 1px 4px}.pitch-field .pitch-dot{width:23px;height:23px;font-size:9px}.pitch-field .pitch-name{font-size:8.5px}.pitch-field .pitch-rating{font-size:10px}.pitch-field .pitch-role{font-size:7.5px}.pitch-field .pitch-mini-fit{font-size:7.5px}.pitch-field.pitch-field-compact .pitch-player{width:14%;min-width:35px;padding:3px 1px}.pitch-field.pitch-field-compact .pitch-dot{width:23px;height:23px;font-size:9px}.pitch-field.pitch-field-compact .pitch-name{font-size:8.5px}.pitch-field.pitch-field-compact .pitch-rating{font-size:10px}.pitch-field.pitch-field-compact .pitch-role{font-size:7.5px}.pitch-field.pitch-field-compact .pitch-mini-fit{font-size:7.5px}.pitch-editor-controls .pitch-fit-legend{font-size:9px;gap:6px}.pitch-picker-popover{padding:10px}}
 
 .career-manager-panel{width:min(560px,100%);max-height:90vh;overflow:auto;background:var(--panel);color:var(--text);border:1px solid #33445d;border-radius:16px;padding:18px;box-shadow:0 20px 70px #0009}.career-manager-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.career-manager-head h2{font-size:24px;margin:5px 0}.career-manager-head p{margin:0 0 14px;color:var(--muted);font-size:12px}.career-slot-list{display:flex;flex-direction:column;gap:8px}.career-slot-row{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);background:#0e1928;border-radius:11px;padding:11px}.career-slot-copy{min-width:0;display:flex;flex-direction:column;gap:3px}.career-slot-copy strong{font-size:13px;overflow-wrap:anywhere}.career-slot-copy small{color:var(--muted);font-size:10px}.career-manager-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}.career-slot-actions{display:flex;align-items:center;gap:5px;flex-shrink:0}.career-slot-actions button{padding:8px;font-size:11px}.danger-muted{background:transparent;color:#f0a0a0;border-color:#6d4148}.career-manager-note{font-size:10px;color:var(--muted);margin:12px 0 0}.home-new-career-button{border-color:#40546a;background:#162538;font-weight:750}.home-clubline .home-crest img{object-fit:contain;width:42px;height:42px}
 @media(max-width:410px){.header-actions{gap:4px}.header-action{padding:7px 7px;font-size:10px}.career-manager-panel{padding:13px}.career-slot-row{align-items:flex-start}.career-slot-row>button{padding:8px;font-size:11px}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.86</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.87</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -5797,7 +5797,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.86 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.87 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 document.getElementById("saveBtn").addEventListener("click",()=>{const ok=save();let b=document.getElementById("saveBtn");b.textContent=ok?"✓ Lagret":"⚠ Lagring feilet";setTimeout(()=>b.textContent="▣ Lagre",1800)});

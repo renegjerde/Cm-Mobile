@@ -1,2 +1,1 @@
-CM Mobile v2.86
-Formation-aware pitch layout for all 23 available formations
+CM Mobile v2.87

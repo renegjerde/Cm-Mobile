@@ -1,3 +1,12 @@
+# CM Mobile v2.87 — større og mer lesbare spillerkort
+
+## v2.87 — Lesbarhet på taktikkbanen
+- Gjort spillerkortene større i alle formasjoner: større kortbredde, initialsirkel, spillernavn, vurdering, rolle og rollepassform.
+- Formasjoner med mange linjer beholder en egen kompaktvariant, men denne er nå betydelig mindre nedskalert enn i v2.86.
+- Små skjermer får egne grenser for kortbredde, slik at de fortsatt er lesbare uten at spillerne overlapper unødvendig.
+- Ingen endringer i formasjonene, spillerroller, manuelle overstyringer eller kampmotoren.
+- Se `TACTICS_FORMATION_CARD_READABILITY_V2.87.md` for detaljer og validering.
+
 # CM Mobile v2.86 — formationene på banen
 
 ## v2.86 — Mer realistisk formasjonvisning i hele spillet
