@@ -1,3 +1,13 @@
+# CM Mobile v2.86 — formationene på banen
+
+## v2.86 — Mer realistisk formasjonvisning i hele spillet
+- Justert banekoordinatene for alle 23 tilgjengelige formasjoner, ikke bare de tre som var vist i skjermbildene.
+- Backer, vingbacker og vinger plasseres bredt; midtstoppere får naturlig spredning i treer-, firer- og femmerrekker.
+- Sentrale midtbanespillere får bedre avstander, og balanserende midtbanespillere ligger litt dypere der formasjonen tilsier det.
+- Formasjoner med fire eller fem linjer bruker litt mindre spillerkort for å redusere overlapping.
+- Eksisterende rollevalg, manuelle rolleoverstyringer og kampmotoren er beholdt.
+- Se `TACTICS_FORMATION_LAYOUT_V2.86.md` for detaljer og teststatus.
+
 # CM Mobile v2.85 — Touchline
 
 ## v2.85 — Formasjonvelgeren lar deg overstyre assistenten

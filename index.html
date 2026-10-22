@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.85 — Touchline</title>
+<title>CM Mobile v2.86 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -367,6 +367,13 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .pitch-field .pitch-player.fit-mid .pitch-dot{border-color:#e8c875}
 .pitch-field .pitch-player.fit-low .pitch-dot{border-color:#e48787}
 .pitch-field .pitch-player.is-selected .pitch-dot{background:#9cde80;border-color:#f0ffe9}
+/* v2.86: compact cards keep narrow diamond / five-line systems from overlapping. */
+.pitch-field.pitch-field-compact .pitch-player{width:14%;max-width:58px;min-width:34px;padding:2px 1px;gap:0}
+.pitch-field.pitch-field-compact .pitch-dot{width:21px;height:21px;font-size:8px}
+.pitch-field.pitch-field-compact .pitch-name{font-size:8px}
+.pitch-field.pitch-field-compact .pitch-rating{font-size:9px}
+.pitch-field.pitch-field-compact .pitch-role{font-size:7px}
+.pitch-field.pitch-field-compact .pitch-mini-fit{font-size:7px}
 .pitch-field .pitch-name{display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px;font-weight:750}
 .pitch-field .pitch-rating{font-size:10px;color:#9cde80;font-weight:950}
 .pitch-field .pitch-role{display:block;width:100%;font-size:8px;color:#b5c8d7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -400,7 +407,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @media(max-width:410px){.header-actions{gap:4px}.header-action{padding:7px 7px;font-size:10px}.career-manager-panel{padding:13px}.career-slot-row{align-items:flex-start}.career-slot-row>button{padding:8px;font-size:11px}}
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.85</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.86</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -2528,15 +2535,71 @@ function tactics(){
   xi.filter(p=>p.assignedRole!=='GK').forEach(p=>{const row=Math.max(0,Math.min(lineCount-1,pitchLineIndex(p.assignedRole)));groups[row].push(p);});
   stablePitchRows=groups.filter(row=>row.length);
  }
+ // v2.86: formation-aware pitch geometry. Each formation keeps its role rows,
+ // but horizontal lanes now follow football positions instead of equal-width rows.
+ const pitchLineY=(lineIndex,lineCount)=>{
+  const presets={
+   1:[46],2:[23,68],3:[17,44,70],4:[13,32,51,71],5:[11,27,43,59,74]
+  };
+  const values=presets[Math.max(1,Math.min(5,lineCount))]||presets[3];
+  return values[Math.max(0,Math.min(values.length-1,lineIndex))]??44;
+ };
+ const pitchRoleX=(p,row)=>{
+  const role=p.assignedRole||'CM';
+  // Natural width keeps both full-backs/wing-backs and wingers close to the touchline.
+  const wideLeft={LB:12,LWB:13,LM:13,LW:14};
+  const wideRight={RB:88,RWB:87,RM:87,RW:86};
+  if(Object.prototype.hasOwnProperty.call(wideLeft,role))return wideLeft[role];
+  if(Object.prototype.hasOwnProperty.call(wideRight,role))return wideRight[role];
+  if(role==='LCB')return row.some(q=>q.assignedRole==='CB')?31:34;
+  if(role==='CB')return 50;
+  if(role==='RCB')return row.some(q=>q.assignedRole==='CB')?69:66;
+  const centralRoles=['DM','CM','AM','ST'];
+  if(centralRoles.includes(role)){
+   const central=row.filter(q=>centralRoles.includes(q.assignedRole));
+   const rank=Math.max(0,central.findIndex(q=>String(q.id)===String(p.id)));
+   const n=central.length;
+   if(n<=1)return 50;
+   const types=central.map(q=>q.assignedRole);
+   const dmCount=types.filter(r=>r==='DM').length;
+   const cmCount=types.filter(r=>r==='CM').length;
+   if(n===3&&dmCount===1&&cmCount===2){
+    if(role==='DM')return 50;
+    const cmRank=central.slice(0,rank+1).filter(q=>q.assignedRole==='CM').length-1;
+    return [35,65][Math.max(0,Math.min(1,cmRank))];
+   }
+   if(n===3&&types.every(r=>r==='CM'))return [30,50,70][rank]??50;
+   if(n===3)return [35,50,65][rank]??50;
+   if(n===2)return [43,57][rank]??50;
+   if(n===4)return [27,42,58,73][rank]??50;
+   return n>1?12+(rank/(n-1))*76:50;
+  }
+  // Safe fallback for custom roles introduced by the free-position editor.
+  const fallback=row.findIndex(q=>String(q.id)===String(p.id));
+  return row.length<=1?50:12+(Math.max(0,fallback)/(row.length-1))*76;
+ };
+ const pitchRoleY=(p,row,baseY)=>{
+  const role=p.assignedRole||'CM';
+  const roles=row.map(q=>q.assignedRole||'CM');
+  const hasDM=roles.includes('DM'),hasCM=roles.includes('CM');
+  let offset=0;
+  // Separate a holding midfielder from the more advanced central midfielders.
+  if(hasDM&&hasCM&&['DM','CM'].includes(role))offset+=role==='DM'?4:-2;
+  // Wing-backs naturally start a little deeper than central midfielders.
+  if((role==='LWB'||role==='RWB')&&roles.some(r=>['DM','CM','AM'].includes(r)))offset+=3;
+  if((role==='LM'||role==='RM')&&roles.some(r=>['CM','DM'].includes(r)))offset+=1;
+  // In a front three, wingers sit fractionally deeper and the striker leads the line.
+  if(roles.some(r=>['LW','RW'].includes(r))&&roles.includes('ST'))offset+=role==='ST'?-2:(role==='LW'||role==='RW'?2:0);
+  if(role==='AM'&&roles.includes('ST'))offset+=2;
+  return Math.max(9,Math.min(79,baseY+offset));
+ };
  const pitchPosition=(slot)=>{
   const p=xi[slot];if(!p)return {x:50,y:50};
   if(p.assignedRole==='GK')return {x:50,y:88};
   const rowIndex=Math.max(0,stablePitchRows.findIndex(row=>row.some(q=>String(q.id)===String(p.id))));
   const row=stablePitchRows[rowIndex]||[p];
-  const column=Math.max(0,row.findIndex(q=>String(q.id)===String(p.id)));
-  const x=row.length<=1?50:12+(column/(row.length-1))*76;
-  const y=stablePitchRows.length<=1?48:15+(rowIndex/(stablePitchRows.length-1))*55;
-  return {x,y};
+  const baseY=pitchLineY(rowIndex,stablePitchRows.length);
+  return {x:pitchRoleX(p,row),y:pitchRoleY(p,row,baseY)};
  };
  const pitchPlayer=(p,slot)=>{
   const pos=pitchPosition(slot),selected=validPitchSelectedSlot()===slot,fitClass=roleFitClass(p,p.assignedRole),fit=roleFitPercent(p,p.assignedRole);
@@ -2544,7 +2607,8 @@ function tactics(){
   const initials=p.pos==='GK'?'GK':(p.name.split(/\s+/).slice(-1)[0]||p.name).slice(0,2).toUpperCase();
   return `<button type="button" class="pitch-player ${selected?'is-selected':''} ${fitClass}" style="left:${pos.x}%;top:${pos.y}%" aria-label="${esc(p.name)}, ${esc(roleLabels[p.assignedRole]||p.assignedRole)}, rollepassform ${fit} prosent. Trykk for å velge spiller til denne plassen." aria-pressed="${selected?'true':'false'}" data-pitch-slot="${slot}" onclick="selectPitchSlot(${slot},this)"><span class="pitch-dot">${esc(initials)}</span><span class="pitch-name">${esc(p.name.split(' ').slice(-1)[0])}</span><strong class="pitch-rating">${positionAdjustedRating(p,p.assignedRole)}</strong>${tag?'<span class="pitch-manual-role-tag">EGEN</span>':''}<span class="pitch-role">${esc(roleLabels[p.assignedRole]||ROLE_BY_SIDE[p.assignedRole]||p.pos)}</span><span class="pitch-mini-fit" style="color:${fit>=80?'#9cde80':fit>=55?'#ffe09a':'#ffaaaa'}">${fit}%</span></button>`;
  };
- const pitch=()=>`<div class="tactics-pitch-field pitch-field" id="tacticsPitchField" role="group" aria-label="Lagoppstilling. Trykk på en spiller for å velge hvem som skal fylle plassen."><div class="pitch-markings" aria-hidden="true"><div class="pitch-half-line"></div><div class="pitch-center-circle"></div><div class="pitch-center-spot"></div><div class="pitch-box-top"></div><div class="pitch-six-top"></div><div class="pitch-box-bottom"></div><div class="pitch-six-bottom"></div></div><span class="pitch-role-label" style="top:5%">ANGREP</span><span class="pitch-role-label" style="bottom:5%">EGET MÅL</span>${xi.map((p,slot)=>pitchPlayer(p,slot)).join('')}</div><div class="pitch-editor-controls"><div class="pitch-fit-legend"><span><i style="background:#9cde80"></i>God rollefit</span><span><i style="background:#e8c875"></i>Brukbar</span><span><i style="background:#e48787"></i>Svak</span></div><button type="button" class="pitch-reset-button" onclick="resetTacticalPitch()">↺ Tilbakestill roller</button></div><p class="pitch-editor-hint">Trykk på en spiller på banen for å velge hvem som skal spille i den plassen. Ingen dra-og-slipp.</p>`;
+ const densePitch=stablePitchRows.length>=4;
+ const pitch=()=>`<div class="tactics-pitch-field pitch-field ${densePitch?'pitch-field-compact':''}" id="tacticsPitchField" role="group" aria-label="Lagoppstilling. Trykk på en spiller for å velge hvem som skal fylle plassen."><div class="pitch-markings" aria-hidden="true"><div class="pitch-half-line"></div><div class="pitch-center-circle"></div><div class="pitch-center-spot"></div><div class="pitch-box-top"></div><div class="pitch-six-top"></div><div class="pitch-box-bottom"></div><div class="pitch-six-bottom"></div></div><span class="pitch-role-label" style="top:5%">ANGREP</span><span class="pitch-role-label" style="bottom:5%">EGET MÅL</span>${xi.map((p,slot)=>pitchPlayer(p,slot)).join('')}</div><div class="pitch-editor-controls"><div class="pitch-fit-legend"><span><i style="background:#9cde80"></i>God rollefit</span><span><i style="background:#e8c875"></i>Brukbar</span><span><i style="background:#e48787"></i>Svak</span></div><button type="button" class="pitch-reset-button" onclick="resetTacticalPitch()">↺ Tilbakestill roller</button></div><p class="pitch-editor-hint">Trykk på en spiller på banen for å velge hvem som skal spille i den plassen. Ingen dra-og-slipp.</p>`;
  const pitchSwapPanel=()=>{
   const slot=validPitchSelectedSlot();if(slot===null||!xi[slot])return '';
   const current=xi[slot],role=current.assignedRole||roleSlotsForFormation(appState.formation)[slot]||'CM';
@@ -5733,7 +5797,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.85 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.86 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 document.getElementById("saveBtn").addEventListener("click",()=>{const ok=save();let b=document.getElementById("saveBtn");b.textContent=ok?"✓ Lagret":"⚠ Lagring feilet";setTimeout(()=>b.textContent="▣ Lagre",1800)});

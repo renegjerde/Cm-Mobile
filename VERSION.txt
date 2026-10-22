@@ -1,2 +1,2 @@
-CM Mobile v2.85
-Tactical formation override fix
+CM Mobile v2.86
+Formation-aware pitch layout for all 23 available formations
