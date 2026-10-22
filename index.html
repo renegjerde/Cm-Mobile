@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.92 — Touchline</title>
+<title>CM Mobile v2.93 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -4509,11 +4509,29 @@ function seasonReviewTournamentMarkup(){
  <div class="section-title" style="margin-top:16px"><h3>Europacup</h3><small>Turneringsfase og resultat</small></div>${europeanNames.map(seasonReviewEuropeanMarkup).join('')}
  </section>`;
 }
+let seasonPlayerStatsSortKey='apps';
+let seasonPlayerStatsSortDir='desc';
+function setSeasonPlayerStatsSort(key){
+ const allowed=new Set(['name','apps','minutes','goals','assists','chancesCreated','yellowCards','redCards']);
+ if(!allowed.has(key))return;
+ if(seasonPlayerStatsSortKey===key){seasonPlayerStatsSortDir=seasonPlayerStatsSortDir==='asc'?'desc':'asc';}
+ else {seasonPlayerStatsSortKey=key;seasonPlayerStatsSortDir=key==='name'?'asc':'desc';}
+ render();
+}
 function seasonReviewPlayerStatsMarkup(){
  const keys=[['apps','Kamper'],['minutes','Minutter'],['goals','Mål'],['assists','Assists'],['chancesCreated','Sjanser skapt'],['yellowCards','Gule'],['redCards','Røde']];
- const players=[...(appState.squad||[])].sort((a,b)=>(Number(b.apps)||0)-(Number(a.apps)||0)||(Number(b.goals)||0)-(Number(a.goals)||0)||(Number(b.assists)||0)-(Number(a.assists)||0)||String(a.name).localeCompare(String(b.name)));
+ const players=[...(appState.squad||[])];
  const used=players.filter(p=>keys.some(([key])=>(Number(p[key])||0)>0));
- return `<section class="card"><div class="section-title"><h2>Spillerstatistikk · ${esc(currentClub().name)}</h2><span class="pill">${used.length} spillere med statistikk</span></div><p class="muted" style="margin-top:-4px">Tallene summerer registrerte kamper i liga, cuper og europacuper denne sesongen.</p>${used.length?`<div class="table-wrap"><table><thead><tr><th>Spiller</th>${keys.map(([k,label])=>`<th>${label}</th>`).join('')}</tr></thead><tbody>${used.map(p=>`<tr><td><strong>${esc(p.name)}</strong><div class="muted" style="font-size:11px">${esc(p.pos||'')}</div></td>${keys.map(([k])=>`<td>${Number(p[k])||0}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:'<p class="muted">Det finnes ingen spillerstatistikk registrert for denne sesongen.</p>'}<div class="notice">Kamper og minutter er basert på det spillet har registrert. Kort og sjanser skapt vises der det finnes data; statistikk fra tidligere versjoner rekonstrueres ikke.</div></section>`;
+ const sortKey=seasonPlayerStatsSortKey||'apps',dir=seasonPlayerStatsSortDir==='asc'?1:-1;
+ used.sort((a,b)=>{
+  let diff=0;
+  if(sortKey==='name')diff=String(a.name||'').localeCompare(String(b.name||''),'no',{sensitivity:'base'});
+  else diff=(Number(a[sortKey])||0)-(Number(b[sortKey])||0);
+  if(diff===0)return String(a.name||'').localeCompare(String(b.name||''),'no',{sensitivity:'base'});
+  return diff*dir;
+ });
+ const header=(key,label,align='right')=>{const active=sortKey===key,arrow=active?(dir===1?'↑':'↓'):'↕';return `<th aria-sort="${active?(dir===1?'ascending':'descending'):'none'}" style="text-align:${align};padding:0"><button type="button" class="stat-sort-button" onclick="setSeasonPlayerStatsSort('${key}')" title="Sorter etter ${label} ${active?(dir===1?'synkende':'stigende'):'stigende eller synkende'}" style="width:100%;height:100%;padding:10px 9px;border:0;border-radius:0;background:${active?'#22374e':'#17263a'};color:${active?'#a8e98e':'var(--muted)'};font-size:12px;font-weight:${active?'850':'600'};white-space:nowrap;text-align:${align}">${label} <span aria-hidden="true" style="font-size:10px">${arrow}</span></button></th>`};
+ return `<section class="card"><div class="section-title"><h2>Spillerstatistikk · ${esc(currentClub().name)}</h2><span class="pill">${used.length} spillere med statistikk</span></div><p class="muted" style="margin-top:-4px">Tallene summerer registrerte kamper i liga, cuper og europacuper denne sesongen. Trykk på en kolonneoverskrift for å sortere; trykk igjen for motsatt rekkefølge.</p>${used.length?`<div class="table-wrap"><table><thead><tr>${header('name','Spiller','left')}${keys.map(([k,label])=>header(k,label)).join('')}</tr></thead><tbody>${used.map(p=>`<tr><td><strong>${esc(p.name)}</strong><div class="muted" style="font-size:11px">${esc(p.pos||'')}</div></td>${keys.map(([k])=>`<td>${Number(p[k])||0}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:'<p class="muted">Det finnes ingen spillerstatistikk registrert for denne sesongen.</p>'}<div class="notice">Kamper og minutter er basert på det spillet har registrert. Kort og sjanser skapt vises der det finnes data; statistikk fra tidligere versjoner rekonstrueres ikke.</div></section>`;
 }
 function seasonReviewEuropeanPlaces(table=sortedTable()){
  const isActivePremier=clubDivision(currentClub())==='Premier League';

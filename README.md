@@ -1,4 +1,11 @@
-# CM Mobile v2.92 — FA Cup semifinale og finale
+# CM Mobile v2.93 — Sorterbar spillerstatistikk
+
+## v2.93 — Klikkbare sorteringskolonner
+- Spillerstatistikken på sesongoppsummeringen kan sorteres ved å klikke på alle kolonneoverskriftene: spiller, kamper, minutter, mål, assists, sjanser skapt, gule kort og røde kort.
+- Første klikk på en ny kolonne sorterer i naturlig retning for den typen data (spillernavn A–Å, tall høyest først). Nytt klikk snur rekkefølgen.
+- Aktiv sortering markeres visuelt og oppgir retning for skjermlesere. Sorteringen endrer kun visningen, ikke spillerdataene.
+- Ingen endringer i kampmotor, turneringsregler eller spillerstatistikkberegning.
+
 
 ## v2.92 — Gjenoppretting av forfalte cuptrinn
 - Rettet at FA Cup kunne bli stående etter kvartfinalen hvis en cupuke ikke ble behandlet akkurat på planlagt uke.
