@@ -1,4 +1,18 @@
-# CM Mobile v2.89 — turnering og runde på kampskjermen
+# CM Mobile v2.91 — National League, opprykksstatus og nedrykksstatus
+
+## v2.91 — National League og matematisk opprykk/nedrykk
+
+- La til National League som en egen 24-klubbs divisjon med 46 kamprunder, tabell, simulert kampstatistikk og genererte 25-spillers tropper der det ikke finnes en verifisert offisiell navneliste.
+- League Two sender de to nederste klubbene til National League; National League-mesteren og playoffvinneren går til League Two. Fire klubber fra den regionale non-league-poolen fyller de ledige plassene.
+- De regionale seriene simuleres ikke som egne tabeller i denne versjonen; fire feederklubber velges deterministisk fra tilgjengelige non-league-kandidater.
+- Championship-playoff er korrigert til plass 3–6 (ikke 3–8); League One 3–6, League Two 4–7, National League 2–7.
+- Ligatabeller viser O ved matematisk sikret opprykk og N ved matematisk sikret nedrykk. Etter fullførte runder vises direkte opprykkslag, simulert playoffvinner og nedrykkslag.
+- Player DB oppgradert til versjon 16; troppene bevares på klubbnivå når en klubb flytter divisjon, og nyopprykkede non-league-klubber får en egen 25-spillers offline tropp.
+- EFL Cup inkluderer fortsatt PL og EFL-klubbene, ikke National League; National League-klubber ligger i FA Cups non-league-pool.
+- JavaScript-syntaks og divisjons-/troppslister er kontrollert. Full Chrome nettlesertest tidsavbrøt i miljøet, så visuell end-to-end-kontroll gjenstår.
+
+Se `NATIONAL_LEAGUE_PROMOTION_AND_MATHEMATICAL_STATUS_V2.91.md` for detaljer og begrensninger.
+
 
 ## v2.89 — Tydelig kampkontekst under livekampen
 - Kampskjermen viser turneringsnavn/divisjon i et eget, tydelig banner og runde/fase ved LIVE-klokken.
