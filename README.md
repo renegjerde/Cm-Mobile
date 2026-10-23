@@ -1,4 +1,4 @@
-# CM Mobile v3.00
+# CM Mobile v3.01
 
 ## Spillerprofil og smartere utlån
 
@@ -8,4 +8,4 @@
 - Klubber som ikke har råd til den foreslåtte låneavgiften filtreres bort. Budsjettet kontrolleres igjen når utlånet bekreftes, og EFL-klubbenes divisjonsbudsjett brukes som reserve der klubbfinansene mangler et beløp.
 - Eksisterende regler for lånevarighet, lønnsandel og overgangsvindu er beholdt.
 
-Pakk ut ZIP-arkivet og åpne `CM_Mobile_v3.00/index.html`.
+Pakk ut ZIP-arkivet og åpne `CM_Mobile_v3.01/index.html`.

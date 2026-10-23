@@ -6082,7 +6082,8 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
   if(paused||matchFinished)return;
   currentMinute++;
   status.textContent=currentMinute<=90?`LIVE · ${currentMinute}'`:engine.isCupMatch&&currentMinute<=120?`EKSTRAOMGANGER · ${currentMinute}'`:`FULL TIME`;
-  progress.style.width=Math.min(100,currentMinute/(engine.isCupMatch?120:90)*100)+"%";
+  // Progress reflects regulation time, not the maximum possible match length. At 90' it reaches 100%; extra time keeps it full.
+  progress.style.width=Math.min(100,Math.max(0,currentMinute)/90*100)+"%";
   const lineupModalLive=document.getElementById('lineupModal');if(lineupModalLive?.classList.contains('open'))renderLiveLineup(engine,currentMinute,score.textContent);
   // Generate the match itself one minute at a time: shots, cards, injuries and goals do not exist until this tick.
   const newEvents=advanceLiveEngine(engine,currentMinute);
