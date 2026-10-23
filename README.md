@@ -1,15 +1,8 @@
-# CM Mobile v3.04
+# CM Mobile v3.05
 
-## Nytt i denne versjonen
-- Mer realistiske kontraktsforhandlinger med beregnet lønnsforventning basert på alder, ferdighet, klubbnivå og moral.
-- Spilleren kan komme med et konkret motkrav til ukelønn. Manageren kan godta eller avslå motkravet.
-- Avslag påvirker moralen, registreres i klubbens logg og gir varsel.
-- Spillerprofilen viser når siste kontraktsforhandling ble avslått.
-- Signerte forlengelser nullstiller telleren for mislykkede forhandlinger og oppdaterer utløpsdatoen.
-- Eksisterende karrierer og kontraktsdatoer beholdes.
+## Kontrakter og overgangsinteresse
+- AI-klubber får høyere sannsynlighet for å by på seniorspillere som nærmer seg kontraktsutløp.
+- Spillere i siste kontraktsår kan bli mer attraktive, men bud er fortsatt ikke garantert.
+- Varsler om kontrakter som krever oppmerksomhet vises på oversiktsskjermen; åpne spillerprofilen for å fornye, legge på transferlisten eller frigi spilleren.
 
-## Oppdatering
-Pakk ut arkivet og åpne `CM_Mobile_v3.04/index.html`. `CONTRACTS_V3.04.md` beskriver endringene.
-
-## Kontroll
-JavaScript-syntaksen er kontrollert med Node.js. Full interaktiv nettlesertest i en aktiv karriere gjenstår.
+Bygger videre på v3.04. Eksisterende karrierer støttes.
