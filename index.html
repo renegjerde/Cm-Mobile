@@ -165,7 +165,30 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 @keyframes goalTextFlash{0%,18%,36%,54%,72%{background:var(--goal-color,#9be27d);color:#101820;box-shadow:0 0 22px color-mix(in srgb,var(--goal-color,#9be27d) 70%,transparent)}9%,27%,45%,63%,81%,100%{background:#1b2b3e;color:#d8e5f2;box-shadow:none}}
 .live-goal-score{animation:scorePop .42s ease-out}
 @keyframes scorePop{0%{transform:scale(1)}45%{transform:scale(1.16);color:var(--green)}100%{transform:scale(1)}}
-.live-paused{color:#ffd27d!important}
+.live-paused{color:#102016!important}
+/* High-contrast halftime/resume control: .live-paused must not turn its label amber. */
+.live-match-controls button.live-paused,
+.live-match-controls button#livePauseBtn.live-paused{
+ background:#a4ef7a!important;
+ color:#07150b!important;
+ -webkit-text-fill-color:#07150b!important;
+ border:2px solid #07150b!important;
+ font-weight:900!important;
+ text-shadow:none!important;
+ opacity:1!important;
+ box-shadow:0 0 0 2px #a4ef7a, 0 3px 0 #4b8137!important;
+}
+#startSecondHalfBtn{
+ background:#a4ef7a!important;
+ color:#07150b!important;
+ -webkit-text-fill-color:#07150b!important;
+ border:2px solid #07150b!important;
+ font-weight:900!important;
+ text-shadow:none!important;
+ opacity:1!important;
+ box-shadow:0 0 0 2px #a4ef7a, 0 3px 0 #4b8137!important;
+}
+#halftimePanel .hero-actions #startSecondHalfBtn{color:#07150b!important;-webkit-text-fill-color:#07150b!important}
 #halftimePanel{margin-top:12px} #halftimePanel .hero-actions button{flex:1}
 
 
@@ -468,7 +491,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.98</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v2.99</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -879,7 +902,7 @@ function buildFPLSquad(clubIndex){
  const out=selected.slice(0,25).map((p,i)=>{const tm=findTransfermarktRecord(p.fullName,p);const pos=p.pos||'MID';return makeRealPlayer(p.fullName,pos,clubIndex,i,{fpl:p,tm,source:'FPL current squad + Transfermarkt profile reference',clubVerified:true});});
  return out.length>=18?out:null;
 }
-function activePlayerDatabaseSourceVersion(){return `embedded-offline-full-profile-archive-${EMBEDDED_TM_PROFILES.length}-european-snapshot-rosters-v2.78-age-audit-dob-supplement-${TM_GLOBAL_REFERENCE_CUTOFF}-pl-official-2026-09-${Object.values(PL_OFFICIAL_ROSTERS_2026_27).reduce((n,a)=>n+a.length,0)}-biancheri-role-transfer-window-guard-v2.98`;}
+function activePlayerDatabaseSourceVersion(){return `embedded-offline-full-profile-archive-${EMBEDDED_TM_PROFILES.length}-european-snapshot-rosters-v2.78-age-audit-dob-supplement-${TM_GLOBAL_REFERENCE_CUTOFF}-pl-official-2026-09-${Object.values(PL_OFFICIAL_ROSTERS_2026_27).reduce((n,a)=>n+a.length,0)}-biancheri-role-transfer-window-guard-v2.99`;}
 function playerSourceSummary(){const local=`Innebygd, komplett referansearkiv for spillerprofiler er tilgjengelig offline (${PLAYER_REFERENCE_STATUS.globalPlayers||EMBEDDED_TM_PROFILES.length} profiler; Transfermarkt-snapshot 06.07.2026). Fødselsdato brukes når navnet kan matches sikkert. Snapshotet bekrefter ikke 2026/27-klubbtilhørighet; ferdigheter og potensial er spillmodell-estimater.`;return PLAYER_REFERENCE_STATUS.fplReady?`Spillertruppene er synkronisert fra Fantasy Premier League${PLAYER_REFERENCE_STATUS.gameweek?` (runde ${PLAYER_REFERENCE_STATUS.gameweek})`:''}. ${local}`:local+' Live FPL-data er ikke tilgjengelig, men grunnregisteret krever ingen nettforbindelse.';}
 function playerDatabaseStatusHTML(players){
  const rows=Array.isArray(players)?players:[],dob=rows.filter(p=>p&&p.dob&&p.dataQuality?.dobVerified===true).length,modelledDob=rows.filter(p=>p&&p.dataQuality?.ageModelledDOB===true).length,tm=rows.filter(p=>p.transfermarktMarketValueEuro||p.preferredFoot||p.heightCm||p.transfermarktPosition).length;
@@ -6247,7 +6270,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.98 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v2.99 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
