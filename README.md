@@ -1,11 +1,10 @@
-# CM Mobile v3.01
+# CM Mobile v3.02
 
-## Spillerprofil og smartere utlån
+## Kontrakter og fri transfer
+- Seniorprofiler viser kontraktens utløpsdato.
+- Eksisterende spillerlagringer migreres med en stabil, deterministisk kontraktsdato hvis spilleren ikke har en registrert kontrakt fra før.
+- Nye signeringer får kontraktsdato.
+- «Frigi på fri transfer» er tilgjengelig fra spillerens utvidede troppsprofil. Spilleren fjernes fra klubben og legges i free-agent-markedet uten overgangssum.
+- Ved sesongskifte blir utløpte kontrakter gjort klubbløse, med logg og historikk. Spillere som er involvert i utlån, hoppes over til låneforholdet er avsluttet.
 
-- Spillerkortets utvidede profil har nå snarveier for «Sett på transferlisten» / «Ta av transferlisten» og «Lån ut».
-- Utlån foreslår maksimalt 10 klubber rangert etter spillerens ferdighetsnivå, forventet bruk og klubbens økonomi.
-- Forslagene viser divisjon, forventet spilletid (fast plass, rotasjon eller utviklingsspiller) og tilgjengelig budsjett.
-- Klubber som ikke har råd til den foreslåtte låneavgiften filtreres bort. Budsjettet kontrolleres igjen når utlånet bekreftes, og EFL-klubbenes divisjonsbudsjett brukes som reserve der klubbfinansene mangler et beløp.
-- Eksisterende regler for lånevarighet, lønnsandel og overgangsvindu er beholdt.
-
-Pakk ut ZIP-arkivet og åpne `CM_Mobile_v3.01/index.html`.
+Pakk ut mappen og åpne `index.html`. Eksisterende karrierer støttes.
