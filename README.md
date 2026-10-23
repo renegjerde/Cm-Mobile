@@ -1,13 +1,11 @@
-# CM Mobile v3.08
+# CM Mobile v3.09
 
-## Overgangsmarked: kompakt låneoversikt
-- Låneavtaler er nå lagt i en sammenleggbar seksjon, slik at den kan skjules mens du bruker overgangsmarkedet.
-- Overskriften viser antall aktive låneavtaler, også når innholdet er skjult.
-- Låneradene bruker en kompakt, responsiv layout som følger samme visuelle prinsipp som spiller-/overgangslisten.
-- Knappene for å forlenge lån og hente hjem spillere er beholdt.
-- Bygger videre på v3.07 og støtter eksisterende karrierer.
+## Europeiske klubber i overgangsmarkedet
+- Internasjonale klubber som deltar i de innebygde UEFA-konkurransene får vedvarende spillerstaller og egne overgangsbudsjetter.
+- Spillerne blir tilgjengelige i det ordinære overgangsmarkedet med verdibasert prisforlangende.
+- Kjøp flytter spilleren ut av den europeiske klubbens stall, legger betalingen til klubbens budsjett og registrerer overgangen i spillerens karrierehistorikk/overgangshistorikk.
+- Klubber som også er engelske PL-klubber fortsetter å bruke sin eksisterende klubb- og spillerstall, slik at spillere ikke dobbelttelles.
+- Alt er offline; ingen ekstern datatilkobling er lagt til.
 
-## Validering
-- JavaScript-syntaks kontrollert med Node.js.
-- ZIP-arkivet kontrollert med unzip.
-- Full interaktiv nettlesertest er ikke utført.
+## Kontroll
+JavaScript-syntaks og ZIP-arkiv er kontrollert. Full interaktiv nettlesertest er ikke utført.
