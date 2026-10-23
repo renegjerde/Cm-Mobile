@@ -1,10 +1,11 @@
-# CM Mobile v3.02
+# CM Mobile v3.03
 
-## Kontrakter og fri transfer
-- Seniorprofiler viser kontraktens utløpsdato.
-- Eksisterende spillerlagringer migreres med en stabil, deterministisk kontraktsdato hvis spilleren ikke har en registrert kontrakt fra før.
-- Nye signeringer får kontraktsdato.
-- «Frigi på fri transfer» er tilgjengelig fra spillerens utvidede troppsprofil. Spilleren fjernes fra klubben og legges i free-agent-markedet uten overgangssum.
-- Ved sesongskifte blir utløpte kontrakter gjort klubbløse, med logg og historikk. Spillere som er involvert i utlån, hoppes over til låneforholdet er avsluttet.
+## Nytt i denne versjonen
+- Varsler på oversiktsskjermen for seniorspillere med kontrakt som utløper ved neste sesongslutt.
+- Forny kontrakt direkte fra utvidet spillerprofil.
+- Kontraktsforhandling med valg av lengde (1–5 sesonger) og ukelønn. Spillerens alder, ferdighet, moral og tilbudet påvirker om tilbudet godtas.
+- Lønnsbudsjettkontroll før tilbud sendes.
+- Varsel ved avslag eller signert forlengelse.
 
-Pakk ut mappen og åpne `index.html`. Eksisterende karrierer støttes.
+## Oppdatering
+Pakk ut arkivet og åpne `CM_Mobile_v3.03/index.html`. Eksisterende lagringer beholdes.
