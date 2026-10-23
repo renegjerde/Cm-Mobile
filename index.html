@@ -491,7 +491,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.05</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.06</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -902,7 +902,7 @@ function buildFPLSquad(clubIndex){
  const out=selected.slice(0,25).map((p,i)=>{const tm=findTransfermarktRecord(p.fullName,p);const pos=p.pos||'MID';return makeRealPlayer(p.fullName,pos,clubIndex,i,{fpl:p,tm,source:'FPL current squad + Transfermarkt profile reference',clubVerified:true});});
  return out.length>=18?out:null;
 }
-function activePlayerDatabaseSourceVersion(){return `embedded-offline-full-profile-archive-${EMBEDDED_TM_PROFILES.length}-european-snapshot-rosters-v2.78-age-audit-dob-supplement-${TM_GLOBAL_REFERENCE_CUTOFF}-pl-official-2026-09-${Object.values(PL_OFFICIAL_ROSTERS_2026_27).reduce((n,a)=>n+a.length,0)}-biancheri-role-transfer-window-guard-v3.05`;}
+function activePlayerDatabaseSourceVersion(){return `embedded-offline-full-profile-archive-${EMBEDDED_TM_PROFILES.length}-european-snapshot-rosters-v2.78-age-audit-dob-supplement-${TM_GLOBAL_REFERENCE_CUTOFF}-pl-official-2026-09-${Object.values(PL_OFFICIAL_ROSTERS_2026_27).reduce((n,a)=>n+a.length,0)}-biancheri-role-transfer-window-guard-v3.06`;}
 function playerSourceSummary(){const local=`Innebygd, komplett referansearkiv for spillerprofiler er tilgjengelig offline (${PLAYER_REFERENCE_STATUS.globalPlayers||EMBEDDED_TM_PROFILES.length} profiler; Transfermarkt-snapshot 06.07.2026). Fødselsdato brukes når navnet kan matches sikkert. Snapshotet bekrefter ikke 2026/27-klubbtilhørighet; ferdigheter og potensial er spillmodell-estimater.`;return PLAYER_REFERENCE_STATUS.fplReady?`Spillertruppene er synkronisert fra Fantasy Premier League${PLAYER_REFERENCE_STATUS.gameweek?` (runde ${PLAYER_REFERENCE_STATUS.gameweek})`:''}. ${local}`:local+' Live FPL-data er ikke tilgjengelig, men grunnregisteret krever ingen nettforbindelse.';}
 function playerDatabaseStatusHTML(players){
  const rows=Array.isArray(players)?players:[],dob=rows.filter(p=>p&&p.dob&&p.dataQuality?.dobVerified===true).length,modelledDob=rows.filter(p=>p&&p.dataQuality?.ageModelledDOB===true).length,tm=rows.filter(p=>p.transfermarktMarketValueEuro||p.preferredFoot||p.heightCm||p.transfermarktPosition).length;
@@ -1258,7 +1258,7 @@ function renewPlayerContract(id){
    if(counterRaw!==null&&counterRaw.trim().toLowerCase()==='ja'){
     const counterProjected=Number(finance.wageBill||0)-currentWage*1000+counterWage*1000;
     if(counterProjected>Number(finance.wageBudget||Infinity)*1.25&&!confirm(`Motkravet vil presse lønnsbudsjettet betydelig. Godta £${counterWage}k/uke likevel?`)){return;}
-    p.contractEndDate=`${currentYear+years}-06-30`;p.contractYearsAtSigning=years;p.wage=counterWage;p.contractRenewedSeason=currentYear;p.contractNegotiationStatus='renewed';p.contractLastTalkSeason=currentYear;
+    p.contractEndDate=`${currentYear+years}-06-30`;p.contractYearsAtSigning=years;p.wage=counterWage;p.contractRenewedSeason=currentYear;p.contractNegotiationStatus='renewed';p.contractLastTalkSeason=currentYear;p.contractTalksFailedCount=0;p.wantsToLeave=false;p.playerExitRequestSeason=null;
     appState.log.push(`${p.name} godtok forlengelse etter motkrav: ${years} sesonger og £${counterWage}k/uke.`);
     queueManagerNotification(`contract-counter-accepted-${p.careerId||p.id}-${currentYear}`,'Kontrakt fornyet',`${p.name} godtok motkravet og signerte til 30.06.${currentYear+years}.`,'squad','normal');save();render();return;
    }
@@ -1273,10 +1273,15 @@ function renewPlayerContract(id){
   p.contractLastTalkSeason=currentYear;
   p.morale=Math.max(20,(Number(p.morale)||65)-(yearsLeft<=1?5:2));
   p.contractTalksFailedCount=(Number(p.contractTalksFailedCount)||0)+1;
+  if(yearsLeft<=1&&p.contractTalksFailedCount>=2&&!p.wantsToLeave){
+   p.wantsToLeave=true;p.playerExitRequestSeason=currentYear;
+   appState.log.push(`${p.name} er frustrert etter flere mislykkede kontraktsforhandlinger og ønsker å forlate klubben.`);
+   queueManagerNotification(`player-wants-to-leave-${p.careerId||p.id}-${currentYear}`,'Spiller ønsker å forlate klubben',`${p.name} har avslått flere kontraktstilbud og ønsker nå å finne en ny klubb. Et realistisk bud kan gjøre spilleren mer villig til å dra.`,'transfers','urgent');
+  }
   save();render();return;
  }
  const oldDate=p.contractEndDate;
- p.contractEndDate=`${currentYear+years}-06-30`;p.contractYearsAtSigning=years;p.wage=offeredWage;p.contractRenewedSeason=currentYear;p.contractNegotiationStatus='renewed';p.contractLastTalkSeason=currentYear;p.contractTalksFailedCount=0;
+ p.contractEndDate=`${currentYear+years}-06-30`;p.contractYearsAtSigning=years;p.wage=offeredWage;p.contractRenewedSeason=currentYear;p.contractNegotiationStatus='renewed';p.contractLastTalkSeason=currentYear;p.contractTalksFailedCount=0;p.wantsToLeave=false;p.playerExitRequestSeason=null;
  appState.log=appState.log||[];appState.log.push(`${p.name} fornyet kontrakten til 30.06.${currentYear+years} på £${offeredWage}k per uke (tidligere utløp ${oldDate}).`);
  appState.managerNotifications=appState.managerNotifications||[];queueManagerNotification(`contract-renewed-${p.careerId||p.id}-${currentYear}`, 'Kontrakt fornyet', `${p.name} har signert en ny kontrakt til 30.06.${currentYear+years}.`, 'squad','normal');
  save();render();
@@ -2015,7 +2020,8 @@ function importantDashboardAlerts(){
  const notices=(appState.managerNotifications||[]).filter(n=>!n.read).slice(-5).reverse();
  const cup=appState.pendingCupMatch;
  const expiringContracts=expiringContractDashboardRows();
- const activeCount=pendingOffers.length+injured.length+suspended.length+(cup?1:0)+expiringContracts.length;
+ const wantToLeave=(appState.squad||[]).filter(p=>p.wantsToLeave&&!p.freeAgent);
+ const activeCount=pendingOffers.length+injured.length+suspended.length+(cup?1:0)+expiringContracts.length+wantToLeave.length;
  if(!activeCount&&!notices.length)return '';
  const rows=[];
  pendingOffers.forEach(o=>rows.push(`<article class="home-alert urgent"><div class="home-alert-icon">📩</div><div class="home-alert-copy"><span class="home-alert-label">Bud mottatt · Handling kreves</span><strong>${esc(o.buyerName||'En klubb')} byr ${money(o.amount)} på ${esc(o.playerName||'en spiller')}</strong><p>${o.isYouth?'Bud på juniortalent.':'Vurder budet opp mot spillerens verdi, rolle og troppsbehov.'}${o.star?' Nøkkelspiller.':''}</p></div><div class="home-alert-actions"><button class="primary" onclick="setPage('transfers')">Vurder bud →</button></div></article>`));
@@ -2023,6 +2029,7 @@ function importantDashboardAlerts(){
  if(suspended.length){const names=suspended.slice(0,4).map(p=>p.name).join(', ');rows.push(`<article class="home-alert urgent"><div class="home-alert-icon">🟥</div><div class="home-alert-copy"><strong>${suspended.length} suspendert${suspended.length===1?' spiller':'e'}</strong><p>${esc(names)}${suspended.length>4?` og ${suspended.length-4} til`:''}. Disse spillerne er ikke tilgjengelige for laguttak.</p></div><div class="home-alert-actions"><button onclick="setPage('squad')">Se tropp →</button></div></article>`)}
  if(cup){const homeName=cup.homeTeam?.name||cup.homeTeam||'Hjemmelag';const awayName=cup.awayTeam?.name||cup.awayTeam||'Bortelag';rows.push(`<article class="home-alert urgent"><div class="home-alert-icon">🏆</div><div class="home-alert-copy"><span class="home-alert-label">Kamp venter</span><strong>${esc(cup.competition||'Cupkamp')}</strong><p>${esc(homeName)} – ${esc(awayName)}. Kampen venter på deg.</p></div><div class="home-alert-actions"><button class="primary" onclick="startPendingCupMatch()">Forbered kamp →</button></div></article>`)}
  expiringContracts.forEach(p=>rows.push(`<article class="home-alert urgent"><div class="home-alert-icon">📝</div><div class="home-alert-copy"><span class="home-alert-label">Kontrakt krever oppmerksomhet</span><strong>${esc(p.name)} · ${contractExpiryStatus(p).label}</strong><p>Forny kontrakten, legg spilleren på transferlisten eller vurder fri transfer før sesongslutt.</p></div><div class="home-alert-actions"><button class="primary" onclick="setPage('squad');expandedSquadPlayer='${String(p.id).replace(/'/g,'')}';render()">Se spiller →</button><button onclick="renewPlayerContract('${String(p.id).replace(/'/g,'')}')">Forny</button></div></article>`));
+ wantToLeave.slice(0,5).forEach(p=>rows.push(`<article class="home-alert urgent"><div class="home-alert-icon">🚪</div><div class="home-alert-copy"><span class="home-alert-label">Spiller ønsker å dra</span><strong>${esc(p.name)} vil forlate klubben</strong><p>Flere mislykkede kontraktsforhandlinger har gjort spilleren klar for et klubbskifte. Legg spilleren på transferlisten eller vurder innkommende bud.</p></div><div class="home-alert-actions"><button class="primary" onclick="setPage('squad');expandedSquadPlayer='${String(p.id).replace(/'/g,'')}';render()">Se spiller →</button><button onclick="setPage('transfers')">Overganger →</button></div></article>`));
  notices.forEach(n=>rows.push(`<article class="home-alert unread"><div class="home-alert-icon">${n.severity==='urgent'?'⚠':'✉'}</div><div class="home-alert-copy"><strong>${esc(n.title||'Klubbmelding')}</strong><p>${esc(n.message||'En viktig hendelse er registrert.')}</p></div><div class="home-alert-actions"><button onclick="openManagerNotification('${esc(n.id)}')">Åpne →</button><button class="ghost" onclick="markManagerNotificationRead('${esc(n.id)}')" title="Marker som lest">Lest</button></div></article>`));
  const total=activeCount+notices.length;
  return `<section class="home-important-alerts" aria-label="Viktige meldinger"><div class="home-important-head"><h2>🔔 Viktige meldinger</h2><span class="home-important-count">${activeCount?`${activeCount} krever handling`:`${notices.length} ulest`}</span></div><div class="home-alert-list">${rows.join('')}</div></section>`;
@@ -3166,10 +3173,12 @@ function processAITransferOffers(week=appState.week){
   // Clubs pay extra attention to players entering the final contract year;
   // the chance rises further in the final months but never guarantees a bid.
   const contractRunDown=expiry.yearsLeft<=0?2.4:expiry.yearsLeft===1?1.85:1;
-  const base=Math.min(.62,(listed?.38:(star?.003:.012))*contractRunDown);
+  const exitRequestFactor=p.wantsToLeave?2.1:1;
+  const failedTalksFactor=Math.min(1.6,1+(Number(p.contractTalksFailedCount)||0)*.15);
+  const base=Math.min(.72,(listed?.38:(star?.003:.012))*contractRunDown*exitRequestFactor*failedTalksFactor);
   if(Math.random()>base)continue;
   const value=Number(p.value)||Math.max(.2,((rating-45)**2)/100);
-  const estimatedAsk=value*(star?1.55:1.18)*(listed?.96:1.08)*(Number(p.age)<22?1.12:Number(p.age)>30?.82:1);
+  const estimatedAsk=value*(star?1.55:1.18)*(listed?.96:1.08)*(Number(p.age)<22?1.12:Number(p.age)>30?.82:1)*(p.wantsToLeave?.88:1);
   const buyers=CLUBS.map((c,i)=>({...c,index:i,rank:divisionRank[clubDivision(c)]??3,fit:aiBuyerFitForPlayer(i,p)})).filter(c=>{
    if(c.index===Number(appState.club)||Number(c.budget)<=0||!c.fit.ok)return false;
    // One division down is entirely possible when the player improves that squad.
@@ -3194,11 +3203,12 @@ function processAITransferOffers(week=appState.week){
   const buyer=top[Math.floor(Math.random()*top.length)];
   const statusGap=Number(buyer.strength||60)-Number(userClub.strength||60);
   const resistance=star?(statusGap>=8?1.32:1.72):(statusGap>=8?1.08:1.24);
-  const ask=+(value*resistance*(listed?.96:1.08)*(Number(p.age)<22?1.12:Number(p.age)>30?.82:1)).toFixed(1);
+  const exitDiscount=p.wantsToLeave?.86:1;
+  const ask=+(value*resistance*(listed?.96:1.08)*(Number(p.age)<22?1.12:Number(p.age)>30?.82:1)*exitDiscount).toFixed(1);
   const bid=+(ask*(listed?.86:.72)*(statusGap>=10?1.08:1)).toFixed(1);
-  const offer={id:'OFFER-'+Date.now()+'-'+Math.floor(Math.random()*100000),playerId:String(p.id),playerName:p.name,buyerIndex:buyer.index,buyerName:buyer.name,amount:Math.max(.1,bid),asking:ask,week,status:'pending',listed,star,createdAt:Date.now()};
+  const offer={id:'OFFER-'+Date.now()+'-'+Math.floor(Math.random()*100000),playerId:String(p.id),playerName:p.name,buyerIndex:buyer.index,buyerName:buyer.name,amount:Math.max(.1,bid),asking:ask,week,status:'pending',listed,star,contractRunDown:expiry.yearsLeft<=1,wantsToLeave:!!p.wantsToLeave,createdAt:Date.now()};
   appState.transferOffers.push(offer);created.push(offer);pending.add(String(p.id));
-  appState.log.push(`${buyer.name} har lagt inn bud på ${p.name}: ${money(offer.amount)}${listed?' etter at spilleren ble lagt ut for salg':''}.`);
+  appState.log.push(`${buyer.name} har lagt inn bud på ${p.name}: ${money(offer.amount)}${listed?' etter at spilleren ble lagt ut for salg':''}${p.wantsToLeave?' (spilleren ønsker å forlate klubben)':''}.`);
  }
  // Other clubs can also scout and bid for youth players who have completed at least one full academy season.
  const userYouth=appState.youthAcademies?.[userClub.name]||[];
@@ -6401,7 +6411,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.05 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.06 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
