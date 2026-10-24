@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v3.19 — Touchline</title>
+<title>CM Mobile v3.20 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -13,7 +13,8 @@ header{position:sticky;top:0;z-index:5;background:#101b2bf2;backdrop-filter:blur
 main{max-width:760px;margin:auto;padding:14px 12px 92px}.hero{border:1px solid #31465f;background:linear-gradient(135deg,#1d344a,#142236 65%,#1b382c);border-radius:16px;padding:17px;margin-bottom:13px;position:relative;overflow:hidden}.eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);font-weight:800}.hero h1{font-size:25px;line-height:1.1;margin:8px 0}.hero p{color:#c2d0df;margin:0 0 14px;max-width:460px}.hero-actions{display:flex;gap:8px;flex-wrap:wrap}.hero-mark{position:absolute;right:-10px;top:12px;font-size:94px;opacity:.10}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:13px}.stat,.card{border:1px solid var(--line);background:var(--panel);border-radius:13px;padding:13px}.stat small,.muted{color:var(--muted)}.stat strong{display:block;font-size:22px;margin-top:3px}.stat .positive{color:var(--green)}.stat .warning{color:var(--gold)}.negative{color:var(--red)}
 .section-title{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 9px}.section-title h2{font-size:15px;margin:0}.section-title small{color:var(--muted)}
-/* v3.19: stronger visual separation in the transfer-window report */
+/* v3.19: stronger visual separation in the transfer-window report
+/* v3.20: expire all undecided bids when a transfer window closes */ */
 .transfer-report-section{margin-top:18px;padding:16px;border-radius:14px;border:1px solid #344b63;background:linear-gradient(145deg,#17263a,#111d2e)}
 .transfer-report-section--club{border-color:#4a9a54;border-left:5px solid #83d96c;background:linear-gradient(145deg,rgba(74,154,84,.17),rgba(17,29,46,.96) 60%)}
 .transfer-report-section--market{border-color:#55769d;border-left:5px solid #7fb4ff;background:linear-gradient(145deg,rgba(91,133,184,.16),rgba(17,29,46,.96) 60%)}
@@ -528,7 +529,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.19</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.20</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -3276,6 +3277,33 @@ function marketControls(){
  <details class="card market-advanced-search" style="padding:0;margin:8px 0 12px" ${window.marketAdvancedOpen?'open':''} ontoggle="window.marketAdvancedOpen=this.open"><summary style="display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;padding:12px 14px;font-weight:800;list-style:none"><span>Avansert søk</span><span class="muted" style="font-size:12px;font-weight:500">Alder · rolle · pris · potensial</span></summary><div style="padding:0 12px 12px"><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px"><div><label for="marketAgeMin" class="muted" style="display:block;font-size:12px;margin:0 0 5px">Alder fra</label><input id="marketAgeMin" aria-label="Alder fra" type="number" min="15" max="50" placeholder="Min. alder" value="${esc(marketAgeMin)}" onchange="setMarketAgeMin(this.value)" style="${style}"></div><div><label for="marketAgeMax" class="muted" style="display:block;font-size:12px;margin:0 0 5px">Alder til</label><input id="marketAgeMax" aria-label="Alder til" type="number" min="15" max="50" placeholder="Maks. alder" value="${esc(marketAgeMax)}" onchange="setMarketAgeMax(this.value)" style="${style}"></div><div style="grid-column:1/-1"><label for="marketExactRole" class="muted" style="display:block;font-size:12px;margin:0 0 5px">Eksakt posisjon / rolle</label><select id="marketExactRole" aria-label="Eksakt posisjon / rolle" onchange="setMarketExactRole(this.value)" style="${style}">${roles.map(([v,l])=>`<option value="${v}" ${marketExactRole===v?'selected':''}>${l}</option>`).join('')}</select></div><div><label for="marketMaxPrice" class="muted" style="display:block;font-size:12px;margin:0 0 5px">Maks overgangssum (£m)</label><input id="marketMaxPrice" aria-label="Maks overgangssum" type="number" min="0" step="0.5" placeholder="Ubegrenset" value="${esc(marketMaxPrice)}" onchange="setMarketMaxPrice(this.value)" style="${style}"></div><div><label for="marketMinPotential" class="muted" style="display:block;font-size:12px;margin:0 0 5px">Min. potensial</label><input id="marketMinPotential" aria-label="Minimum potensial" type="number" min="1" max="99" placeholder="Ingen min." value="${esc(marketMinPotential)}" onchange="setMarketMinPotential(this.value)" style="${style}"></div></div><p class="muted" style="font-size:11px;margin:8px 2px 0">Spillere uten registrert alder utelates når du bruker aldersfilter. Eksakt posisjon matcher spillerens primære eller registrerte naturlige roller.</p><div style="display:flex;justify-content:flex-end;margin-top:8px"><button type="button" onclick="resetAdvancedMarketFilters()">Nullstill avanserte filtre</button></div></div></details>`;
 }
 function transferWindowOpen(week=appState.week){return !!appState.preseasonActive||(week>=1&&week<=2)||(week>=19&&week<=23)}
+function transferWindowKindForWeek(week=appState.week,preseason=false){const w=Number(week)||1;if(preseason||(w>=1&&w<=2))return 'summer';if(w>=19&&w<=23)return 'winter';return null;}
+function isTransferWindowClosingWeek(week=appState.week){return !appState.preseasonActive&&(Number(week)===2||Number(week)===23);}
+function transferOfferWindowKey(offer){
+ const y=Number(offer?.seasonYear)||Number(appState.seasonYear)||2026;
+ if(offer?.transferWindowKey)return String(offer.transferWindowKey);
+ const kind=transferWindowKindForWeek(offer?.week,offer?.calendarPhase==='preseason'||Number(offer?.preseasonWeek)>0);
+ return `${y}:${kind||`week-${Number(offer?.week)||1}`}`;
+}
+function expirePendingTransferOffersOutsideWindow(){
+ if(!Array.isArray(appState.transferOffers))appState.transferOffers=[];
+ const open=transferWindowOpen(appState.week);
+ const currentKey=open?currentTransferWindowKey(appState.week):null;
+ const expired=[];
+ for(const offer of appState.transferOffers){
+  if(!offer||offer.status!=='pending')continue;
+  if(!open||transferOfferWindowKey(offer)!==currentKey){offer.status='expired';offer.expiredReason='transfer-window-closed';offer.expiredAt=Date.now();expired.push(offer);}
+ }
+ if(expired.length){
+  if(!Array.isArray(appState.log))appState.log=[];
+  const names=expired.slice(0,3).map(o=>o.playerName||'en spiller').join(', ');
+  appState.log.push(`${expired.length} ubehandlede overgangsbud utløp da overgangsvinduet stengte${names?`: ${names}${expired.length>3?' m.fl.':''}`:''}.`);
+ }
+ return expired.length;
+}
+function transferOfferActionableNow(offer){
+ return !!offer&&transferWindowOpen(appState.week)&&transferOfferWindowKey(offer)===currentTransferWindowKey(appState.week);
+}
 function transferWindowCalendarText(){const y=Number(appState.seasonYear)||2026;return `Sommer: de fire pre-season-ukene og de to første ligarundene (${y}) · Vinter: 1. januar–1. februar ${y+1} (modellert som GW 19–23).`}
 function listedPlayerIds(){if(!Array.isArray(appState.listedForTransfer))appState.listedForTransfer=[];return appState.listedForTransfer;}
 function listPlayerForTransfer(id){if(!transferWindowOpen()){alert(`Overgangsvinduet er stengt. ${transferWindowCalendarText()}`);return;}const p=appState.squad.find(x=>String(x.id)===String(id));if(!p)return;const ids=listedPlayerIds();if(ids.includes(String(id))){appState.listedForTransfer=ids.filter(x=>x!==String(id));appState.log.push(`${p.name} er tatt av overgangslisten.`);}else{appState.listedForTransfer.push(String(id));appState.log.push(`${p.name} er lagt ut på overgangsmarkedet. Andre klubber får tydelig beskjed om at spilleren kan kjøpes.`);}save();render()}
@@ -3388,7 +3416,10 @@ function aiBuyerFitForPlayer(buyerIndex,p){
  return {ok:rating>=qualityFloor&&improvesDepth,group,needs:needs[group]||0,weakest,qualityFloor,improvesDepth};
 }
 function processAITransferOffers(week=appState.week){
- if(!transferWindowOpen(week))return [];
+ // Offers generated after the final match of a window are not actionable: the
+ // match-finalization flow advances the gameweek before the manager can respond.
+ // Skip those bids entirely; earlier pending offers expire at the same boundary.
+ if(!transferWindowOpen(week)||isTransferWindowClosingWeek(week))return [];
  if(!Array.isArray(appState.transferOffers))appState.transferOffers=[];
  if(!Array.isArray(appState.listedForTransfer))appState.listedForTransfer=[];
  const pending=new Set(appState.transferOffers.filter(o=>o.status==='pending').map(o=>String(o.playerId)));
@@ -3442,7 +3473,7 @@ function processAITransferOffers(week=appState.week){
   const exitDiscount=p.wantsToLeave?.86:1;
   const ask=+(value*resistance*(listed?.96:1.08)*(Number(p.age)<22?1.12:Number(p.age)>30?.82:1)*exitDiscount).toFixed(1);
   const bid=+(ask*(listed?.86:.72)*(statusGap>=10?1.08:1)).toFixed(1);
-  const offer={id:'OFFER-'+Date.now()+'-'+Math.floor(Math.random()*100000),playerId:String(p.id),playerName:p.name,buyerIndex:buyer.index,buyerName:buyer.name,amount:Math.max(.1,bid),asking:ask,week,status:'pending',listed,star,contractRunDown:expiry.yearsLeft<=1,wantsToLeave:!!p.wantsToLeave,createdAt:Date.now()};
+  const offer={id:'OFFER-'+Date.now()+'-'+Math.floor(Math.random()*100000),playerId:String(p.id),playerName:p.name,buyerIndex:buyer.index,buyerName:buyer.name,amount:Math.max(.1,bid),asking:ask,week,status:'pending',listed,star,contractRunDown:expiry.yearsLeft<=1,wantsToLeave:!!p.wantsToLeave,seasonYear:Number(appState.seasonYear)||2026,calendarPhase:appState.preseasonActive?'preseason':'league',preseasonWeek:appState.preseasonActive?(Number(appState.preseasonWeek)||1):null,transferWindowKey:currentTransferWindowKey(week),createdAt:Date.now()};
   appState.transferOffers.push(offer);created.push(offer);pending.add(String(p.id));
   appState.log.push(`${buyer.name} har lagt inn bud på ${p.name}: ${money(offer.amount)}${listed?' etter at spilleren ble lagt ut for salg':''}${p.wantsToLeave?' (spilleren ønsker å forlate klubben)':''}.`);
  }
@@ -3468,7 +3499,7 @@ function processAITransferOffers(week=appState.week){
   const buyer=buyers[Math.floor(Math.random()*Math.min(3,buyers.length))];
   const amount=Math.max(.1,+(ask*(listed?.86:.68)*(wantsOut?.95:1)).toFixed(1));
   if(Number(buyer.budget)<amount)continue;
-  const offer={id:'OFFER-EU-'+Date.now()+'-'+Math.floor(Math.random()*100000),playerId:String(p.id),playerName:p.name,buyerIndex:-2,buyerType:'european',buyerEuropeanName:buyer.name,buyerName:buyer.name,amount,asking:+ask.toFixed(1),week,status:'pending',listed,star,contractRunDown:expiry.yearsLeft<=1,wantsToLeave:wantsOut,createdAt:Date.now()};
+  const offer={id:'OFFER-EU-'+Date.now()+'-'+Math.floor(Math.random()*100000),playerId:String(p.id),playerName:p.name,buyerIndex:-2,buyerType:'european',buyerEuropeanName:buyer.name,buyerName:buyer.name,amount,asking:+ask.toFixed(1),week,status:'pending',listed,star,contractRunDown:expiry.yearsLeft<=1,wantsToLeave:wantsOut,seasonYear:Number(appState.seasonYear)||2026,calendarPhase:appState.preseasonActive?'preseason':'league',preseasonWeek:appState.preseasonActive?(Number(appState.preseasonWeek)||1):null,transferWindowKey:currentTransferWindowKey(week),createdAt:Date.now()};
   appState.transferOffers.push(offer);created.push(offer);pending.add(String(p.id));
   appState.log.push(`${buyer.name} (${buyer.country||'Europa'}) har lagt inn et bud på ${p.name}: ${money(amount)}${wantsOut?' (spilleren ønsker å forlate klubben)':''}.`);
  }
@@ -3490,7 +3521,7 @@ function processAITransferOffers(week=appState.week){
   buyers.sort((a,b)=>(Math.max(0,Number(b.fit.needs)||0)*2-Math.abs(Number(b.strength||60)-rating)*.35)-(Math.max(0,Number(a.fit.needs)||0)*2-Math.abs(Number(a.strength||60)-rating)*.35));
   const buyer=buyers[Math.floor(Math.random()*Math.min(4,buyers.length))];
   const amount=Math.max(.1,+(ask*(.68+Math.random()*.22)).toFixed(2));
-  const offer={id:'YOUTH-OFFER-'+Date.now()+'-'+Math.floor(Math.random()*100000),playerId:String(p.id),playerName:p.name,buyerIndex:buyer.index,buyerName:buyer.name,amount,asking:ask,week,status:'pending',listed:false,star,isYouth:true,createdAt:Date.now()};
+  const offer={id:'YOUTH-OFFER-'+Date.now()+'-'+Math.floor(Math.random()*100000),playerId:String(p.id),playerName:p.name,buyerIndex:buyer.index,buyerName:buyer.name,amount,asking:ask,week,status:'pending',listed:false,star,isYouth:true,seasonYear:Number(appState.seasonYear)||2026,calendarPhase:appState.preseasonActive?'preseason':'league',preseasonWeek:appState.preseasonActive?(Number(appState.preseasonWeek)||1):null,transferWindowKey:currentTransferWindowKey(week),createdAt:Date.now()};
   appState.transferOffers.push(offer);created.push(offer);pending.add(String(p.id));
   appState.log.push(`${buyer.name} har vist interesse og lagt inn bud på junioren ${p.name}: ${money(amount)}.`);
  }
@@ -3498,6 +3529,12 @@ function processAITransferOffers(week=appState.week){
 }
 function respondTransferOffer(offerId,action){
  const o=(appState.transferOffers||[]).find(x=>x.id===offerId&&x.status==='pending');if(!o)return;
+ if(!transferOfferActionableNow(o)){
+  o.status='expired';o.expiredReason='transfer-window-closed';o.expiredAt=Date.now();
+  if(!Array.isArray(appState.log))appState.log=[];
+  appState.log.push(`Budet fra ${o.buyerName||'en klubb'} på ${o.playerName||'spilleren'} utløp fordi overgangsvinduet er stengt.`);
+  save();render();alert(`Budet på ${o.playerName||'spilleren'} kan ikke behandles fordi overgangsvinduet er stengt. ${transferWindowCalendarText()}`);return;
+ }
  let p=appState.squad.find(x=>String(x.id)===String(o.playerId));let youthCohort=null;
  if(!p&&o.isYouth){youthCohort=appState.youthAcademies?.[currentClub().name]||[];p=youthCohort.find(x=>String(x.id)===String(o.playerId));}
  if(!p){o.status='expired';save();render();return;}
@@ -6878,7 +6915,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    // Match cards and injuries now update the actual player, persist across domestic cups/league fixtures, and count down only after a fixture is completed.
    applyLiveFixtureAvailability(engine);
    let newOffers=[];
-   if(!engine.isCupMatch){recordTeamContinuity();processMidweekCompetitions(appState.week);const aiMoves=processAILeagueTransfers(appState.week);newOffers=processAITransferOffers(appState.week);payWeeklyWages();const completedWeek=appState.week;processPlayerDiscontentWeek(completedWeek);appState.week++;appState.played++;processLoanReturns();if(completedWeek===2||completedWeek===23){appState.transferWindowReports=appState.transferWindowReports||[];const report=buildTransferWindowReport(completedWeek);appState.transferWindowReports.push(report);appState.pendingTransferWindowReport=report;}appState.recommendationRound=null;appState.recommendationInfo=null;}
+   if(!engine.isCupMatch){recordTeamContinuity();processMidweekCompetitions(appState.week);const aiMoves=processAILeagueTransfers(appState.week);newOffers=processAITransferOffers(appState.week);payWeeklyWages();const completedWeek=appState.week;processPlayerDiscontentWeek(completedWeek);appState.week++;appState.played++;processLoanReturns();if(completedWeek===2||completedWeek===23){expirePendingTransferOffersOutsideWindow();appState.transferWindowReports=appState.transferWindowReports||[];const report=buildTransferWindowReport(completedWeek);appState.transferWindowReports.push(report);appState.pendingTransferWindowReport=report;}appState.recommendationRound=null;appState.recommendationInfo=null;}
    appState.squad.forEach(p=>{
     // Availability counters are decremented at the next round's team-selection entry, not immediately after the incident.
     const appearance=engine.appearances[String(p.id)];
@@ -7081,7 +7118,7 @@ const clockTick=()=>{
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.19 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.20 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
