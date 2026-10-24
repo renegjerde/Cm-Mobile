@@ -1,15 +1,15 @@
-# CM Mobile v3.11
+# CM Mobile v3.12
 
-## Changes
-- European clubs participating in the built-in UEFA competitions can now submit transfer bids for players at the user's club.
-- European bids use club strength, player rating/value, age, transfer-list status, contract expiry and whether the player wants to leave to shape bid likelihood and price.
-- Accepting a European bid transfers the player into that club's existing European transfer squad and updates both clubs' budgets, the user's transfer history, and pending offers for the same player.
-- Existing English-club transfer logic remains in place.
+## Cross-border loan integration
+- Loan-in market flow now explicitly supports players from the integrated club world, including European clubs represented in `worldSquads`, alongside separately indexed EFL clubs.
+- Added a duplicate-career-identity guard before taking a player on loan, preventing the same career from being added twice to the manager's squad.
+- The outgoing-loan dialog now identifies itself as drawing from the combined club market, including European destinations.
+- Existing wage-share, loan-fee, duration, loan-return and transfer-history systems are retained.
+
+## Files
+- `index.html` — game
+- `README.md` — version notes
+- `CROSS_BORDER_LOANS_V3.12.md` — focused change log and known limitations
 
 ## Validation
-- JavaScript syntax checked with Node.js (`node --check`).
-- ZIP archive integrity checked.
-- Full interactive browser/gameplay testing has not been performed.
-
-## Notes
-Cross-border loan agreements are not yet included in this release; they are the next part of the European transfer integration.
+JavaScript syntax and ZIP integrity are checked with Node.js and `unzip -t`. No full interactive browser playthrough has been performed.
