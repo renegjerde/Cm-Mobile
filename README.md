@@ -1,26 +1,28 @@
-# CM Mobile v3.16
+# CM Mobile v3.17 — English/European player registration cleanup
 
-## Innhold
-- `index.html` — komplett spillet, klar til publisering i GitHub Pages-roten.
-- `DIVISION_AUDIT_V3.16.md` — gjennomgang av alle 116 klubbplasseringene i de fem engelske divisjonene ved sesongstart 2026/27.
+## Contents
+- `index.html` — complete game, ready for the GitHub Pages root.
+- `PLAYER_REGISTRY_AUDIT_V3.17.md` — registration-deduplication rules and validation notes.
 
-## Endringer i v3.16
-- Gjenoppretter en uforanderlig 2026/27-grunnliste for Premier League, Championship, League One, League Two og National League når en ny eller lagret 2026/27-karriere åpnes.
-- Hindrer divisjonsendringer fra en senere karriere i å lekke til en annen karriere i samme nettleser.
-- Oppgraderer klubbregisterkontrollen til versjon 3 og lagrer resultatet av revisjonen i karrieredataene.
-- Kontrollerer hele seriekamprogrammet: riktige klubbreferanser, én kamp per klubb per runde og én hjemmekamp/bortekamp mot hver motstander. Et ugyldig program bygges på nytt før første seriekamp dersom ingen ligakamper allerede er spilt.
-- Beskytter allerede spilte resultater mot automatisk overskriving.
+## Changes in v3.17
+- Adds a persistent Transfermarkt profile ID to player records created from the embedded profile archive, so identity is stable across club changes and save migrations.
+- Treats the official English PL/EFL squad registers for September 2026 as the source of truth for the 2026/27 starting state.
+- On loading an existing career, removes matching players from European transfer squads when that same player is already registered with an English club. Matching uses stable career IDs and profile IDs first, then exact normalized names with trusted birth dates/official registration as a fallback.
+- Removes duplicate identities inside a European squad and prevents the same identity from appearing twice in the transfer list.
+- Keeps loaned-out ownership records intact; players on loan are not removed from their parent club just because they appear in a borrower roster.
+- European match simulation now uses the persistent European transfer roster, so a player removed from a European club is not resurrected from the older July 2026 snapshot in a later European match.
+- Records removals in the career log and a small audit history so the clean-up can be reviewed in-game.
 
-## Publisering på GitHub Pages
-1. Pakk ut ZIP-filen.
-2. Åpne mappen `CM_Mobile_v3.16`.
-3. Last opp/erstatt `index.html` i `main`-grenens rot (samme sted som den aktive nettsiden allerede henter `index.html` fra).
-4. Commit og push. Arkivmappen i ZIP-en er bare leveringsstruktur; nettsiden bruker root-filen med mindre GitHub Pages er konfigurert annerledes.
-5. Åpne siden på nytt og kontroller at toppteksten viser `v3.16`. På iPhone kan en gammel side være cachet; last siden på nytt etter at GitHub Pages er oppdatert.
+## Publish to GitHub Pages
+1. Unzip this archive.
+2. Open the `CM_Mobile_v3.17` folder.
+3. Replace `index.html` in the `main` branch root with this version's `index.html`.
+4. Commit/push, reload the live site, and confirm the title/header shows `v3.17`.
 
-## Teststatus
-- JavaScript-syntaks kontrollert med Node.js.
-- Klubbregister kontrollert: 20 + 24 + 24 + 24 + 24 = 116 unike klubber, ingen overlapp.
-- Isolert kjøretidstest: delt divisjonsregister gjenopprettes, 38-runders Premier League-kamprogram dannes, et ødelagt program uten spilte kamper bygges på nytt, og allerede spilte kamper overskrives ikke automatisk.
-- ZIP-arkiv kontrollert.
-- Full interaktiv nettlesertest med brukerens faktiske karrierelagring er ikke gjennomført.
+The version folder inside this ZIP is a delivery folder; GitHub Pages continues to use the root `index.html` unless the repository's Pages configuration says otherwise.
+
+## Test status
+- All inline JavaScript blocks pass `node --check`.
+- Isolated regression test passed: an English-registered duplicate is removed from the European squad; a European-only player stays; same-name players with conflicting trusted birth dates/identity references are not incorrectly deleted; running the cleanup twice is idempotent.
+- ZIP integrity checked after packaging.
+- A complete interactive browser test using the user's actual saved career has not been completed. The live migration count is written to the in-game log when the career is next loaded.
