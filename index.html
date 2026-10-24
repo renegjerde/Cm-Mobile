@@ -3300,6 +3300,32 @@ function processAITransferOffers(week=appState.week){
   appState.transferOffers.push(offer);created.push(offer);pending.add(String(p.id));
   appState.log.push(`${buyer.name} har lagt inn bud på ${p.name}: ${money(offer.amount)}${listed?' etter at spilleren ble lagt ut for salg':''}${p.wantsToLeave?' (spilleren ønsker å forlate klubben)':''}.`);
  }
+
+ // European clubs also bid for first-team players at the user's club.
+ // Keep the same simple, probabilistic model as domestic AI bids.
+ ensureEuropeanTransferWorld();
+ for(const p of appState.squad){
+  if(!p||!p.name||pending.has(String(p.id))||playerMovedInCurrentWindow(p,movedThisWindow))continue;
+  const expiry=contractExpiryStatus(p),listed=(appState.listedForTransfer||[]).includes(String(p.id));
+  const rating=Number(p.rating)||45, value=Number(p.value)||Math.max(.2,((rating-45)**2)/100);
+  const wantsOut=!!p.wantsToLeave, age=Number(p.age)||25;
+  const star=rating>=Number(userClub.strength||65)+2;
+  const base=Math.min(.34,(listed?.16:(star?.004:.009))*(expiry.yearsLeft<=0?2.2:expiry.yearsLeft===1?1.6:1)*(wantsOut?1.8:1));
+  if(Math.random()>base)continue;
+  const ask=value*(star?1.5:1.12)*(age<22?1.1:age>30?.82:1)*(wantsOut?.9:1);
+  const buyers=Object.values(appState.europeanTransferClubData||{}).map(meta=>({...meta,fit:aiBuyerFitForPlayer(-2,p)})).filter(c=>{
+   if(!c.name||Number(c.budget)<ask*.48||Number(c.strength)>rating+13)return false;
+   const roster=appState.europeanTransferSquads?.[c.name]||[];
+   return !roster.some(x=>playerCareerIdentity(x)===playerCareerIdentity(p));
+  }).sort((a,b)=>Math.abs(Number(a.strength||60)-rating)-Math.abs(Number(b.strength||60)-rating));
+  if(!buyers.length)continue;
+  const buyer=buyers[Math.floor(Math.random()*Math.min(3,buyers.length))];
+  const amount=Math.max(.1,+(ask*(listed?.86:.68)*(wantsOut?.95:1)).toFixed(1));
+  if(Number(buyer.budget)<amount)continue;
+  const offer={id:'OFFER-EU-'+Date.now()+'-'+Math.floor(Math.random()*100000),playerId:String(p.id),playerName:p.name,buyerIndex:-2,buyerType:'european',buyerEuropeanName:buyer.name,buyerName:buyer.name,amount,asking:+ask.toFixed(1),week,status:'pending',listed,star,contractRunDown:expiry.yearsLeft<=1,wantsToLeave:wantsOut,createdAt:Date.now()};
+  appState.transferOffers.push(offer);created.push(offer);pending.add(String(p.id));
+  appState.log.push(`${buyer.name} (${buyer.country||'Europa'}) har lagt inn et bud på ${p.name}: ${money(amount)}${wantsOut?' (spilleren ønsker å forlate klubben)':''}.`);
+ }
  // Other clubs can also scout and bid for youth players who have completed at least one full academy season.
  const userYouth=appState.youthAcademies?.[userClub.name]||[];
  for(const p of userYouth){
@@ -3332,6 +3358,24 @@ function respondTransferOffer(offerId,action){
  if(action==='reject'){o.status='rejected';appState.log.push(`Budet fra ${o.buyerName} på ${p.name} ble avslått.`);}
  else if(action==='counter'){o.counter=+(Math.max(o.asking,o.amount*1.18)).toFixed(1);if(Math.random()<Math.min(.82,o.amount/o.counter*.72)){o.amount=o.counter;o.status='pending';o.countered=true;appState.log.push(`${o.buyerName} godtar motkravet på ${money(o.counter)} for ${p.name}. Du kan nå godta eller avslå budet.`);}else{o.status='rejected';appState.log.push(`${o.buyerName} avslo motkravet på ${money(o.counter)} for ${p.name}.`);}}
  else if(action==='accept'){
+  if(o.buyerType==='european'){
+   ensureEuropeanTransferWorld();
+   const buyerName=String(o.buyerEuropeanName||o.buyerName||'');
+   const buyer=appState.europeanTransferClubData?.[buyerName];
+   if(!buyer||Number(buyer.budget)<Number(o.amount||0)){o.status='expired';appState.log.push(`Budet fra ${buyerName} kunne ikke gjennomføres fordi klubben ikke lenger har tilstrekkelig budsjett.`);save();render();return;}
+   const stableCareerId=String(p.careerId||p.id||p.name);p.careerId=stableCareerId;
+   appState.budget=+(Number(appState.budget||0)+Number(o.amount||0)).toFixed(2);
+   buyer.budget=+(Math.max(0,Number(buyer.budget||0)-Number(o.amount||0))).toFixed(2);
+   const roster=appState.europeanTransferSquads[buyerName]||(appState.europeanTransferSquads[buyerName]=[]);
+   if(o.isYouth){if(Array.isArray(youthCohort)){const ix=youthCohort.findIndex(x=>String(x.id)===String(p.id));if(ix>=0)youthCohort.splice(ix,1);}}
+   else {appState.squad=appState.squad.filter(x=>playerCareerIdentity(x)!==stableCareerId);if(Array.isArray(appState.worldSquads?.[appState.club]))appState.worldSquads[appState.club]=appState.worldSquads[appState.club].filter(x=>playerCareerIdentity(x)!==stableCareerId);}
+   roster.push({...p,careerId:stableCareerId,clubName:buyerName,clubIndex:-1,internationalClub:true,id:'EU-'+Date.now()+'-'+Math.floor(Math.random()*10000),loanStatus:null});
+   appState.listedForTransfer=(appState.listedForTransfer||[]).filter(x=>x!==String(p.id));o.status='accepted';
+   for(const other of appState.transferOffers||[])if(other!==o&&other.status==='pending'&&String(other.playerId)===String(o.playerId))other.status='expired';
+   appState.transferHistory=appState.transferHistory||[];appState.transferHistory.push({type:'sale',playerName:p.name,playerCareerId:stableCareerId,from:(CLUBS[appState.club]?.name||currentClub().name),to:buyerName,fee:o.amount,week:o.week,seasonYear:Number(appState.seasonYear)||2026,transferDate:transferDateForGameweek(appState.seasonYear,o.week),calendarPhase:appState.preseasonActive?'preseason':'league',preseasonWeek:appState.preseasonActive?(Number(appState.preseasonWeek)||1):null,transferTypeLabel:o.isYouth?'Juniorovergang':'Salg',ownerClubIndex:appState.club,youth:!!o.isYouth,internationalClub:true});
+   appState.log.push(`${p.name} solgt til ${buyerName} for ${money(o.amount)}. Pengene er lagt til overgangsbudsjettet.`);
+   save();render();return;
+  }
   const buyer=CLUBS[o.buyerIndex];if(!buyer){o.status='expired';save();render();return;}const fromList=appState.listedForTransfer||[];const stableCareerId=String(p.careerId||p.id||p.name);p.careerId=stableCareerId;
   appState.budget=+(Number(appState.budget||0)+o.amount).toFixed(1);
   buyer.budget=Math.max(.2,+(Number(buyer.budget||0)-Number(o.amount||0)).toFixed(2));
@@ -6502,7 +6546,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.10 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.11 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
