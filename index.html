@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v3.13 — Touchline</title>
+<title>CM Mobile v3.14 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -5450,10 +5450,54 @@ function simulateMatch(powerA,powerB,homeA,playersA=[],playersB=[],formationA="4
  stats.possessionA=Math.max(30,Math.min(70,Math.round(50+(attackA-attackB)*.6+(homeA?3:-3))));
  return {ga:scoreA,gb:scoreB,events,stats,xiA,xiB,chanceList,attackA,attackB,defenseA,defenseB};
 }
+function ensureActiveLeagueTableRows(){
+ // Saved careers can contain a table from an older club list. Keep all matching
+ // results, but make sure every current club has a valid row before simulation.
+ const clubs=activeLeagueClubs();
+ const original=Array.isArray(appState.table)?appState.table:[];
+ const existing=original.filter(row=>row&&typeof row==='object'&&String(row.name||'').trim());
+ const byName=new Map();
+ for(const row of existing){const name=String(row.name).trim();if(!byName.has(name))byName.set(name,row);}
+ let changed=!Array.isArray(appState.table)||existing.length!==original.length||original.length!==clubs.length;
+ const fields=['p','w','d','l','gf','ga','pts'];
+ const normalized=clubs.map(club=>{
+  const saved=byName.get(String(club.name).trim());
+  if(!saved)changed=true;
+  const row=saved?{...saved,name:club.name}:{name:club.name,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
+  for(const key of fields){
+   const legacyValue=key==='p'?row.played:undefined;
+   const raw=row[key]??legacyValue;
+   const value=Number(raw);
+   if(!Number.isFinite(value)||value<0){row[key]=0;changed=true;}else row[key]=value;
+  }
+  return row;
+ });
+ if(normalized.length!==original.length||normalized.some((row,i)=>row.name!==original[i]?.name))changed=true;
+ appState.table=normalized;
+ if(changed&&Number(appState.tableRepairVersion||0)<1){
+  appState.log=Array.isArray(appState.log)?appState.log:[];
+  appState.log.push('Kamptabellen ble synkronisert med klubbene i aktiv divisjon før kampstart. Eksisterende resultater for klubber med samme navn er beholdt.');
+  appState.tableRepairVersion=1;
+ }
+}
 function applyTableResult(a,b,ga,gb){
- const ta=appState.table.find(x=>x.name===CLUBS[a].name),tb=appState.table.find(x=>x.name===CLUBS[b].name);
- ta.p++;tb.p++;ta.gf+=ga;ta.ga+=gb;tb.gf+=gb;tb.ga+=ga;
- if(ga>gb){ta.w++;ta.pts+=3;tb.l++}else if(ga<gb){tb.w++;tb.pts+=3;ta.l++}else{ta.d++;tb.d++;ta.pts++;tb.pts++}
+ if(!Array.isArray(appState.table))appState.table=[];
+ const rowFor=index=>{
+  const club=CLUBS[Number(index)];
+  if(!club)throw new Error(`Kan ikke oppdatere tabellen: klubbindeks ${index} finnes ikke.`);
+  let row=appState.table.find(x=>x&&String(x.name)===String(club.name));
+  if(!row){
+   row={name:club.name,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
+   appState.table.push(row);
+   if(Array.isArray(appState.log))appState.log.push(`Tabellrad for ${club.name} ble opprettet automatisk under resultatføring.`);
+  }
+  for(const key of ['p','w','d','l','gf','ga','pts'])if(!Number.isFinite(Number(row[key])))row[key]=0;else row[key]=Number(row[key]);
+  return row;
+ };
+ const ta=rowFor(a),tb=rowFor(b);
+ if(ta===tb)throw new Error('Tabelloppdatering avbrutt: samme klubb ble funnet på begge sider av kampen.');
+ ta.p++;tb.p++;ta.gf+=Number(ga)||0;ta.ga+=Number(gb)||0;tb.gf+=Number(gb)||0;tb.ga+=Number(ga)||0;
+ if(ga>gb){ta.w++;ta.pts+=3;tb.l++;}else if(ga<gb){tb.w++;tb.pts+=3;ta.l++;}else{ta.d++;tb.d++;ta.pts++;tb.pts++;}
 }
 function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
 function playerFormValue(p){return clamp(Number(p.form??6.5),4,10)}
@@ -6058,6 +6102,8 @@ function playMatch(){
    }
   }
   if(!Number.isFinite(Number(appState.week))||Number(appState.week)<1)appState.week=1;
+  // Repair stale/incomplete saved league tables before any other fixture is simulated.
+  ensureActiveLeagueTableRows();
   ensureFixtures();
   const teams=activeLeagueClubIndices();
   const expectedCount=(teams.length-1)*2;
@@ -6581,7 +6627,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.13 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.14 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
