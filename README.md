@@ -1,15 +1,19 @@
-# CM Mobile v3.12
+# CM Mobile v3.13 — Touchline Edition
 
-## Cross-border loan integration
-- Loan-in market flow now explicitly supports players from the integrated club world, including European clubs represented in `worldSquads`, alongside separately indexed EFL clubs.
-- Added a duplicate-career-identity guard before taking a player on loan, preventing the same career from being added twice to the manager's squad.
-- The outgoing-loan dialog now identifies itself as drawing from the combined club market, including European destinations.
-- Existing wage-share, loan-fee, duration, loan-return and transfer-history systems are retained.
+## Kampstart rettet og gjort mer robust
 
-## Files
-- `index.html` — game
-- `README.md` — version notes
-- `CROSS_BORDER_LOANS_V3.12.md` — focused change log and known limitations
+- Kontroll av at ligaens kampprogram har gyldige runder, lag og kamper.
+- Trygg gjenoppbygging av et ugyldig åpningsprogram i en uspilt karriere.
+- Tydelig feilmelding og loggføring dersom kampstart ikke kan fullføres, i stedet for en stille avbrytelse.
+- Kontroll mot dobbeltklikk mens kampstart behandles.
+- Opprettholder eksisterende CM 97/98-inspirerte kampflyt, overganger og laguttak.
 
-## Validation
-JavaScript syntax and ZIP integrity are checked with Node.js and `unzip -t`. No full interactive browser playthrough has been performed.
+## Innhold
+- `index.html` — komplett spill.
+- `README.md` — denne filen.
+- `MATCH_START_FIX_V3.13.md` — teknisk endringsnotat og teststatus.
+
+## Teststatus
+- JavaScript-syntaks kontrollert med Node.js.
+- ZIP-arkiv testet.
+- Full interaktiv test i brukerens nettleser og med brukerens eksisterende lagring er ikke utført.

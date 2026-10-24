@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v2.93 — Touchline</title>
+<title>CM Mobile v3.13 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -6039,59 +6039,93 @@ function applyLiveFixtureAvailability(engine){
 }
 
 function playMatch(){
- ensureCareerSystems();if(appState.preseasonActive){alert(`Pre-season uke ${appState.preseasonWeek} av ${appState.preseasonWeeks}: fullfør de fire ukene før første obligatoriske kamp.`);return;}processWeeklyTrainingInjuries();
- if(appState.pendingCupMatch){playPendingCupMatch();return;}
- ensureFixtures();
- const round=appState.fixtures.find(f=>f.round===appState.week&&!f.played);
- if(!round){appState.page='season';save();render();return}
- const userIndex=appState.club;
- const fixture=round.games.find(g=>g.includes(userIndex));
- const oppIndex=fixture[0]===userIndex?fixture[1]:fixture[0];
- const c=currentClub(),opp=CLUBS[oppIndex],home=fixture[0]===userIndex;
- const previousPositions=new Map(sortedTable().map((team,index)=>[team.name,index+1]));
- const roundResults=[];
- const makeOpponentSquad=(clubIndex)=>((appState.worldSquads&&appState.worldSquads[clubIndex])||buildRealSquad(clubIndex)).map(p=>({...p,attributes:{...p.attributes},sourcePlayerId:p.id,id:`opp-${clubIndex}-${p.id}`,fitness:Number(p.fitness??100),injured:Number(p.injured)||0,suspended:Number(p.suspended)||0}));
- let userMatch=null;
- for(const [a,b] of round.games){
-  const playersA=a===userIndex?appState.squad:makeOpponentSquad(a);
-  const playersB=b===userIndex?appState.squad:makeOpponentSquad(b);
-  if(a===userIndex||b===userIndex){
-   const xiA=a===userIndex?currentStartingXI():assignTacticalRoles(createMatchLineup(playersA,'4-3-3',CLUBS[a].name),'4-3-3');
-   const opponentFormation=getOpponentFormation(oppIndex,appState.week);
-   const xiB=b===userIndex?currentStartingXI():assignTacticalRoles(createMatchLineup(playersB,opponentFormation,CLUBS[b].name),opponentFormation);
-   userMatch=createLiveEngine(a,b,home,playersA,playersB,xiA,xiB,a===userIndex?appState.formation:'4-3-3',b===userIndex?appState.formation:getOpponentFormation(oppIndex,appState.week));
-   continue;
+ if(window.__cmMatchStartLock)return;
+ window.__cmMatchStartLock=true;
+ try{
+  ensureCareerSystems();
+  if(appState.preseasonActive){alert(`Pre-season uke ${appState.preseasonWeek} av ${appState.preseasonWeeks}: fullfør de fire ukene før første obligatoriske kamp.`);return;}
+  if(seasonCompleted()){appState.page='season';save();render();return;}
+  if(appState.pendingCupMatch){processWeeklyTrainingInjuries();playPendingCupMatch();return;}
+
+  const userIndex=Number(appState.club);
+  if(!Number.isInteger(userIndex)||!CLUBS[userIndex])throw new Error('Klubben din er ikke gyldig i den aktive karrieren. Åpne Karrierer og last inn karrieren på nytt.');
+  const actualDivision=clubDivision(CLUBS[userIndex]);
+  if(appState.activeDivision!==actualDivision){
+   appState.activeDivision=actualDivision;
+   if(Number(appState.played||0)===0&&Number(appState.week||1)===1){
+    appState.table=activeLeagueClubs().map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
+    appState.fixtures=[];
+   }
   }
-  const sim=simulateMatch(teamPower(a),teamPower(b),true,playersA,playersB,'4-3-3','4-3-3','Balanced','Balanced');
-  roundResults.push({a,b,ga:sim.ga,gb:sim.gb,events:sim.events});
-  recordSimulatedPlayerStats(a,b,playersA,playersB,sim,CLUBS[a]?.division||'Premier League');
-  applySimulatedFixtureAvailability(a,b,playersA,playersB,sim,CLUBS[a]?.division||'Premier League',`SIM-${appState.seasonYear}-${appState.week}-${a}-${b}`);
-  applyTableResult(a,b,sim.ga,sim.gb);
- }
- const emptyStats={shots:0,shotsAgainst:0,onTarget:0,onTargetAgainst:0,possession:50};
- showMatch(c,opp,0,0,home,'',emptyStats,roundResults,[],[],{},userMatch,round,previousPositions);
- // Always start a newly opened live match at the top, regardless of the scroll
- // position in the long pre-match squad selection screen.
- window.scrollTo(0,0);
- requestAnimationFrame(()=>window.scrollTo(0,0));
- setTimeout(()=>window.scrollTo(0,0),40);
-}
-function clubPrimaryColor(name){
- const n=String(name||'').toLowerCase();
- const colors=[
-  [/manchester united|liverpool|arsenal|nottingham forest|bayern|roma|benfica|sunderland/,'#e53945'],
-  [/manchester city|ipswich|leicester|porto|everton|napoli|lazio|real sociedad/,'#58a6e7'],
-  [/chelsea|leeds|brighton|crystal palace|psg|schalke|inter|fenerbahçe/,'#3979e8'],
-  [/tottenham|real madrid|juventus|newcastle|fulham|sporting/,'#dce8f6'],
-  [/borussia dortmund|norwich|watford|yellow/,'#f4d33e'],
-  [/aston villa|west ham|burnley|brentford|atletico/,'#d94d58'],
-  [/wolves|wolverhampton|hull|orange/,'#f29b38'],
-  [/forest|nottingham/,'#e53945'],
-  [/celtic|green|sporting cp/,'#38bd78']
- ];
- for(const [re,color] of colors)if(re.test(n))return color;
- let hash=0;for(let i=0;i<n.length;i++)hash=(hash*31+n.charCodeAt(i))|0;
- return `hsl(${Math.abs(hash)%360} 72% 62%)`;
+  if(!Number.isFinite(Number(appState.week))||Number(appState.week)<1)appState.week=1;
+  ensureFixtures();
+  const teams=activeLeagueClubIndices();
+  const expectedCount=(teams.length-1)*2;
+  const expectedSet=new Set(teams.map(Number));
+  const scheduleIsValid=Array.isArray(appState.fixtures)&&appState.fixtures.length===expectedCount&&appState.fixtures.every((f,i)=>{
+   if(Number(f?.round)!==i+1||!Array.isArray(f.games)||f.games.length!==teams.length/2)return false;
+   const seen=new Set();
+   for(const game of f.games){
+    if(!Array.isArray(game)||game.length!==2)return false;
+    const a=Number(game[0]),b=Number(game[1]);
+    if(a===b||!expectedSet.has(a)||!expectedSet.has(b)||seen.has(a)||seen.has(b))return false;
+    seen.add(a);seen.add(b);
+   }
+   return seen.size===teams.length&&teams.every(t=>seen.has(Number(t)));
+  });
+  // A fresh, unplayed career can safely rebuild a malformed opening schedule.
+  if(!scheduleIsValid&&Number(appState.week)===1&&Number(appState.played||0)===0){appState.fixtures=[];ensureFixtures();}
+  const roundNo=Number(appState.week)||1;
+  let round=appState.fixtures.find(f=>Number(f.round)===roundNo&&!f.played);
+  if(!round&&roundNo===1&&Number(appState.played||0)===0){appState.fixtures=[];ensureFixtures();round=appState.fixtures.find(f=>Number(f.round)===1&&!f.played);}
+  if(!round){
+   const message=`Fant ikke en uspilt serierunde ${roundNo}. Kampen ble ikke startet. Sjekk kampprogrammet under Tabell.`;
+   appState.log=Array.isArray(appState.log)?appState.log:[];appState.log.push(message);save();alert(message);return;
+  }
+  const fixture=(round.games||[]).find(g=>Array.isArray(g)&&g.some(i=>Number(i)===userIndex));
+  if(!fixture||fixture.length!==2){
+   const message=`Fant ingen gyldig kamp for ${CLUBS[userIndex].name} i runde ${roundNo}. Kampoppsettet ble kontrollert, men kampen kan ikke startes uten å risikere feil resultat.`;
+   appState.log=Array.isArray(appState.log)?appState.log:[];appState.log.push(message);save();alert(message);return;
+  }
+  processWeeklyTrainingInjuries();
+  const oppIndex=Number(fixture[0])===userIndex?Number(fixture[1]):Number(fixture[0]);
+  const c=currentClub(),opp=CLUBS[oppIndex],home=Number(fixture[0])===userIndex;
+  if(!opp)throw new Error(`Motstanderen i runde ${roundNo} finnes ikke i klubbdatabasen.`);
+  const previousPositions=new Map(sortedTable().map((team,index)=>[team.name,index+1]));
+  const roundResults=[];
+  const makeOpponentSquad=(clubIndex)=>((appState.worldSquads&&appState.worldSquads[clubIndex])||buildRealSquad(clubIndex)).map(p=>({...p,attributes:{...p.attributes},sourcePlayerId:p.id,id:`opp-${clubIndex}-${p.id}`,fitness:Number(p.fitness??100),injured:Number(p.injured)||0,suspended:Number(p.suspended)||0}));
+  let userMatch=null;
+  for(const [aRaw,bRaw] of round.games){
+   const a=Number(aRaw),b=Number(bRaw);
+   const playersA=a===userIndex?appState.squad:makeOpponentSquad(a);
+   const playersB=b===userIndex?appState.squad:makeOpponentSquad(b);
+   if(a===userIndex||b===userIndex){
+    const xiA=a===userIndex?currentStartingXI():assignTacticalRoles(createMatchLineup(playersA,'4-3-3',CLUBS[a].name),'4-3-3');
+    const opponentIndex=a===userIndex?b:a;
+    const opponentFormation=getOpponentFormation(opponentIndex,roundNo);
+    const xiB=b===userIndex?currentStartingXI():assignTacticalRoles(createMatchLineup(playersB,opponentFormation,CLUBS[b].name),opponentFormation);
+    userMatch=createLiveEngine(a,b,home,playersA,playersB,xiA,xiB,a===userIndex?appState.formation:'4-3-3',b===userIndex?appState.formation:opponentFormation);
+    continue;
+   }
+   const sim=simulateMatch(teamPower(a),teamPower(b),true,playersA,playersB,'4-3-3','4-3-3','Balanced','Balanced');
+   roundResults.push({a,b,ga:sim.ga,gb:sim.gb,events:sim.events});
+   recordSimulatedPlayerStats(a,b,playersA,playersB,sim,CLUBS[a]?.division||'Premier League');
+   applySimulatedFixtureAvailability(a,b,playersA,playersB,sim,CLUBS[a]?.division||'Premier League',`SIM-${appState.seasonYear}-${appState.week}-${a}-${b}`);
+   applyTableResult(a,b,sim.ga,sim.gb);
+  }
+  if(!userMatch)throw new Error(`Kampmotoren kunne ikke opprette kampen for ${CLUBS[userIndex].name}. Kontroller at klubben står i runde ${roundNo}.`);
+  const emptyStats={shots:0,shotsAgainst:0,onTarget:0,onTargetAgainst:0,possession:50};
+  showMatch(c,opp,0,0,home,'',emptyStats,roundResults,[],[],{},userMatch,round,previousPositions);
+  // Always start a newly opened live match at the top, regardless of the scroll position.
+  window.scrollTo(0,0);
+  requestAnimationFrame(()=>window.scrollTo(0,0));
+  setTimeout(()=>window.scrollTo(0,0),40);
+ }catch(error){
+  console.error('CM Mobile: kampstart feilet',error);
+  const detail=String(error?.message||error||'Ukjent feil');
+  try{appState.log=Array.isArray(appState.log)?appState.log:[];appState.log.push(`Kampstart feilet: ${detail}`);save();appState.page='tactics';render();}catch(recoveryError){console.error('CM Mobile: kunne ikke gjenopprette taktikkvisningen',recoveryError);}
+  alert(`Kampen kunne ikke startes: ${detail}`);
+ }finally{window.__cmMatchStartLock=false;}
 }
 function matchCommentary(e,c,opp,home){
  const club=e.side==="user"?c.name:opp.name;
@@ -6547,7 +6581,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.12 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.13 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
