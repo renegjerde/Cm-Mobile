@@ -1,0 +1,128 @@
+{
+  "baseAudit": {
+    "total": 116,
+    "unique": 116,
+    "duplicates": [],
+    "countErrors": [],
+    "membershipErrors": [],
+    "counts": {
+      "Premier League": 20,
+      "Championship": 24,
+      "League One": 24,
+      "League Two": 24,
+      "National League": 24
+    },
+    "ok": true
+  },
+  "fixtureTests": [
+    {
+      "division": "Premier League",
+      "clubCount": 20,
+      "rounds": 38,
+      "matches": 380,
+      "valid": true
+    },
+    {
+      "division": "Championship",
+      "clubCount": 24,
+      "rounds": 46,
+      "matches": 552,
+      "valid": true
+    },
+    {
+      "division": "League One",
+      "clubCount": 24,
+      "rounds": 46,
+      "matches": 552,
+      "valid": true
+    },
+    {
+      "division": "League Two",
+      "clubCount": 24,
+      "rounds": 46,
+      "matches": 552,
+      "valid": true
+    },
+    {
+      "division": "National League",
+      "clubCount": 24,
+      "rounds": 46,
+      "matches": 552,
+      "valid": true
+    }
+  ],
+  "fixtureTestsAfterMovement": [
+    {
+      "division": "Premier League",
+      "clubCount": 20,
+      "rounds": 38,
+      "matches": 380,
+      "valid": true
+    },
+    {
+      "division": "Championship",
+      "clubCount": 24,
+      "rounds": 46,
+      "matches": 552,
+      "valid": true
+    },
+    {
+      "division": "League One",
+      "clubCount": 24,
+      "rounds": 46,
+      "matches": 552,
+      "valid": true
+    },
+    {
+      "division": "League Two",
+      "clubCount": 24,
+      "rounds": 46,
+      "matches": 552,
+      "valid": true
+    },
+    {
+      "division": "National League",
+      "clubCount": 24,
+      "rounds": 46,
+      "matches": 552,
+      "valid": true
+    }
+  ],
+  "dynamicCounts": {
+    "Premier League": 20,
+    "Championship": 24,
+    "League One": 24,
+    "League Two": 24,
+    "National League": 24
+  },
+  "snapshotPreserved": true,
+  "regionalClubs": [
+    {
+      "name": "Test Regional Club A",
+      "division": "National League"
+    },
+    {
+      "name": "Test Regional Club B",
+      "division": "National League"
+    },
+    {
+      "name": "Test Regional Club C",
+      "division": "National League"
+    },
+    {
+      "name": "Test Regional Club D",
+      "division": "National League"
+    }
+  ],
+  "duplicateLeagueKeys": [],
+  "migration": {
+    "migrated": true,
+    "year": 2026,
+    "club": "Birmingham City",
+    "division": "Championship",
+    "tableRows": 24,
+    "week": 1,
+    "played": 0,
+    "ok": true
+  }
+}

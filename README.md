@@ -1,10 +1,17 @@
-# CM Mobile v3.32
+# CM Mobile v3.33 — ligasystemreparasjon
 
-Åpne `index.html` i en moderne nettleser. Dette er en selvstendig HTML-app.
+Dette er en arbeidsutgivelse som retter opp grunnmodellen for engelske nasjonale divisjoner og starter på nytt med en kjent 2026/27-grunntilstand dersom en eldre lagring har en korrupt eller utdatert ligamodell.
 
-## Viktig endring i v3.32
-Denne versjonen prioriterer korrekt ligatabell og korrekt sesongregnskap. Ved mistanke om korrupte kamptall forsøker den å rekonstruere tabellen fra kampresultater merket med gjeldende sesong. Hvis historikken ikke er tilstrekkelig, starter den inneværende sesongen på nytt, inkludert ligaregister, cupturneringer og sesongstatistikk fremfor å vise feil kamptall. Eldre karrierer kan derfor måtte starte ligasesongen på nytt.
+## Innhold
 
-Resultatføring har en unik kampnøkkel, og ligatabellen valideres mot aktiv sesong ved hver visning.
+- `index.html` — spillet, inkludert innebygde data og grensesnitt.
+- `LEAGUE_SYSTEM_REPAIR_V3.33.md` — endringer, tester og kjente begrensninger.
+- `registry_test_v333_result.json` — resultat fra isolerte register- og terminlistetester.
 
-Se `LEAGUE_SYSTEM_REPAIR_V3.32.md` for endringslogg og testavgrensninger.
+## Kjøring
+
+Pakk ut ZIP-filen og åpne `index.html` i en moderne nettleser. Hvis du vil teste fra en ren tilstand, start en ny karriere. Denne utgivelsen prioriterer en ren ligagrunnmodell framfor å bevare korrupte gamle sesongdata.
+
+## Status
+
+Kildekodens JavaScript-syntaks og isolerte tester for klubbregister, terminlister og migrering er kontrollert. En full gjennomspilling i nettleser fra ny karriere til sesongslutt er **ikke** bekreftet i denne utgivelsen. Se reparasjonsrapporten før du vurderer dette som ferdig.
