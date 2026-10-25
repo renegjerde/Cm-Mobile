@@ -183,7 +183,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .live-match-controls .speed-label{color:var(--muted);font-size:12px;margin-left:auto}
 .live-match-controls select{border:1px solid var(--line);background:#203149;color:var(--text);border-radius:10px;padding:9px 10px;font-weight:700;font-size:13px;max-width:160px}
 .live-match-controls .tactic-label{font-size:12px;color:var(--muted)}
-/* v3.24: flash only the scorer line, using the team's two actual kit colours as solid alternating foreground/background pairs. */
+/* v3.25: audited club kit colours; only the scorer line, using the team's two actual kit colours as solid alternating foreground/background pairs. */
 .goal-scorer-line{display:inline-block;max-width:100%;padding:3px 9px 5px;margin:0 0 2px -3px;border:2px solid transparent;border-radius:8px;vertical-align:middle;overflow-wrap:anywhere}
 .goal-scorer-line.goal-scorer-line-flash{animation:goalScorerLineFlash .5s steps(1,end) 6;will-change:background-color,color,border-color,box-shadow}
 @keyframes goalScorerLineFlash{
@@ -531,7 +531,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.24</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.25</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -6838,16 +6838,1247 @@ function clubBadgeMarkup(teamOrName,size=42){
  const sources=[officialLogo,backupLogo,fallback].filter((url,index,list)=>url&&list.indexOf(url)===index);
  return sources.map((url,index)=>`<img src="${esc(url)}" alt="${safeName}${index===sources.length-1&&url===fallback?' generert':''} klubbmerke" title="${safeName}" ${url===fallback?'':'loading="lazy"'} width="${px}" height="${px}" style="${style};display:${index===0?'block':'none'}" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block'">`).join('');
 }
+// Curated 2026/27 home-kit colour registry. Each club's primary colour reflects its home shirt.
+// Secondary is the shorts/trim colour when it offers a readable flash; otherwise the renderer
+// chooses a high-contrast neutral (white or deep charcoal) rather than an arbitrary badge colour.
+const CLUB_HOME_KIT_COLORS = {
+  "Arsenal": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Liverpool": {
+    "primary": "#C8102E",
+    "secondary": "#FFFFFF"
+  },
+  "Manchester United": {
+    "primary": "#DA291C",
+    "secondary": "#FFFFFF"
+  },
+  "Brentford": {
+    "primary": "#E30613",
+    "secondary": "#FFFFFF"
+  },
+  "Nottingham Forest": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Sunderland": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Boreham Wood": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Altrincham": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Carlisle United": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Kidderminster Harriers": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Tamworth": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Woking": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Lincoln City": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Charlton Athletic": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Bristol City": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Middlesbrough": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Sheffield United": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Southampton": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Stoke City": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Bristol Rovers": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Cheltenham Town": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Crewe Alexandra": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Exeter City": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Fleetwood Town": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Accrington Stanley": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Barnet": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Walsall": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Swindon Town": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Southend United": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Hapoel Beer-Sheva": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Rennes": {
+    "primary": "#D71920",
+    "secondary": "#111827"
+  },
+  "FC Twente": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "AZ Alkmaar": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Shelbourne": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Silkeborg IF": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Crvena zvezda": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Slavia Praha": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "CSKA Sofia": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Thun": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Lincoln Red Imps": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Viking FK": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "AFC Bournemouth": {
+    "primary": "#D71920",
+    "secondary": "#111827"
+  },
+  "Crawley Town": {
+    "primary": "#D71920",
+    "secondary": "#111827"
+  },
+  "Bromley": {
+    "primary": "#D71920",
+    "secondary": "#111827"
+  },
+  "Shakhtar Donetsk": {
+    "primary": "#F39200",
+    "secondary": "#111827"
+  },
+  "AC Milan": {
+    "primary": "#D71920",
+    "secondary": "#111827"
+  },
+  "Lille": {
+    "primary": "#D71920",
+    "secondary": "#182D55"
+  },
+  "HNK Rijeka": {
+    "primary": "#FFFFFF",
+    "secondary": "#0057B8"
+  },
+  "FC Pyunik": {
+    "primary": "#D71920",
+    "secondary": "#111827"
+  },
+  "Partizan": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "FCSB": {
+    "primary": "#D71920",
+    "secondary": "#0057B8"
+  },
+  "Dinamo Zagreb": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Jagiellonia Białystok": {
+    "primary": "#F7D116",
+    "secondary": "#D71920"
+  },
+  "Raków Częstochowa": {
+    "primary": "#D71920",
+    "secondary": "#0057B8"
+  },
+  "Levski Sofia": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Jablonec": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Real Betis": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Crystal Palace": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Luton Town": {
+    "primary": "#F39200",
+    "secondary": "#182D55"
+  },
+  "Riga FC": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Borac": {
+    "primary": "#0057B8",
+    "secondary": "#D71920"
+  },
+  "CFR Cluj": {
+    "primary": "#6C1D45",
+    "secondary": "#FFFFFF"
+  },
+  "OFI Crete": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "Ararat-Armenia": {
+    "primary": "#D71920",
+    "secondary": "#111827"
+  },
+  "Universitatea Craiova": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Hoffenheim": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Chelsea": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Brighton & Hove Albion": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Coventry City": {
+    "primary": "#6CABDD",
+    "secondary": "#FFFFFF"
+  },
+  "Ipswich Town": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Everton": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Birmingham City": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Blackburn Rovers": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Portsmouth": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Sheffield Wednesday": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Leeds United": {
+    "primary": "#FFFFFF",
+    "secondary": "#0057B8"
+  },
+  "Reading": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Stockport County": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Wigan Athletic": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Huddersfield Town": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Wycombe Wanderers": {
+    "primary": "#182D55",
+    "secondary": "#6CABDD"
+  },
+  "Salford City": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Oldham Athletic": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Barrow": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Eastleigh": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "FC Halifax Town": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Gateshead": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "Hartlepool United": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Wealdstone": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "York City": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Colchester United": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Oxford United": {
+    "primary": "#F7D116",
+    "secondary": "#182D55"
+  },
+  "Linfield": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Rangers": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "FC Zürich": {
+    "primary": "#FFFFFF",
+    "secondary": "#0057B8"
+  },
+  "Servette FC": {
+    "primary": "#6C1D45",
+    "secondary": "#FFFFFF"
+  },
+  "Lausanne-Sport": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "FC Basel": {
+    "primary": "#D71920",
+    "secondary": "#0057B8"
+  },
+  "FC Lugano": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "FC Porto": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Benfica": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Real Sociedad": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Celta": {
+    "primary": "#6CABDD",
+    "secondary": "#FFFFFF"
+  },
+  "Getafe": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Athletic Club": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Stuttgart": {
+    "primary": "#FFFFFF",
+    "secondary": "#D71920"
+  },
+  "Lens": {
+    "primary": "#D71920",
+    "secondary": "#F7D116"
+  },
+  "Como": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Aarhus": {
+    "primary": "#FFFFFF",
+    "secondary": "#0057B8"
+  },
+  "Gent": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Slovan Bratislava": {
+    "primary": "#6CABDD",
+    "secondary": "#FFFFFF"
+  },
+  "HJK Helsinki": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "KuPS": {
+    "primary": "#111827",
+    "secondary": "#F7D116"
+  },
+  "Villarreal": {
+    "primary": "#F7D116",
+    "secondary": "#182D55"
+  },
+  "Sabah": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "FC Astana": {
+    "primary": "#F7D116",
+    "secondary": "#0057B8"
+  },
+  "Shamrock Rovers": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Manchester City": {
+    "primary": "#6CABDD",
+    "secondary": "#FFFFFF"
+  },
+  "Aston Villa": {
+    "primary": "#6C1D45",
+    "secondary": "#FFFFFF"
+  },
+  "Marseille": {
+    "primary": "#FFFFFF",
+    "secondary": "#6CABDD"
+  },
+  "Napoli": {
+    "primary": "#6CABDD",
+    "secondary": "#FFFFFF"
+  },
+  "Olympiacos": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "FC Midtjylland": {
+    "primary": "#111827",
+    "secondary": "#D71920"
+  },
+  "FC København": {
+    "primary": "#FFFFFF",
+    "secondary": "#0057B8"
+  },
+  "Malmö FF": {
+    "primary": "#6CABDD",
+    "secondary": "#FFFFFF"
+  },
+  "BSC Young Boys": {
+    "primary": "#E7B72D",
+    "secondary": "#111827"
+  },
+  "Club Brugge": {
+    "primary": "#0057B8",
+    "secondary": "#111827"
+  },
+  "Bodø/Glimt": {
+    "primary": "#F7D116",
+    "secondary": "#111827"
+  },
+  "Molde FK": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Tottenham Hotspur": {
+    "primary": "#FFFFFF",
+    "secondary": "#182D55"
+  },
+  "FC Nordsjælland": {
+    "primary": "#D71920",
+    "secondary": "#111827"
+  },
+  "SK Brann": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Fulham": {
+    "primary": "#FFFFFF",
+    "secondary": "#111827"
+  },
+  "Derby County": {
+    "primary": "#FFFFFF",
+    "secondary": "#111827"
+  },
+  "Preston North End": {
+    "primary": "#FFFFFF",
+    "secondary": "#182D55"
+  },
+  "Swansea City": {
+    "primary": "#FFFFFF",
+    "secondary": "#111827"
+  },
+  "Bolton Wanderers": {
+    "primary": "#FFFFFF",
+    "secondary": "#182D55"
+  },
+  "Wrexham": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Real Madrid": {
+    "primary": "#FFFFFF",
+    "secondary": "#182D55"
+  },
+  "Sporting CP": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Juventus": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "Ajax": {
+    "primary": "#FFFFFF",
+    "secondary": "#D71920"
+  },
+  "Feyenoord": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "PAOK": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "Lech Poznań": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Viktoria Plzeň": {
+    "primary": "#D71920",
+    "secondary": "#0057B8"
+  },
+  "Hajduk Split": {
+    "primary": "#FFFFFF",
+    "secondary": "#0057B8"
+  },
+  "The New Saints": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Celtic": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "AFC Wimbledon": {
+    "primary": "#182D55",
+    "secondary": "#6CABDD"
+  },
+  "Newport County": {
+    "primary": "#F7D116",
+    "secondary": "#111827"
+  },
+  "Tranmere Rovers": {
+    "primary": "#FFFFFF",
+    "secondary": "#0057B8"
+  },
+  "Chesterfield": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Watford": {
+    "primary": "#F7D116",
+    "secondary": "#111827"
+  },
+  "Leicester City": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Fenerbahçe": {
+    "primary": "#182D55",
+    "secondary": "#E7B72D"
+  },
+  "APOEL": {
+    "primary": "#F7D116",
+    "secondary": "#0057B8"
+  },
+  "Pafos FC": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Hull City": {
+    "primary": "#F39200",
+    "secondary": "#111827"
+  },
+  "Wolverhampton Wanderers": {
+    "primary": "#F7D116",
+    "secondary": "#111827"
+  },
+  "Borussia Dortmund": {
+    "primary": "#F7D116",
+    "secondary": "#111827"
+  },
+  "Norwich City": {
+    "primary": "#F7D116",
+    "secondary": "#00843D"
+  },
+  "Harrogate Town": {
+    "primary": "#F7D116",
+    "secondary": "#111827"
+  },
+  "Boston United": {
+    "primary": "#F7D116",
+    "secondary": "#111827"
+  },
+  "Burton Albion": {
+    "primary": "#F7D116",
+    "secondary": "#111827"
+  },
+  "Mansfield Town": {
+    "primary": "#F7D116",
+    "secondary": "#0057B8"
+  },
+  "Lillestrøm": {
+    "primary": "#F7D116",
+    "secondary": "#111827"
+  },
+  "Mjällby": {
+    "primary": "#F7D116",
+    "secondary": "#111827"
+  },
+  "Kairat Almaty": {
+    "primary": "#F7D116",
+    "secondary": "#111827"
+  },
+  "Sint-Truiden": {
+    "primary": "#F7D116",
+    "secondary": "#0057B8"
+  },
+  "Celje": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Forest Green Rovers": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Yeovil Town": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Omonia Nicosia": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Kauno Žalgiris": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Panathinaikos": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Ferencváros": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Egnatia": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Newcastle United": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "West Bromwich Albion": {
+    "primary": "#182D55",
+    "secondary": "#FFFFFF"
+  },
+  "Queens Park Rangers": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Port Vale": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "Rochdale": {
+    "primary": "#0057B8",
+    "secondary": "#111827"
+  },
+  "Grimsby Town": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "West Ham United": {
+    "primary": "#6C1D45",
+    "secondary": "#6CABDD"
+  },
+  "Burnley": {
+    "primary": "#6C1D45",
+    "secondary": "#6CABDD"
+  },
+  "Trabzonspor": {
+    "primary": "#6C1D45",
+    "secondary": "#6CABDD"
+  },
+  "Monaco": {
+    "primary": "#FFFFFF",
+    "secondary": "#D71920"
+  },
+  "Roma": {
+    "primary": "#7A263A",
+    "secondary": "#E7B72D"
+  },
+  "Hearts": {
+    "primary": "#7A263A",
+    "secondary": "#FFFFFF"
+  },
+  "Blackpool": {
+    "primary": "#F39200",
+    "secondary": "#FFFFFF"
+  },
+  "Sutton United": {
+    "primary": "#F39200",
+    "secondary": "#111827"
+  },
+  "Anderlecht": {
+    "primary": "#5E2A84",
+    "secondary": "#FFFFFF"
+  },
+  "Inter": {
+    "primary": "#0057B8",
+    "secondary": "#111827"
+  },
+  "Atalanta": {
+    "primary": "#0057B8",
+    "secondary": "#111827"
+  },
+  "Beşiktaş": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "Notts County": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "Lugano": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "Brøndby IF": {
+    "primary": "#E7B72D",
+    "secondary": "#0057B8"
+  },
+  "Galatasaray": {
+    "primary": "#D71920",
+    "secondary": "#E7B72D"
+  },
+  "AEK Athen": {
+    "primary": "#E7B72D",
+    "secondary": "#111827"
+  },
+  "AEK Athens": {
+    "primary": "#E7B72D",
+    "secondary": "#111827"
+  },
+  "Bayern München": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Atlético Madrid": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Braga": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Barcelona": {
+    "primary": "#A50044",
+    "secondary": "#004D98"
+  },
+  "NEC Nijmegen": {
+    "primary": "#00843D",
+    "secondary": "#D71920"
+  },
+  "Inter Escaldes": {
+    "primary": "#0057B8",
+    "secondary": "#111827"
+  },
+  "Union Saint-Gilloise": {
+    "primary": "#E7B72D",
+    "secondary": "#0057B8"
+  },
+  "Paris Saint-Germain": {
+    "primary": "#182D55",
+    "secondary": "#D71920"
+  },
+  "Bayer Leverkusen": {
+    "primary": "#D71920",
+    "secondary": "#111827"
+  },
+  "Cardiff City": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "AFC Fylde": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Aldershot Town": {
+    "primary": "#D71920",
+    "secondary": "#0057B8"
+  },
+  "Hornchurch": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Scunthorpe United": {
+    "primary": "#6C1D45",
+    "secondary": "#0057B8"
+  },
+  "Solihull Moors": {
+    "primary": "#0057B8",
+    "secondary": "#F7D116"
+  },
+  "Worthing": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Millwall": {
+    "primary": "#182D55",
+    "secondary": "#FFFFFF"
+  },
+  "Barnsley": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Bradford City": {
+    "primary": "#6C1D45",
+    "secondary": "#F7D116"
+  },
+  "Cambridge United": {
+    "primary": "#111827",
+    "secondary": "#F7D116"
+  },
+  "Doncaster Rovers": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Leyton Orient": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Milton Keynes Dons": {
+    "primary": "#FFFFFF",
+    "secondary": "#D71920"
+  },
+  "Peterborough United": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Plymouth Argyle": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Stevenage": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Gillingham": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Northampton Town": {
+    "primary": "#6C1D45",
+    "secondary": "#FFFFFF"
+  },
+  "Rotherham United": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Shrewsbury Town": {
+    "primary": "#0057B8",
+    "secondary": "#F7D116"
+  },
+  "RB Leipzig": {
+    "primary": "#FFFFFF",
+    "secondary": "#D71920"
+  },
+  "PSV Eindhoven": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "KRC Genk": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Djurgårdens IF": {
+    "primary": "#182D55",
+    "secondary": "#6CABDD"
+  },
+  "Red Bull Salzburg": {
+    "primary": "#FFFFFF",
+    "secondary": "#D71920"
+  },
+  "SK Sturm Graz": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "PFC Ludogorets": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Rapid Wien": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Sparta Praha": {
+    "primary": "#6C1D45",
+    "secondary": "#FFFFFF"
+  },
+  "Legia Warszawa": {
+    "primary": "#FFFFFF",
+    "secondary": "#00843D"
+  },
+  "Aberdeen": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "BK Häcken": {
+    "primary": "#F7D116",
+    "secondary": "#111827"
+  },
+  "Aris Limassol": {
+    "primary": "#F7D116",
+    "secondary": "#111827"
+  },
+  "Víkingur Reykjavík": {
+    "primary": "#D71920",
+    "secondary": "#111827"
+  },
+  "LASK": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "GNK Dinamo": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Lyon": {
+    "primary": "#FFFFFF",
+    "secondary": "#D71920"
+  },
+  "Torreense": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Freiburg": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Iberia Tbilisi": {
+    "primary": "#111827",
+    "secondary": "#F7D116"
+  },
+  "Sevilla": {
+    "primary": "#FFFFFF",
+    "secondary": "#D71920"
+  },
+  "Valencia": {
+    "primary": "#FFFFFF",
+    "secondary": "#111827"
+  },
+  "Eintracht Frankfurt": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "VfL Wolfsburg": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Mainz 05": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "FC Augsburg": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Atlético de Madrid": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Leverkusen": {
+    "primary": "#D71920",
+    "secondary": "#111827"
+  },
+  "Leipzig": {
+    "primary": "#FFFFFF",
+    "secondary": "#D71920"
+  },
+  "Paris": {
+    "primary": "#182D55",
+    "secondary": "#D71920"
+  },
+  "Celta Vigo": {
+    "primary": "#6CABDD",
+    "secondary": "#FFFFFF"
+  },
+  "Milan": {
+    "primary": "#D71920",
+    "secondary": "#111827"
+  },
+  "PSV": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Porto": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Bournemouth": {
+    "primary": "#D71920",
+    "secondary": "#111827"
+  },
+  "Brighton": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Athletic Bilbao": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Sevilla FC": {
+    "primary": "#FFFFFF",
+    "secondary": "#D71920"
+  },
+  "Valencia CF": {
+    "primary": "#FFFFFF",
+    "secondary": "#111827"
+  },
+  "SC Freiburg": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "FC Bayern München": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Bayern Munich": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "FC Barcelona": {
+    "primary": "#A50044",
+    "secondary": "#004D98"
+  },
+  "Bayer 04 Leverkusen": {
+    "primary": "#D71920",
+    "secondary": "#111827"
+  },
+  "VfB Stuttgart": {
+    "primary": "#FFFFFF",
+    "secondary": "#D71920"
+  },
+  "TSG 1899 Hoffenheim": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "LOSC Lille": {
+    "primary": "#D71920",
+    "secondary": "#182D55"
+  },
+  "RC Lens": {
+    "primary": "#D71920",
+    "secondary": "#F7D116"
+  },
+  "Olympique Marseille": {
+    "primary": "#FFFFFF",
+    "secondary": "#6CABDD"
+  },
+  "Olympique Lyon": {
+    "primary": "#FFFFFF",
+    "secondary": "#D71920"
+  },
+  "Real Betis Balompié": {
+    "primary": "#00843D",
+    "secondary": "#FFFFFF"
+  },
+  "Real Sociedad de Fútbol": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Villarreal CF": {
+    "primary": "#F7D116",
+    "secondary": "#182D55"
+  },
+  "Inter Milan": {
+    "primary": "#0057B8",
+    "secondary": "#111827"
+  },
+  "SSC Napoli": {
+    "primary": "#6CABDD",
+    "secondary": "#FFFFFF"
+  },
+  "Juventus FC": {
+    "primary": "#111827",
+    "secondary": "#FFFFFF"
+  },
+  "Associazione Sportiva Roma": {
+    "primary": "#7A263A",
+    "secondary": "#E7B72D"
+  },
+  "Atalanta BC": {
+    "primary": "#0057B8",
+    "secondary": "#111827"
+  },
+  "Como 1907": {
+    "primary": "#0057B8",
+    "secondary": "#FFFFFF"
+  },
+  "Ajax Amsterdam": {
+    "primary": "#FFFFFF",
+    "secondary": "#D71920"
+  },
+  "Feyenoord Rotterdam": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "SL Benfica": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "SC Braga": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "FC Twente Enschede": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  },
+  "Celta de Vigo": {
+    "primary": "#6CABDD",
+    "secondary": "#FFFFFF"
+  },
+  "Sunderland AFC": {
+    "primary": "#D71920",
+    "secondary": "#FFFFFF"
+  }
+};
+const CLUB_HOME_KIT_COLOR_BY_KEY = (() => {
+ const byKey = Object.create(null);
+ Object.entries(CLUB_HOME_KIT_COLORS).forEach(([clubName, palette]) => {
+  const key = normalizedClubKey(clubName);
+  if (key && !byKey[key]) byKey[key] = palette;
+ });
+ return byKey;
+})();
+function kitColorLuminance(hex){
+ const value=String(hex||'#000000').replace('#','');
+ if(!/^[0-9a-f]{6}$/i.test(value))return 0;
+ const rgb=[0,2,4].map(i=>parseInt(value.slice(i,i+2),16)/255).map(v=>v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4));
+ return .2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2];
+}
+function kitColorContrast(a,b){
+ const la=kitColorLuminance(a),lb=kitColorLuminance(b);
+ return (Math.max(la,lb)+.05)/(Math.min(la,lb)+.05);
+}
 function clubGoalColors(name){
  const key=normalizedClubKey(name);
- const known={
-  arsenal:['#EF0107','#FFFFFF'],'manchestercity':['#6CABDD','#1C2C5B'],liverpool:['#C8102E','#F6EB61'],'manchesterunited':['#DA291C','#FBE122'],chelsea:['#034694','#FFFFFF'],'tottenhamhotspur':['#FFFFFF','#132257'],'newcastleunited':['#241F20','#FFFFFF'],'astonvilla':['#95BFE5','#670E36'],brighton:['#0057B8','#FFCD00'],bournemouth:['#DA291C','#000000'],crystalpalace:['#1B458F','#C4122E'],everton:['#003399','#FFFFFF'],brentford:['#E30613','#FFFFFF'],coventrycity:['#62A6D7','#FFFFFF'],fulham:['#000000','#CC0000'],hullcity:['#F39200','#000000'],ipswichtown:['#005A9C','#FFFFFF'],leedsunited:['#FFCD00','#FFFFFF'],nottinghamforest:['#E53233','#FFFFFF'],sunderland:['#E53233','#FFFFFF'],westhamunited:['#7A263A','#80BFFF'],burnley:['#6C1D45','#99D6EA'],wolverhamptonwanderers:['#FDB913','#231F20'],leicestercity:['#003090','#FDBE11'],southampton:['#D71920','#FFFFFF'],sheffieldunited:['#EE2737','#000000'],middlesbrough:['#E31B23','#FFFFFF'],norwichcity:['#FFF200','#009639'],watford:['#FBE122','#ED2127'],cardiffcity:['#0070B5','#FFFFFF'],swanseacity:['#FFFFFF','#000000'],sunderlandafc:['#E53233','#FFFFFF'],sheffieldwednesday:['#0066B3','#FFFFFF'],portsmouth:['#003DA5','#FFFFFF'],derbycounty:['#FFFFFF','#000000'],westbromwichalbion:['#122F67','#FFFFFF'],blackburnrovers:['#009FE3','#FFFFFF'],'stoke city':['#E03A3E','#FFFFFF'],qpr:['#1D5DA8','#FFFFFF'],queensparkrangers:['#1D5DA8','#FFFFFF'],bristolcity:['#D71920','#FFFFFF'],bristolrovers:['#00205B','#FFFFFF'],oxfordunited:['#FBC707','#002F6C'],lutontown:['#F58220','#FFFFFF'],prestonnorthend:['#FFFFFF','#003A70'],charltonathletic:['#D71920','#FFFFFF'],reading:['#004494','#FFFFFF'],boltonwanderers:['#FFFFFF','#D71920'],blackpool:['#F58220','#FFFFFF'],barnsley:['#D71920','#FFFFFF'],wiganathletic:['#0057B8','#FFFFFF'],peterboroughunited:['#0057B8','#FFFFFF'],huddersfieldtown:['#0066B3','#FFFFFF'],milwall:['#003DA5','#FFFFFF'],millwall:['#003DA5','#FFFFFF'],'real madrid':['#FFFFFF','#FDB913'],realmadrid:['#FFFFFF','#FDB913'],barcelona:['#A50044','#004D98'],fcbarcelona:['#A50044','#004D98'],bayernmunich:['#DC052D','#FFFFFF'],borussiadortmund:['#FDE100','#000000'],parissaintgermain:['#004170','#DA291C'],psg:['#004170','#DA291C'],atleticomadrid:['#CB3524','#FFFFFF'],juventus:['#000000','#FFFFFF'],acmilan:['#FB090B','#000000'],intermilan:['#0068A8','#000000'],internazionale:['#0068A8','#000000'],ajax:['#D2122E','#FFFFFF'],ajaxamsterdam:['#D2122E','#FFFFFF'],benfica:['#E32219','#FFFFFF'],sportingcp:['#008B45','#FFFFFF'],portosad:['#003399','#FFFFFF'],feyenoord:['#EF3340','#FFFFFF'],psveindhoven:['#E30613','#FFFFFF'],celtic:['#008A4B','#FFFFFF'],rangers:['#0050A4','#FFFFFF'],galatasaray:['#A90432','#FDB913'],fenerbahce:['#002D72','#FDB913'],napoli:['#0077C8','#FFFFFF'],roma:['#8E1B3A','#F5A623'],lazio:['#87CEEB','#FFFFFF']
- };
- if(known[key])return {primary:known[key][0],secondary:known[key][1]};
- const seed=stableSeed(String(name||'Club')+'|CM-MOBILE-GOAL-PALETTE-V1');
- const hue=seed%360;
- return {primary:`hsl(${hue} 78% 56%)`,secondary:`hsl(${(hue+34+(seed%22))%360} 78% 70%)`};
+ const palette=CLUB_HOME_KIT_COLOR_BY_KEY[key];
+ // Never synthesize random hues from a crest/name: an unlisted legacy name gets the same neutral pair.
+ if(!palette)return {primary:'#22344A',secondary:'#FFFFFF',catalogued:false};
+ let secondary=palette.secondary||'#FFFFFF';
+ if(kitColorContrast(palette.primary,secondary)<4.5){
+  const whiteContrast=kitColorContrast(palette.primary,'#FFFFFF');
+  const darkContrast=kitColorContrast(palette.primary,'#101827');
+  secondary=whiteContrast>=darkContrast?'#FFFFFF':'#101827';
+ }
+ return {primary:palette.primary,secondary,catalogued:true};
 }
+function kitPaletteCoverageAudit(){
+ const names=[
+  ...(CLUBS||[]).map(c=>c.name),...Object.values(EFL_DIVISIONS||{}).flat(),
+  ...(INTERNATIONAL_CLUBS||[]).map(c=>c.name),...(EUROPA_LEAGUE_POOL||[]).map(c=>c.name),
+  ...(CONFERENCE_LEAGUE_POOL||[]).map(c=>c.name),...Object.values(UEFA_2026_27||{}).flat(),
+  ...Object.keys(EUROPEAN_LOGOS||{})
+ ].filter(Boolean);
+ const unique=[...new Set(names)];
+ const missing=unique.filter(n=>!CLUB_HOME_KIT_COLOR_BY_KEY[normalizedClubKey(n)]);
+ return {total:unique.length,covered:unique.length-missing.length,missing};
+}
+const CLUB_KIT_PALETTE_AUDIT = kitPaletteCoverageAudit();
+
 function liveMatchContext(c,engine,round){
  const roundValue=Number(engine?.competitionRound||round?.round||round||appState.week)||1;
  let competition='',roundLabel='';
