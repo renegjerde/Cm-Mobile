@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v3.30 — Touchline</title>
+<title>CM Mobile v3.31 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -196,7 +196,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 /* v3.26: fast transfer-market index, memoized player lookups, and filter-only rendering without full save/boot cycle. */
 /* v3.28: move next-match card directly below the manager hero on the home dashboard. */
 /* v3.29: one primary match-preparation action; show relevant table position and recent form on the dashboard. */
-/* v3.30: cup fixtures resolve the canonical squad database; cup-only teams keep a persistent named squad. */
+/* v3.31: cup fixtures resolve the canonical squad database; cup-only teams keep a persistent named squad. */
 .goal-scorer-line{display:inline-block;max-width:100%;padding:3px 9px 5px;margin:0 0 2px -3px;border:2px solid transparent;border-radius:8px;vertical-align:middle;overflow-wrap:anywhere}
 .goal-scorer-line.goal-scorer-line-flash{animation:goalScorerLineFlash .5s steps(1,end) 6;will-change:background-color,color,border-color,box-shadow}
 @keyframes goalScorerLineFlash{
@@ -544,7 +544,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.30</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.31</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -3786,7 +3786,7 @@ function resetBaseDomesticRegistry2026_27(){
  return changed;
 }
 function auditBaseDomesticRegistry2026_27(){
- const all=[...CLUBS.map(c=>({name:c.name,division:'Premier League'})),...Object.entries(BASE_EFL_DIVISIONS_2026_27).flatMap(([division,names])=>names.map(name=>({name,division})))];
+ const all=canonicalDomesticClubRegistry();
  const byKey=new Map(),duplicates=[];
  for(const club of all){const key=domesticClubKey(club.name);if(byKey.has(key))duplicates.push(`${club.name}: ${byKey.get(key)} / ${club.division}`);else byKey.set(key,club.division);}
  const expected={ 'Premier League':20, 'Championship':24, 'League One':24, 'League Two':24, 'National League':24 };
@@ -3800,6 +3800,28 @@ function auditBaseDomesticRegistry2026_27(){
 // the saved, post-promotion/relegation table membership is the source of truth.
 const CLUB_REGISTRY_AUDIT_VERSION=3;
 const DOMESTIC_DIVISION_ORDER=['Premier League','Championship','League One','League Two','National League'];
+// v3.31: one read-only canonical registry view. The original PL array order is
+// deliberately preserved because saved careers and worldSquads still use its indexes.
+function canonicalDomesticClubRegistry(){
+ const entries=[];
+ for(const c of CLUBS){
+  const name=String(c?.name||'').trim();if(!name)continue;
+  entries.push({id:`eng:${domesticClubKey(name)}`,name,division:'Premier League',source:'CLUBS',legacyPremierLeagueIndex:CLUBS.indexOf(c)});
+ }
+ for(const division of DOMESTIC_DIVISION_ORDER.filter(d=>d!=='Premier League')){
+  for(const name of (EFL_DIVISIONS[division]||[])){
+   const canonicalName=String(name||'').trim();if(!canonicalName)continue;
+   entries.push({id:`eng:${domesticClubKey(canonicalName)}`,name:canonicalName,division,source:'EFL_DIVISIONS',legacyPremierLeagueIndex:null});
+  }
+ }
+ return entries;
+}
+function auditCanonicalDomesticClubRegistry(){
+ const entries=canonicalDomesticClubRegistry(),ids=new Map(),duplicates=[];
+ for(const entry of entries){if(ids.has(entry.id))duplicates.push({id:entry.id,name:entry.name,divisions:[ids.get(entry.id),entry.division]});else ids.set(entry.id,entry.division);}
+ const counts=Object.fromEntries(DOMESTIC_DIVISION_ORDER.map(d=>[d,entries.filter(c=>c.division===d).length]));
+ return {total:entries.length,uniqueIds:ids.size,duplicates,counts,ok:entries.length===ids.size&&duplicates.length===0};
+}
 function domesticClubKey(name){
  const key=typeof normalizedClubKey==='function'?normalizedClubKey(name):String(name||'').toLowerCase().replace(/[^a-z0-9]/g,'');
  if(key==='mkdons')return 'miltonkeynesdons';
@@ -4346,7 +4368,7 @@ const EFL_OFFICIAL_ROSTER_STATUS_2026_27={"Birmingham City":"complete","Blackbur
 function eflOfficialRosterNamesForClub(clubName){const names=EFL_OFFICIAL_ROSTERS_2026_27?.[clubName];return Array.isArray(names)?names.slice():[]}
 function eflOfficialRosterStatusForClub(clubName){return EFL_OFFICIAL_ROSTER_STATUS_2026_27?.[clubName]||'pending'}
 
-// v3.30: club-published first-team roster for the National League club that was
+// v3.31: club-published first-team roster for the National League club that was
 // incorrectly treated as a cup-only club by the cup fixture roster resolver.
 // Positions use the club squad page and current 2026/27 squad listings.
 const NATIONAL_LEAGUE_CURATED_ROSTERS_2026_27={
@@ -4770,7 +4792,7 @@ function applyCupRosterAvailability(teamA,teamB,playersA,playersB,sim,competitio
  processCompletedFixtureAvailability(rosterForCupMatch(teamA),matchKey);
  processCompletedFixtureAvailability(rosterForCupMatch(teamB),matchKey);
 }
-// v3.30: the single recordSimulatedCupPlayerStats implementation above handles every squad type.
+// v3.31: the single recordSimulatedCupPlayerStats implementation above handles every squad type.
 function simulateCompetitionMatchRaw(a,b,competition,roundNo,gameNo){
  const pa=competitionSquad(a),pb=competitionSquad(b);
  const sim=simulateMatch(a.strength,b.strength,true,pa,pb,'4-3-3','4-3-3','Balanced','Balanced');
@@ -8847,7 +8869,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.30 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.31 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
