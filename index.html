@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v3.33 — Touchline</title>
+<title>CM Mobile v3.34 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -1830,15 +1830,24 @@ function youthAcademyPage(){
  const positionRows=[['GK','Keepere'],['DEF','Forsvar'],['MID','Midtbane'],['ATT','Angrep']].map(([pos,label])=>({pos,label,count:youth.filter(p=>p.pos===pos).length,target:YOUTH_ACADEMY_TARGETS[pos]}));
  return `<div class="hero"><div class="eyebrow">Youth development · ${seasonLabel()}</div><h1>Juniorstall</h1><div class="squad-summary"><span class="pill green">${youth.length}/25 talenter</span><span class="pill">${youth.filter(p=>Number(p.potential)>=90).length} stortalenter</span><span class="pill">${eligibleCount} klare for opprykk</span></div></div><section class="card"><div class="section-title"><h2>Struktur på juniorstallen</h2><span class="pill">${youth.length} / 25</span></div><div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">${positionRows.map(r=>`<div class="stat"><small>${r.label}</small><strong>${r.count} / ${r.target}</strong></div>`).join('')}</div></section><section class="card"><div class="section-title"><h2>Akademispillere</h2><span class="pill">${youth.length} talenter</span></div>${youth.length?youth.slice().sort((a,b)=>({GK:0,DEF:1,MID:2,ATT:3}[a.pos]??4)-({GK:0,DEF:1,MID:2,ATT:3}[b.pos]??4)||(b.potential-a.potential)).map(p=>{const served=(Number(appState.seasonYear)||2026)-Number(p.academySeason||appState.seasonYear);const eligible=served>=1&&Number(p.age)>=16&&Number(p.age)<=18;return `<div class="player"><div style="flex:1;min-width:0"><div class="player-name">${esc(p.name)} <span class="pill">${p.pos}</span> <span class="pill ${Number(p.potential)>=90?'green':''}">${youthPotentialLabel(p)}</span></div><div class="player-meta">${playerAgeText(p)} · Ferdighet ${p.rating} · Potensial ${p.potential}</div><div class="attrs"><span class="attr">Verdi ${money(p.value)}</span><span class="attr">Lønn ${p.wage}k/uke</span><span class="attr">Junior siden ${Number(p.academySeason)}/${String(Number(p.academySeason)+1).slice(-2)}</span></div><button style="margin-top:8px" onclick="promoteYouthPlayer('${String(p.id).replace(/'/g,"\\'")}')" ${!eligible?'disabled':''}>${Number(p.age)>18?'Frigis ved sesongskiftet':served<1?'Minst ett år i juniorstallen':Number(p.age)<16?'Må være minst 16 år':'Hent opp til førstelaget'}</button></div></div>`}).join(''):'<p class="muted">Ingen juniorer registrert ennå.</p>'}</section>`;
 }
-function makeSquad(clubIndex){
- const i=Number(clubIndex),club=CLUBS[i];if(!club)return [];
+function ensureWorldSquadForClub(clubIndex){
+ const i=Number(clubIndex),club=CLUBS[i];if(!Number.isInteger(i)||!club)return [];
  if(!Array.isArray(appState.worldSquads))appState.worldSquads=[];
  let roster=appState.worldSquads[i];
- if(!Array.isArray(roster)||!roster.length){
-  const division=clubDivision(club),dbRoster=appState.eflPlayerDatabase?.[division]?.[club.name];
-  roster=Array.isArray(dbRoster)&&dbRoster.length?dbRoster.map((p,j)=>({...p,clubIndex:i,clubName:club.name,division,id:p.id||`club-${i}-${j}`,careerId:p.careerId||p.id||`club-${i}-${j}`})):buildRealSquad(i);
+ // Empty arrays are not valid squads. v3.33 created empty worldSquads slots for EFL teams,
+ // and JavaScript treats [] as truthy, so the match engine silently fielded no opponents.
+ if(!Array.isArray(roster)||roster.length<18){
+  const division=clubDivision(club),dbRoster=division==='Premier League'?null:appState.eflPlayerDatabase?.[division]?.[club.name];
+  // A partial registered list of 11–17 players cannot support a full season with injuries, suspensions and substitutes.
+  // Prefer the complete in-game squad builder when the current-season list is incomplete.
+  const source=Array.isArray(dbRoster)&&dbRoster.length>=18?dbRoster:buildRealSquad(i);
+  roster=(Array.isArray(source)?source:[]).map((p,j)=>({...p,clubIndex:i,clubName:club.name,division,id:p.id||`club-${i}-${j}`,careerId:p.careerId||p.id||`club-${i}-${j}`,attributes:{...(p.attributes||{})}}));
   appState.worldSquads[i]=roster;
  }
+ return roster;
+}
+function makeSquad(clubIndex){
+ const roster=ensureWorldSquadForClub(clubIndex);
  return roster.map(p=>({...p,attributes:{...(p.attributes||{})}}));
 }
 function init(){resetBaseDomesticRegistry2026_27();appState.preseasonActive=true;appState.preseasonWeek=1;appState.preseasonWeeks=4;appState.trainingFormations=["4-3-3","4-2-3-1","4-4-2"];appState.log=[`Ny karriere starter med fire ukers pre-season i ${seasonLabel()}.`];if(!Array.isArray(appState.worldSquads)||appState.worldDatabaseVersion!==PLAYER_DB_VERSION||appState.worldDatabaseSourceVersion!==activePlayerDatabaseSourceVersion()){appState.worldSquads=buildWorldDatabase();appState.worldDatabaseVersion=PLAYER_DB_VERSION;appState.worldDatabaseSourceVersion=activePlayerDatabaseSourceVersion();}appState.activeDivision=clubDivision(CLUBS[appState.club]);appState.squad=makeSquad(appState.club);ensureTransferPool();appState.budget=CLUBS[appState.club].budget;appState.table=activeLeagueClubs().map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));appState.fixtures=[];appState.leagueFormatVersion=3;ensureFixtures();appState.started=true;initDomesticCompetitions();initClubFinances(true);ensureYouthAcademies();normalizeAllPlayerAges(Number(appState.seasonYear)||2026);ensureAllPlayerContracts();save();render()}
@@ -6145,11 +6154,16 @@ function startSelectedCareer(){
  };
  Object.keys(appState).forEach(k=>delete appState[k]);
  Object.assign(appState,defaults);
+ // Build the lower-division roster source once, before selecting the manager's squad.
+ // In v3.33 this happened after makeSquad(), then buildEFLPlayerDB() was run a second time;
+ // that produced mismatched active-manager and competition rosters and made career creation slow.
+ initDomesticCompetitions();
  marketSearch="";marketPosition="ALL";marketSort="recommended";marketScope="all";marketAgeMin="";marketAgeMax="";marketExactRole="ALL";marketMaxPrice="";marketMinPotential="";window.marketAdvancedOpen=false;
  appState.squad=makeSquad(idx).map(p=>({...p,fitness:100,morale:75,goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,form:6.5,injured:0,suspended:0}));
+ appState.worldSquads[idx]=appState.squad.map(p=>({...p,attributes:{...(p.attributes||{})}}));
  appState.budget=CLUBS[idx].budget;
  appState.table=activeLeagueClubs().map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
- appState.fixtures=[];initDomesticCompetitions();appState.eflPlayerDatabase=mergeEFLPlayerDBByClubName(appState.eflPlayerDatabase,buildEFLPlayerDB());appState.eflPlayerDatabaseVersion=EFL_DB_VERSION;ensureNationalLeagueRosters();ensureFixtures();initClubFinances(true);ensureYouthAcademies();normalizeAllPlayerAges(Number(appState.seasonYear)||2026);
+ appState.fixtures=[];ensureFixtures();initClubFinances(true);ensureYouthAcademies();normalizeAllPlayerAges(Number(appState.seasonYear)||2026);
  save();
  render();
 }
@@ -7249,7 +7263,7 @@ function playMatch(){
    const fromHistory=(round.games||[]).filter(pair=>Array.isArray(pair)&&!pair.some(x=>Number(x)===userIndex)).map(([a,b])=>{const home=CLUBS[Number(a)]?.name,away=CLUBS[Number(b)]?.name,r=historyMap.get(`${home}|${away}`);return r?{a:Number(a),b:Number(b),ga:Number(r.homeGoals),gb:Number(r.awayGoals),events:[]}:null;});
    if(fromHistory.length===expectedAIResults&&fromHistory.every(Boolean)){roundResults=fromHistory;reuseAIResults=true;round.aiResults=roundResults;round.aiResultsApplied=true;}
   }
-  const makeOpponentSquad=(clubIndex)=>((appState.worldSquads&&appState.worldSquads[clubIndex])||buildRealSquad(clubIndex)).map(p=>({...p,attributes:{...p.attributes},sourcePlayerId:p.id,id:`opp-${clubIndex}-${p.id}`,fitness:Number(p.fitness??100),injured:Number(p.injured)||0,suspended:Number(p.suspended)||0}));
+  const makeOpponentSquad=(clubIndex)=>ensureWorldSquadForClub(clubIndex).map(p=>({...p,attributes:{...(p.attributes||{})},sourcePlayerId:p.id,id:`opp-${clubIndex}-${p.id}`,fitness:Number(p.fitness??100),injured:Number(p.injured)||0,suspended:Number(p.suspended)||0}));
   let userMatch=null;
   for(const [aRaw,bRaw] of round.games){
    const a=Number(aRaw),b=Number(bRaw);
@@ -9056,7 +9070,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.33 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.34 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
