@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v3.28 — Touchline</title>
+<title>CM Mobile v3.29 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -74,6 +74,15 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .home-matchup{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center}
 .home-team{min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:7px}.home-team:last-child{align-items:flex-end;text-align:right}.home-team strong{display:block;font-size:13px;overflow-wrap:anywhere}.home-team small{display:block;color:var(--muted);font-size:10px;margin-top:-3px}.home-team-badge{width:46px;height:46px;flex:0 0 46px;border-radius:12px;background:#22344a;border:1px solid #3a4b61;display:grid;place-items:center;overflow:hidden;font-size:18px;color:var(--muted)}.home-team-badge img{width:36px;height:36px;object-fit:contain}.home-team-badge.badge-fallback{font-size:12px;font-weight:800}
 .home-vs{color:var(--muted);font-size:11px;font-weight:800}
+.home-team .match-team-record{justify-content:flex-start;gap:4px;width:100%;font-size:10px;line-height:1.2;overflow-wrap:anywhere}
+.home-team:last-child .match-team-record{justify-content:flex-end}
+.home-team .match-team-position{font-size:10px}
+.home-team .match-form-label{font-size:9px;font-weight:800;text-transform:uppercase}
+.home-team .match-form-dots{gap:2px}
+.home-team .match-form-dot{width:15px;height:15px;font-size:9px;border-radius:4px}
+.home-team .match-form-empty{font-size:10px}
+.home-hero-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:3px}
+.home-hero-actions-single button{min-height:36px}
 .home-next .home-next-action{width:100%;margin-top:12px}
 .home-section{margin-top:12px}.home-section .section-title{margin-top:14px}
 .home-news-row{padding:9px 0;border-bottom:1px solid #26364a;font-size:12px}.home-news-row:last-child{border-bottom:0}
@@ -186,6 +195,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 /* v3.25: audited club kit colours; only the scorer line, using the team's two actual kit colours as solid alternating foreground/background pairs. */
 /* v3.26: fast transfer-market index, memoized player lookups, and filter-only rendering without full save/boot cycle. */
 /* v3.28: move next-match card directly below the manager hero on the home dashboard. */
+/* v3.29: one primary match-preparation action; show relevant table position and recent form on the dashboard. */
 .goal-scorer-line{display:inline-block;max-width:100%;padding:3px 9px 5px;margin:0 0 2px -3px;border:2px solid transparent;border-radius:8px;vertical-align:middle;overflow-wrap:anywhere}
 .goal-scorer-line.goal-scorer-line-flash{animation:goalScorerLineFlash .5s steps(1,end) 6;will-change:background-color,color,border-color,box-shadow}
 @keyframes goalScorerLineFlash{
@@ -533,7 +543,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.28</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.29</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -2035,24 +2045,56 @@ function advancePreseasonWeek(){
  appState.recommendationRound=null;appState.recommendationInfo=null;save();render();
 }
 function seasonCompleted(){return !!(appState.fixtures&&appState.fixtures.length&&appState.fixtures.every(f=>f.played))}
+function domesticStandingsForTeam(teamName){
+ const mainRows=Array.isArray(appState.table)?appState.table:[];
+ if(mainRows.some(r=>r?.name===teamName))return sortedTable();
+ for(const data of Object.values(appState.lowerLeagues||{})){
+  const rows=Array.isArray(data?.rows)?data.rows:[];
+  if(rows.some(r=>r?.name===teamName))return [...rows].sort((a,b)=>(Number(b.pts)||0)-(Number(a.pts)||0)||((Number(b.gf)||0)-(Number(b.ga)||0))-((Number(a.gf)||0)-(Number(a.ga)||0))||(Number(b.strength)||0)-(Number(a.strength)||0)||String(a.name).localeCompare(String(b.name)));
+ }
+ return null;
+}
 function recentTeamForm(teamName,competition='domestic'){
  const out=[];
  if(competition==='european'){
-  const comps=Object.values(appState.europeanCompetitions||{});
-  const matches=comps.flatMap(c=>(c.results||[]).filter(r=>r.isLeaguePhase&&(r.home===teamName||r.away===teamName)).map(r=>({r,c:c.name}))).sort((a,b)=>(Number(a.r.round)||0)-(Number(b.r.round)||0));
-  matches.slice(-5).forEach(({r})=>{const sc=europeanResultScore(r);if(!sc)return;const gf=r.home===teamName?sc.home:sc.away,ga=r.home===teamName?sc.away:sc.home;out.push(gf>ga?'V':gf===ga?'U':'T')});
- }else{
-  const matches=(Array.isArray(appState.leagueRecentResults)?appState.leagueRecentResults:[]).filter(r=>r.home===teamName||r.away===teamName).sort((a,b)=>(Number(a.round)||0)-(Number(b.round)||0));
-  matches.slice(-5).forEach(r=>{const gf=r.home===teamName?Number(r.homeGoals):Number(r.awayGoals),ga=r.home===teamName?Number(r.awayGoals):Number(r.homeGoals);out.push(gf>ga?'V':gf===ga?'U':'T')});
+  const matches=Object.values(appState.europeanCompetitions||{}).flatMap(c=>(c.results||[]).filter(r=>r.home===teamName||r.away===teamName).map(r=>({r,competition:c.name})))
+   .sort((a,b)=>(Number(a.r.week??a.r.round)||0)-(Number(b.r.week??b.r.round)||0)||(Number(a.r.round)||0)-(Number(b.r.round)||0)||(Number(a.r.leg)||0)-(Number(b.r.leg)||0));
+  matches.slice(-5).forEach(({r})=>{const sc=europeanResultScore(r);if(!sc)return;const gf=r.home===teamName?sc.home:sc.away,ga=r.home===teamName?sc.away:sc.home;out.push(gf>ga?'V':gf===ga?'U':'T');});
+  return out;
  }
+ // Main-league form comes from the same result ledger that updates the main league table.
+ if((appState.table||[]).some(r=>r?.name===teamName)){
+  const matches=(Array.isArray(appState.leagueRecentResults)?appState.leagueRecentResults:[]).filter(r=>r.home===teamName||r.away===teamName).sort((a,b)=>(Number(a.round)||0)-(Number(b.round)||0));
+  matches.slice(-5).forEach(r=>{const gf=r.home===teamName?Number(r.homeGoals):Number(r.awayGoals),ga=r.home===teamName?Number(r.awayGoals):Number(r.homeGoals);if(Number.isFinite(gf)&&Number.isFinite(ga))out.push(gf>ga?'V':gf===ga?'U':'T');});
+  return out;
+ }
+ // Lower-division clubs use their own saved match log rather than appearing to have no form.
+ for(const data of Object.values(appState.lowerLeagues||{})){
+  if(!(data.rows||[]).some(r=>r?.name===teamName))continue;
+  const matches=(Array.isArray(data.matchLog)?data.matchLog:[]).filter(r=>r.home===teamName||r.away===teamName).sort((a,b)=>(Number(a.round)||0)-(Number(b.round)||0));
+  matches.slice(-5).forEach(r=>{let hg=Number(r.ga),ag=Number(r.gb);if(!Number.isFinite(hg)||!Number.isFinite(ag)){const sc=String(r.score||'').match(/(\d+)\s*[–-]\s*(\d+)/);if(!sc)return;hg=Number(sc[1]);ag=Number(sc[2]);}const gf=r.home===teamName?hg:ag,ga=r.home===teamName?ag:hg;out.push(gf>ga?'V':gf===ga?'U':'T');});
+  return out;
+ }
+ // Legacy / external clubs may still have entries in the main result list.
+ const matches=(Array.isArray(appState.leagueRecentResults)?appState.leagueRecentResults:[]).filter(r=>r.home===teamName||r.away===teamName).sort((a,b)=>(Number(a.round)||0)-(Number(b.round)||0));
+ matches.slice(-5).forEach(r=>{const gf=r.home===teamName?Number(r.homeGoals):Number(r.awayGoals),ga=r.home===teamName?Number(r.awayGoals):Number(r.homeGoals);if(Number.isFinite(gf)&&Number.isFinite(ga))out.push(gf>ga?'V':gf===ga?'U':'T');});
  return out;
 }
-function matchFormMarkup(teamName,isEuropean=false){
- let position='–',form=[];
- if(isEuropean){const comp=Object.values(appState.europeanCompetitions||{}).find(c=>(c.table||[]).some(t=>t.name===teamName));if(comp){const rows=sortedEuropeanTable(comp);position=rows.findIndex(t=>t.name===teamName)+1||'–';form=recentTeamForm(teamName,'european');}}
- else {const rows=sortedTable();position=rows.findIndex(t=>t.name===teamName)+1||'–';form=recentTeamForm(teamName,'domestic');}
- const dots=form.length?form.map(v=>`<span class="match-form-dot ${v==='V'?'win':v==='U'?'draw':'loss'}" title="${v==='V'?'Seier':v==='U'?'Uavgjort':'Tap'}">${v}</span>`).join(''):'<span class="match-form-empty">Ingen kamper</span>';
- return `<div class="match-team-record"><span class="match-team-position">${position}. plass</span><span class="match-form-label">Form</span><span class="match-form-dots">${dots}</span></div>`;
+function matchFormMarkup(teamName,isEuropean=false,showPosition=true){
+ let position=null,form=[];
+ if(isEuropean){
+  const comp=Object.values(appState.europeanCompetitions||{}).find(c=>(c.table||[]).some(t=>t.name===teamName));
+  if(comp){const rows=sortedEuropeanTable(comp),idx=rows.findIndex(t=>t.name===teamName);if(idx>=0)position=idx+1;}
+  form=recentTeamForm(teamName,'european');
+ }else{
+  const rows=domesticStandingsForTeam(teamName);
+  if(rows){const idx=rows.findIndex(t=>t.name===teamName);if(idx>=0)position=idx+1;}
+  form=recentTeamForm(teamName,'domestic');
+ }
+ const positionMarkup=showPosition&&position!==null?`<span class="match-team-position">${position}. plass</span>`:'';
+ const formMarkup=form.length?`<span class="match-form-label">Form</span><span class="match-form-dots">${form.map(v=>`<span class="match-form-dot ${v==='V'?'win':v==='U'?'draw':'loss'}" title="${v==='V'?'Seier':v==='U'?'Uavgjort':'Tap'}">${v}</span>`).join('')}</span>`:(positionMarkup?'<span class="match-form-label">Form</span><span class="match-form-empty">Ingen kamper</span>':'');
+ if(!positionMarkup&&!formMarkup)return '';
+ return `<div class="match-team-record">${positionMarkup}${formMarkup}</div>`;
 }
 function currentClubRecord(){return appState.table.find(t=>t.name===currentClub().name)||{p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}}
 function sortedTable(){return [...appState.table].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf)}
@@ -2143,7 +2185,6 @@ function home(){
  const c=currentClub(),t=currentClubRecord(),next=CLUBS[getNextOpponentIndex()],done=seasonCompleted();
  const rank=sortedTable().findIndex(x=>x.name===c.name)+1;
  const division=appState.activeDivision||clubDivision(c);
- const primary=appState.preseasonActive?`<button class="primary home-primary" onclick="advancePreseasonWeek()">▶ Fullfør oppkjøringsuke ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}</button>`:appState.pendingCupMatch?`<button class="primary home-primary" onclick="startPendingCupMatch()">▶ Sett opp laget</button>`:done?`<button class="primary home-primary" onclick="setPage('season')">Se sesongoppsummering →</button>`:`<button class="primary home-primary" onclick="setPage('tactics')">▶ Sett opp laget</button>`;
  const pendingMatch=appState.pendingCupMatch;
  const pendingStageLabel=pendingMatch?(pendingMatch.roundLabel||(pendingMatch.isEuropeanLeague?`Ligafase runde ${pendingMatch.roundNo}`:pendingMatch.knockoutStageName||cupRoundLabel(pendingMatch.competition,pendingMatch.roundNo))):'';
  const status=appState.preseasonActive?`Pre-season · uke ${Number(appState.preseasonWeek)||1} av ${Number(appState.preseasonWeeks)||4}`:pendingMatch?`${pendingMatch.competition} · ${pendingStageLabel}`:done?`Sesongen ${seasonLabel()} er ferdig`:`${division} · Runde ${appState.week}`;
@@ -2152,12 +2193,16 @@ function home(){
  const matchup=opponentFixture?.games.find(g=>g.includes(appState.club));
  const homeGame=matchup?matchup[0]===appState.club:true;
  let nextTitle=appState.preseasonActive?'Neste steg':appState.pendingCupMatch?'Neste kamp':done?'Sesongen er ferdig':'Neste ligakamp';
- let nextBody=appState.preseasonActive?`<div class="home-matchup"><div class="home-team">${clubBadgeMarkup(c.name)}<strong>${esc(c.name)}</strong><small>Tropp, trening og overganger</small></div><div class="home-vs">PRE-SEASON</div><div class="home-team"><span class="home-team-badge">⚽</span><strong>${Number(appState.preseasonWeek)||1} / ${Number(appState.preseasonWeeks)||4}</strong><small>Oppkjøringsuker</small></div></div>`:appState.pendingCupMatch?`<div class="home-matchup"><div class="home-team">${clubBadgeMarkup(appState.pendingCupMatch.homeTeam)}<strong>${esc(appState.pendingCupMatch.homeTeam.name)}</strong><small>Hjemme</small></div><div class="home-vs">VS</div><div class="home-team">${clubBadgeMarkup(appState.pendingCupMatch.awayTeam)}<strong>${esc(appState.pendingCupMatch.awayTeam.name)}</strong><small>Borte</small></div></div>`:done?`<div class="muted">Sesongen er ferdigspilt. Se sluttabell og sesongstatistikk.</div>`:`<div class="home-matchup"><div class="home-team">${clubBadgeMarkup(homeGame?c.name:next.name)}<strong>${esc(homeGame?c.name:next.name)}</strong><small>${homeGame?'Hjemme':'Borte'}</small></div><div class="home-vs">VS</div><div class="home-team">${clubBadgeMarkup(homeGame?next.name:c.name)}<strong>${esc(homeGame?next.name:c.name)}</strong><small>${homeGame?'Borte':'Hjemme'}</small></div></div>`;
+ const pendingHomeMatch=appState.pendingCupMatch;
+ const homeMatchIsEuropean=!!(pendingHomeMatch?.isEuropeanLeague||pendingHomeMatch?.isEuropeanKnockout);
+ const homeMatchHasStandings=!pendingHomeMatch||!!pendingHomeMatch?.isEuropeanLeague;
+ const homeTeamRecord=(name)=>matchFormMarkup(name,homeMatchIsEuropean,homeMatchHasStandings);
+ let nextBody=appState.preseasonActive?`<div class="home-matchup"><div class="home-team">${clubBadgeMarkup(c.name)}<strong>${esc(c.name)}</strong><small>Tropp, trening og overganger</small></div><div class="home-vs">PRE-SEASON</div><div class="home-team"><span class="home-team-badge">⚽</span><strong>${Number(appState.preseasonWeek)||1} / ${Number(appState.preseasonWeeks)||4}</strong><small>Oppkjøringsuker</small></div></div>`:appState.pendingCupMatch?`<div class="home-matchup"><div class="home-team">${clubBadgeMarkup(appState.pendingCupMatch.homeTeam)}<strong>${esc(appState.pendingCupMatch.homeTeam.name)}</strong><small>Hjemme</small>${homeTeamRecord(appState.pendingCupMatch.homeTeam.name)}</div><div class="home-vs">VS</div><div class="home-team">${clubBadgeMarkup(appState.pendingCupMatch.awayTeam)}<strong>${esc(appState.pendingCupMatch.awayTeam.name)}</strong><small>Borte</small>${homeTeamRecord(appState.pendingCupMatch.awayTeam.name)}</div></div>`:done?`<div class="muted">Sesongen er ferdigspilt. Se sluttabell og sesongstatistikk.</div>`:`<div class="home-matchup"><div class="home-team">${clubBadgeMarkup(homeGame?c.name:next.name)}<strong>${esc(homeGame?c.name:next.name)}</strong><small>${homeGame?'Hjemme':'Borte'}</small>${homeTeamRecord(homeGame?c.name:next.name)}</div><div class="home-vs">VS</div><div class="home-team">${clubBadgeMarkup(homeGame?next.name:c.name)}<strong>${esc(homeGame?next.name:c.name)}</strong><small>${homeGame?'Borte':'Hjemme'}</small>${homeTeamRecord(homeGame?next.name:c.name)}</div></div>`;
  let nextAction=appState.preseasonActive?`<button class="primary home-next-action" onclick="advancePreseasonWeek()">Fullfør oppkjøringsuke →</button>`:appState.pendingCupMatch?`<button class="primary home-next-action" onclick="startPendingCupMatch()">Forbered laget →</button>`:done?`<button class="primary home-next-action" onclick="setPage('season')">Åpne sesongoppsummering →</button>`:`<button class="primary home-next-action" onclick="setPage('tactics')">Forbered laget →</button>`;
  const weeklyWages=appState.squad.reduce((n,p)=>n+(Number(p.wage)||0),0)/1000;
  const weeklyIncome=Number(getClubFinance().weeklyIncomeM)||weeklyOperatingRevenueM(getClubFinance().division||division,c.strength);
  const net=weeklyIncome-weeklyWages;
- return `<section class="hero home-hero"><div class="home-clubline"><div class="home-crest">${crest}</div><div class="home-club-copy"><div class="eyebrow">Managerprofil · ${seasonLabel()}</div><h1>${esc(c.name)}</h1><div class="home-seasonline">${esc(status)}</div></div></div><div class="home-status"><span class="pill">${done?'Sluttplass':'Ligaplass'} ${rank}/${activeLeagueClubs().length}</span><span class="pill">${t.pts} poeng</span>${appState.preseasonActive?'<span class="pill green">Overgangsvindu åpent</span>':''}</div><div class="home-hero-actions">${primary}<button class="home-new-career-button" type="button" onclick="startNewCareer()">＋ Start ny karriere</button></div></section>
+ return `<section class="hero home-hero"><div class="home-clubline"><div class="home-crest">${crest}</div><div class="home-club-copy"><div class="eyebrow">Managerprofil · ${seasonLabel()}</div><h1>${esc(c.name)}</h1><div class="home-seasonline">${esc(status)}</div></div></div><div class="home-status"><span class="pill">${done?'Sluttplass':'Ligaplass'} ${rank}/${activeLeagueClubs().length}</span><span class="pill">${t.pts} poeng</span>${appState.preseasonActive?'<span class="pill green">Overgangsvindu åpent</span>':''}</div><div class="home-hero-actions home-hero-actions-single"><button class="home-new-career-button" type="button" onclick="startNewCareer()">＋ Start ny karriere</button></div></section>
  <section class="card home-next"><div class="home-next-head"><h2>${esc(nextTitle)}</h2><span class="pill ${appState.preseasonActive?'green':''}">${appState.preseasonActive?'UKE '+(Number(appState.preseasonWeek)||1):done?'FULLFØRT':'GW '+appState.week}</span></div>${nextBody}${nextAction}</section>
  ${importantDashboardAlerts()}
  <div class="home-shortcuts"><button onclick="setPage('squad')">♟ Tropp</button><button onclick="setPage('transfers')">⇄ Overganger</button><button onclick="setPage('finance')">£ Økonomi</button></div>
@@ -3099,7 +3144,7 @@ function tactics(){
  }
  const matchDateIso=gameDateForWeek(appState.seasonYear,matchWeek);
  const matchDateLabel=new Date(`${matchDateIso}T00:00:00Z`).toLocaleDateString('nb-NO',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});
- const matchContextMarkup=`<section class="card match-context-card" aria-label="Kampinformasjon for neste kamp"><div class="match-context-head"><div class="match-context-title"><div class="eyebrow">NESTE KAMP</div><h2>🏆 ${esc(matchCompetition)}</h2></div><div class="match-context-chips"><span class="match-context-chip">${esc(matchRoundLabel)}</span><span class="match-context-chip">📅 ${esc(matchDateLabel)}</span></div></div><div class="match-context-teams"><div class="match-context-team"><div class="match-context-crest">${clubBadgeMarkup(matchHomeName,48)}</div><strong>${esc(matchHomeName)}</strong><small>HJEMMELAG</small>${matchFormMarkup(matchHomeName,!!pendingMatch?.isEuropeanLeague)}</div><div class="match-context-vs"><span>VS</span></div><div class="match-context-team"><div class="match-context-crest">${clubBadgeMarkup(matchAwayName,48)}</div><strong>${esc(matchAwayName)}</strong><small>BORTELAG</small>${matchFormMarkup(matchAwayName,!!pendingMatch?.isEuropeanLeague)}</div></div><div class="match-context-footer"><span class="match-venue ${userIsHome?'':'away'}">${userIsHome?'🏠 DU SPILLER HJEMME':'✈️ DU SPILLER BORTE'}</span><span class="match-opponent-meta">Motstanderens formasjon <strong>${esc(opponentFormation)}</strong></span></div></section>`;
+ const matchContextMarkup=`<section class="card match-context-card" aria-label="Kampinformasjon for neste kamp"><div class="match-context-head"><div class="match-context-title"><div class="eyebrow">NESTE KAMP</div><h2>🏆 ${esc(matchCompetition)}</h2></div><div class="match-context-chips"><span class="match-context-chip">${esc(matchRoundLabel)}</span><span class="match-context-chip">📅 ${esc(matchDateLabel)}</span></div></div><div class="match-context-teams"><div class="match-context-team"><div class="match-context-crest">${clubBadgeMarkup(matchHomeName,48)}</div><strong>${esc(matchHomeName)}</strong><small>HJEMMELAG</small>${matchFormMarkup(matchHomeName,!!(pendingMatch?.isEuropeanLeague||pendingMatch?.isEuropeanKnockout),!pendingMatch||!!pendingMatch?.isEuropeanLeague)}</div><div class="match-context-vs"><span>VS</span></div><div class="match-context-team"><div class="match-context-crest">${clubBadgeMarkup(matchAwayName,48)}</div><strong>${esc(matchAwayName)}</strong><small>BORTELAG</small>${matchFormMarkup(matchAwayName,!!(pendingMatch?.isEuropeanLeague||pendingMatch?.isEuropeanKnockout),!pendingMatch||!!pendingMatch?.isEuropeanLeague)}</div></div><div class="match-context-footer"><span class="match-venue ${userIsHome?'':'away'}">${userIsHome?'🏠 DU SPILLER HJEMME':'✈️ DU SPILLER BORTE'}</span><span class="match-opponent-meta">Motstanderens formasjon <strong>${esc(opponentFormation)}</strong></span></div></section>`;
  return `<div class="hero tactics-hero"><div class="eyebrow">Match preparation · ${seasonLabel()}</div><h1>Laguttak og taktikk</h1><div class="hero-actions"><span class="pill green">${xi.length}/11 valgt</span><span class="pill">Reserver: ${bench.length}</span><span class="pill ${unavailableCount?'warning':'green'}">${unavailableCount?`${unavailableCount} utilgjengelig`:'Alle tilgjengelige'}</span></div><button type="button" class="primary tactics-start-top" onclick="playMatch()">⚽ Avspark – bruk valgt ellever</button></div>${matchContextMarkup}
  <section class="card tactics-quick-controls"><div class="field"><label>FORMASJON I NESTE KAMP</label><select id="formation" onchange="appState.formation=this.value;appState.selectedXI=null;appState.tacticalRoleOverrides={};appState.tacticalPositionRoleOverrides={};appState.tacticalPositions={};appState.pitchSelectedSlot=null;save();render()">${appState.trainingFormations.map(f=>`<option value="${esc(f)}" ${appState.formation===f?'selected':''}>${esc(f)}</option>`).join('')}</select></div><div class="field"><label>MENTALITET</label><select id="tactic" onchange="appState.tactic=this.value;save()">${["Defensive","Balanced","Attacking","High press"].map(f=>`<option value="${f}" ${appState.tactic===f?"selected":""}>${mentalLabels[f]}</option>`).join('')}</select></div><button type="button" style="width:100%;margin:3px 0 0;border-color:#7e9c70;background:#1b382c;color:#bdf0ad;font-weight:850" onclick="rotateStartingXI()">🔄 Roter troppen</button><p class="tactics-mini-status">Prioriterer spillere som ikke startet forrige kamp. Skadde og suspenderte spillere utelates.</p></section>
  <section class="card assistant-match-plan" style="border-color:#647b52;background:linear-gradient(145deg,#192b2b,#142236);margin-bottom:12px"><div class="section-title"><h2>🤖 Assistentens kampplan</h2><span class="pill green">Klargjort automatisk</span></div><div class="player"><div style="flex:1"><strong>Formasjon · ${esc(appState.formation)}</strong><div class="player-meta">Motstanderens formasjon ${esc(opponentFormation)} · Mentalitet ${mentalLabels[appState.tactic]||'Balansert'}</div></div><span class="pill">${xi.length}/11</span></div><p class="muted" style="margin:6px 0;font-size:12px">Assistentens forslag: ${esc(appState.recommendationInfo?.formation||assistantSuggestedFormation)} · ${(()=>{const prev=new Set((appState.lastStartingXI||[]).map(String));const rotated=xi.filter(p=>!prev.has(String(p.id))).length;return `${rotated} endringer fra forrige startellever`;})()}</p><button type="button" class="ghost" style="width:100%" onclick="applyPreMatchRecommendation(true);render()">Be assistenten vurdere på nytt</button></section>
@@ -8657,7 +8702,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.28 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.29 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
