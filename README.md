@@ -1,12 +1,14 @@
-# CM Mobile v3.27 — Next match moved up
+# CM Mobile v3.28
 
-## What changed
-- Moved the `Neste kamp` / `Neste ligakamp` card directly below the manager profile hero on the home dashboard.
-- Important messages now appear after the next-match card, so the upcoming fixture and `Forbered laget` action are visible much earlier on mobile and smaller screens.
-- Keeps the existing match selection, cup match handling, alert ordering, shortcuts, financial metrics, and recent-news logic unchanged.
+## Endringer
+- Rettet divisjonsvelgeren i Tabell: `ensureFixtures()` overskrev tidligere valget med Premier League ved hver rendering. Valgt divisjon lagres nå separat fra divisjonen manageren spiller i.
+- Lagt til en sikker engangskontroll som kan reparere Premier League-tabellen hvis antall spilte kamper er åpenbart høyere enn serierunden og hele den unike kamphistorikken kan kobles til kampprogrammet.
+- Reparerer også en eldre feil i kamphistorikken der hjemmemål og bortemål kunne bli byttet når managerens klubb spilte borte.
+- AI-kampene i samme serierunde gjenbrukes dersom kampen startes på nytt før brukerens kamp er ferdig. Det hindrer dobbeltelling i tabell og spillerstatistikk.
+- Lavere divisjoner fortsetter å bli simulert automatisk når ligakampen er fullført.
 
-## Compatibility
-Updated from v3.26. No career data is reset or migrated.
+## Publisering
+Pakk ut arkivet og erstatt `index.html` i rotmappen på GitHub Pages (`main`).
 
-## Validation
-Inline JavaScript syntax and ZIP structure checked. UI order confirmed in the generated home template. No full browser test against the user's saved career was performed.
+## Tester
+JavaScript-syntaks og ZIP-arkiv er kontrollert. Isolerte tester dekker divisjonsvalg, rundeframdrift, gjenoppbygging fra unike kamphistorikkdata og retting av eldre hjemme-/bortescore. Full interaktiv nettlesertest med karrierelagringen din er ikke utført.

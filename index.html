@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v3.27 — Touchline</title>
+<title>CM Mobile v3.28 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -185,7 +185,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .live-match-controls .tactic-label{font-size:12px;color:var(--muted)}
 /* v3.25: audited club kit colours; only the scorer line, using the team's two actual kit colours as solid alternating foreground/background pairs. */
 /* v3.26: fast transfer-market index, memoized player lookups, and filter-only rendering without full save/boot cycle. */
-/* v3.27: move next-match card directly below the manager hero on the home dashboard. */
+/* v3.28: move next-match card directly below the manager hero on the home dashboard. */
 .goal-scorer-line{display:inline-block;max-width:100%;padding:3px 9px 5px;margin:0 0 2px -3px;border:2px solid transparent;border-radius:8px;vertical-align:middle;overflow-wrap:anywhere}
 .goal-scorer-line.goal-scorer-line-flash{animation:goalScorerLineFlash .5s steps(1,end) 6;will-change:background-color,color,border-color,box-shadow}
 @keyframes goalScorerLineFlash{
@@ -533,7 +533,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.27</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.28</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -5429,13 +5429,22 @@ function tableZoneLegend(division){
  return `<div class="table-zone-legend" aria-label="Forklaring på tabellfarger og statusbokstaver">${bits.join('')}</div>`;
 }
 
+const LEAGUE_TABLE_DIVISIONS=['Premier League','Championship','League One','League Two','National League'];
+function setLeagueTableDivision(value){
+ const next=String(value||'');
+ if(!LEAGUE_TABLE_DIVISIONS.includes(next))return;
+ appState.leagueTableDivision=next;
+ appState.leagueView='table';
+ render();
+}
 function league(){
  const active=appState.activeDivision||clubDivision(currentClub());
- const selected=appState.leagueTableDivision||active;
+ const selected=LEAGUE_TABLE_DIVISIONS.includes(String(appState.leagueTableDivision||''))?String(appState.leagueTableDivision):active;
+ if(selected!==appState.leagueTableDivision)appState.leagueTableDivision=selected;
  const isMain=selected===active;
  const done=seasonCompleted();
- const options=['Premier League','Championship','League One','League Two','National League'];
- const selector=`<section class="card"><div class="field"><label>VELG DIVISJON</label><select onchange="appState.leagueTableDivision=this.value;render()">${options.map(d=>`<option value="${d}" ${selected===d?'selected':''}>${d}</option>`).join('')}</select></div></section>`;
+ const options=LEAGUE_TABLE_DIVISIONS;
+ const selector=`<section class="card"><div class="field"><label for="leagueTableDivisionSelect">VELG DIVISJON</label><select id="leagueTableDivisionSelect" onchange="setLeagueTableDivision(this.value)" aria-label="Velg divisjon for ligatabellen">${options.map(d=>`<option value="${d}" ${selected===d?'selected':''}>${d}</option>`).join('')}</select></div></section>`;
  if(appState.leagueView==='players')return `<div class="hero"><div class="eyebrow">League centre</div><h1>Tabell og statistikk</h1><p>Sesong ${seasonLabel()}</p><div class="hero-actions"><button onclick="appState.leagueView='table';render()">Ligatabell</button><button class="primary" onclick="appState.leagueView='players';render()">Spillerstatistikk</button></div></div>${leaguePlayerStats()}`;
  let rows,playedRounds,totalRounds;
  if(isMain){rows=sortedTable();playedRounds=appState.played;totalRounds=appState.fixtures.length;}
@@ -5812,8 +5821,11 @@ function activeFixtureScheduleIsValid(fixtures,teams=activeLeagueClubIndices()){
 function ensureFixtures(){
  if((Number(appState.seasonYear)||2026)===2026){
   resetBaseDomesticRegistry2026_27();
-  // In the 2026/27 base career the only selectable domestic division is the Premier League.
-  if(Number.isInteger(Number(appState.club))&&CLUBS[Number(appState.club)]){appState.activeDivision='Premier League';appState.leagueTableDivision='Premier League';}
+  // The manager's active league remains the Premier League, but the League Centre
+  // selector is independent and must survive every render.
+  if(Number.isInteger(Number(appState.club))&&CLUBS[Number(appState.club)])appState.activeDivision='Premier League';
+  const validTableDivisions=['Premier League','Championship','League One','League Two','National League'];
+  if(!validTableDivisions.includes(String(appState.leagueTableDivision||'')))appState.leagueTableDivision='Premier League';
  }
  const teams=activeLeagueClubIndices(),n=teams.length,roundCount=(n-1)*2;
  const prior=Array.isArray(appState.fixtures)?appState.fixtures:[];
@@ -6102,6 +6114,70 @@ function ensureActiveLeagueTableRows(){
   appState.log.push('Kamptabellen ble synkronisert med klubbene i aktiv divisjon før kampstart. Eksisterende resultater for klubber med samme navn er beholdt.');
   appState.tableRepairVersion=1;
  }
+}
+function repairOvercountedPremierLeagueTableV328(){
+ if(Number(appState.plTableRepairVersionV328||0)>=1)return false;
+ const year=Number(appState.seasonYear)||2026,played=Math.max(0,Math.min(38,Number(appState.played)||0));
+ if(year!==2026||played<1||!Array.isArray(appState.fixtures)||!Array.isArray(appState.table))return false;
+ const clubs=activeLeagueClubs();if(clubs.length!==20||appState.activeDivision!=='Premier League')return false;
+ const maxExpected=played+1;
+ const maxSeen=Math.max(0,...appState.table.map(r=>Number(r?.p)||0));
+ const totalSeen=appState.table.reduce((n,r)=>n+(Number(r?.p)||0),0);
+ const rowShapeBad=appState.table.length!==20||appState.table.some(r=>!r||!Number.isFinite(Number(r.p))||Number(r.p)>Number(r.w||0)+Number(r.d||0)+Number(r.l||0)||Number(r.pts||0)!==3*(Number(r.w)||0)+(Number(r.d)||0));
+ const suspicious=rowShapeBad||maxSeen>maxExpected||totalSeen>20*played+20;
+ if(!suspicious){appState.plTableRepairVersionV328=1;return false;}
+ const validNames=new Set(clubs.map(c=>String(c.name)));
+ const byKey=new Map();
+ for(const r of (Array.isArray(appState.leagueRecentResults)?appState.leagueRecentResults:[])){
+  const rn=Number(r?.round),home=String(r?.home||''),away=String(r?.away||'');let hg=Number(r?.homeGoals),ag=Number(r?.awayGoals);
+  if(!Number.isInteger(rn)||rn<1||rn>played||!validNames.has(home)||!validNames.has(away)||home===away||!Number.isInteger(hg)||!Number.isInteger(ag)||hg<0||ag<0)continue;
+  // Older builds reversed the saved goals when the manager's club was the away side.
+  // Correct that known legacy ledger defect before rebuilding the table.
+  if(away===String(CLUBS[Number(appState.club)]?.name||'')){const swap=hg;hg=ag;ag=swap;}
+  const key=`${rn}|${home}|${away}`;if(!byKey.has(key))byKey.set(key,{round:rn,home,away,homeGoals:hg,awayGoals:ag});
+ }
+ const fixtureByRound=new Map(appState.fixtures.map(f=>[Number(f?.round),f]));
+ const uniqueResults=[];
+ for(let rn=1;rn<=played;rn++){
+  const round=fixtureByRound.get(rn),games=round?.games;
+  if(!Array.isArray(games)||games.length!==10)return false;
+  const roundSeen=new Set();
+  for(const pair of games){
+   if(!Array.isArray(pair)||pair.length!==2)return false;
+   const home=CLUBS[Number(pair[0])]?.name,away=CLUBS[Number(pair[1])]?.name;
+   if(!home||!away||roundSeen.has(home)||roundSeen.has(away))return false;
+   const result=byKey.get(`${rn}|${home}|${away}`);if(!result)return false;
+   roundSeen.add(home);roundSeen.add(away);uniqueResults.push(result);
+  }
+  if(roundSeen.size!==20)return false;
+ }
+ // Preserve a partially prepared current round if its AI games were already simulated before a reload.
+ const currentRound=fixtureByRound.get(played+1);
+ let partialAI=[];
+ if(currentRound&&!currentRound.played){
+  const aiGames=(currentRound.games||[]).filter(pair=>Array.isArray(pair)&&!pair.some(x=>Number(x)===Number(appState.club)));
+  const currentRoundMap=new Map();
+  for(const r of (Array.isArray(appState.leagueRecentResults)?appState.leagueRecentResults:[])){
+   if(Number(r?.round)!==played+1)continue;
+   const home=String(r.home||''),away=String(r.away||''),hg=Number(r.homeGoals),ag=Number(r.awayGoals);
+   if(validNames.has(home)&&validNames.has(away)&&Number.isInteger(hg)&&Number.isInteger(ag)){const k=`${home}|${away}`;if(!currentRoundMap.has(k))currentRoundMap.set(k,{round:played+1,home,away,homeGoals:hg,awayGoals:ag});}
+  }
+  const candidate=aiGames.map(pair=>{const home=CLUBS[Number(pair[0])]?.name,away=CLUBS[Number(pair[1])]?.name;return currentRoundMap.get(`${home}|${away}`);});
+  if(aiGames.length===9&&candidate.every(Boolean))partialAI=candidate;
+ }
+ const rebuilt=clubs.map(c=>({name:c.name,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
+ const rowByName=new Map(rebuilt.map(r=>[r.name,r]));
+ const apply=(r)=>{const h=rowByName.get(r.home),a=rowByName.get(r.away);if(!h||!a)return false;h.p++;a.p++;h.gf+=r.homeGoals;h.ga+=r.awayGoals;a.gf+=r.awayGoals;a.ga+=r.homeGoals;if(r.homeGoals>r.awayGoals){h.w++;h.pts+=3;a.l++;}else if(r.homeGoals<r.awayGoals){a.w++;a.pts+=3;h.l++;}else{h.d++;a.d++;h.pts++;a.pts++;}return true;};
+ for(const r of uniqueResults)if(!apply(r))return false;
+ for(const r of partialAI)if(!apply(r))return false;
+ // Every club must have exactly the completed number of matches, plus a possible non-user match this round.
+ if(rebuilt.some(r=>r.p<played||r.p>played+1))return false;
+ const oldRows=new Map(appState.table.filter(Boolean).map(r=>[String(r.name),r]));
+ appState.table=rebuilt.map(r=>({...oldRows.get(r.name),...r}));
+ appState.plTableRepairVersionV328=1;
+ appState.log=Array.isArray(appState.log)?appState.log:[];
+ appState.log.push(`Premier League-tabellen ble reparert i v3.28 fra ${uniqueResults.length} unike, planlagte seriekamper${partialAI.length?` og ${partialAI.length} AI-kamper i pågående runde`:''}. Dublerte resultater ble ikke telt flere ganger.`);
+ return true;
 }
 function applyTableResult(a,b,ga,gb){
  if(!Array.isArray(appState.table))appState.table=[];
@@ -6761,11 +6837,24 @@ function playMatch(){
   const c=currentClub(),opp=CLUBS[oppIndex],home=Number(fixture[0])===userIndex;
   if(!opp)throw new Error(`Motstanderen i runde ${roundNo} finnes ikke i klubbdatabasen.`);
   const previousPositions=new Map(sortedTable().map((team,index)=>[team.name,index+1]));
-  const roundResults=[];
+  const expectedAIPairs=(round.games||[]).filter(pair=>Array.isArray(pair)&&!pair.some(x=>Number(x)===userIndex));
+  const expectedAIResults=expectedAIPairs.length;
+  const expectedAIKeys=new Set(expectedAIPairs.map(pair=>`${Number(pair[0])}|${Number(pair[1])}`));
+  const validSavedAIResults=Array.isArray(round.aiResults)&&round.aiResults.length===expectedAIResults&&new Set(round.aiResults.map(r=>`${Number(r.a)}|${Number(r.b)}`)).size===expectedAIResults&&round.aiResults.every(r=>Number.isInteger(Number(r.a))&&Number.isInteger(Number(r.b))&&Number.isInteger(Number(r.ga))&&Number.isInteger(Number(r.gb))&&expectedAIKeys.has(`${Number(r.a)}|${Number(r.b)}`));
+  let reuseAIResults=validSavedAIResults&&round.aiResultsApplied===true;
+  let roundResults=reuseAIResults?round.aiResults.map(r=>({...r,events:Array.isArray(r.events)?r.events:[]})):[];
+  // Upgrade older saves where the AI games were already applied but were not cached on the fixture.
+  if(!reuseAIResults&&expectedAIResults===9){
+   const historyMap=new Map();
+   for(const r of (appState.leagueRecentResults||[]))if(Number(r?.round)===roundNo&&Number.isInteger(Number(r.homeGoals))&&Number.isInteger(Number(r.awayGoals)))historyMap.set(`${r.home}|${r.away}`,r);
+   const fromHistory=(round.games||[]).filter(pair=>Array.isArray(pair)&&!pair.some(x=>Number(x)===userIndex)).map(([a,b])=>{const home=CLUBS[Number(a)]?.name,away=CLUBS[Number(b)]?.name,r=historyMap.get(`${home}|${away}`);return r?{a:Number(a),b:Number(b),ga:Number(r.homeGoals),gb:Number(r.awayGoals),events:[]}:null;});
+   if(fromHistory.length===expectedAIResults&&fromHistory.every(Boolean)){roundResults=fromHistory;reuseAIResults=true;round.aiResults=roundResults;round.aiResultsApplied=true;}
+  }
   const makeOpponentSquad=(clubIndex)=>((appState.worldSquads&&appState.worldSquads[clubIndex])||buildRealSquad(clubIndex)).map(p=>({...p,attributes:{...p.attributes},sourcePlayerId:p.id,id:`opp-${clubIndex}-${p.id}`,fitness:Number(p.fitness??100),injured:Number(p.injured)||0,suspended:Number(p.suspended)||0}));
   let userMatch=null;
   for(const [aRaw,bRaw] of round.games){
    const a=Number(aRaw),b=Number(bRaw);
+   if(reuseAIResults&&a!==userIndex&&b!==userIndex)continue;
    const playersA=a===userIndex?appState.squad:makeOpponentSquad(a);
    const playersB=b===userIndex?appState.squad:makeOpponentSquad(b);
    if(a===userIndex||b===userIndex){
@@ -6784,7 +6873,15 @@ function playMatch(){
   }
   if(!userMatch)throw new Error(`Kampmotoren kunne ikke opprette kampen for ${CLUBS[userIndex].name}. Kontroller at klubben står i runde ${roundNo}.`);
   const emptyStats={shots:0,shotsAgainst:0,onTarget:0,onTargetAgainst:0,possession:50};
-  appState.leagueRecentResults=Array.isArray(appState.leagueRecentResults)?appState.leagueRecentResults:[];roundResults.forEach(r=>appState.leagueRecentResults.push({round:roundNo,home:CLUBS[r.a]?.name,away:CLUBS[r.b]?.name,homeGoals:r.ga,awayGoals:r.gb}));appState.leagueRecentResults=appState.leagueRecentResults.slice(-1000);
+  if(!reuseAIResults){
+   appState.leagueRecentResults=Array.isArray(appState.leagueRecentResults)?appState.leagueRecentResults:[];
+   roundResults.forEach(r=>appState.leagueRecentResults.push({round:roundNo,home:CLUBS[r.a]?.name,away:CLUBS[r.b]?.name,homeGoals:r.ga,awayGoals:r.gb}));
+   appState.leagueRecentResults=appState.leagueRecentResults.slice(-1000);
+   round.aiResults=roundResults.map(r=>({...r,events:Array.isArray(r.events)?r.events.map(e=>({...e})):[]}));
+   round.aiResultsApplied=true;
+   // Persist the round's AI fixtures now so leaving/reloading before the user's match cannot simulate them twice.
+   save();
+  }
   showMatch(c,opp,0,0,home,'',emptyStats,roundResults,[],[],{},userMatch,round,previousPositions);
   // Always start a newly opened live match at the top, regardless of the scroll position.
   window.scrollTo(0,0);
@@ -8306,7 +8403,7 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
    const userGoals=userIsA?ga:gb, opponentGoals=userIsA?gb:ga;
    const margin=userGoals-opponentGoals;
    const resultText=engine.isCupMatch?(cupResolution?.resultText||`${engine.competition} · ${c.name} ${userGoals}–${opponentGoals} ${opp.name}.`):`Runde ${appState.week}: ${c.name} ${userGoals}–${opponentGoals} ${opp.name} (${home?'hjemme':'borte'}).`;
-   if(!engine.isCupMatch){appState.log.push(resultText);appState.leagueRecentResults=Array.isArray(appState.leagueRecentResults)?appState.leagueRecentResults:[];appState.leagueRecentResults.push({round:Number(appState.week)||1,home:CLUBS[engine.a]?.name,away:CLUBS[engine.b]?.name,homeGoals:userIsA?ga:gb,awayGoals:userIsA?gb:ga});appState.leagueRecentResults=appState.leagueRecentResults.slice(-1000);}
+   if(!engine.isCupMatch){appState.log.push(resultText);appState.leagueRecentResults=Array.isArray(appState.leagueRecentResults)?appState.leagueRecentResults:[];appState.leagueRecentResults.push({round:Number(appState.week)||1,home:CLUBS[engine.a]?.name,away:CLUBS[engine.b]?.name,homeGoals:ga,awayGoals:gb});appState.leagueRecentResults=appState.leagueRecentResults.slice(-1000);}
    // Match cards and injuries now update the actual player, persist across domestic cups/league fixtures, and count down only after a fixture is completed.
    applyLiveFixtureAvailability(engine);
    let newOffers=[];
@@ -8560,7 +8657,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.27 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.28 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
