@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v3.26 — Touchline</title>
+<title>CM Mobile v3.27 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -185,6 +185,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .live-match-controls .tactic-label{font-size:12px;color:var(--muted)}
 /* v3.25: audited club kit colours; only the scorer line, using the team's two actual kit colours as solid alternating foreground/background pairs. */
 /* v3.26: fast transfer-market index, memoized player lookups, and filter-only rendering without full save/boot cycle. */
+/* v3.27: move next-match card directly below the manager hero on the home dashboard. */
 .goal-scorer-line{display:inline-block;max-width:100%;padding:3px 9px 5px;margin:0 0 2px -3px;border:2px solid transparent;border-radius:8px;vertical-align:middle;overflow-wrap:anywhere}
 .goal-scorer-line.goal-scorer-line-flash{animation:goalScorerLineFlash .5s steps(1,end) 6;will-change:background-color,color,border-color,box-shadow}
 @keyframes goalScorerLineFlash{
@@ -532,7 +533,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.26</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.27</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -2157,10 +2158,11 @@ function home(){
  const weeklyIncome=Number(getClubFinance().weeklyIncomeM)||weeklyOperatingRevenueM(getClubFinance().division||division,c.strength);
  const net=weeklyIncome-weeklyWages;
  return `<section class="hero home-hero"><div class="home-clubline"><div class="home-crest">${crest}</div><div class="home-club-copy"><div class="eyebrow">Managerprofil · ${seasonLabel()}</div><h1>${esc(c.name)}</h1><div class="home-seasonline">${esc(status)}</div></div></div><div class="home-status"><span class="pill">${done?'Sluttplass':'Ligaplass'} ${rank}/${activeLeagueClubs().length}</span><span class="pill">${t.pts} poeng</span>${appState.preseasonActive?'<span class="pill green">Overgangsvindu åpent</span>':''}</div><div class="home-hero-actions">${primary}<button class="home-new-career-button" type="button" onclick="startNewCareer()">＋ Start ny karriere</button></div></section>
+ <section class="card home-next"><div class="home-next-head"><h2>${esc(nextTitle)}</h2><span class="pill ${appState.preseasonActive?'green':''}">${appState.preseasonActive?'UKE '+(Number(appState.preseasonWeek)||1):done?'FULLFØRT':'GW '+appState.week}</span></div>${nextBody}${nextAction}</section>
  ${importantDashboardAlerts()}
  <div class="home-shortcuts"><button onclick="setPage('squad')">♟ Tropp</button><button onclick="setPage('transfers')">⇄ Overganger</button><button onclick="setPage('finance')">£ Økonomi</button></div>
  <div class="home-metrics"><div class="home-metric"><small>Overgangsbudsjett</small><strong class="positive">${money(appState.budget)}</strong><span class="sub">Tilgjengelig</span></div><div class="home-metric"><small>Lønn per uke</small><strong>${money(weeklyWages)}</strong><span class="sub">${appState.squad.length} spillere i troppen</span></div><div class="home-metric"><small>Spilte ligakamper</small><strong>${Number.isFinite(Number(t.p))?Number(t.p):0}</strong><span class="sub">${done?'Sesong fullført':`Av ${Math.max(0,activeLeagueClubs().length*2-2)} mulige`}</span></div><div class="home-metric"><small>Netto drift / uke</small><strong class="${net<0?'negative':'positive'}">${money(net)}</strong><span class="sub">Lønnsramme ${money(getClubFinance().wageBudget/1000)}/uke</span></div></div>
- <section class="card home-next"><div class="home-next-head"><h2>${esc(nextTitle)}</h2><span class="pill ${appState.preseasonActive?'green':''}">${appState.preseasonActive?'UKE '+(Number(appState.preseasonWeek)||1):done?'FULLFØRT':'GW '+appState.week}</span></div>${nextBody}${nextAction}</section>
+ 
  <section class="card home-section"><div class="section-title" style="margin-top:0"><h2>Siste nytt</h2><span class="muted">Klubbfeed</span></div>${appState.log.length?appState.log.slice(-3).reverse().map(x=>`<div class="home-news-row">${esc(x)}</div>`).join(''):`<div class="muted">Ingen nyheter ennå. Her vises overganger, kamper og viktige hendelser.</div>`}</section>`;
 }
 
@@ -8558,7 +8560,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.26 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.27 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){

@@ -1,15 +1,12 @@
-# CM Mobile v3.26 — Transfer-market performance
+# CM Mobile v3.27 — Next match moved up
 
 ## What changed
-- Replaced all-pairs duplicate checks in transfer-market roster construction with identity-index buckets keyed by career ID, Transfermarkt ID and normalized name. Existing identity-equivalence checks remain the final authority.
-- Memoized Transfermarkt profile lookups and pre-indexed official PL/EFL roster-name lookups.
-- Cached the master transfer-market list within an unchanged UI/game state.
-- Search and filter interactions now redraw only the transfer-market results area and do not serialize/compress the full saved career on every keystroke/filter selection. Search text and player-role sets are memoized for each market-row object.
-- Full state-changing renders invalidate the market cache so purchases, loans, AI updates and roster changes are reflected correctly; a purchase/loan writes the save once through the render path instead of saving twice.
-- European-roster duplicate cleanup and the shared roster dedup helper use the same identity index approach.
+- Moved the `Neste kamp` / `Neste ligakamp` card directly below the manager profile hero on the home dashboard.
+- Important messages now appear after the next-match card, so the upcoming fixture and `Forbered laget` action are visible much earlier on mobile and smaller screens.
+- Keeps the existing match selection, cup match handling, alert ordering, shortcuts, financial metrics, and recent-news logic unchanged.
 
 ## Compatibility
-Updated from v3.25. This does not reset or replace career data.
+Updated from v3.26. No career data is reset or migrated.
 
 ## Validation
-Inline JavaScript syntax and ZIP structure checked. A seeded 4,000-record identity fixture produced exactly the same retained records with linear and indexed deduplication. No full browser performance profile against the user's saved career was performed.
+Inline JavaScript syntax and ZIP structure checked. UI order confirmed in the generated home template. No full browser test against the user's saved career was performed.
