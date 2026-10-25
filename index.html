@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v3.23 — Touchline</title>
+<title>CM Mobile v3.24 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -15,7 +15,7 @@ main{max-width:760px;margin:auto;padding:14px 12px 92px}.hero{border:1px solid #
 .section-title{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 9px}.section-title h2{font-size:15px;margin:0}.section-title small{color:var(--muted)}
 /* v3.19: stronger visual separation in the transfer-window report */
 /* v3.20: expire all undecided bids when a transfer window closes */
-/* v3.23: cup registrations/counts and unified matchday navigation */
+/* v3.24: cup registrations/counts and unified matchday navigation */
 .transfer-report-section{margin-top:18px;padding:16px;border-radius:14px;border:1px solid #344b63;background:linear-gradient(145deg,#17263a,#111d2e)}
 .transfer-report-section--club{border-color:#4a9a54;border-left:5px solid #83d96c;background:linear-gradient(145deg,rgba(74,154,84,.17),rgba(17,29,46,.96) 60%)}
 .transfer-report-section--market{border-color:#55769d;border-left:5px solid #7fb4ff;background:linear-gradient(145deg,rgba(91,133,184,.16),rgba(17,29,46,.96) 60%)}
@@ -183,7 +183,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .live-match-controls .speed-label{color:var(--muted);font-size:12px;margin-left:auto}
 .live-match-controls select{border:1px solid var(--line);background:#203149;color:var(--text);border-radius:10px;padding:9px 10px;font-weight:700;font-size:13px;max-width:160px}
 .live-match-controls .tactic-label{font-size:12px;color:var(--muted)}
-/* v3.23: flash only the scorer line, using the team's two actual kit colours as solid alternating foreground/background pairs. */
+/* v3.24: flash only the scorer line, using the team's two actual kit colours as solid alternating foreground/background pairs. */
 .goal-scorer-line{display:inline-block;max-width:100%;padding:3px 9px 5px;margin:0 0 2px -3px;border:2px solid transparent;border-radius:8px;vertical-align:middle;overflow-wrap:anywhere}
 .goal-scorer-line.goal-scorer-line-flash{animation:goalScorerLineFlash .5s steps(1,end) 6;will-change:background-color,color,border-color,box-shadow}
 @keyframes goalScorerLineFlash{
@@ -531,7 +531,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.23</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.24</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -3999,7 +3999,7 @@ function cupProgressText(cup,name){
  const total=cupTotalStages(name),completed=Math.max(0,Math.min(total,Number(cup?.round)||0));
  return `${completed} av ${total} trinn fullført`;
 }
-// v3.23: Count actual played ties (not BYE records or duplicate result rows).
+// v3.24: Count actual played ties (not BYE records or duplicate result rows).
 function domesticCupPlayedMatchCount(cup){
  const seen=new Set();
  for(const r of cup?.results||[]){
@@ -4012,7 +4012,7 @@ function domesticCupPlayedMatchCount(cup){
  }
  return seen.size;
 }
-// v3.23: Repair two safe 2026/27 saved-cup registration defects without touching results.
+// v3.24: Repair two safe 2026/27 saved-cup registration defects without touching results.
 function repairSavedDomesticCupRegistrations(){
  if(Number(appState.seasonYear||2026)!==2026||!appState.cupCompetitions)return;
  const fresh=buildDomesticCupData();
@@ -7204,7 +7204,54 @@ const clockTick=()=>{
 }
 function setPage(p){appState.page=p;render()}
 let lastRenderedPage=null;
-function render(){normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.23 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+
+// v3.24: one-time migration restoring first-team U21 supplements in saved PL squads.
+// Preserve career transfers: never re-add a prospect if the active career records that
+// the player has already left that club. This supplements existing squads; it does not
+// replace the user's saved players, stats, contracts, injuries, or tactical selections.
+function restoreMissingPLU21PlayersV324(){
+ const VERSION=1;
+ if(Number(appState.plU21RestoreMigrationV324||0)>=VERSION)return {added:0,skipped:0};
+ let added=0,skipped=0;
+ const currentYear=Number(appState.seasonYear)||2026;
+ const history=[...(Array.isArray(appState.transferHistory)?appState.transferHistory:[]),...(Array.isArray(appState.transferLog)?appState.transferLog:[])];
+ const norm=n=>normalisePlayerName(String(n||''));
+ const hasLeftClub=(name,clubName)=>history.some(h=>{
+  const player=norm(h.playerName||h.name||h.player);
+  const from=String(h.from||h.fromClub||h.sellerClub||'');
+  const to=String(h.to||h.toClub||h.buyerClub||'');
+  return player===norm(name)&&norm(from)===norm(clubName)&&to&&norm(to)!==norm(clubName);
+ });
+ for(const [clubName,names] of Object.entries(PL_FIRST_TEAM_U21_SUPPLEMENT_2026_27||{})){
+  const ci=CLUBS.findIndex(c=>c.name===clubName);
+  if(ci<0||clubDivision(CLUBS[ci])!=='Premier League')continue;
+  const isUserClub=Number(appState.club)===ci;
+  const targets=[];
+  if(Array.isArray(appState.worldSquads?.[ci]))targets.push(appState.worldSquads[ci]);
+  else if(Array.isArray(appState.worldSquads)){appState.worldSquads[ci]=[];targets.push(appState.worldSquads[ci]);}
+  if(isUserClub&&Array.isArray(appState.squad))targets.push(appState.squad);
+  for(const roster of targets){
+   const existing=new Set(roster.filter(Boolean).map(p=>norm(p.name)));
+   for(const name of names||[]){
+    const key=norm(name);if(!key||existing.has(key))continue;
+    if(hasLeftClub(name,clubName)){skipped++;continue;}
+    const pos=plFirstTeamU21Position(name)||premierLeagueRosterPosition(clubName,name,roster.length,{});
+    const tm=findTransfermarktRecord(name,null,clubName);
+    const player=makeRealPlayer(name,pos,ci,roster.length,{tm,source:'Curated 2026/27 first-team U21 supplement; restored by v3.24 migration',clubVerified:false,firstTeamU21Supplement:true});
+    player.squadMembershipSource='PL 2026/27 U21/first-team supplement';
+    player.squadMembershipVerified=false;player.u21Eligible=true;player.firstTeamU21Supplement=true;
+    player.clubName=clubName;player.division=clubDivision(CLUBS[ci]);
+    ensurePlayerContract(player,currentYear);
+    roster.push(player);existing.add(key);added++;
+   }
+  }
+ }
+ appState.plU21RestoreMigrationV324=VERSION;
+ if(added){appState.log=Array.isArray(appState.log)?appState.log:[];appState.log.push(`U21-troppsmigrering v3.24: ${added} manglende førsteligalagsspillere gjenopprettet${skipped?`; ${skipped} spillere utelatt fordi karrierehistorikken viser at de har forlatt klubben`:''}.`);}
+ return {added,skipped};
+}
+
+function render(){restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.24 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
