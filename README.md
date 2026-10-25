@@ -1,19 +1,15 @@
-# CM Mobile v3.25
+# CM Mobile v3.26 — Transfer-market performance
 
-## Endringer i v3.25 — draktfarger ved scoring
-- Erstattet den gamle blandede emblem-/klubbpaletten med et katalogbasert hjemmedraktregister.
-- Manchester United blinker nå rødt/hvitt i stedet for rødt/gult: rødt med hvit tekst, deretter hvitt med rød tekst.
-- Dekker alle klubbnavn i engelske divisjoner og europeiske klubb-/UEFA-pooler, inkludert aliaser som brukes av crest-registeret.
-- Fjernet tilfeldige hash-baserte farger for ukjente klubber; reservefargene er faste.
-- Sikrer kontrast mellom de to blinkefasene for leselig tekst.
-- Beholder tre sekunders målfeiring og pause i kamptiden fra v3.23.
+## What changed
+- Replaced all-pairs duplicate checks in transfer-market roster construction with identity-index buckets keyed by career ID, Transfermarkt ID and normalized name. Existing identity-equivalence checks remain the final authority.
+- Memoized Transfermarkt profile lookups and pre-indexed official PL/EFL roster-name lookups.
+- Cached the master transfer-market list within an unchanged UI/game state.
+- Search and filter interactions now redraw only the transfer-market results area and do not serialize/compress the full saved career on every keystroke/filter selection. Search text and player-role sets are memoized for each market-row object.
+- Full state-changing renders invalidate the market cache so purchases, loans, AI updates and roster changes are reflected correctly; a purchase/loan writes the save once through the render path instead of saving twice.
+- European-roster duplicate cleanup and the shared roster dedup helper use the same identity index approach.
 
-## Publisering
-Erstatt `index.html` i rotmappen til GitHub Pages (`main`) med denne filen.
+## Compatibility
+Updated from v3.25. This does not reset or replace career data.
 
-## Kontroll
-JavaScript-syntaks og ZIP-arkiv er validert. Full interaktiv nettlesertest med den lagrede karrieren er ikke utført. Se `KIT_COLOURS_RESEARCH_V3.25.md` for fargeregister, kilder og metode.
-
-## Historikk
-- v3.24: Gjenoppretting av manglende U21-spillere i eksisterende lagringer.
-- v3.23: Tre sekunders blink på målscorer-linjen med pause i kamptiden.
+## Validation
+Inline JavaScript syntax and ZIP structure checked. A seeded 4,000-record identity fixture produced exactly the same retained records with linear and indexed deduplication. No full browser performance profile against the user's saved career was performed.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v3.24 — Touchline</title>
+<title>CM Mobile v3.26 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -184,6 +184,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 .live-match-controls select{border:1px solid var(--line);background:#203149;color:var(--text);border-radius:10px;padding:9px 10px;font-weight:700;font-size:13px;max-width:160px}
 .live-match-controls .tactic-label{font-size:12px;color:var(--muted)}
 /* v3.25: audited club kit colours; only the scorer line, using the team's two actual kit colours as solid alternating foreground/background pairs. */
+/* v3.26: fast transfer-market index, memoized player lookups, and filter-only rendering without full save/boot cycle. */
 .goal-scorer-line{display:inline-block;max-width:100%;padding:3px 9px 5px;margin:0 0 2px -3px;border:2px solid transparent;border-radius:8px;vertical-align:middle;overflow-wrap:anywhere}
 .goal-scorer-line.goal-scorer-line-flash{animation:goalScorerLineFlash .5s steps(1,end) 6;will-change:background-color,color,border-color,box-shadow}
 @keyframes goalScorerLineFlash{
@@ -531,7 +532,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.25</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.26</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -790,7 +791,15 @@ function applyGlobalProfilesToCareer(){
  save();
  if(document.getElementById('app'))render();
 }
-function referenceMapValue(map,name){if(!map||!name)return null;if(Object.prototype.hasOwnProperty.call(map,name))return map[name];const target=normalisePlayerName(name);for(const k of Object.keys(map)){if(normalisePlayerName(k)===target)return map[k]}return null}
+const normalizedReferenceMapIndexes=new WeakMap();
+function referenceMapValue(map,name){
+ if(!map||!name)return null;
+ if(Object.prototype.hasOwnProperty.call(map,name))return map[name];
+ const target=normalisePlayerName(name);if(!target)return null;
+ let index=normalizedReferenceMapIndexes.get(map);
+ if(!index){index=new Map();for(const k of Object.keys(map)){const n=normalisePlayerName(k);if(n&&!index.has(n))index.set(n,map[k]);}normalizedReferenceMapIndexes.set(map,index);}
+ return index.has(target)?index.get(target):null;
+}
 function fplPositionGroup(v){return ({1:'GK',2:'DEF',3:'MID',4:'ATT'})[Number(v)]||null}
 function fplFullName(p){return [p?.first_name,p?.second_name].filter(Boolean).join(' ').trim()||String(p?.web_name||'').trim()}
 function seasonAgeForDOB(dob){return ageAtSeasonStart(dob)}
@@ -845,13 +854,19 @@ function transfermarktRole(position,foot){
 }
 let tmNameIndexPrimarySource=null,tmNameIndexGlobalSource=null,tmNameIndexPrimary=new Map(),tmNameIndexGlobal=new Map();
 function buildTMNameIndex(rows){const index=new Map();for(const p of (Array.isArray(rows)?rows:[])){const key=normalisePlayerName(p.name);if(!key)continue;if(!index.has(key))index.set(key,[]);index.get(key).push(p);}return index;}
+let officialRosterNameClubIndex=null,officialRosterPLSource=null,officialRosterEFLSource=null;
 function officialRosterNameClubMatches(name){
- // Build this at lookup time so both official 2026/27 registries are available after script initialization.
- const key=normalisePlayerName(name),matches=[];
- if(!key)return matches;
- if(typeof PL_OFFICIAL_ROSTERS_2026_27!=='undefined')Object.entries(PL_OFFICIAL_ROSTERS_2026_27).forEach(([club,names])=>{if((names||[]).some(n=>normalisePlayerName(n)===key))matches.push(club)});
- if(typeof EFL_OFFICIAL_ROSTERS_2026_27!=='undefined')Object.entries(EFL_OFFICIAL_ROSTERS_2026_27).forEach(([club,names])=>{if((names||[]).some(n=>normalisePlayerName(n)===key))matches.push(club)});
- return [...new Set(matches)];
+ const key=normalisePlayerName(name);if(!key)return [];
+ const pl=typeof PL_OFFICIAL_ROSTERS_2026_27!=='undefined'?PL_OFFICIAL_ROSTERS_2026_27:null;
+ const efl=typeof EFL_OFFICIAL_ROSTERS_2026_27!=='undefined'?EFL_OFFICIAL_ROSTERS_2026_27:null;
+ if(!officialRosterNameClubIndex||officialRosterPLSource!==pl||officialRosterEFLSource!==efl){
+  const index=new Map();
+  const add=(club,names)=>{for(const playerName of names||[]){const k=normalisePlayerName(playerName);if(!k)continue;if(!index.has(k))index.set(k,[]);if(!index.get(k).includes(club))index.get(k).push(club);}};
+  if(pl)Object.entries(pl).forEach(([club,names])=>add(club,names));
+  if(efl)Object.entries(efl).forEach(([club,names])=>add(club,names));
+  officialRosterNameClubIndex=index;officialRosterPLSource=pl;officialRosterEFLSource=efl;
+ }
+ return officialRosterNameClubIndex.get(key)||[];
 }
 function tmCandidatesForName(name,fplRecord,clubName){
  const n=normalisePlayerName(name),f=normalisePlayerName(fplFullName(fplRecord)),w=normalisePlayerName(fplRecord?.web_name);
@@ -883,7 +898,16 @@ function tmCandidatesForName(name,fplRecord,clubName){
  });
  return candidates;
 }
-function findTransfermarktRecord(name,fplRecord,clubName){return tmCandidatesForName(name,fplRecord,clubName)[0]||null}
+let tmProfileLookupCache=new Map(),tmProfileLookupPrimarySource=null,tmProfileLookupGlobalSource=null;
+function findTransfermarktRecord(name,fplRecord,clubName){
+ if(tmProfileLookupPrimarySource!==TM_REFERENCE_PLAYERS||tmProfileLookupGlobalSource!==TM_GLOBAL_PLAYER_REFERENCE){tmProfileLookupCache.clear();tmProfileLookupPrimarySource=TM_REFERENCE_PLAYERS;tmProfileLookupGlobalSource=TM_GLOBAL_PLAYER_REFERENCE;}
+ const nameKey=normalisePlayerName(name),fplKey=normalisePlayerName(fplFullName(fplRecord)),webKey=normalisePlayerName(fplRecord?.web_name),teamKey=String(fplRecord?.teamShort||''),clubKey=tmProfileClubKey(clubName||'');
+ const cacheKey=[nameKey,fplKey,webKey,teamKey,clubKey].join('|');
+ if(tmProfileLookupCache.has(cacheKey))return tmProfileLookupCache.get(cacheKey);
+ const profile=tmCandidatesForName(name,fplRecord,clubName)[0]||null;
+ if(tmProfileLookupCache.size>50000)tmProfileLookupCache.clear();
+ tmProfileLookupCache.set(cacheKey,profile);return profile;
+}
 function fplRosterScore(p){
  const minutes=Number(p.minutes)||0,points=Number(p.total_points)||0,price=Number(p.now_cost)||0,starts=Number(p.starts)||0;
  const tm=findTransfermarktRecord(fplFullName(p),p),mv=Number(tm?.marketValue)||0;
@@ -1475,6 +1499,8 @@ function careerSavedAt(value){const n=Number(value);if(!Number.isFinite(n)||n<=0
 // UI-state for the transfer-list accordion must survive full-page re-renders after listing/unlisting players.
 window.transferListAccordionOpen = window.transferListAccordionOpen ?? false;
 let marketSearch="";let marketPosition="ALL";let marketSort="recommended";let marketScope="all";let marketAgeMin="";let marketAgeMax="";let marketExactRole="ALL";let marketMaxPrice="";let marketMinPotential="";
+let marketPlayerListCache=null;
+function invalidateMarketPlayerCache(){marketPlayerListCache=null;} 
 
 function generateAttributes(pos,base){
  const r=(center,spread=10)=>Math.max(25,Math.min(99,Math.round(center+(Math.random()*spread*2-spread))));
@@ -2411,7 +2437,7 @@ function loanMarketPlayer(id){
  if(!fromEFL){CLUBS[parentIndex].budget=+(Number(CLUBS[parentIndex].budget||0)+fee).toFixed(2);if(appState.clubFinances?.[CLUBS[parentIndex]?.name])appState.clubFinances[CLUBS[parentIndex].name].transferBudget=CLUBS[parentIndex].budget;}
  appState.squad.push(loaned);if(!Array.isArray(appState.worldSquads[appState.club]))appState.worldSquads[appState.club]=[];appState.worldSquads[appState.club].push(loaned);
  appState.transferHistory=appState.transferHistory||[];appState.transferHistory.push({type:'loan-in',playerName:loaned.name,playerCareerId:playerCareerIdentity(loaned),from:loaned.loanParentClubName,to:currentClub().name,fee,week:Number(appState.week)||1,seasonYear:Number(appState.seasonYear)||2026,transferDate:startDate,calendarPhase:appState.preseasonActive?'preseason':'league',preseasonWeek:appState.preseasonActive?(Number(appState.preseasonWeek)||1):null,transferTypeLabel:'Lån inn',loanEndDate:endDate,loanDurationWeeks:weeks,loanWageShare:wageShare,borrowerType:fromEFL?'efl':'pl',borrowerDivision:fromEFL?p.marketDivision:null});
- appState.log.push(`${loaned.name} lånes inn fra ${loaned.loanParentClubName} til ${currentClub().name} til ${endDate}. Låneavgift: ${money(fee)}. Din klubb dekker ${Math.round(wageShare*100)} % av lønnen.`);save();render();
+ appState.log.push(`${loaned.name} lånes inn fra ${loaned.loanParentClubName} til ${currentClub().name} til ${endDate}. Låneavgift: ${money(fee)}. Din klubb dekker ${Math.round(wageShare*100)} % av lønnen.`);render();
 }
 function openPlayerCareer(id){appState.playerCareerProfile=String(id);appState.page='playerCareer';render()}
 function findCareerProfilePlayer(){
@@ -3160,6 +3186,19 @@ function sameRegisteredPlayer(a,b){
  // Exact full name is a safe fallback when one side is from an official September 2026 register.
  return !!(a.officialRegistration||b.officialRegistration);
 }
+function createPlayerIdentityIndex(){return {careerId:new Map(),transfermarktId:new Map(),nameKey:new Map()};}
+function identityCandidates(index,descriptor){
+ const out=[],seen=new Set();
+ const add=key=>{if(!key)return;for(const d of index[key.type].get(key.value)||[])if(!seen.has(d)){seen.add(d);out.push(d);}};
+ add({type:'careerId',value:descriptor.careerId});add({type:'transfermarktId',value:descriptor.transfermarktId});add({type:'nameKey',value:descriptor.nameKey});return out;
+}
+function identityIndexAdd(index,descriptor){
+ for(const [field,value] of [['careerId',descriptor.careerId],['transfermarktId',descriptor.transfermarktId],['nameKey',descriptor.nameKey]]){
+  if(!value)continue;if(!index[field].has(value))index[field].set(value,[]);index[field].get(value).push(descriptor);
+ }
+}
+function findSameRegisteredPlayerIndexed(index,descriptor){for(const candidate of identityCandidates(index,descriptor))if(sameRegisteredPlayer(descriptor,candidate))return candidate;return null;}
+
 function englishRegistrationIndex(){
  const entries=[],byTmId=new Map(),byCareerId=new Map(),byName=new Map();
  const add=(player,clubName,official=false)=>{
@@ -3198,13 +3237,8 @@ function isEnglishRegisteredPlayer(player,clubName,index){
  return (index.byName.get(d.nameKey)||[]).some(other=>sameRegisteredPlayer(d,other));
 }
 function deduplicateRosterByIdentity(roster,clubName){
- const out=[],descriptors=[];
- for(const p of Array.isArray(roster)?roster:[]){
-  if(!p)continue;
-  const d=playerIdentityDescriptor(p,clubName,false);
-  if(descriptors.some(existing=>sameRegisteredPlayer(d,existing)))continue;
-  out.push(p);descriptors.push(d);
- }
+ const out=[],seen=createPlayerIdentityIndex();
+ for(const p of Array.isArray(roster)?roster:[]){if(!p)continue;const d=playerIdentityDescriptor(p,clubName,false);if(findSameRegisteredPlayerIndexed(seen,d))continue;identityIndexAdd(seen,d);out.push(p);}
  return out;
 }
 function ensureEuropeanTransferWorld(){
@@ -3232,7 +3266,7 @@ function ensureEuropeanTransferWorld(){
  if(!needsDedup)return;
  const english=englishRegistrationIndex();let removed=0,withinClubRemoved=0;const removals=[];
  for(const [clubName,roster] of Object.entries(appState.europeanTransferSquads)){
-  const seen=[];const keep=[];
+  const seen=createPlayerIdentityIndex(),keep=[];
   for(const p of Array.isArray(roster)?roster:[]){
    if(!p||!p.name)continue;
    // A loaned-out player remains owned by the European club; never delete ownership data.
@@ -3240,8 +3274,8 @@ function ensureEuropeanTransferWorld(){
    if(p.loanStatus!=='out'&&isEnglishRegisteredPlayer(p,clubName,english)){
     removed++;removals.push({playerName:p.name,from:clubName,to:english.entries.find(e=>sameRegisteredPlayer(descriptor,e))?.clubName||'engelsk klubb',transfermarktPlayerId:descriptor.transfermarktId||'',reason:'English registered roster takes precedence'});continue;
    }
-   if(seen.some(existing=>sameRegisteredPlayer(descriptor,existing))){withinClubRemoved++;continue;}
-   seen.push(descriptor);keep.push(p);
+   if(findSameRegisteredPlayerIndexed(seen,descriptor)){withinClubRemoved++;continue;}
+   identityIndexAdd(seen,descriptor);keep.push(p);
   }
   appState.europeanTransferSquads[clubName]=keep;
  }
@@ -3255,22 +3289,45 @@ function ensureEuropeanTransferWorld(){
  appState.europeanTransferDedupSeasonYear=currentSeason;
 }
 function europeanTransferAskingPrice(p,clubName){const c=appState.europeanTransferClubData?.[clubName]||{};const base=Number(p.value)||Math.max(.2,((Number(p.rating||55)-45)**2)/100);const strength=Number(c.strength)||60;const importance=Number(p.rating||50)>=strength+3?1.32:Number(p.rating||50)>=strength-5?1.08:.88;const age=Number(p.age)||25;return Math.max(.2,+((base*importance*(age<22?1.12:age>30?.8:1)*(p.morale<55?.9:1)).toFixed(1)));}
-function allMarketPlayers(){ensureTransferPool();ensureEuropeanTransferWorld();const list=[],movedThisWindow=transferWindowOpen()?movedPlayerSetForCurrentWindow():{ids:new Set(),names:new Set()};const recentlyMoved=p=>playerMovedInCurrentWindow(p,movedThisWindow);for(const [div,clubs] of Object.entries(appState.eflPlayerDatabase||{}))for(const [clubName,players] of Object.entries(clubs))for(const p of players){if(!p||p.loanStatus||recentlyMoved(p))continue;list.push({...p,marketClubIndex:-1,marketDivision:div,clubName,clubShort:clubName.slice(0,3).toUpperCase(),freeAgent:false,askingPrice:Math.max(.1,+(p.value*(p.rating>65?1.35:1.15)).toFixed(2))});}for(let ci=0;ci<(appState.worldSquads||[]).length;ci++){if(ci===Number(appState.club))continue;for(const p of appState.worldSquads[ci]||[]){if(!p||!p.name||p.loanStatus||recentlyMoved(p))continue;const club=CLUBS[ci];list.push({...p,marketClubIndex:ci,clubName:club.name,clubShort:club.short,freeAgent:false,askingPrice:transferAskingPrice(p,ci)});}}
- for(const [clubName,players] of Object.entries(appState.europeanTransferSquads||{})){const meta=appState.europeanTransferClubData?.[clubName]||{};for(const p of players||[]){if(!p||!p.name||p.loanStatus||recentlyMoved(p)||appState.squad.some(x=>playerCareerIdentity(x)===playerCareerIdentity(p)))continue;list.push({...p,marketClubIndex:-2,marketClubType:'european',marketClubName:clubName,marketDivision:meta.country||'Europa',clubName,clubShort:clubName.split(/\s+/).map(x=>x[0]).join('').slice(0,3).toUpperCase(),freeAgent:false,askingPrice:europeanTransferAskingPrice(p,clubName)});}}
+function allMarketPlayers(){
+ if(Array.isArray(marketPlayerListCache))return marketPlayerListCache;
+ ensureTransferPool();ensureEuropeanTransferWorld();
+ const list=[],movedThisWindow=transferWindowOpen()?movedPlayerSetForCurrentWindow():{ids:new Set(),names:new Set()};
+ const recentlyMoved=p=>playerMovedInCurrentWindow(p,movedThisWindow);
+ for(const [div,clubs] of Object.entries(appState.eflPlayerDatabase||{}))for(const [clubName,players] of Object.entries(clubs))for(const p of players){if(!p||p.loanStatus||recentlyMoved(p))continue;list.push({...p,marketClubIndex:-1,marketDivision:div,clubName,clubShort:clubName.slice(0,3).toUpperCase(),freeAgent:false,askingPrice:Math.max(.1,+(p.value*(p.rating>65?1.35:1.15)).toFixed(2))});}
+ for(let ci=0;ci<(appState.worldSquads||[]).length;ci++){if(ci===Number(appState.club))continue;for(const p of appState.worldSquads[ci]||[]){if(!p||!p.name||p.loanStatus||recentlyMoved(p))continue;const club=CLUBS[ci];if(!club)continue;list.push({...p,marketClubIndex:ci,clubName:club.name,clubShort:club.short,freeAgent:false,askingPrice:transferAskingPrice(p,ci)});}}
+ for(const [clubName,players] of Object.entries(appState.europeanTransferSquads||{})){const meta=appState.europeanTransferClubData?.[clubName]||{};for(const p of players||[]){if(!p||!p.name||p.loanStatus||recentlyMoved(p))continue;list.push({...p,marketClubIndex:-2,marketClubType:'european',marketClubName:clubName,marketDivision:meta.country||'Europa',clubName,clubShort:clubName.split(/\s+/).map(x=>x[0]).join('').slice(0,3).toUpperCase(),freeAgent:false,askingPrice:europeanTransferAskingPrice(p,clubName)});}}
  for(const p of appState.freeAgents||[])list.push({...p,marketClubIndex:-1,clubName:'Klubbløs',clubShort:'FA',freeAgent:true,askingPrice:p.value});
  for(const [academyClub,cohort] of Object.entries(appState.youthAcademies||{})){if(academyClub===currentClub().name||!Array.isArray(cohort))continue;const clubIndex=CLUBS.findIndex(c=>c.name===academyClub);for(const p of cohort){const seasonsServed=(Number(appState.seasonYear)||2026)-Number(p.academySeason||appState.seasonYear);if(seasonsServed<1||Number(p.age)<16)continue;list.push({...p,marketClubIndex:clubIndex,marketDivision:p.division,clubName:academyClub,clubShort:(CLUBS[clubIndex]?.short||academyClub.slice(0,3).toUpperCase()),freeAgent:false,academyPlayer:true,askingPrice:Math.max(.15,+(Number(p.value||.1)*(Number(p.potential)>=90?2.2:Number(p.potential)>=80?1.65:1.25)).toFixed(2))});}}
- const visible=list.filter(p=>!appState.squad.some(x=>String(x.id)===String(p.id)));
- const unique=[],descriptors=[];for(const player of visible){const d=playerIdentityDescriptor(player,player.marketClubName||player.clubName||'',false);if(descriptors.some(old=>sameRegisteredPlayer(d,old)))continue;unique.push(player);descriptors.push(d);}return unique;
+ const currentSquadIds=new Set((appState.squad||[]).map(x=>String(x?.id??'')));
+ const currentSquadCareerIds=new Set((appState.squad||[]).map(playerCareerIdentity));
+ const visible=list.filter(p=>!currentSquadIds.has(String(p.id))&&!(p.marketClubType==='european'&&currentSquadCareerIds.has(playerCareerIdentity(p))));
+ const unique=[],seen=createPlayerIdentityIndex();
+ for(const player of visible){
+  const d=playerIdentityDescriptor(player,player.marketClubName||player.clubName||'',false);
+  if(findSameRegisteredPlayerIndexed(seen,d))continue;
+  identityIndexAdd(seen,d);unique.push(player);
+ }
+ marketPlayerListCache=unique;return marketPlayerListCache;
 }
 function transferAskingPrice(p,ci){const base=Number(p.value)||Math.max(.2,((Number(p.rating||55)-45)**2)/100);const age=Number(p.age)||25;const importance=(p.rating||50)>=(CLUBS[ci]?.strength||65)+2?1.28:(p.rating||50)>=(CLUBS[ci]?.strength||65)-5?1.08:.86;const youth=age<22?1.12:age>30?.78:1;return Math.max(.2,+((base*importance*youth)*(p.morale<55?.88:1)).toFixed(1));}
+const marketPlayerRolesMemo=new WeakMap(),marketPlayerSearchTextMemo=new WeakMap();
 function marketPlayerRoles(p){
+ if(p&&typeof p==='object'&&marketPlayerRolesMemo.has(p))return marketPlayerRolesMemo.get(p);
  const roles=new Set();
- for(const role of (Array.isArray(p.naturalPositions)?p.naturalPositions:[]))if(role)roles.add(String(role).toUpperCase());
- for(const role of [p.role,p.assignedRole])if(role)roles.add(String(role).toUpperCase());
- const tmRole=transfermarktRole(p.transfermarktPosition||p.referencePosition||'',p.preferredFoot||p.referenceFoot||'');
+ for(const role of (Array.isArray(p?.naturalPositions)?p.naturalPositions:[]))if(role)roles.add(String(role).toUpperCase());
+ for(const role of [p?.role,p?.assignedRole])if(role)roles.add(String(role).toUpperCase());
+ const tmRole=transfermarktRole(p?.transfermarktPosition||p?.referencePosition||'',p?.preferredFoot||p?.referenceFoot||'');
  if(tmRole)roles.add(tmRole);
- if(p.pos==='GK')roles.add('GK');
+ if(p?.pos==='GK')roles.add('GK');
+ if(p&&typeof p==='object')marketPlayerRolesMemo.set(p,roles);
  return roles;
+}
+function marketPlayerSearchText(p){
+ if(p&&typeof p==='object'&&marketPlayerSearchTextMemo.has(p))return marketPlayerSearchTextMemo.get(p);
+ const text=[p?.name,p?.clubName,p?.pos].map(v=>String(v||'').toLowerCase()).join(' ');
+ if(p&&typeof p==='object')marketPlayerSearchTextMemo.set(p,text);
+ return text;
 }
 function marketPlayerMatchesExactRole(p,role){
  if(!role||role==='ALL')return true;
@@ -3281,7 +3338,7 @@ function marketPlayerMatchesExactRole(p,role){
 function filteredMarketPlayers(){
  let players=allMarketPlayers();
  const q=marketSearch.trim().toLowerCase();
- if(q)players=players.filter(p=>String(p.name||'').toLowerCase().includes(q)||String(p.clubName||'').toLowerCase().includes(q)||String(p.pos||'').toLowerCase().includes(q)||marketPlayerRoles(p).has(q.toUpperCase()));
+ if(q)players=players.filter(p=>marketPlayerSearchText(p).includes(q)||marketPlayerRoles(p).has(q.toUpperCase()));
  if(marketPosition!=='ALL')players=players.filter(p=>p.pos===marketPosition);
  if(marketExactRole!=='ALL')players=players.filter(p=>marketPlayerMatchesExactRole(p,marketExactRole));
  const minAge=marketAgeMin===''?null:Number(marketAgeMin),maxAge=marketAgeMax===''?null:Number(marketAgeMax);
@@ -3635,15 +3692,34 @@ function loanManagementMarkup(){
  const rows=(html)=>html.replace(/class=\"player\"/g,'class=\"player loan-management-player\"');
  return `<details class="card cup-accordion transfer-list-accordion loan-management-accordion" ${window.loanManagementAccordionOpen?'open':''} ontoggle="window.loanManagementAccordionOpen=this.open"><summary class="section-title"><h2>Låneavtaler</h2><span class="pill">${count}</span></summary><div class="loan-management-body">${rows(incoming)}${rows(outgoing)}${empty}<p class="muted">Lønnsfordelingen brukes i ukentlige lønnskostnader. Lån og returer registreres i spillerens overgangshistorikk.</p></div></details>`;
 }
-function transfers(){const players=filteredMarketPlayers();const shown=players.slice(0,60);const open=transferWindowOpen();const listed=listedPlayerIds();return `<div class="hero"><div class="eyebrow">Recruitment centre · ${allMarketPlayers().length} spillere</div><h1>Overgangsmarked</h1><div class="hero-actions"><span class="pill ${open?'green':''}">${open?'Vinduet er åpent':'Vinduet er stengt'} · ${appState.preseasonActive?`Pre-season ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:`GW ${appState.week}`}</span><span class="pill green">Budsjett ${money(appState.budget)}</span><span class="pill">Lønnsramme: ${money(getClubFinance().wageBudget/1000)}/uke</span><span class="pill ${getClubFinance().wageBill>getClubFinance().wageBudget?'':'green'}">Lønn ${money(getClubFinance().wageBill/1000)}/uke</span></div><p class="muted">${transferWindowCalendarText()}</p></div>${transferInbox()}<details class="card cup-accordion transfer-list-accordion" ${window.transferListAccordionOpen?'open':''} ontoggle="window.transferListAccordionOpen=this.open"><summary class="section-title"><h2>Din overgangsliste</h2><span class="pill">${appState.squad.length} spillere · ${listed.length} på markedet</span></summary>${appState.squad.slice().sort((a,b)=>(b.rating||0)-(a.rating||0)).map(p=>{const isListed=listed.includes(String(p.id));return `<div class="player transfer-list-player"><div class="transfer-list-player-info"><div class="player-name">${esc(p.name)} <span class="pill">${esc(p.pos)}</span> ${isListed?'<span class="pill green">På markedet</span>':''}</div><div class="player-meta">Ferdighet ${p.rating} · Potensial ${p.potential} · Verdi ${money(p.value||0)}${(p.rating||0)>=CLUBS[appState.club].strength+2?' · Nøkkelspiller':''}</div></div><div class="transfer-list-player-actions"><button class="transfer-action-sale" ${!open?'disabled':''} onclick="listPlayerForTransfer('${String(p.id).replace(/'/g,"\'")}')">${isListed?'Ta av markedet':'Legg ut for salg'}</button><button class="transfer-action-loan" ${(!open||p.loanStatus)?'disabled':''} onclick="openOutgoingLoan('${String(p.id).replace(/'/g,"\'")}')">Lån ut</button></div></div>`}).join('')}${!open?'<p class="muted" style="margin:8px 2px;font-size:12px">Budmottak åpner igjen ved neste overgangsvindu.</p>':''}</details>${loanManagementMarkup()}<section class="card"><div class="section-title"><h2>Spillere på markedet</h2><span class="muted">${players.length} treff</span></div>${marketControls()}${shown.length?shown.map(p=>{const unaffordable=appState.budget<p.askingPrice;const availability=p.academyPlayer?'Juniorstall · talent tilgjengelig':p.freeAgent?'Klubbløs':(p.rating>=(CLUBS[p.marketClubIndex]?.strength||65)+2?'Nøkkelspiller – vanskelig å hente':'Under kontrakt');return `<div class="player"><div style="min-width:0;flex:1"><div class="player-name">${esc(p.name)} <span class="pill">${p.pos}</span></div><div class="player-meta">${Number.isFinite(p.age)?p.age+' år':playerAgeText(p)} · ${esc(p.clubName)} · Ferdighet ${p.rating} · Potensial ${p.potential}</div><div class="attrs"><span class="attr">Verdi ${money(p.value||p.askingPrice)}</span><span class="attr">Lønn ${p.wage||0}k/uke</span><span class="attr">${availability}</span></div></div><div style="text-align:right;flex-shrink:0"><div class="rating">${money(p.askingPrice)}</div><button style="margin-top:6px;padding:7px 9px" onclick="buyMarketPlayer('${String(p.id).replace(/'/g,"\\'")}')" ${(!open||unaffordable)?'disabled':''}>${p.freeAgent?'Tilby kontrakt':p.academyPlayer?'Hent talent':'Gi bud'}</button>${(Number(p.marketClubIndex)>=0||p.marketDivision)&&!p.freeAgent&&!p.academyPlayer?`<button style="margin-top:6px;padding:7px 9px" onclick="loanMarketPlayer('${String(p.id).replace(/'/g,"\\'")}')" ${!open?'disabled':''}>Lån</button>`:''}</div></div>`}).join(''):`<div class="muted">Ingen spillere matcher søket. Prøv et annet navn eller filter.</div>`}${players.length>shown.length?`<p class="muted" style="margin:8px 2px;font-size:12px">Viser ${shown.length} av ${players.length} treff.</p>`:''}</section><section class="card"><div class="section-title"><h2>Tidligere vindusrapporter</h2><span class="pill">${(appState.transferWindowReports||[]).length}</span></div>${(appState.transferWindowReports||[]).slice().reverse().map(r=>`<div class="player"><div style="flex:1"><strong>${esc(seasonLabel())} · GW ${r.startWeek}–${r.endWeek}</strong><div class="player-meta">${r.arrivals} kjøp · ${r.departures} salg · Netto ${money(r.net)}</div></div></div>`).join('')||'<p class="muted">Rapportene vises her etter at vinduene stenger.</p>'}</section>`}
-function setMarketSearch(v){marketSearch=v;const el=document.querySelector('input[aria-label="Søk spiller eller klubb"]');const pos=el?el.selectionStart:v.length;render();const next=document.querySelector('input[aria-label="Søk spiller eller klubb"]');if(next){next.focus();next.setSelectionRange(pos,pos)}}
-function setMarketPosition(v){marketPosition=v;if(v!=='ALL')marketExactRole='ALL';render()}
-function setMarketScope(v){marketScope=v;render()}function setMarketSort(v){marketSort=v;render()}
-function setMarketAgeMin(v){marketAgeMin=String(v??'').trim();render()}function setMarketAgeMax(v){marketAgeMax=String(v??'').trim();render()}
-function setMarketExactRole(v){marketExactRole=v;if(v!=='ALL')marketPosition='ALL';render()}
-function setMarketMaxPrice(v){marketMaxPrice=String(v??'').trim();render()}function setMarketMinPotential(v){marketMinPotential=String(v??'').trim();render()}
-function resetAdvancedMarketFilters(){marketAgeMin='';marketAgeMax='';marketExactRole='ALL';marketMaxPrice='';marketMinPotential='';render()}
-function buyMarketPlayer(id){if(!transferWindowOpen()){alert(`Overgangsvinduet er stengt. ${transferWindowCalendarText()}`);return;}const market=allMarketPlayers();const p=market.find(x=>String(x.id)===String(id));if(!p)return;const price=Number(p.askingPrice)||Number(p.value)||1;if(appState.budget<price){appState.log.push(`Overgangstilbud avslått: ${p.name} er utenfor budsjettet.`);render();return;}if(!p.freeAgent&&p.marketClubType!=='european'&&p.rating>=(CLUBS[p.marketClubIndex]?.strength||65)+3&&p.morale>=65&&Math.random()<.55){const counter=+(price*1.18).toFixed(1);appState.log.push(`${p.clubName} avslo budet på ${p.name} (${money(price)}). De krever nærmere ${money(counter)}.`);render();return;}appState.budget=+(appState.budget-price).toFixed(1);let signed;if(p.freeAgent){signed={...p, id:'SIGNED-'+Date.now()+'-'+Math.floor(Math.random()*10000),clubIndex:appState.club,freeAgent:false,contractEndDate:null,source:'Free-agent signing'};appState.freeAgents=(appState.freeAgents||[]).filter(x=>String(x.id)!==String(p.id));}else if(p.academyPlayer){const academy=appState.youthAcademies?.[p.clubName]||[];const youthIndex=academy.findIndex(x=>String(x.id)===String(p.id));if(youthIndex<0){appState.budget=+(appState.budget+price).toFixed(1);alert('Denne junioren er ikke lenger tilgjengelig.');return;}const youth=academy[youthIndex];if((Number(appState.seasonYear)||2026)<=Number(youth.academySeason||appState.seasonYear)||Number(youth.age)<16){appState.budget=+(appState.budget+price).toFixed(1);alert('Spilleren må ha tilbrakt minst én sesong i juniorstallen og være minst 16 år.');return;}signed={...youth,id:'SIGNED-'+Date.now()+'-'+Math.floor(Math.random()*10000),clubIndex:appState.club,clubName:currentClub().name,division:clubDivision(currentClub()),youth:false,academyTransferred:true,source:'Signed from another academy',apps:0,minutes:0,goals:0,assists:0,fitness:100,morale:70,injured:0,suspended:0};academy.splice(youthIndex,1);appState.log.push(`${signed.name} ble hentet fra juniorstallen til ${p.clubName} for ${money(price)}.`);}else if(p.marketClubType==='european'){const sourceName=p.marketClubName||p.clubName;const roster=appState.europeanTransferSquads?.[sourceName]||[];const ix=roster.findIndex(x=>playerCareerIdentity(x)===playerCareerIdentity(p));if(ix<0){appState.budget=+(appState.budget+price).toFixed(1);alert('Spilleren er ikke lenger tilgjengelig i den europeiske klubben.');return;}const original=roster.splice(ix,1)[0];const meta=appState.europeanTransferClubData?.[sourceName];if(meta)meta.budget=+(Number(meta.budget||0)+price).toFixed(2);signed={...original,id:'SIGNED-'+Date.now()+'-'+Math.floor(Math.random()*10000),clubIndex:appState.club,clubName:currentClub().name,internationalClub:false,source:'European club transfer'};appState.log.push(`${currentClub().name} signerte ${signed.name} fra ${sourceName} for ${money(price)}.`);}else if(Number(p.marketClubIndex)<0){signed={...p,id:'SIGNED-'+Date.now()+'-'+Math.floor(Math.random()*10000),clubIndex:appState.club,source:'EFL database transfer'};const list=appState.eflPlayerDatabase?.[p.marketDivision]?.[p.clubName];if(list)appState.eflPlayerDatabase[p.marketDivision][p.clubName]=list.filter(x=>String(x.id)!==String(p.id));appState.log.push(`${currentClub().name} signerte ${p.name} fra ${p.clubName} (${p.marketDivision}).`);}else{const from=p.marketClubIndex;const idx=(appState.worldSquads[from]||[]).findIndex(x=>String(x.id)===String(p.id));if(idx<0){appState.budget=+(appState.budget+price).toFixed(1);return;}signed={...appState.worldSquads[from][idx],clubIndex:appState.club,fitness:Math.min(100,Number(p.fitness??90)),morale:Math.max(65,Number(p.morale??70)),id:Date.now()+Math.floor(Math.random()*10000)};appState.worldSquads[from].splice(idx,1);CLUBS[from].budget=+(Number(CLUBS[from].budget||0)+price).toFixed(2);if(appState.clubFinances?.[CLUBS[from].name])appState.clubFinances[CLUBS[from].name].transferBudget=CLUBS[from].budget;appState.log.push(`${currentClub().name} signerte ${p.name} fra ${p.clubName} for ${money(price)}.`);}signed.careerId=signed.careerId||p.careerId||p.id;if(!signed.careerStats)signed.careerStats={apps:0,minutes:0,goals:0,assists:0,yellowCards:0,redCards:0,chancesCreated:0};if(!Array.isArray(signed.careerHistory))signed.careerHistory=[];ensurePlayerContract(signed);if(p.freeAgent)appState.log.push(`${p.name} signerte for ${currentClub().name} på fri overgang mot ${signed.wage}k/uke.`);appState.transferHistory=appState.transferHistory||[];appState.transferHistory.push({type:p.freeAgent?'signing':'buy',playerName:p.name,playerCareerId:String(signed.careerId||p.careerId||p.id||''),from:p.freeAgent?'Klubbløs':p.clubName,to:currentClub().name,fee:p.freeAgent?0:price,week:Number(appState.week)||1,seasonYear:Number(appState.seasonYear)||2026,transferDate:transferDateForGameweek(appState.seasonYear,appState.week),calendarPhase:appState.preseasonActive?'preseason':'league',preseasonWeek:appState.preseasonActive?(Number(appState.preseasonWeek)||1):null,transferTypeLabel:p.freeAgent?'Fri overgang':p.academyPlayer?'Juniorovergang':'Kjøp',ownerClubIndex:appState.club});appState.squad.push(signed);if(Array.isArray(appState.worldSquads[appState.club])){const old=appState.worldSquads[appState.club].findIndex(x=>String(x.name)===String(signed.name));if(old>=0)appState.worldSquads[appState.club][old]=signed;else appState.worldSquads[appState.club].push(signed);}save();render()}
+function marketPlayersSectionMarkup(){
+ const players=filteredMarketPlayers(),shown=players.slice(0,60),open=transferWindowOpen();
+ return `<section id="marketPlayersResults" class="card"><div class="section-title"><h2>Spillere på markedet</h2><span class="muted">${players.length} treff</span></div>${marketControls()}${shown.length?shown.map(p=>{const unaffordable=appState.budget<p.askingPrice;const availability=p.academyPlayer?'Juniorstall · talent tilgjengelig':p.freeAgent?'Klubbløs':(p.rating>=(CLUBS[p.marketClubIndex]?.strength||65)+2?'Nøkkelspiller – vanskelig å hente':'Under kontrakt');return `<div class="player"><div style="min-width:0;flex:1"><div class="player-name">${esc(p.name)} <span class="pill">${p.pos}</span></div><div class="player-meta">${Number.isFinite(p.age)?p.age+' år':playerAgeText(p)} · ${esc(p.clubName)} · Ferdighet ${p.rating} · Potensial ${p.potential}</div><div class="attrs"><span class="attr">Verdi ${money(p.value||p.askingPrice)}</span><span class="attr">Lønn ${p.wage||0}k/uke</span><span class="attr">${availability}</span></div></div><div style="text-align:right;flex-shrink:0"><div class="rating">${money(p.askingPrice)}</div><button style="margin-top:6px;padding:7px 9px" onclick="buyMarketPlayer('${String(p.id).replace(/'/g,"\\'")}')" ${(!open||unaffordable)?'disabled':''}>${p.freeAgent?'Tilby kontrakt':p.academyPlayer?'Hent talent':'Gi bud'}</button>${(Number(p.marketClubIndex)>=0||p.marketDivision)&&!p.freeAgent&&!p.academyPlayer?`<button style="margin-top:6px;padding:7px 9px" onclick="loanMarketPlayer('${String(p.id).replace(/'/g,"\\'")}')" ${!open?'disabled':''}>Lån</button>`:''}</div></div>`}).join(''):`<div class="muted">Ingen spillere matcher søket. Prøv et annet navn eller filter.</div>`}${players.length>shown.length?`<p class="muted" style="margin:8px 2px;font-size:12px">Viser ${shown.length} av ${players.length} treff.</p>`:''}</section>`;
+}
+function refreshMarketFilterResults(){
+ const current=document.getElementById('marketPlayersResults');if(!current)return false;
+ const template=document.createElement('template');template.innerHTML=marketPlayersSectionMarkup().trim();
+ const replacement=template.content.firstElementChild;if(!replacement)return false;
+ current.replaceWith(replacement);return true;
+}
+function transfers(){const open=transferWindowOpen();const listed=listedPlayerIds();return `<div class="hero"><div class="eyebrow">Recruitment centre · ${allMarketPlayers().length} spillere</div><h1>Overgangsmarked</h1><div class="hero-actions"><span class="pill ${open?'green':''}">${open?'Vinduet er åpent':'Vinduet er stengt'} · ${appState.preseasonActive?`Pre-season ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:`GW ${appState.week}`}</span><span class="pill green">Budsjett ${money(appState.budget)}</span><span class="pill">Lønnsramme: ${money(getClubFinance().wageBudget/1000)}/uke</span><span class="pill ${getClubFinance().wageBill>getClubFinance().wageBudget?'':'green'}">Lønn ${money(getClubFinance().wageBill/1000)}/uke</span></div><p class="muted">${transferWindowCalendarText()}</p></div>${transferInbox()}<details class="card cup-accordion transfer-list-accordion" ${window.transferListAccordionOpen?'open':''} ontoggle="window.transferListAccordionOpen=this.open"><summary class="section-title"><h2>Din overgangsliste</h2><span class="pill">${appState.squad.length} spillere · ${listed.length} på markedet</span></summary>${appState.squad.slice().sort((a,b)=>(b.rating||0)-(a.rating||0)).map(p=>{const isListed=listed.includes(String(p.id));return `<div class="player transfer-list-player"><div class="transfer-list-player-info"><div class="player-name">${esc(p.name)} <span class="pill">${esc(p.pos)}</span> ${isListed?'<span class="pill green">På markedet</span>':''}</div><div class="player-meta">Ferdighet ${p.rating} · Potensial ${p.potential} · Verdi ${money(p.value||0)}${(p.rating||0)>=CLUBS[appState.club].strength+2?' · Nøkkelspiller':''}</div></div><div class="transfer-list-player-actions"><button class="transfer-action-sale" ${!open?'disabled':''} onclick="listPlayerForTransfer('${String(p.id).replace(/'/g,"\'")}')">${isListed?'Ta av markedet':'Legg ut for salg'}</button><button class="transfer-action-loan" ${(!open||p.loanStatus)?'disabled':''} onclick="openOutgoingLoan('${String(p.id).replace(/'/g,"\'")}')">Lån ut</button></div></div>`}).join('')}${!open?'<p class="muted" style="margin:8px 2px;font-size:12px">Budmottak åpner igjen ved neste overgangsvindu.</p>':''}</details>${loanManagementMarkup()}${marketPlayersSectionMarkup()}<section class="card"><div class="section-title"><h2>Tidligere vindusrapporter</h2><span class="pill">${(appState.transferWindowReports||[]).length}</span></div>${(appState.transferWindowReports||[]).slice().reverse().map(r=>`<div class="player"><div style="flex:1"><strong>${esc(seasonLabel())} · GW ${r.startWeek}–${r.endWeek}</strong><div class="player-meta">${r.arrivals} kjøp · ${r.departures} salg · Netto ${money(r.net)}</div></div></div>`).join('')||'<p class="muted">Rapportene vises her etter at vinduene stenger.</p>'}</section>`}
+function setMarketSearch(v){
+ marketSearch=String(v??'');const el=document.querySelector('#marketPlayersResults input[aria-label="Søk spiller eller klubb"]');const pos=el?el.selectionStart:marketSearch.length;
+ if(!refreshMarketFilterResults()){render();return;}
+ const next=document.querySelector('#marketPlayersResults input[aria-label="Søk spiller eller klubb"]');if(next){next.focus();try{next.setSelectionRange(pos,pos)}catch(e){}}
+}
+function updateMarketFilters(){if(!refreshMarketFilterResults())render();}
+function setMarketPosition(v){marketPosition=v;if(v!=='ALL')marketExactRole='ALL';updateMarketFilters()}
+function setMarketScope(v){marketScope=v;updateMarketFilters()}
+function setMarketSort(v){marketSort=v;updateMarketFilters()}
+function setMarketAgeMin(v){marketAgeMin=String(v??'').trim();updateMarketFilters()}
+function setMarketAgeMax(v){marketAgeMax=String(v??'').trim();updateMarketFilters()}
+function setMarketExactRole(v){marketExactRole=v;if(v!=='ALL')marketPosition='ALL';updateMarketFilters()}
+function setMarketMaxPrice(v){marketMaxPrice=String(v??'').trim();updateMarketFilters()}
+function setMarketMinPotential(v){marketMinPotential=String(v??'').trim();updateMarketFilters()}
+function resetAdvancedMarketFilters(){marketAgeMin='';marketAgeMax='';marketExactRole='ALL';marketMaxPrice='';marketMinPotential='';updateMarketFilters()}
+
+function buyMarketPlayer(id){if(!transferWindowOpen()){alert(`Overgangsvinduet er stengt. ${transferWindowCalendarText()}`);return;}const market=allMarketPlayers();const p=market.find(x=>String(x.id)===String(id));if(!p)return;const price=Number(p.askingPrice)||Number(p.value)||1;if(appState.budget<price){appState.log.push(`Overgangstilbud avslått: ${p.name} er utenfor budsjettet.`);render();return;}if(!p.freeAgent&&p.marketClubType!=='european'&&p.rating>=(CLUBS[p.marketClubIndex]?.strength||65)+3&&p.morale>=65&&Math.random()<.55){const counter=+(price*1.18).toFixed(1);appState.log.push(`${p.clubName} avslo budet på ${p.name} (${money(price)}). De krever nærmere ${money(counter)}.`);render();return;}appState.budget=+(appState.budget-price).toFixed(1);let signed;if(p.freeAgent){signed={...p, id:'SIGNED-'+Date.now()+'-'+Math.floor(Math.random()*10000),clubIndex:appState.club,freeAgent:false,contractEndDate:null,source:'Free-agent signing'};appState.freeAgents=(appState.freeAgents||[]).filter(x=>String(x.id)!==String(p.id));}else if(p.academyPlayer){const academy=appState.youthAcademies?.[p.clubName]||[];const youthIndex=academy.findIndex(x=>String(x.id)===String(p.id));if(youthIndex<0){appState.budget=+(appState.budget+price).toFixed(1);alert('Denne junioren er ikke lenger tilgjengelig.');return;}const youth=academy[youthIndex];if((Number(appState.seasonYear)||2026)<=Number(youth.academySeason||appState.seasonYear)||Number(youth.age)<16){appState.budget=+(appState.budget+price).toFixed(1);alert('Spilleren må ha tilbrakt minst én sesong i juniorstallen og være minst 16 år.');return;}signed={...youth,id:'SIGNED-'+Date.now()+'-'+Math.floor(Math.random()*10000),clubIndex:appState.club,clubName:currentClub().name,division:clubDivision(currentClub()),youth:false,academyTransferred:true,source:'Signed from another academy',apps:0,minutes:0,goals:0,assists:0,fitness:100,morale:70,injured:0,suspended:0};academy.splice(youthIndex,1);appState.log.push(`${signed.name} ble hentet fra juniorstallen til ${p.clubName} for ${money(price)}.`);}else if(p.marketClubType==='european'){const sourceName=p.marketClubName||p.clubName;const roster=appState.europeanTransferSquads?.[sourceName]||[];const ix=roster.findIndex(x=>playerCareerIdentity(x)===playerCareerIdentity(p));if(ix<0){appState.budget=+(appState.budget+price).toFixed(1);alert('Spilleren er ikke lenger tilgjengelig i den europeiske klubben.');return;}const original=roster.splice(ix,1)[0];const meta=appState.europeanTransferClubData?.[sourceName];if(meta)meta.budget=+(Number(meta.budget||0)+price).toFixed(2);signed={...original,id:'SIGNED-'+Date.now()+'-'+Math.floor(Math.random()*10000),clubIndex:appState.club,clubName:currentClub().name,internationalClub:false,source:'European club transfer'};appState.log.push(`${currentClub().name} signerte ${signed.name} fra ${sourceName} for ${money(price)}.`);}else if(Number(p.marketClubIndex)<0){signed={...p,id:'SIGNED-'+Date.now()+'-'+Math.floor(Math.random()*10000),clubIndex:appState.club,source:'EFL database transfer'};const list=appState.eflPlayerDatabase?.[p.marketDivision]?.[p.clubName];if(list)appState.eflPlayerDatabase[p.marketDivision][p.clubName]=list.filter(x=>String(x.id)!==String(p.id));appState.log.push(`${currentClub().name} signerte ${p.name} fra ${p.clubName} (${p.marketDivision}).`);}else{const from=p.marketClubIndex;const idx=(appState.worldSquads[from]||[]).findIndex(x=>String(x.id)===String(p.id));if(idx<0){appState.budget=+(appState.budget+price).toFixed(1);return;}signed={...appState.worldSquads[from][idx],clubIndex:appState.club,fitness:Math.min(100,Number(p.fitness??90)),morale:Math.max(65,Number(p.morale??70)),id:Date.now()+Math.floor(Math.random()*10000)};appState.worldSquads[from].splice(idx,1);CLUBS[from].budget=+(Number(CLUBS[from].budget||0)+price).toFixed(2);if(appState.clubFinances?.[CLUBS[from].name])appState.clubFinances[CLUBS[from].name].transferBudget=CLUBS[from].budget;appState.log.push(`${currentClub().name} signerte ${p.name} fra ${p.clubName} for ${money(price)}.`);}signed.careerId=signed.careerId||p.careerId||p.id;if(!signed.careerStats)signed.careerStats={apps:0,minutes:0,goals:0,assists:0,yellowCards:0,redCards:0,chancesCreated:0};if(!Array.isArray(signed.careerHistory))signed.careerHistory=[];ensurePlayerContract(signed);if(p.freeAgent)appState.log.push(`${p.name} signerte for ${currentClub().name} på fri overgang mot ${signed.wage}k/uke.`);appState.transferHistory=appState.transferHistory||[];appState.transferHistory.push({type:p.freeAgent?'signing':'buy',playerName:p.name,playerCareerId:String(signed.careerId||p.careerId||p.id||''),from:p.freeAgent?'Klubbløs':p.clubName,to:currentClub().name,fee:p.freeAgent?0:price,week:Number(appState.week)||1,seasonYear:Number(appState.seasonYear)||2026,transferDate:transferDateForGameweek(appState.seasonYear,appState.week),calendarPhase:appState.preseasonActive?'preseason':'league',preseasonWeek:appState.preseasonActive?(Number(appState.preseasonWeek)||1):null,transferTypeLabel:p.freeAgent?'Fri overgang':p.academyPlayer?'Juniorovergang':'Kjøp',ownerClubIndex:appState.club});appState.squad.push(signed);if(Array.isArray(appState.worldSquads[appState.club])){const old=appState.worldSquads[appState.club].findIndex(x=>String(x.name)===String(signed.name));if(old>=0)appState.worldSquads[appState.club][old]=signed;else appState.worldSquads[appState.club].push(signed);}render()}
 
 function buyPlayer(i){const p=allMarketPlayers()[Number(i)];if(p)buyMarketPlayer(p.id)}
 const EFL_DIVISIONS={"National League":["AFC Fylde","Altrincham","Aldershot Town","Barrow","Boston United","Boreham Wood","Carlisle United","Eastleigh","FC Halifax Town","Forest Green Rovers","Gateshead","Hartlepool United","Harrogate Town","Hornchurch","Kidderminster Harriers","Scunthorpe United","Solihull Moors","Southend United","Sutton United","Tamworth","Wealdstone","Worthing","Woking","Yeovil Town"],"Championship":["Birmingham City","Blackburn Rovers","Bolton Wanderers","Bristol City","Burnley","Cardiff City","Charlton Athletic","Derby County","Lincoln City","Middlesbrough","Millwall","Norwich City","Portsmouth","Preston North End","Queens Park Rangers","Sheffield United","Southampton","Stoke City","Swansea City","Watford","West Bromwich Albion","West Ham United","Wolverhampton Wanderers","Wrexham"],"League One":["AFC Wimbledon","Barnsley","Blackpool","Bradford City","Bromley","Burton Albion","Cambridge United","Doncaster Rovers","Huddersfield Town","Leicester City","Leyton Orient","Luton Town","Mansfield Town","Milton Keynes Dons","Notts County","Oxford United","Peterborough United","Plymouth Argyle","Reading","Sheffield Wednesday","Stockport County","Stevenage","Wigan Athletic","Wycombe Wanderers"],"League Two":["Accrington Stanley","Barnet","Bristol Rovers","Cheltenham Town","Chesterfield","Colchester United","Crewe Alexandra","Crawley Town","Exeter City","Fleetwood Town","Gillingham","Grimsby Town","Newport County","Northampton Town","Oldham Athletic","Port Vale","Rochdale","Rotherham United","Salford City","Shrewsbury Town","Swindon Town","Tranmere Rovers","Walsall","York City"]};
@@ -8482,7 +8558,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.24 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.26 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
