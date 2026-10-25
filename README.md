@@ -1,13 +1,12 @@
-# CM Mobile v3.22
+# CM Mobile v3.23
 
-## Endringer
-- Kampkortet viser tabellplassering og siste fem resultater (V/U/T) for begge lag før ligakamper.
-- Europeiske ligafasekamper viser plassering og form fra den aktuelle europeiske ligatabellen.
-- Nye ligakamper lagrer kort resultatlogg for å kunne vise form på tvers av lag.
-- Før det finnes historikk, vises «Ingen kamper» i stedet for oppdiktet form.
+## Endring
+- Målscorer-linjen blinker i tre sekunder med solide, vekslende draktfarger: lagets primærfarge som bakgrunn med sekundærfargen på teksten, deretter motsatt.
+- Blinkingen er fortsatt begrenset til målscorer-linjen; hele kampkortet blinker ikke.
+- Kampklokken forblir stoppet mens målfeiringen vises.
 
 ## Publisering
-Erstatt `index.html` i rotmappen på GitHub Pages (`main`) med denne versjonens `index.html`.
+Erstatt `index.html` i rotmappen til GitHub Pages (`main`) med denne filen.
 
-## Teststatus
-JavaScript-syntaks og ZIP-arkiv kontrolleres. Full nettlesertest med eksisterende karrierelagring er ikke utført.
+## Kontroll
+JavaScript-syntaks og ZIP-arkiv kan valideres lokalt; full interaktiv nettlesertest er ikke utført.
