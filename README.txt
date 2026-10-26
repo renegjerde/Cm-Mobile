@@ -1,3 +1,2 @@
-CM Mobile v3.44
-Open CM_Mobile_v3.44.html in a modern browser.
-See CM_Mobile_v3.44_REPAIR_REPORT.md for changes and test limits.
+CM Mobile v3.45
+Open CM_Mobile_v3.45.html in a browser. The title and in-game version labels should all display v3.45.
