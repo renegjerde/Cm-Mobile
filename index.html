@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v3.46 — Touchline</title>
+<title>CM Mobile v3.47 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -544,7 +544,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.46</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.47</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -7594,6 +7594,42 @@ function englishLeagueLogoUrl(name,key){
  return `https://raw.githubusercontent.com/gmorison-aiio/club_logos/main/${fileBase}_ClubLogo.png`;
 }
 
+// Expanded English non-league logo registry. The public JoseArroyave/football-logos
+// repository documents SVG assets under logos/england and states that its files are
+// free for personal and commercial use. These are remote assets; failed requests
+// transparently fall through to existing club-provided logos and then generated SVG.
+const ENGLISH_NONLEAGUE_LOGO_FILES_BY_KEY = {
+ fylde:'AFC Fylde.svg',
+ aldershottown:'Aldershot Town.svg',
+ altrincham:'Altrincham FC.svg',
+ barrow:'Barrow AFC.svg',
+ borehamwood:'Boreham Wood.svg',
+ bostonunited:'Boston United.svg',
+ carlisleunited:'Carlisle United.svg',
+ eastleigh:'Eastleigh.svg',
+ halifaxtown:'FC Halifax Town.svg',
+ forestgreenrovers:'Forest Green Rovers.svg',
+ gateshead:'Gateshead FC.svg',
+ harrogatetown:'Harrogate Town.svg',
+ hartlepoolunited:'Hartlepool United.svg',
+ hornchurch:'Hornchurch.svg',
+ kidderminsterharriers:'Kidderminster Harriers.svg',
+ scunthorpeunited:'Scunthorpe United.svg',
+ solihullmoors:'Solihull Moors.svg',
+ southendunited:'Southend United.svg',
+ suttonunited:'Sutton United.svg',
+ tamworth:'Tamworth.svg',
+ wealdstone:'Wealdstone.svg',
+ woking:'Woking FC.svg',
+ worthing:'Worthing.svg',
+ yeoviltown:'Yeovil Town.svg'
+};
+function englishNonLeagueLogoUrl(name,key){
+ const filename=ENGLISH_NONLEAGUE_LOGO_FILES_BY_KEY[key];
+ if(!filename)return '';
+ return `https://raw.githubusercontent.com/JoseArroyave/football-logos/refs/heads/main/logos/england/${encodeURIComponent(filename)}`;
+}
+
 // Source audit: this checks mappings wired into the game, not live HTTP availability.
 // Exposed read-only for development diagnostics; the generated SVG remains the final
 // fallback so an unmapped/unreachable external logo never creates a blank badge.
@@ -7615,12 +7651,13 @@ function clubLogoCoverageAudit(){
  for(const row of byKey.values()){
   const name=row.names[0],key=row.key;
   if(ENGLISH_LOGO_SOURCE_CLUB_KEYS.has(key))row.source='english-pl-efl-png';
+  else if(ENGLISH_NONLEAGUE_LOGO_FILES_BY_KEY[key])row.source='english-national-league-svg';
   else if(EUROPEAN_LOGOS[name]||EUROPEAN_LOGO_ID_BY_KEY[key])row.source='football-data-crest';
   else row.source='generated-svg-only';
  }
  const rows=[...byKey.values()].sort((a,b)=>a.names[0].localeCompare(b.names[0]));
  const counts=rows.reduce((acc,row)=>{acc[row.source]=(acc[row.source]||0)+1;return acc;},{});
- return {checkedAtBuildVersion:'v3.46',totalNormalizedEntries:rows.length,counts,unmapped:rows.filter(row=>row.source==='generated-svg-only').map(row=>({key:row.key,names:row.names})),note:'Source mappings only; does not verify live HTTP availability. All badges retain a generated SVG fallback.'};
+ return {checkedAtBuildVersion:'v3.47',totalNormalizedEntries:rows.length,counts,unmapped:rows.filter(row=>row.source==='generated-svg-only').map(row=>({key:row.key,names:row.names})),note:'Source mappings only; does not verify live HTTP availability. All badges retain a generated SVG fallback.'};
 }
 window.CM_MOBILE_LOGO_AUDIT = clubLogoCoverageAudit();
 function generatedClubCrestDataUri(name, monogram){
@@ -7661,10 +7698,12 @@ function clubBadgeMarkup(teamOrName,size=42){
  const short=String(supplied.short||registered?.short||requestedName.split(/\s+/).filter(Boolean).map(x=>x[0]).join('').slice(0,3)||'FC').replace(/[^A-Za-z0-9]/g,'').slice(0,3).toUpperCase()||'FC';
  const europeanId=EUROPEAN_LOGOS[requestedName]||EUROPEAN_LOGO_ID_BY_KEY[requestedKey];
  const englishLogo=englishLeagueLogoUrl(requestedName,requestedKey);
- // Prefer the curated current-season PL/EFL PNG where available; preserve the
- // older registry URL as a second chance, then use an always-available SVG.
- const officialLogo=englishLogo||supplied.logo||registered?.logo||(europeanId?`https://crests.football-data.org/${europeanId}.svg`:'');
- const backupLogo=englishLogo?(supplied.logo||registered?.logo||''):'';
+ const nonLeagueLogo=englishNonLeagueLogoUrl(requestedName,requestedKey);
+ // Prefer the curated PL/EFL PNG for its 92 known clubs, then use the explicit
+ // English non-league SVG registry. Existing per-club logo URLs and generated SVG
+ // remain fallbacks if a remote asset cannot be loaded.
+ const officialLogo=englishLogo||nonLeagueLogo||supplied.logo||registered?.logo||(europeanId?`https://crests.football-data.org/${europeanId}.svg`:'');
+ const backupLogo=(englishLogo||nonLeagueLogo)?(supplied.logo||registered?.logo||''):'';
  const fallback=generatedClubCrestDataUri(requestedName,short);
  const safeName=esc(requestedName);
  const px=Math.max(18,Math.min(96,Number(size)||42));
@@ -9316,7 +9355,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.46 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.47 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
