@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v3.47 — Touchline</title>
+<title>CM Mobile v3.48 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -544,7 +544,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.47</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.48</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -7630,6 +7630,84 @@ function englishNonLeagueLogoUrl(name,key){
  return `https://raw.githubusercontent.com/JoseArroyave/football-logos/refs/heads/main/logos/england/${encodeURIComponent(filename)}`;
 }
 
+// Additional European club assets from the public 2026/27 league-logo tree.
+// Each mapping points to a concrete filename, not a guess derived from the display name.
+// These are remote PNGs; if one is unavailable the resolver continues to the next source.
+const EUROPEAN_LEAGUE_LOGO_FILES_BY_KEY = {
+ aarhus:{league:'Denmark - Superliga',file:'Aarhus GF.png'},
+ brondbyif:{league:'Denmark - Superliga',file:'Bröndby IF.png'},
+ kobenhavn:{league:'Denmark - Superliga',file:'FC Copenhagen.png'},
+ midtjylland:{league:'Denmark - Superliga',file:'FC Midtjylland.png'},
+ nordsjaelland:{league:'Denmark - Superliga',file:'FC Nordsjaelland.png'},
+ silkeborgif:{league:'Denmark - Superliga',file:'Silkeborg IF.png'},
+ aberdeen:{league:'Scotland - Scottish Premiership',file:'Aberdeen FC.png'},
+ celtic:{league:'Scotland - Scottish Premiership',file:'Celtic FC.png'},
+ hearts:{league:'Scotland - Scottish Premiership',file:'Heart of Midlothian FC.png'},
+ rangers:{league:'Scotland - Scottish Premiership',file:'Rangers FC.png'},
+ aekathen:{league:'Greece - Super League 1',file:'AEK Athens.png'},
+ aekathens:{league:'Greece - Super League 1',file:'AEK Athens.png'},
+ oficrete:{league:'Greece - Super League 1',file:'OFI Crete.png'},
+ olympiacos:{league:'Greece - Super League 1',file:'Olympiacos Piraeus.png'},
+ paok:{league:'Greece - Super League 1',file:'PAOK Thessaloniki.png'},
+ panathinaikos:{league:'Greece - Super League 1',file:'Panathinaikos.png'},
+ anderlecht:{league:'Belgium - Jupiler Pro League',file:'RSC Anderlecht.png'},
+ clubbrugge:{league:'Belgium - Jupiler Pro League',file:'Club Brugge KV.png'},
+ gent:{league:'Belgium - Jupiler Pro League',file:'KAA Gent.png'},
+ krcgenk:{league:'Belgium - Jupiler Pro League',file:'KRC Genk.png'},
+ sinttruiden:{league:'Belgium - Jupiler Pro League',file:'Sint-Truidense VV.png'},
+ besiktas:{league:'Türkiye - Süper Lig',file:'Besiktas JK.png'},
+ fenerbahce:{league:'Türkiye - Süper Lig',file:'Fenerbahce.png'},
+ galatasaray:{league:'Türkiye - Süper Lig',file:'Galatasaray.png'},
+ trabzonspor:{league:'Türkiye - Süper Lig',file:'Trabzonspor.png'},
+ bkhacken:{league:'Sweden - Allsvenskan',file:'BK Häcken.png'},
+ djurgardensif:{league:'Sweden - Allsvenskan',file:'Djurgårdens IF.png'},
+ malmoff:{league:'Sweden - Allsvenskan',file:'Malmö FF.png'},
+ mjallby:{league:'Sweden - Allsvenskan',file:'Mjällby AIF.png'},
+ bodoglimt:{league:'Norway - Eliteserien',file:'FK BodøGlimt.png'},
+ brann:{league:'Norway - Eliteserien',file:'SK Brann.png'},
+ molde:{league:'Norway - Eliteserien',file:'Molde FK.png'},
+ viking:{league:'Norway - Eliteserien',file:'Viking FK.png'},
+ crvenazvezda:{league:'Serbia - Super liga Srbije',file:'Red Star Belgrade.png'},
+ partizan:{league:'Serbia - Super liga Srbije',file:'FK Partizan Belgrade.png'},
+ dinamozagreb:{league:'Croatia - SuperSport HNL',file:'GNK Dinamo Zagreb.png'},
+ gnkdinamo:{league:'Croatia - SuperSport HNL',file:'GNK Dinamo Zagreb.png'},
+ hajduksplit:{league:'Croatia - SuperSport HNL',file:'HNK Hajduk Split.png'},
+ hnkrijeka:{league:'Croatia - SuperSport HNL',file:'HNK Rijeka.png'},
+ basel:{league:'Switzerland - Super League',file:'FC Basel 1893.png'},
+ bscyoungboys:{league:'Switzerland - Super League',file:'BSC Young Boys.png'},
+ lugano:{league:'Switzerland - Super League',file:'FC Lugano.png'},
+ lausannesport:{league:'Switzerland - Super League',file:'FC Lausanne-Sport.png'},
+ servette:{league:'Switzerland - Super League',file:'Servette FC.png'},
+ thun:{league:'Switzerland - Super League',file:'FC Thun.png'},
+ zurich:{league:'Switzerland - Super League',file:'FC Zürich.png'},
+ jagielloniabialystok:{league:'Poland - PKO BP Ekstraklasa',file:'Jagiellonia Bialystok.png'},
+ lechpoznan:{league:'Poland - PKO BP Ekstraklasa',file:'Lech Poznan.png'},
+ legiawarszawa:{league:'Poland - PKO BP Ekstraklasa',file:'Legia Warszawa.png'},
+ rakowczestochowa:{league:'Poland - PKO BP Ekstraklasa',file:'Raków Częstochowa.png'},
+ la:{league:'Austria - Bundesliga',file:'LASK.png'},
+ rapidwien:{league:'Austria - Bundesliga',file:'Rapid Vienna.png'},
+ redbullsalzburg:{league:'Austria - Bundesliga',file:'Red Bull Salzburg.png'},
+ sturmgraz:{league:'Austria - Bundesliga',file:'SK Sturm Graz.png'},
+ jablonec:{league:'Czech Republic - Chance Liga',file:'FK Jablonec.png'},
+ slaviapraha:{league:'Czech Republic - Chance Liga',file:'SK Slavia Prague.png'},
+ spartapraha:{league:'Czech Republic - Chance Liga',file:'AC Sparta Prague.png'},
+ viktoriaplzen:{league:'Czech Republic - Chance Liga',file:'FC Viktoria Plzen.png'},
+ cskasofia:{league:'Bulgaria - efbet Liga',file:'CSKA Sofia.png'},
+ levskisofia:{league:'Bulgaria - efbet Liga',file:'Levski Sofia.png'},
+ pfcludogorets:{league:'Bulgaria - efbet Liga',file:'Ludogorets Razgrad.png'},
+ twente:{league:'Netherlands - Eredivisie',file:'FC Twente Enschede.png'},
+ necnijmegen:{league:'Netherlands - Eredivisie',file:'NEC Nijmegen.png'},
+ fcsb:{league:'Romania - SuperLiga',file:'FCSB.png'},
+ universitateacraiova:{league:'Romania - SuperLiga',file:'Universitatea Craiova.png'},
+ getafe:{league:'Spain - LaLiga',file:'Getafe CF.png'},
+ shakhtardonet:{league:'Ukraine - Premier Liga',file:'Shakhtar Donetsk.png'}
+};
+function europeanLeagueLogoUrl(key){
+ const asset=EUROPEAN_LEAGUE_LOGO_FILES_BY_KEY[key];
+ if(!asset)return '';
+ return `https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/${encodeURIComponent(asset.league)}/${encodeURIComponent(asset.file)}`;
+}
+
 // Source audit: this checks mappings wired into the game, not live HTTP availability.
 // Exposed read-only for development diagnostics; the generated SVG remains the final
 // fallback so an unmapped/unreachable external logo never creates a blank badge.
@@ -7652,12 +7730,13 @@ function clubLogoCoverageAudit(){
   const name=row.names[0],key=row.key;
   if(ENGLISH_LOGO_SOURCE_CLUB_KEYS.has(key))row.source='english-pl-efl-png';
   else if(ENGLISH_NONLEAGUE_LOGO_FILES_BY_KEY[key])row.source='english-national-league-svg';
+  else if(EUROPEAN_LEAGUE_LOGO_FILES_BY_KEY[key])row.source='european-league-png';
   else if(EUROPEAN_LOGOS[name]||EUROPEAN_LOGO_ID_BY_KEY[key])row.source='football-data-crest';
   else row.source='generated-svg-only';
  }
  const rows=[...byKey.values()].sort((a,b)=>a.names[0].localeCompare(b.names[0]));
  const counts=rows.reduce((acc,row)=>{acc[row.source]=(acc[row.source]||0)+1;return acc;},{});
- return {checkedAtBuildVersion:'v3.47',totalNormalizedEntries:rows.length,counts,unmapped:rows.filter(row=>row.source==='generated-svg-only').map(row=>({key:row.key,names:row.names})),note:'Source mappings only; does not verify live HTTP availability. All badges retain a generated SVG fallback.'};
+ return {checkedAtBuildVersion:'v3.48',totalNormalizedEntries:rows.length,counts,unmapped:rows.filter(row=>row.source==='generated-svg-only').map(row=>({key:row.key,names:row.names})),note:'Source mappings only; does not verify live HTTP availability. All badges try configured image sources before generated SVG fallback.'};
 }
 window.CM_MOBILE_LOGO_AUDIT = clubLogoCoverageAudit();
 function generatedClubCrestDataUri(name, monogram){
@@ -7699,16 +7778,14 @@ function clubBadgeMarkup(teamOrName,size=42){
  const europeanId=EUROPEAN_LOGOS[requestedName]||EUROPEAN_LOGO_ID_BY_KEY[requestedKey];
  const englishLogo=englishLeagueLogoUrl(requestedName,requestedKey);
  const nonLeagueLogo=englishNonLeagueLogoUrl(requestedName,requestedKey);
- // Prefer the curated PL/EFL PNG for its 92 known clubs, then use the explicit
- // English non-league SVG registry. Existing per-club logo URLs and generated SVG
- // remain fallbacks if a remote asset cannot be loaded.
- const officialLogo=englishLogo||nonLeagueLogo||supplied.logo||registered?.logo||(europeanId?`https://crests.football-data.org/${europeanId}.svg`:'');
- const backupLogo=(englishLogo||nonLeagueLogo)?(supplied.logo||registered?.logo||''):'';
+ const europeanLeagueLogo=europeanLeagueLogoUrl(requestedKey);
+ // Try every configured source in priority order. A stale remote URL should not
+ // prevent a later known crest source from loading before the generated fallback.
  const fallback=generatedClubCrestDataUri(requestedName,short);
  const safeName=esc(requestedName);
  const px=Math.max(18,Math.min(96,Number(size)||42));
  const style=`width:${px}px;height:${px}px;object-fit:contain;display:block;flex:0 0 auto`;
- const sources=[officialLogo,backupLogo,fallback].filter((url,index,list)=>url&&list.indexOf(url)===index);
+ const sources=[englishLogo,nonLeagueLogo,supplied.logo,registered?.logo,europeanLeagueLogo,europeanId?`https://crests.football-data.org/${europeanId}.svg`:'' ,fallback].filter((url,index,list)=>url&&list.indexOf(url)===index);
  return sources.map((url,index)=>`<img src="${esc(url)}" alt="${safeName}${index===sources.length-1&&url===fallback?' generert':''} klubbmerke" title="${safeName}" ${url===fallback?'':'loading="lazy"'} width="${px}" height="${px}" style="${style};display:${index===0?'block':'none'}" onerror="this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='block'">`).join('');
 }
 // Curated 2026/27 home-kit colour registry. Each club's primary colour reflects its home shirt.
@@ -9355,7 +9432,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.47 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.48 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
