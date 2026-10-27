@@ -1,16 +1,9 @@
-# CM Mobile v3.50 — ligatabellens plasseringskolonne
+# CM Mobile v3.51 — change report
 
-## Endring
-- Plasseringsnummer, opprykk/nedrykk-status og formpiler vises nå i tre faste kolonner i første tabellcelle.
-- Selve plasseringstallet er høyrejustert i en fast bredde, slik at tallene står rett under hverandre.
-- Opp/ned vises som kun en grønn/rød pil, uten synlig flyttetall som tidligere gjorde cellen ujevn. Tooltip og tilgjengelighetslabel beholder informasjon om antall plasser flyttet.
-- En tom pilplass reserveres når klubben ikke har flyttet seg, slik at kolonnebredden ikke hopper mellom rader.
-- Endringen er brukt i aktiv ligatabell, divisjonstabeller under konkurranser og sesongoppsummering.
-- Versjonsmerking er oppdatert til 3.50.
-
-## Validering
-- Begge innebygde JavaScript-blokker bestod `node --check`.
-- Statisk test bekreftet at alle tre tabellrenderere bruker samme rank-cell-helper.
-- Statisk test bekreftet at synlig versjonsmerking er konsekvent v3.50.
-- ZIP-arkivene består `unzip -t`.
-- Interaktiv nettlesertest på en eksisterende karriere er ikke utført i denne leveransen.
+- Completed source registration for the remaining 31 previously unmapped logo keys using supplementary European club-logo links.
+- Added in-manual source attribution and link to football-logos.cc usage policy.
+- Corrected exact source slugs for Slovan Bratislava and Víkingur R. after checking their club pages.
+- Documented the source site’s non-commercial-use restriction.
+- Updated runtime logo audit and all visible version markers to v3.51.
+- Existing multi-source image error fallback remains enabled.
+- See `CM_Mobile_v3.51_LOGO_REPORT.md` for validation limits and source-registration details.
