@@ -1,12 +1,14 @@
-# CM Mobile v3.56
+# CM Mobile v3.57
 
-## Oversikt og karriereadministrasjon
+## Kampdatoer: cup og europacup
 
-- Fjernet «Start ny karriere» fra managerprofilen på oversikten. Den aktive managerhverdagen skal ikke ha en slik primærhandling på profilsiden.
-- Beholdt «Start ny karriere» i **Karrierer**-menyen, der ny karriere opprettes og lagringer administreres.
-- Den aktive oversikten får dermed mer fokus på klubbprofil og neste kamp.
+- Kampdatoene som vises i oversikten og taktikk-/kampforberedelsesskjermen følger nå turneringens ukedag i stedet for alltid å vise ligalørdag.
+- Champions League settes til tirsdag/onsdag (varierer med runde).
+- Europa League og Conference League settes til torsdag.
+- EFL Cup settes til tirsdag.
+- Ligakamper og FA Cup beholder lørdag som standard.
 
 ## Teststatus
 - JavaScript-syntaks kontrollert med Node.js.
 - ZIP-integritet kontrollert.
-- Ikke gjennomført full interaktiv nettlesertest; kontroller gjerne at knappen fortsatt finnes i Karrierer og ikke lenger vises på oversikten.
+- Ikke gjennomført full interaktiv nettleser- eller sesongkalendertest.

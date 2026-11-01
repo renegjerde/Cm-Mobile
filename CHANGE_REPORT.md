@@ -1,5 +1,5 @@
-# CM Mobile v3.56 – endringsrapport
+# CM Mobile v3.57 – endringsrapport
 
-Fjernet snarveien «Start ny karriere» fra managerprofil/oversikt. Karriereoppretting er fortsatt tilgjengelig fra Karrierer-menyen.
+Rettet datoetiketter for cup- og europacupkamper på oversikten og taktikk-skjermen, slik at disse ikke automatisk vises som lørdagskamper. Datoresolver bruker kampens konkurranse for å velge relevant ukedag.
 
-Test: JavaScript-syntakskontroll og ZIP-integritet. Full nettlesertest ikke utført.
+Kontroll: JavaScript-syntakskontroll og ZIP-integritet. Full nettlesertest gjenstår.
