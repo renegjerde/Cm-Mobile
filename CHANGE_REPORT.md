@@ -1,5 +1,5 @@
-# CM Mobile v3.54 change report
+# CM Mobile v3.55 – endringsrapport
 
-Adjusted current ability for embedded first-team U21/prospect supplement players using age-based ceilings, while preserving high potential and named exceptional prospects. Player database version incremented from 27 to 28. The package includes a newly written README.md as requested for every update.
+Oppdatering av navne- og nasjonalitetsprofil for genererte cup-only/europeiske utfyllingsspillere. Generiske engelske navn brukes ikke lenger som standard for alle klubber; profilen velges etter land/divisjon, med lokal majoritet og begrenset internasjonal miks.
 
-Validation: both inline JavaScript blocks pass Node.js syntax checks. ZIP integrity passes. No full interactive browser test or broad player-by-player realism audit is claimed.
+Kontroll: JavaScript-syntakskontroll og ZIP-integritet. Full nettlesertest er ikke utført.

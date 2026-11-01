@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v3.54 — Touchline</title>
+<title>CM Mobile v3.55 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -552,7 +552,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.54</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.55</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -1187,7 +1187,7 @@ function makeRealPlayer(name,pos,clubIndex,slot,reference={}){
  if(fpl&&Number(fpl.minutes)>=180){const minutes=Number(fpl.minutes),points=Number(fpl.total_points)||0,per90=points/(minutes/90),posBase=pos==='GK'?3.1:pos==='DEF'?3.2:pos==='MID'?3.65:3.75;const sample=Math.min(1,minutes/720);fplRatingDelta=Math.max(-3.5,Math.min(4.5,(per90-posBase)*1.3))*sample+Math.max(-1.2,Math.min(1.2,((Number(fpl.form)||0)-4)*.25))*sample;}
  rating=Math.max(42,Math.min(95,Math.round(rating+fplRatingDelta)));
  const ageForDevelopment=Number.isFinite(age)?age:27;
- // v3.54: U21 squad supplements are prospects, not automatically senior-ready.
+ // v3.55: U21 squad supplements are prospects, not automatically senior-ready.
  // Preserve exceptional, already-established young players; otherwise apply age-based
  // current-ability ceilings while leaving potential and development headroom intact.
  const establishedU21Exceptions=new Set([
@@ -5001,17 +5001,46 @@ function persistentCompetitionRoster(team){
  if(cupMatch)return {type:'cupOnly',index:-1,division:team.division||'Non-league',clubName:cupMatch.name,roster:cupMatch.roster};
  return null;
 }
+function generatedEuropeanNameProfile(country){
+ const c=String(country||'').toLowerCase();
+ const profiles=[
+  {keys:['spain','españa','spania'],nat:'Spania',first:['Álvaro','Iker','Hugo','Pablo','Sergio','Javier','Adrián','Diego','Marcos','Raúl','Mateo','Lucas'],last:['García','Martínez','López','Sánchez','Fernández','González','Pérez','Rodríguez','Torres','Navarro','Romero','Molina']},
+  {keys:['germany','deutschland','tyskland'],nat:'Tyskland',first:['Lukas','Leon','Finn','Paul','Jonas','Max','Felix','Ben','Noah','Niklas','Florian','Timo'],last:['Müller','Schmidt','Schneider','Fischer','Weber','Wagner','Becker','Hoffmann','Schulz','Koch','Bauer','Richter']},
+  {keys:['italy','italia','italien'],nat:'Italia',first:['Lorenzo','Matteo','Alessandro','Andrea','Luca','Federico','Gabriele','Riccardo','Davide','Tommaso','Marco','Niccolò'],last:['Rossi','Russo','Ferrari','Esposito','Bianchi','Romano','Colombo','Ricci','Marino','Greco','Conti','De Luca']},
+  {keys:['france','francia','frankrike'],nat:'Frankrike',first:['Lucas','Hugo','Enzo','Nathan','Mathis','Théo','Antoine','Jules','Kylian','Yanis','Noah','Maxime'],last:['Martin','Bernard','Dubois','Thomas','Robert','Richard','Petit','Durand','Leroy','Moreau','Simon','Laurent']},
+  {keys:['portugal','portug'],nat:'Portugal',first:['João','Tiago','Diogo','Rafael','Gonçalo','Francisco','Pedro','Miguel','André','Afonso','Nuno','Tomás'],last:['Silva','Santos','Ferreira','Pereira','Costa','Oliveira','Rodrigues','Martins','Sousa','Fernandes','Gomes','Lopes']},
+  {keys:['netherlands','holland','nederland','nederlandene'],nat:'Nederland',first:['Daan','Sem','Jesse','Luuk','Lars','Thijs','Milan','Bram','Finn','Jayden','Mees','Timo'],last:['de Jong','Jansen','de Vries','van den Berg','van Dijk','Bakker','Visser','Smit','Meijer','de Boer','Mulder','Bos']},
+  {keys:['belgium','belgië','belgien','belgia'],nat:'Belgia',first:['Noah','Arthur','Liam','Louis','Lucas','Milan','Jules','Mathis','Nathan','Victor','Théo','Adam'],last:['Peeters','Janssens','Maes','Jacobs','Mertens','Willems','Claes','Goossens','Wouters','De Smet','Dubois','Lambert']},
+  {keys:['scotland','skottland'],nat:'Skottland',first:['Callum','Lewis','Scott','Ryan','Euan','Jamie','Cameron','Aiden','Ross','Liam','Kieran','Fraser'],last:['Campbell','Stewart','Robertson','Thomson','Anderson','MacDonald','Scott','Reid','Murray','Taylor','Clark','Wilson']},
+  {keys:['england','england','united kingdom','uk'],nat:'England',first:['Jack','Harry','Oliver','Charlie','George','Alfie','Freddie','Archie','Theo','Ethan','William','James'],last:['Smith','Jones','Taylor','Brown','Williams','Wilson','Johnson','Davies','Robinson','Wright','Thompson','Walker']},
+  {keys:['turkey','türkiye','tyrkia'],nat:'Tyrkia',first:['Arda','Emir','Kerem','Eren','Mert','Can','Yusuf','Burak','Kaan','Deniz','Ahmet','Mehmet'],last:['Yılmaz','Kaya','Demir','Şahin','Çelik','Yıldız','Yıldırım','Öztürk','Aydın','Özdemir','Arslan','Doğan']},
+  {keys:['greece','hellas','hellas','gresk'],nat:'Hellas',first:['Giorgos','Dimitris','Nikos','Kostas','Vasilis','Giannis','Alexandros','Petros','Andreas','Stavros','Manolis','Christos'],last:['Papadopoulos','Pappas','Nikolaidis','Georgiou','Dimitriou','Kostas','Vlachos','Ioannidis','Petridis','Antonopoulos','Mavros','Theodorou']},
+  {keys:['norway','norge','norwegen'],nat:'Norge',first:['Oskar','Magnus','Sander','Emil','Noah','Isak','Aksel','Tobias','Elias','Henrik','Jonas','Markus'],last:['Hansen','Johansen','Olsen','Larsen','Andersen','Pedersen','Nilsen','Kristiansen','Berg','Haugen','Dahl','Solberg']},
+  {keys:['sweden','sverige','schweden'],nat:'Sverige',first:['Elias','William','Hugo','Oscar','Leo','Noah','Axel','Viktor','Isak','Liam','Anton','Albin'],last:['Andersson','Johansson','Karlsson','Nilsson','Eriksson','Larsson','Olsson','Persson','Svensson','Gustafsson','Pettersson','Lindberg']},
+  {keys:['denmark','danmark','dänemark'],nat:'Danmark',first:['William','Noah','Oscar','Lucas','Victor','Malthe','Emil','Oliver','Magnus','Frederik','Mikkel','Jonas'],last:['Nielsen','Jensen','Hansen','Pedersen','Andersen','Christensen','Larsen','Sørensen','Rasmussen','Jørgensen','Petersen','Madsen']},
+  {keys:['switzerland','schweiz','suisse','sveits'],nat:'Sveits',first:['Luca','Noah','Nico','Jan','Leon','Fabio','David','Elia','Simon','Milan','Joel','Yann'],last:['Müller','Meier','Schmid','Keller','Weber','Huber','Meyer','Steiner','Frei','Brunner','Rossi','Baumann']},
+  {keys:['austria','österreich','østerrike'],nat:'Østerrike',first:['Lukas','David','Jakob','Maximilian','Paul','Florian','Felix','Simon','Elias','Moritz','Niklas','Tobias'],last:['Gruber','Huber','Bauer','Wagner','Müller','Pichler','Steiner','Moser','Mayer','Hofer','Berger','Fuchs']},
+  {keys:['poland','polska','polen'],nat:'Polen',first:['Jakub','Kacper','Mateusz','Szymon','Bartosz','Filip','Michał','Jan','Piotr','Adam','Wojciech','Tymon'],last:['Nowak','Kowalski','Wiśniewski','Wójcik','Kowalczyk','Kamiński','Lewandowski','Zieliński','Szymański','Woźniak','Dąbrowski','Kozłowski']},
+  {keys:['croatia','hrvatska','kroatia'],nat:'Kroatia',first:['Luka','Ivan','Marko','Josip','Mateo','Filip','Petar','Ante','Mario','Toni','Duje','Lovro'],last:['Horvat','Kovačević','Babić','Marić','Jurić','Novak','Knežević','Vuković','Božić','Blažević','Šarić','Perić']},
+  {keys:['serbia','srbija','serbia'],nat:'Serbia',first:['Luka','Stefan','Nikola','Marko','Miloš','Lazar','Vuk','Filip','Uroš','Nemanja','Dušan','Aleksa'],last:['Jovanović','Petrović','Nikolić','Marković','Đorđević','Stojanović','Ilić','Pavlović','Milošević','Todorović','Popović','Lukić']}
+ ];
+ return profiles.find(p=>p.keys.some(k=>c.includes(k)))||profiles[8];
+}
 function buildPersistentCupOnlySquad(team){
  const clubName=String(team?.name||'Unknown FC'),division=String(team?.division||'Non-league'),strength=Number(team?.strength)||43;
  const positions=['GK','GK','GK','DEF','DEF','DEF','DEF','DEF','DEF','DEF','MID','MID','MID','MID','MID','MID','MID','ATT','ATT','ATT','ATT','ATT','ATT','ATT','ATT'];
- const first=typeof EFL_FIRST!=='undefined'?EFL_FIRST:['Alex','Ben','Charlie','Daniel','Ethan'],last=typeof EFL_LAST!=='undefined'?EFL_LAST:['Adams','Brown','Clarke','Davies','Smith'];
- const used=new Set(),roster=[];
+ const profile=generatedEuropeanNameProfile(team?.country||division),used=new Set(),roster=[];
+ const foreignPool=['France','Portugal','Brazil','Argentina','Spain','Germany','Netherlands','Belgium'];
  for(let i=0;i<positions.length;i++){
-  const pos=positions[i];let seed=stableSeed(`cup-only-roster|${clubName}|${i}`),name='',attempt=0;
-  do{const f=first[seed%first.length],l=last[stableSeed(`cup-only-surname|${clubName}|${i}|${attempt}`)%last.length];name=`${f} ${l}`;seed=stableSeed(`${seed}|${attempt++}`);}while((used.has(normalisePlayerName(name))||name==='')&&attempt<300);
+  const pos=positions[i],seed=stableSeed(`cup-only-roster|${clubName}|${i}`);
+  // Most fillers are locally plausible; a minority reflect normal cross-border recruitment.
+  const local=(seed%100)<78,foreign=generatedEuropeanNameProfile(foreignPool[(seed>>>4)%foreignPool.length]);
+  const names=local?profile:foreign;
+  let name='',attempt=0;
+  do{const f=names.first[seed%names.first.length],l=names.last[stableSeed(`cup-only-surname|${clubName}|${i}|${attempt}`)%names.last.length];name=`${f} ${l}`;attempt++;}while((used.has(normalisePlayerName(name))||name==='')&&attempt<300);
   used.add(normalisePlayerName(name));
-  const p=makeRealPlayer(name,pos,-1,i,{clubName,clubStrength:strength,clubBudget:0,source:'Generated cup-only squad; fictional identity for clubs without an embedded current roster'});
-  p.id=`cup-only-${domesticClubKey(clubName)}-${i+1}`;p.careerId=p.id;p.clubIndex=-1;p.clubName=clubName;p.division=division;p.source='Generated cup-only squad; fictional identity for clubs without an embedded current roster';p.squadMembershipVerified=false;p.realNameVerified=false;
+  const p=makeRealPlayer(name,pos,-1,i,{clubName,clubStrength:strength,clubBudget:0,source:'Generated cup-only squad; fictional identity with club-local naming profile'});
+  p.id=`cup-only-${domesticClubKey(clubName)}-${i+1}`;p.careerId=p.id;p.clubIndex=-1;p.clubName=clubName;p.division=division;p.source='Generated cup-only squad; fictional identity with club-local naming profile';p.squadMembershipVerified=false;p.realNameVerified=false;p.nationality=names.nat;
   roster.push(p);
  }
  appState.cupOnlySquads=appState.cupOnlySquads||{};appState.cupOnlySquads[clubName]=roster;
@@ -9555,7 +9584,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.54 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.55 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
