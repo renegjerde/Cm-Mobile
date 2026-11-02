@@ -1,5 +1,5 @@
-# CM Mobile v3.57 – endringsrapport
+# CM Mobile v3.58 – endringsrapport
 
-Rettet datoetiketter for cup- og europacupkamper på oversikten og taktikk-skjermen, slik at disse ikke automatisk vises som lørdagskamper. Datoresolver bruker kampens konkurranse for å velge relevant ukedag.
+Posisjonsredigeringen har nå CB (sentral midtstopper). LCB/CB/RCB regnes som en felles sentral stoppergruppe ved rollefit, slik at sidebytte ikke gir unødvendig stort ratingtrekk.
 
-Kontroll: JavaScript-syntakskontroll og ZIP-integritet. Full nettlesertest gjenstår.
+Kontroller: JavaScript-syntakskontroll og ZIP-integritet. Full nettlesertest gjenstår.

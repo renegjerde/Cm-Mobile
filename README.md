@@ -1,14 +1,12 @@
-# CM Mobile v3.57
+# CM Mobile v3.58
 
-## Kampdatoer: cup og europacup
+## Midtstopperroller og rollejustering
 
-- Kampdatoene som vises i oversikten og taktikk-/kampforberedelsesskjermen følger nå turneringens ukedag i stedet for alltid å vise ligalørdag.
-- Champions League settes til tirsdag/onsdag (varierer med runde).
-- Europa League og Conference League settes til torsdag.
-- EFL Cup settes til tirsdag.
-- Ligakamper og FA Cup beholder lørdag som standard.
+- La til «Sentral midtstopper (CB)» som primær- og sekundærposisjon i spillerprofilens posisjonsredigering.
+- LCB, CB og RCB behandles som én sentral stopperfamilie ved rolleberegning. En venstre- eller høyre midtstopper får ikke lenger et stort ferdighetstrekk bare fordi vedkommende spiller sentralt eller på motsatt side.
+- Oppdaterte rollebonus i laguttaksberegningen slik at sentrale stoppere vurderes på lik linje på stopperplass.
 
 ## Teststatus
-- JavaScript-syntaks kontrollert med Node.js.
+- JavaScript-syntaks kontrollert.
 - ZIP-integritet kontrollert.
-- Ikke gjennomført full interaktiv nettleser- eller sesongkalendertest.
+- Full nettlesertest ikke utført.
