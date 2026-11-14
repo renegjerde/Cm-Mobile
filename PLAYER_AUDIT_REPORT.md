@@ -1,39 +1,41 @@
-# CM Mobile v3.63 – permanent UEFA List B snapshot
+# CM Mobile v3.64 – europeisk spillerbase
 
-Date: 14 November 2026
-Base: CM Mobile v3.62
+Dato: 14. november 2026  
+Grunnlag: CM Mobile v3.63 med permanent UEFA List B-snapshot.
 
-## Change
-- Added a fixed offline snapshot of UEFA List B players from the latest completed matchweek as of 14 November 2026.
-- List B entries are merged into the existing club rosters as ordinary players. The UI does not label them as List B or generated players.
-- A one-time career migration (`uefaListBPermanentMigrationVersion = 1`) prevents later matchday or in-season updates.
-- Existing List A / domestic players are preserved. Exact normalized-name duplicates within the destination club are not added again.
-- Players are inserted into the canonical Premier League, EFL, or European roster so transfers and match simulation use the same stored player.
-- List B players receive an age-model input constrained to the 16–21 range, consistent with the List B eligibility group. Their skill profile remains the game’s deterministic player model unless separate curated ratings exist.
+## Endringer
+- Bygget List A-register for de klubbene som manglet et pålitelig innebygd spillerregister: Sabah og Slovan Bratislava (UCL), ni ikke-engelske UEL-klubber og elleve UECL-klubber.
+- Eksisterende UCL List A er beholdt, med UEFA-korrigering for Barcelona: Jesse Bisiwu og Hamza Abdelkarim ligger i List A, mens Shane Kluivert ligger i List B.
+- Rettet List B-oppføringer som manglet i KuPS, Kauno Žalgiris, Pafos og Riga. La til de manglende List B-angriperne i Inter og Porto.
+- Fjernet Barcelona-spillerne Jesse Bisiwu og Hamza Abdelkarim fra List B.
+- Alle klubbene bruker samme ordinære spillerregister i spillet; ingen synlige A/B- eller regen-markeringer.
+- List B-migreringen er versjonert til v2. Eksisterende v3.63-karrierer får bare manglende spillere lagt til én gang.
+- List A-migreringen er versjonert til v2. Den erstatter bare urørte, uverifiserte arkiv-/genererte europastaller; lag med kamphistorikk, overføringer, manuelle endringer eller verifiserte spillere beskyttes.
+- Nye europeiske staller bygges fra UEFA List A der et kuratert register finnes; ellers brukes innebygd profilarkiv før systemet eventuelt genererer spillere.
+- Ingen nettforespørsler, kampdagsoppdateringer eller fremtidig UEFA-synkronisering.
 
-## Snapshot source and timing
-- Champions League: after matchday 4 (3–4 November 2026).
-- Europa League: after matchday 4 (4–5 November 2026).
-- Conference League: after matchday 3 (5 November 2026).
-- The game does not query UEFA after this import.
+## Datadekning og kildebegrensning
 
-## Captured List B entries
-| Competition | Clubs with data entries | Players |
-|---|---:|---:|
-| Champions League | 36 | 388 |
-| Europa League | 36 | 364 |
-| Conference League | 36 | 221 |
+Alle 108 klubboppføringene i de tre turneringene er representert i snapshotet. Tabellens List A-kilde skiller mellom manuelt transkriberte UEFA-troppslister og eldre innebygd profildata. For enkelte klubber uten manuelt transkribert List A brukes Transfermarkt-basert profilarkiv datert 6. juli 2026 som reserve; dette er **ikke** bevis på at samtlige spillere fortsatt var registrert i klubben 14. november. Det er derfor ikke riktig å omtale hver eneste List A-oppføring som offisielt november-verifisert.
 
-**Total captured:** 973 player-name entries across 108 club/competition entries.
+| Turnering | Klubboppføringer | UEFA List A manuelt transkribert | Profilarkiv som reserve | List B-spillere |
+|---|---:|---:|---:|---:|
+| Champions League | 36 | 31 | 0 | 392 |
+| Europa League | 36 | 9 | 24 | 364 |
+| Conference League | 36 | 11 | 24 | 226 |
 
-## Validation notes
-- Within-club normalized-name collisions in the snapshot data: 0.
-- List B is merged only once per saved career. A later transfer, retirement or release is not reversed by another UEFA import.
-- If a List B player is already present in the same club roster, the existing record is retained, so any existing stats/history remain attached.
-- This is a manually curated transcription of starred List B entries from UEFA squad pages. It should not be treated as a complete player-attribute database: names and position groups are the imported registration facts; ratings and some biographical fields remain game-modeled.
+List A-kildeside for hver klubb og detaljerte navnelister finnes i `UEFA_PLAYER_DATABASE_SNAPSHOT_2026-11-14.json`. UEFA opplyser selv at squad-change-sidene er en praktisk informasjonskilde uten garanti for fullstendighet, og at klubbene selv har ansvar for å verifisere registreringene.
 
-## Build tests
-- JavaScript syntax check: passed (`node --check` on the main inline script).
-- Migration harness: passed; 108 competition team records traversed, 973 List B names in the snapshot, 972 additions with one intentionally pre-existing duplicate, and a second migration added 0 players.
-- Within-squad normalized-name duplicates in the supplied snapshot: 0.
-- ZIP integrity: checked after packaging.
+## Viktige migreringsvern
+- Klubber med kamphistorikk, spillerhistorikk eller overføringer får ikke automatisk overskrevet eksisterende lagrede tropper.
+- List B-spillere fra v3.63 blir beholdt under List A-migreringen.
+- Doble navn slås bare sammen innen en klubb; like navn i ulike klubber fjernes ikke uten sterk identitetsmatch.
+- Eksisterende spillerhistorikk og karriere-ID beholdes for allerede registrerte List B-spillere.
+
+## Teststatus
+- JavaScript-syntaks: kontrollert.
+- UEFA-klubbregister: 36 + 36 + 36 klubboppføringer kontrollert.
+- Snapshot: alle tre turneringsnøkler kontrollert mot `UEFA_2026_27`.
+- List B: dublettkontroll innen hver klubb og versjonert idempotent migrering testet.
+- ZIP-integritet: kontrollert etter pakking.
+- Ingen live Supabase-test eller test av brukerens faktiske karrierelagring er utført.

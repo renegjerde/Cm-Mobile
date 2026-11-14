@@ -1,0 +1,4182 @@
+{
+  "snapshot_date": "2026-11-14",
+  "season": "2026/27",
+  "refresh_policy": "static-no-network-no-matchday-refresh",
+  "competitions": {
+    "Champions League": {
+      "LASK": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 23,
+        "list_b_count": 9,
+        "list_b_players": {
+          "GK": [
+            "Christof Katzmayr"
+          ],
+          "DEF": [
+            "Jakob Wansch",
+            "Ryan Rodriguez German",
+            "Luca Ortner",
+            "Armin Midzic",
+            "Jonas Ilk",
+            "Alan Wimmer"
+          ],
+          "ATT": [
+            "Matthias Hartl",
+            "Paul Krapf"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Lukas Jungwirth",
+            "Tobias Schützenauer",
+            "Fabian Schillinger"
+          ],
+          "DEF": [
+            "George Bello",
+            "Miguel Freckleton",
+            "Xavier Mbuyamba",
+            "Andrés Andrade",
+            "Kasper Jørgensen",
+            "Manoël Verhaeghe",
+            "Daniel Elfadli",
+            "Yvan Dibango",
+            "João Victor Tornich"
+          ],
+          "MID": [
+            "Melayro Bogarde",
+            "Kryštof Daněk",
+            "Robert Ljubičić",
+            "Alessandro Schöpf",
+            "Christoph Lang",
+            "Florian Flecker",
+            "Sascha Horvath"
+          ],
+          "ATT": [
+            "Samuel Adeniran",
+            "Moses Usor",
+            "Sasa Kalajdzic",
+            "Nael Kane"
+          ]
+        }
+      },
+      "Sabah": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 24,
+        "list_b_count": 2,
+        "list_b_players": {
+          "GK": [
+            "Rauf Ayyubov",
+            "Ravan Mirzammadov"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Amin Ramazanov",
+            "Stas Pokatilov"
+          ],
+          "DEF": [
+            "Steve Solvet",
+            "Aden McCarthy",
+            "Rahman Dashdamirov",
+            "Tellur Mutallimov",
+            "Tymoteusz Puchacz",
+            "Erivaldo Almeida",
+            "Akim Zedadka"
+          ],
+          "MID": [
+            "Abdulakh Khaibulaev",
+            "Umarali Rakhmonaliev",
+            "Khayal Aliyev",
+            "Aleksey Isaev",
+            "Kaheem Parris",
+            "Ivan Lepinjica",
+            "Rauf Rustamli",
+            "Du Queiroz",
+            "Rodrigo Fernandes",
+            "Jafar Mukhtarov"
+          ],
+          "ATT": [
+            "Christian Nwachukwu",
+            "Joy-Lance Mickels",
+            "Veljko Simić",
+            "Xander Severina",
+            "Orphé Mbina"
+          ]
+        }
+      },
+      "Club Brugge": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 15,
+        "list_b_players": {
+          "GK": [
+            "Axl De Corte",
+            "Argus Vanden Driessche",
+            "Thibeau Kestemont"
+          ],
+          "DEF": [
+            "Jorne Spileers",
+            "Kyriani Sabbe",
+            "Alexander Vandeperre",
+            "Wout Verlinden",
+            "Axl Wins"
+          ],
+          "MID": [
+            "Joaquin Seys",
+            "Jessi Da Silva",
+            "Lucas Delorge",
+            "Gianluca Okon",
+            "Mohamed Elbay",
+            "Naim Amengai"
+          ],
+          "ATT": [
+            "Jakke Van Britsom"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Yann Sommer",
+            "Nordin Jackers"
+          ],
+          "DEF": [
+            "Han-beom Lee",
+            "Joel Ordóñez",
+            "Matteo Dams",
+            "Hugo Siquet",
+            "Brandon Mechele",
+            "Samba Coulibaly",
+            "Samuel Van Hoogen",
+            "Andre Garcia"
+          ],
+          "MID": [
+            "Freddie Potts",
+            "Hugo Vetlesen",
+            "Cheveyo Tsawa",
+            "Hans Vanaken",
+            "Lynnt Audoor",
+            "Félix Lemaréchal",
+            "Tian Koren"
+          ],
+          "ATT": [
+            "Nicolò Tresoldi",
+            "Carlos Forbs",
+            "Jan Virgili",
+            "Romeo Vermant",
+            "Wisdom Mike",
+            "Milan Robberechts",
+            "Mamadou Diakhon",
+            "Andrej Vasović"
+          ]
+        }
+      },
+      "Slavia Praha": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 20,
+        "list_b_players": {
+          "GK": [
+            "Adam Rezek",
+            "Adam Paar",
+            "Ondřej Suchý"
+          ],
+          "DEF": [
+            "Jakub Kolísek",
+            "David Barčot",
+            "Štěpán Chaluš",
+            "Filip Kočvara",
+            "Martin Kovář",
+            "Jáchym Palivec",
+            "Vít Skokan"
+          ],
+          "MID": [
+            "Karel Belžík",
+            "Ondřej Frolík",
+            "Aleksa Ilinčič",
+            "Jakub Kratochvíl",
+            "Ondřej Mašek",
+            "Martin Palaščák"
+          ],
+          "ATT": [
+            "Dan Kohout",
+            "Matěj Kotrba",
+            "Petr Potměšil",
+            "Adam Procházka"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Nazar Domchak",
+            "Jakub Markovič"
+          ],
+          "DEF": [
+            "Štěpán Chaloupek",
+            "Tomáš Holeš",
+            "David Zima",
+            "Ange N'Guessan",
+            "Tomáš Vlček",
+            "Mikuláš Konečný"
+          ],
+          "MID": [
+            "Oskar Kubiak",
+            "Danijel Šturm",
+            "Samuel Isife",
+            "Mubarak Suleiman",
+            "David Moses",
+            "Lukáš Provod",
+            "Emmanuel Ayaosi",
+            "Toumani Diakité",
+            "Michal Sadílek",
+            "Ivan Schranz",
+            "Wiktor Nowak",
+            "Pavel Kačor",
+            "David Jurásek",
+            "Eliáš Piták"
+          ],
+          "ATT": [
+            "Mojmír Chytil",
+            "Adonija Ouanda",
+            "Tomáš Chorý"
+          ]
+        }
+      },
+      "Arsenal": {
+        "list_a_source": "English official senior register + UEFA List B",
+        "list_a_count": null,
+        "list_b_count": 30,
+        "list_b_players": {
+          "GK": [
+            "Khari Ranson",
+            "Jack Porter",
+            "Jack Talbot"
+          ],
+          "DEF": [
+            "Brayden Clarke",
+            "Joshua Ogunnaike",
+            "Josiah King",
+            "Teshaun Murisa",
+            "Abraham Owusu-Gyasi",
+            "Patrick Stachow",
+            "Joshua Tahou",
+            "Hakeem Abubakar",
+            "Elyon Mbala",
+            "Marli Salmon",
+            "Joshua Sesay"
+          ],
+          "MID": [
+            "Andre Annous",
+            "Ife Ibrahim",
+            "Theo Julienne",
+            "Louie Copley",
+            "Myles Lewis-Skelly",
+            "Max Dowman",
+            "Brando Bailey-Joseph",
+            "Maalik Hashi",
+            "Saurap Sampang",
+            "Emerson Nwaneri",
+            "Charlie Purdy"
+          ],
+          "ATT": [
+            "Ceadach O'Neill",
+            "Louis Zečević-John",
+            "Marley Frohock",
+            "Bowen Phillips",
+            "Jayden Oba"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Aston Villa": {
+        "list_a_source": "English official senior register + UEFA List B",
+        "list_a_count": null,
+        "list_b_count": 43,
+        "list_b_players": {
+          "GK": [
+            "Owen Asemota",
+            "Sam Lewis",
+            "Theo Houston",
+            "Rhys Oakley",
+            "Jack Allan",
+            "Jayden Garthwaite"
+          ],
+          "DEF": [
+            "Vincely Mudame",
+            "Travis Patterson",
+            "Harry Pinnell",
+            "Leon Routh",
+            "TJ Carroll",
+            "Ashton McWilliams",
+            "Teddie Bloomfield",
+            "Clay Atkins",
+            "Farid Addey",
+            "MJ Lyeli",
+            "Kairi Ketebu",
+            "Curtis Mitchell"
+          ],
+          "MID": [
+            "Lennon Moss",
+            "George Hemmings",
+            "Cole Brannigan",
+            "Rodrigo Fortes",
+            "Vinnie Hayward",
+            "Keilan Quinn",
+            "Woody Burgess",
+            "Jahmi Kellyman",
+            "Olly Lloyd",
+            "Lennon Melhuish"
+          ],
+          "ATT": [
+            "Jamaldeen Jimoh-Aloba",
+            "Erin Orebowale",
+            "Rory Wilson",
+            "Alfie Lynskey",
+            "Mason Cotcher",
+            "Trai-Varn Mulley",
+            "Max Jenner",
+            "Tay'Veon Smithen",
+            "Oscar Johnson",
+            "Jack McGrath",
+            "Markie Meade",
+            "Daniel Adediran",
+            "Oliver Bindley",
+            "Josh Blake",
+            "Rio Hammond"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Liverpool": {
+        "list_a_source": "English official senior register + UEFA List B",
+        "list_a_count": null,
+        "list_b_count": 12,
+        "list_b_players": {
+          "GK": [
+            "Bailey Hall"
+          ],
+          "DEF": [
+            "Joseph Bradshaw",
+            "Oliver O'Connor",
+            "DJ Esdaille",
+            "Cameron Williams",
+            "Lucas Pitt",
+            "Wellity Lucky"
+          ],
+          "ATT": [
+            "Rio Ngumoha",
+            "Jayden Danns",
+            "Finn Inglethorpe",
+            "Josh Sonni-Lambie",
+            "Clae Ewing"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Manchester City": {
+        "list_a_source": "English official senior register + UEFA List B",
+        "list_a_count": null,
+        "list_b_count": 4,
+        "list_b_players": {
+          "GK": [
+            "Max-Edgar Chabot"
+          ],
+          "DEF": [
+            "Kaden Braithwaite"
+          ],
+          "MID": [
+            "Nico O’Reilly",
+            "Floyd Samba"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Manchester United": {
+        "list_a_source": "English official senior register + UEFA List B",
+        "list_a_count": null,
+        "list_b_count": 10,
+        "list_b_players": {
+          "DEF": [
+            "Leny Yoro",
+            "Harry Amass",
+            "Jaydan Kamason",
+            "Daniel Armer",
+            "Albert Mills"
+          ],
+          "MID": [
+            "Kobbie Mainoo",
+            "Jack Fletcher",
+            "Tyler Fletcher",
+            "Jim Thwaites"
+          ],
+          "ATT": [
+            "Shea Lacey"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Lens": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 10,
+        "list_b_players": {
+          "GK": [
+            "Daivy Lefranc-Yeboah",
+            "Arthur Mogo Njimfo",
+            "Fedwan Messaoudi"
+          ],
+          "DEF": [
+            "Djulian Fernoc",
+            "Noé Kemtchoum"
+          ],
+          "MID": [
+            "Léopold Joursky",
+            "Nathanaël Gane Bernardino",
+            "Lucas Robbe"
+          ],
+          "ATT": [
+            "Mohamed Seddik",
+            "Mezian Mesloub Soares"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Régis Gurtner",
+            "Mathieu Gorgelin",
+            "Robin Risser"
+          ],
+          "DEF": [
+            "Ruben Aguilar",
+            "Nidal Čelik",
+            "Samson Baidoo",
+            "Matthieu Udol",
+            "Jean-Clair Todibo",
+            "Michał Skóraś",
+            "Saud Abdulhamid",
+            "Jonathan Gradit",
+            "Ismaëlo Ganiou",
+            "Souleymane Sagnan",
+            "Kyllian Antonio"
+          ],
+          "MID": [
+            "Andrija Bulatović",
+            "Yacine Titraoui",
+            "Amadou Haidara",
+            "Mickaël Cuisance"
+          ],
+          "ATT": [
+            "Florian Sotoca",
+            "Thorgan Hazard",
+            "Florian Thauvin",
+            "Odsonne Édouard",
+            "Abdallah Sima",
+            "Junior Kadile",
+            "Franjo Ivanović"
+          ]
+        }
+      },
+      "Lille": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 24,
+        "list_b_count": 3,
+        "list_b_players": {
+          "GK": [
+            "Zadig Lanssade",
+            "Thomas Sajous"
+          ],
+          "MID": [
+            "Yeli Traore"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Berke Özer",
+            "Orlando Gill"
+          ],
+          "DEF": [
+            "Loun Srdanović",
+            "Nathan Ngoy",
+            "Alexsandro",
+            "Romain Perraud",
+            "Tiago Santos",
+            "Tanguy Nianzou",
+            "Calvin Verdonk",
+            "Isaac Cossier",
+            "Maxima Goffi"
+          ],
+          "MID": [
+            "Nabil Bentaleb",
+            "Ethan Mbappé",
+            "Hákon Haraldsson",
+            "Osame Sahraoui",
+            "Maurits Kjærgaard",
+            "Ngal'Ayel Mukau",
+            "Başar Önal",
+            "Benjamin André"
+          ],
+          "ATT": [
+            "Dilane Bakwa",
+            "Olivier Giroud",
+            "Ayase Ueda",
+            "Gaëtan Perrin",
+            "Soriba Diaoune"
+          ]
+        }
+      },
+      "Paris Saint-Germain": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 24,
+        "list_b_count": 4,
+        "list_b_players": {
+          "GK": [
+            "Arthur Vignaud",
+            "Adam Mouak",
+            "Arthur Bar"
+          ],
+          "DEF": [
+            "David Boly"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Alessandro Longoni",
+            "Lucas Chevalier",
+            "Matvei Safonov"
+          ],
+          "DEF": [
+            "Achraf Hakimi",
+            "Lucas Beraldo",
+            "Marquinhos",
+            "Illia Zabarnyi",
+            "Lucas Digne",
+            "Lucas Hernández",
+            "Nuno Mendes",
+            "Willian Pacho"
+          ],
+          "MID": [
+            "Fabián Ruiz",
+            "Maghnes Akliouche",
+            "Vitinha",
+            "Senny Mayulu",
+            "Dro Fernández",
+            "Warren Zaïre-Emery",
+            "João Neves"
+          ],
+          "ATT": [
+            "Khvicha Kvaratskhelia",
+            "Ferran Torres",
+            "Ousmane Dembélé",
+            "Désiré Doué",
+            "Mika Godts",
+            "Quentin Ndjantou"
+          ]
+        }
+      },
+      "Bayern München": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 21,
+        "list_b_count": 9,
+        "list_b_players": {
+          "GK": [
+            "Jannis Bärtl",
+            "David Poder-Stiube"
+          ],
+          "DEF": [
+            "Cassiano Kiala",
+            "Filip Pavić"
+          ],
+          "MID": [
+            "Erblin Osmani",
+            "Lennart Karl",
+            "Tim Binder",
+            "David Daiber"
+          ],
+          "ATT": [
+            "Noah Codjo-Evora"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Manuel Neuer",
+            "Sven Ulreich",
+            "Jonas Urbig"
+          ],
+          "DEF": [
+            "Dayot Upamecano",
+            "Minjae Kim",
+            "Jonathan Tah",
+            "Nathaniel Brown",
+            "Hiroki Ito",
+            "Sacha Boey",
+            "Josip Stanišić"
+          ],
+          "MID": [
+            "Joshua Kimmich",
+            "Tom Bischof",
+            "Jamal Musiala",
+            "Michael Olise",
+            "Alphonso Davies",
+            "Konrad Laimer",
+            "Ismael Saibari",
+            "Aleksandar Pavlović"
+          ],
+          "ATT": [
+            "Serge Gnabry",
+            "Harry Kane",
+            "Luis Díaz"
+          ]
+        }
+      },
+      "Borussia Dortmund": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 22,
+        "list_b_count": 7,
+        "list_b_players": {
+          "DEF": [
+            "Jan Luca Riedl",
+            "Miguel Adje",
+            "Luca Reggiani"
+          ],
+          "MID": [
+            "Enzo Dos Santos",
+            "Mussa Kaba"
+          ],
+          "ATT": [
+            "Samuele Inácio",
+            "Mathis Albert"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Gregor Kobel",
+            "Patrick Drewes",
+            "Silas Ostrzinski",
+            "Alexander Meyer"
+          ],
+          "DEF": [
+            "Waldemar Anton",
+            "Nico Schlotterbeck",
+            "Ramy Bensebaini",
+            "Joane Gadou",
+            "Daniel Svensson",
+            "Julian Ryerson",
+            "Kauã Prates",
+            "Filippo Mané"
+          ],
+          "MID": [
+            "Jobe Bellingham",
+            "Felix Nmecha",
+            "Carney Chukwuemeka",
+            "Ethan Nwaneri",
+            "Marcel Sabitzer",
+            "Joey Veerman"
+          ],
+          "ATT": [
+            "Serhou Guirassy",
+            "Maximilian Beier",
+            "Konstantinos Karetsas",
+            "Fábio Silva"
+          ]
+        }
+      },
+      "RB Leipzig": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 22,
+        "list_b_count": 7,
+        "list_b_players": {
+          "GK": [
+            "Franz Hantschmann",
+            "Janos Kanyai",
+            "Elian Hähner"
+          ],
+          "MID": [
+            "Antonio Nusa",
+            "Assan Ouédraogo",
+            "Benno Kaltefleiter",
+            "Viggo Gebel"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Ørjan Nyland",
+            "Maarten Vandevoordt"
+          ],
+          "DEF": [
+            "Abdoul Kone",
+            "Willi Orbán",
+            "Lukas Klostermann",
+            "David Raum",
+            "Castello Lukeba",
+            "Max Finkgräfe",
+            "Benjamin Henrichs"
+          ],
+          "MID": [
+            "Maxime Estève",
+            "Ezechiel Banzuzi",
+            "Nicolas Seiwald",
+            "Christoph Baumgartner",
+            "Ridle Baku",
+            "Rocco Reitz",
+            "Neil El Aynaoui",
+            "Christopher Nkunku",
+            "Andrija Maksimović"
+          ],
+          "ATT": [
+            "Brajan Gruda",
+            "Johan Bakayoko",
+            "Tidiam Gomis",
+            "Rômulo Cardoso"
+          ]
+        }
+      },
+      "Stuttgart": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 24,
+        "list_b_count": 6,
+        "list_b_players": {
+          "GK": [
+            "Dennis Seimen",
+            "Tom Walz",
+            "Lucas Nagel"
+          ],
+          "DEF": [
+            "Maximilian Herwerth",
+            "Yanik Spalt"
+          ],
+          "MID": [
+            "Ertugrul Yigit"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Fabian Bredlow",
+            "Marius Funk"
+          ],
+          "DEF": [
+            "Ameen Al-Dakhil",
+            "Ramon Hendriks",
+            "Josha Vagnoman",
+            "Maximilian Mittelstädt",
+            "Luca Jaquez",
+            "Lorenz Assignon",
+            "Jeff Chabot",
+            "Alexander Groiß",
+            "Dominik Nothnagel"
+          ],
+          "MID": [
+            "Angelo Stiller",
+            "Ermedin Demirović",
+            "Chris Führich",
+            "Bilal El Khannouss",
+            "Atakan Karazor",
+            "Grischa Prömel",
+            "Nikolas Nartey",
+            "Finn Jeltsch",
+            "Leo Sauer"
+          ],
+          "ATT": [
+            "Tiago Tomás",
+            "Dženan Pejčinović",
+            "Jamie Leweling",
+            "Deniz Undav"
+          ]
+        }
+      },
+      "AEK Athens": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 21,
+        "list_b_count": 1,
+        "list_b_players": {
+          "GK": [
+            "Marios Balamotis"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Thomas Strakosha",
+            "Alberto Brignoli"
+          ],
+          "DEF": [
+            "Harold Moukoudi",
+            "Stavros Pilios",
+            "Lazaros Rota",
+            "Domagoj Vida",
+            "Charalampos Lykogiannis",
+            "Filipe Relvas"
+          ],
+          "MID": [
+            "Kaan Kairinen",
+            "Mijat Gaćinović",
+            "Lovro Majer",
+            "Kervin Arriaga",
+            "Răzvan Marin",
+            "Petros Mantalos",
+            "Milán Vitális"
+          ],
+          "ATT": [
+            "Derek Kutesa",
+            "Luka Jović",
+            "Aboubakary Koita",
+            "Barnabás Varga",
+            "João Mário",
+            "Zini"
+          ]
+        }
+      },
+      "Como": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 21,
+        "list_b_count": 4,
+        "list_b_players": {
+          "GK": [
+            "Lorenzo Luigi Ginelli"
+          ],
+          "DEF": [
+            "Federico Grilli"
+          ],
+          "MID": [
+            "Riccardo Cassano",
+            "Matteo Papaccioli"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Jean Butez",
+            "Robert Sánchez"
+          ],
+          "DEF": [
+            "Marc-Oliver Kempf",
+            "Àlex Valle",
+            "Jacobo Ramón",
+            "Alberto Dossena",
+            "Kaiki Bruno",
+            "Yan Couto",
+            "Ivan Smolčić",
+            "Trevoh Chalobah"
+          ],
+          "MID": [
+            "Máximo Perrone",
+            "Luis Milla",
+            "Lucas Da Cunha",
+            "Maxence Caqueret",
+            "Nico Paz",
+            "Martin Baturina",
+            "Samuele Ricci",
+            "Mattia Liberali"
+          ],
+          "ATT": [
+            "Tasos Douvikas",
+            "Assane Diao",
+            "Moise Kean"
+          ]
+        }
+      },
+      "Inter": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 23,
+        "list_b_count": 6,
+        "list_b_players": {
+          "DEF": [
+            "Francesco Stante",
+            "Leonardo Bovio"
+          ],
+          "MID": [
+            "Aleksandar Stanković"
+          ],
+          "ATT": [
+            "Mattia Mosconi",
+            "Matteo Lavelli",
+            "Pio Esposito"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Josep Martínez",
+            "Raffaele Di Gennaro",
+            "Ivan Provedel"
+          ],
+          "DEF": [
+            "John Stones",
+            "Manuel Akanji",
+            "Benjamin Pavard",
+            "Carlos Augusto",
+            "Yann Bisseck",
+            "Federico Dimarco",
+            "Mattia Marello",
+            "Alessandro Bastoni",
+            "Djed Spence"
+          ],
+          "MID": [
+            "Piotr Zieliński",
+            "Petar Sučić",
+            "Andy Diouf",
+            "Hakan Çalhanoğlu",
+            "Curtis Jones",
+            "Henrikh Mkhitaryan",
+            "Nicolò Barella"
+          ],
+          "ATT": [
+            "Marcus Thuram",
+            "Lautaro Martínez",
+            "Luis Henrique",
+            "Ange-Yoan Bonny"
+          ]
+        }
+      },
+      "Napoli": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 23,
+        "list_b_count": 4,
+        "list_b_players": {
+          "GK": [
+            "Claudio Pugliese",
+            "David Spinelli"
+          ],
+          "DEF": [
+            "Claudio Lieto"
+          ],
+          "MID": [
+            "Andrea Chiummariello"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Alex Meret",
+            "Nikita Contini",
+            "Vanja Milinković-Savić"
+          ],
+          "DEF": [
+            "Benoît Badiashile",
+            "Amir Rrahmani",
+            "Rafa Marín",
+            "Mathías Olivera",
+            "Giovanni Di Lorenzo",
+            "Sam Beukema",
+            "Leonardo Spinazzola"
+          ],
+          "MID": [
+            "Billy Gilmour",
+            "Scott McTominay",
+            "Kevin De Bruyne",
+            "Stanislav Lobotka",
+            "Frank Anguissa"
+          ],
+          "ATT": [
+            "David Neres",
+            "Rasmus Højlund",
+            "Lorenzo Lucca",
+            "Matteo Politano",
+            "Giovane",
+            "Antonio Vergara",
+            "Alisson Santos",
+            "Noa Lang"
+          ]
+        }
+      },
+      "Roma": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 22,
+        "list_b_count": 3,
+        "list_b_players": {
+          "GK": [
+            "Giorgio De Marzi"
+          ],
+          "MID": [
+            "Alessandro Di Nunzio"
+          ],
+          "ATT": [
+            "Antonio Arena"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Devis Vasquez",
+            "Pierluigi Gollini"
+          ],
+          "DEF": [
+            "Devyne Rensch",
+            "Konstantinos Koulierakis",
+            "Evan N'Dicka",
+            "Nahuel Molina",
+            "Mario Hermoso",
+            "Gianluca Mancini",
+            "Leonardo Balerdi",
+            "Wesley França",
+            "Emanuele Lulli",
+            "Daniele Ghilardi"
+          ],
+          "MID": [
+            "Bryan Cristante",
+            "Lorenzo Pellegrini",
+            "Marten de Roon",
+            "Manu Koné",
+            "Niccolò Pisilli"
+          ],
+          "ATT": [
+            "Santiago Castro",
+            "Donyell Malen",
+            "Matías Soulé",
+            "Paulo Dybala",
+            "Rodrigo Mora"
+          ]
+        }
+      },
+      "Feyenoord": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 24,
+        "list_b_count": 22,
+        "list_b_players": {
+          "GK": [
+            "Stenn de Mol",
+            "Tim Haksteeg"
+          ],
+          "DEF": [
+            "Thijs Kraaijeveld",
+            "Givairo Read",
+            "Tijme Wessels",
+            "Marleyson Cruz",
+            "Twan Schens",
+            "Hakeem Agboluaje",
+            "Matthew Mparaganda",
+            "Dani Slory",
+            "Boaz Plantinga"
+          ],
+          "MID": [
+            "Tobias van den Elshout",
+            "Nick de Koning",
+            "Nassim El Harmouz",
+            "Kevin Khan",
+            "Zino Sneijer",
+            "Luca Dahl Tomasson"
+          ],
+          "ATT": [
+            "Jivayno Zinhagel",
+            "Shaqueel van Persie",
+            "Arman Nahany",
+            "Izu Onunta",
+            "Kelvin Neijenhuis"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Tjark Ernst",
+            "Florian Kastenmeier",
+            "Mannou Berger",
+            "Liam Bossin"
+          ],
+          "DEF": [
+            "Bart Nieuwkoop",
+            "Tsuyoshi Watanabe",
+            "Gijs Smal",
+            "Jerry St. Juste",
+            "Jordan Bos",
+            "Javi López",
+            "Mats Deijl",
+            "Mika Mármol"
+          ],
+          "MID": [
+            "Jakub Moder",
+            "Gjivai Zechiël",
+            "Luciano Valente",
+            "Sem Steijn",
+            "Oussama Targhalline",
+            "Charles Vanhoutte"
+          ],
+          "ATT": [
+            "Gonçalo Borges",
+            "Reiss Nelson",
+            "Nacho Ferri",
+            "Anis Hadj Moussa",
+            "Gaoussou Diarra",
+            "Jerayno Schaken"
+          ]
+        }
+      },
+      "PSV Eindhoven": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 23,
+        "list_b_count": 22,
+        "list_b_players": {
+          "GK": [
+            "Tijn Smolenaars",
+            "Stijn Kuijsten",
+            "Jim Aerts",
+            "Kane Aerts"
+          ],
+          "DEF": [
+            "Michael Bresser",
+            "Wessel Kuhn",
+            "Fabian Merién",
+            "Floris Bos",
+            "Madi Nsosemo",
+            "Dyran Stam",
+            "Brent Jonkers",
+            "Rivas Manuhutu",
+            "Kyano Penso",
+            "Ezechiel Siani Emaga",
+            "Jorvimar Martina",
+            "Sébastien Ditmer"
+          ],
+          "MID": [
+            "Amir Bouhamdi",
+            "Shuryjano Cornecion",
+            "Boet Mulders",
+            "Gino Verhulst",
+            "Jaden de Guzman",
+            "Loek Schakenraad"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Nick Olij",
+            "Matěj Kovář"
+          ],
+          "DEF": [
+            "Lutsharel Geertruida",
+            "Yarek Gasiorowski",
+            "Armando Obispo",
+            "Ryan Flamingo",
+            "Sergiño Dest",
+            "Mauro Júnior",
+            "Filip Kostić",
+            "Kiliann Sildillia"
+          ],
+          "MID": [
+            "Paul Wanner",
+            "Guus Til",
+            "Sven Mijnans",
+            "Kodai Sano",
+            "Ayoni Santos"
+          ],
+          "ATT": [
+            "Ivan Perišić",
+            "Ruben van Bommel",
+            "Ricardo Pepi",
+            "Sami Ouaissa",
+            "Esmir Bajraktarević",
+            "Mikkel Bro-Hansen",
+            "Dennis Man",
+            "Sam Lammers"
+          ]
+        }
+      },
+      "Bodø/Glimt": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 23,
+        "list_b_count": 9,
+        "list_b_players": {
+          "GK": [
+            "Martin Lund Andersen",
+            "Isak Sjong"
+          ],
+          "DEF": [
+            "Matias Jaiteh",
+            "Mathias Blix Olsen"
+          ],
+          "MID": [
+            "Kasper Solhaug",
+            "Levi Monsen Yeboah",
+            "Erling Eliassen",
+            "Jesper Rabben Nygård"
+          ],
+          "ATT": [
+            "Hindrin Chooly"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Julian Faye Lund",
+            "Nikita Haikin"
+          ],
+          "DEF": [
+            "Villads Nielsen",
+            "Odin Bjørtuft",
+            "Haitam Aleesami",
+            "Jostein Gundersen",
+            "Fredrik Bjørkan"
+          ],
+          "MID": [
+            "Patrick Berg",
+            "Sondre Auklend",
+            "Ulrik Saltnes",
+            "Joshua Kitolano",
+            "Sondre Brunstad Fet",
+            "Fredrik Sjøvold",
+            "Magnus Riisnæs",
+            "Håkon Evjen",
+            "Assan Sanyang",
+            "August Mikkelsen"
+          ],
+          "ATT": [
+            "Andreas Helmersen",
+            "Jens Petter Hauge",
+            "Ole Didrik Blomberg",
+            "Ola Brynhildsen",
+            "Joel Mvuka",
+            "Isak Määttä"
+          ]
+        }
+      },
+      "Viking FK": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 4,
+        "list_b_players": {
+          "DEF": [
+            "Vetle Auklend"
+          ],
+          "MID": [
+            "Ola Visted",
+            "Tobias Moi",
+            "Jakob Hansen"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Arild Østbø",
+            "Erlend Jacobsen",
+            "Ľubomír Belko"
+          ],
+          "DEF": [
+            "Herman Haugen",
+            "Viljar Vevatne",
+            "Martin Ove Roseth",
+            "Henrik Heggheim",
+            "Gianni Stensness",
+            "Essiën Bassey",
+            "Sondre Bjørshol",
+            "Anders Baertelsen",
+            "Henrik Falchener",
+            "Jesper Daland",
+            "Kristoffer Haugen"
+          ],
+          "MID": [
+            "Kristoffer Askildsen",
+            "Joe Bell",
+            "Zlatko Tripić",
+            "Henrik Bjørdal",
+            "Amin Cosic"
+          ],
+          "ATT": [
+            "Nick D'Agostino",
+            "Romano Postema",
+            "Veton Berisha",
+            "Peter Christiansen",
+            "Erik Botheim",
+            "Simen Kvia-Egeskog"
+          ]
+        }
+      },
+      "FC Porto": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 24,
+        "list_b_count": 11,
+        "list_b_players": {
+          "GK": [
+            "Gonçalo Ribeiro"
+          ],
+          "DEF": [
+            "Martim Fernandes",
+            "Luis Gomes",
+            "Martim Cunha",
+            "Martim Chelmik"
+          ],
+          "MID": [
+            "Tiago Silva",
+            "Bernardo Lima",
+            "João Teixeira"
+          ],
+          "ATT": [
+            "Duarte Cunha",
+            "André Miranda",
+            "Mateus Mide"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Cláudio Ramos",
+            "João Costa",
+            "João Afonso",
+            "Diogo Costa"
+          ],
+          "DEF": [
+            "Jakub Kiwior",
+            "Jan Bednarek",
+            "Zaidu Sanusi",
+            "Nehuén Pérez",
+            "Alberto Costa",
+            "Souza",
+            "Francisco Moura"
+          ],
+          "MID": [
+            "Victor Froholdt",
+            "Pablo Rosario",
+            "Inbeom Hwang",
+            "Alan Varela",
+            "Seko Fofana"
+          ],
+          "ATT": [
+            "William Gomes",
+            "Samu",
+            "Gabriel Veiga",
+            "Pepê",
+            "Borja Sainz",
+            "André Silva",
+            "Santiago Giménez",
+            "Oskar Pietuszewski"
+          ]
+        }
+      },
+      "Sporting CP": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 16,
+        "list_b_players": {
+          "GK": [
+            "William Lodmell",
+            "Miguel Gouveia",
+            "Guilherme Pires",
+            "Francisco Silva"
+          ],
+          "MID": [
+            "João Simões",
+            "Micael Sanhá",
+            "Diego Farinha",
+            "Rayhan Momade",
+            "Flávio Gonçalves",
+            "Sandro Gambôa",
+            "Ivanildo",
+            "Rafael Camacho",
+            "Martim Almeida",
+            "Eduardo Felicíssimo",
+            "Victor Bastianele",
+            "Leonardo Varela"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Rui Silva",
+            "Kaique Pereira",
+            "Diego Callai"
+          ],
+          "DEF": [
+            "Sergi Altimira",
+            "Zeno Debast",
+            "Giorgos Vagiannidis",
+            "Moncef Zekri",
+            "Iván Fresneda",
+            "Gonçalo Inácio",
+            "Ibrahima Ba",
+            "Eduardo Quaresma"
+          ],
+          "MID": [
+            "Silas Andersen",
+            "Rodrigo Zalazar",
+            "Maximiliano Araújo",
+            "Pedro Lima",
+            "Issa Doumbia",
+            "Samuel Justo"
+          ],
+          "ATT": [
+            "Fotis Ioannidis",
+            "Geny Catamo",
+            "Nuno Santos",
+            "Nestory Irankunda",
+            "Jesse Derry",
+            "Luis Guilherme",
+            "Rodrigo Rodrigues",
+            "Luis Suárez"
+          ]
+        }
+      },
+      "Slovan Bratislava": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 22,
+        "list_b_count": 7,
+        "list_b_players": {
+          "GK": [
+            "Daniel Gramblička",
+            "Dávid Balog"
+          ],
+          "DEF": [
+            "Matúš Tomáško",
+            "Robert Tománek"
+          ],
+          "MID": [
+            "Leo Hofstädter"
+          ],
+          "ATT": [
+            "Nino Marcelli",
+            "Alexej Maroš"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Aleksandar Popović",
+            "Matúš Macík",
+            "Dominik Takáč"
+          ],
+          "DEF": [
+            "Samuel Kozlovský",
+            "Kevin Wimmer",
+            "Kenan Bajrić",
+            "Svetozar Marković",
+            "César Blackman",
+            "Sahmkou Camara",
+            "Sandro Cruz"
+          ],
+          "MID": [
+            "Peter Pokorný",
+            "Rahim Ibrahim",
+            "Artur Gajdoš",
+            "Tigran Barseghyan",
+            "Alen Mustafić",
+            "Cristian Martínez",
+            "Danylo Ihnatenko",
+            "Daiki Matsuoka"
+          ],
+          "ATT": [
+            "Roman Čerepkai",
+            "Alasana Yirajang",
+            "Suleiman Camara",
+            "Andraž Šporar"
+          ]
+        }
+      },
+      "Atlético Madrid": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 24,
+        "list_b_count": 23,
+        "list_b_players": {
+          "GK": [
+            "Salvador Esquivel",
+            "Alvaro Moreno",
+            "Daniel Rubio",
+            "Miguel Olarieta"
+          ],
+          "DEF": [
+            "Romeo Hueso",
+            "Jorge Domínguez",
+            "Miguel Gil",
+            "Cristian Grant",
+            "Daniel Perez",
+            "Adrian Almeida",
+            "Pablo Pan",
+            "Adrián Martínez",
+            "David Arza"
+          ],
+          "MID": [
+            "Taufyk Zanzi",
+            "Jorge Castillo",
+            "Ruben Gomez",
+            "David Fernandez"
+          ],
+          "ATT": [
+            "Sergio Esteban",
+            "Miguel Llorente",
+            "Jesus Barrios",
+            "Abdou Kemo Badji",
+            "Joel Sanchez",
+            "Gonzalo Gross"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Juan Musso",
+            "Jan Oblak"
+          ],
+          "DEF": [
+            "Dávid Hancko",
+            "Marc Pubill",
+            "Cristian Romero",
+            "Alejandro Grimaldo",
+            "Robin Le Normand",
+            "Dani Martínez",
+            "Arnau Solà"
+          ],
+          "MID": [
+            "Obed Vargas",
+            "Rodrigo Mendoza",
+            "Johnny Cardoso",
+            "Koke",
+            "Kang-in Lee",
+            "Pablo Barrios",
+            "Álex Baena",
+            "Marcos Llorente",
+            "Morten Hjulmand"
+          ],
+          "ATT": [
+            "Alexander Sørloth",
+            "Ademola Lookman",
+            "Jonathan David",
+            "Arnau Ortiz",
+            "Julián Alvarez",
+            "Giuliano Simeone"
+          ]
+        }
+      },
+      "Barcelona": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 10,
+        "list_b_players": {
+          "GK": [
+            "Eder Aller",
+            "Iker Rodriguez"
+          ],
+          "DEF": [
+            "Pesquer",
+            "Landry Farré",
+            "Guillem Victor",
+            "Alex Campos"
+          ],
+          "MID": [
+            "Brian Fariñas",
+            "Orian Goren",
+            "Pedro Villar"
+          ],
+          "ATT": [
+            "Shane Kluivert"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Joan García",
+            "Wojciech Szczęsny",
+            "Dominik Livaković"
+          ],
+          "DEF": [
+            "João Cancelo",
+            "Alejandro Balde",
+            "Pau Cubarsí",
+            "Xavi Espart",
+            "Andreas Christensen",
+            "Gerard Martín",
+            "Jules Koundé",
+            "Eric García"
+          ],
+          "MID": [
+            "Gavi",
+            "Pedri",
+            "Rodri",
+            "Frenkie de Jong",
+            "Marc Bernal"
+          ],
+          "ATT": [
+            "Fermín López",
+            "Gabriel Jesus",
+            "Lamine Yamal",
+            "Raphinha",
+            "Karim Adeyemi",
+            "Anthony Gordon",
+            "Dani Olmo",
+            "Jesse Bisiwu",
+            "Hamza Abdelkarim"
+          ]
+        }
+      },
+      "Real Betis": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 19,
+        "list_b_players": {
+          "GK": [
+            "Manu González",
+            "Victor Kroes"
+          ],
+          "DEF": [
+            "Carlos De Roa",
+            "Jorge Oreiro",
+            "Oscar Masque",
+            "Miguel Cuevas",
+            "Alvaro Díez",
+            "Carlos Lara",
+            "Curro Macías",
+            "Fabian Embalo",
+            "Marcos Solis"
+          ],
+          "MID": [
+            "Ismael Barea",
+            "Rica",
+            "Iván Corralejo",
+            "Miguel Angel Castilla",
+            "Kike Collantes",
+            "Ruben Lidueña",
+            "Marcos Mora",
+            "Miguel Angel"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Álvaro Vallés",
+            "Diego Conde"
+          ],
+          "DEF": [
+            "Héctor Bellerín",
+            "Diego Llorente",
+            "Natan",
+            "Marc Bartra",
+            "Fran García",
+            "Ángel Ortiz",
+            "Valentín Gómez",
+            "Junior Firpo"
+          ],
+          "MID": [
+            "Facundo Bernal",
+            "Pablo Fornals",
+            "Iker Losada",
+            "Álvaro Fidalgo",
+            "Rodrigo Riquelme",
+            "Nelson Deossa",
+            "Giovani Lo Celso",
+            "Marc Roca",
+            "Isco",
+            "Dani Ceballos"
+          ],
+          "ATT": [
+            "Antony",
+            "Cucho Hernández",
+            "Abde Ezzalzouli",
+            "Troy Parrott",
+            "Aitor Ruibal"
+          ]
+        }
+      },
+      "Real Madrid": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 10,
+        "list_b_players": {
+          "GK": [
+            "Sergio Mestre",
+            "Javi Navarro",
+            "Illia Voloshyn"
+          ],
+          "DEF": [
+            "Jesús Fortea",
+            "Joan Martínez",
+            "Mario Rivas"
+          ],
+          "MID": [
+            "Thiago Pitarch",
+            "Jorge Cestero",
+            "Diego Villalba",
+            "Gabriel Valero"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Thibaut Courtois",
+            "Andriy Lunin"
+          ],
+          "DEF": [
+            "Raúl Asencio",
+            "Éder Militão",
+            "Dean Huijsen",
+            "Trent Alexander-Arnold",
+            "Ibrahima Konaté",
+            "Marc Cucurella",
+            "Álvaro Carreras",
+            "Antonio Rüdiger",
+            "Denzel Dumfries"
+          ],
+          "MID": [
+            "Jude Bellingham",
+            "Eduardo Camavinga",
+            "Federico Valverde",
+            "Aurélien Tchouaméni",
+            "Arda Güler",
+            "Bernardo Silva",
+            "Yan Diomande",
+            "Sergio Martínez"
+          ],
+          "ATT": [
+            "Vinícius Júnior",
+            "Endrick",
+            "Kylian Mbappé",
+            "Rodrygo",
+            "Carlos Espí",
+            "Brahim Díaz"
+          ]
+        }
+      },
+      "Villarreal": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 7,
+        "list_b_players": {
+          "GK": [
+            "Pablo Polo"
+          ],
+          "MID": [
+            "Diatta Alassane",
+            "Joselillo Gaitán",
+            "Mahamoud Barry",
+            "César Bonafé",
+            "Alvaro Alcaide",
+            "Moussa Traore"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Luiz Júnior",
+            "Rubén Gómez",
+            "Péter Gulácsi",
+            "Yakiv Kinareikin"
+          ],
+          "DEF": [
+            "Logan Costa",
+            "Alex Freeman",
+            "Pau Navarro",
+            "Juan Foyth",
+            "Renato Veiga",
+            "Santiago Mouriño",
+            "Carlos Romero",
+            "Sergi Cardona"
+          ],
+          "MID": [
+            "Alberto Moleiro",
+            "Santi Comesaña",
+            "Carlos Macià",
+            "Pape Gueye",
+            "Tani Oluwaseyi",
+            "Nathan Saliba",
+            "Nizar El Jmili"
+          ],
+          "ATT": [
+            "Gerard Moreno",
+            "Georges Mikautadze",
+            "Ilias Akhomach",
+            "Tajon Buchanan",
+            "Nicolas Pépé",
+            "Ayoze Pérez"
+          ]
+        }
+      },
+      "Fenerbahçe": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 24,
+        "list_b_count": 10,
+        "list_b_players": {
+          "GK": [
+            "Kuzey Sapaz",
+            "Yasir Caklı"
+          ],
+          "DEF": [
+            "Çağan Sarıdikmen",
+            "Bedirhan Korkmaz",
+            "Gökmen Özdemir"
+          ],
+          "MID": [
+            "Efe Fettahoğlu",
+            "Emin Sayar",
+            "Güner Ekici",
+            "Emirhan Ateş"
+          ],
+          "ATT": [
+            "Alaettin Ekici"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Tarık Çetin",
+            "Ederson",
+            "Mert Günok"
+          ],
+          "DEF": [
+            "Yiğit Efe Demir",
+            "Nathan Aké",
+            "Mert Müldür",
+            "Kojo Peprah Oppong",
+            "Nélson Semedo",
+            "Milan Škriniar",
+            "Ognjen Mimović"
+          ],
+          "MID": [
+            "Archie Brown",
+            "İsmail Yüksek",
+            "Mattéo Guendouzi",
+            "İrfan Can Kahveci",
+            "Levent Mercan",
+            "Bartuğ Elmaz",
+            "Oğuz Aydın",
+            "N'Golo Kanté"
+          ],
+          "ATT": [
+            "Kerem Aktürkoğlu",
+            "Romelu Lukaku",
+            "Marco Asensio",
+            "Mason Greenwood",
+            "Vedat Muriqi",
+            "Dorgeles Nene"
+          ]
+        }
+      },
+      "Galatasaray": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 24,
+        "list_b_count": 9,
+        "list_b_players": {
+          "DEF": [
+            "Dağhan Kahraman",
+            "Cihan Akgün"
+          ],
+          "MID": [
+            "Oğulcan Yançel",
+            "Eyüp Karasu",
+            "Furkan Koçak",
+            "Berat Luş",
+            "Onur Yıldız"
+          ],
+          "ATT": [
+            "Arda Tagay",
+            "Ada Yüzgeç"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Uğurcan Çakır",
+            "Günay Güvenç",
+            "Jankat Yılmaz",
+            "Enes Büyük"
+          ],
+          "DEF": [
+            "El Chadaille Bitshiabu",
+            "Ismail Jakobs",
+            "Davinson Sánchez",
+            "Roland Sallai",
+            "Eren Elmalı",
+            "Abdülkerim Bardakcı",
+            "Wilfried Singo"
+          ],
+          "MID": [
+            "Gabriel Sara",
+            "Lesley Ugochukwu",
+            "İlkay Gündoğan",
+            "Lucas Torreira",
+            "Renato Nhaga",
+            "Aleksei Batrakov",
+            "Mario Lemina"
+          ],
+          "ATT": [
+            "Leroy Sané",
+            "Yunus Akgün",
+            "Deniz Gül",
+            "Rafael Leão",
+            "Victor Osimhen",
+            "Barış Alper Yılmaz"
+          ]
+        }
+      },
+      "Shakhtar Donetsk": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 4,
+        "list_b_players": {
+          "GK": [
+            "Rostyslav Bahlai"
+          ],
+          "MID": [
+            "Newertton",
+            "Viktor Tsukanov",
+            "Denys Smetana"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Kiril Fesiun",
+            "Dmytro Riznyk"
+          ],
+          "DEF": [
+            "Marlon Santos",
+            "Valeriy Bondar",
+            "Pedro Henrique",
+            "Irakli Azarov",
+            "Vinícius Tobías",
+            "Alaa Ghram",
+            "Oleksandr Karavaiev",
+            "Mykola Matviyenko"
+          ],
+          "MID": [
+            "Marlon Gomes",
+            "Dmytro Kryskiv",
+            "Isaque",
+            "Gabriel Carvalho",
+            "Oleh Ocheretko",
+            "Yehor Nazaryna",
+            "Alisson Santana",
+            "Lucas Ferreira",
+            "Prosper Obah",
+            "Ryan Roberto",
+            "Gleiker Mendoza",
+            "Bruninho"
+          ],
+          "ATT": [
+            "Lassina Traoré",
+            "Kauã Elias",
+            "Luca Meirelles"
+          ]
+        }
+      },
+      "_summary": {
+        "club_entries": 36,
+        "official_list_a_clubs_manually_transcribed": 31,
+        "profile_archive_fallback_clubs": 0,
+        "list_a_player_count_known_or_profile_estimate": 732,
+        "list_b_player_count": 392
+      }
+    },
+    "Europa League": {
+      "Anderlecht": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 81 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 12,
+        "list_b_players": {
+          "GK": [
+            "Mattis Seghers",
+            "Michiel Haentjens",
+            "Kamiel Timmermans"
+          ],
+          "DEF": [
+            "Kaïs Barry",
+            "Ali Maamar"
+          ],
+          "MID": [
+            "Joshua Nga Kana",
+            "Alexander De Ridder",
+            "Noah Kalonji",
+            "Tristan Degreef"
+          ],
+          "ATT": [
+            "Jayden Onia Seke",
+            "Noa Ojea",
+            "Terry Van De Ven"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Ararat-Armenia": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 23,
+        "list_b_count": 3,
+        "list_b_players": {
+          "GK": [
+            "Suren Grigoryan"
+          ],
+          "MID": [
+            "Mikayel Khudaverdyan",
+            "Vahe Petrosyan"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Arman Nersesyan",
+            "João Bravim"
+          ],
+          "DEF": [
+            "Hugo Oliveira",
+            "Junior Bueno",
+            "Luis Felipe",
+            "Kamo Hovhannisyan",
+            "Bruno Pereira",
+            "Edgar Grigoryan",
+            "Bruno Wilson",
+            "Alexandros Malis"
+          ],
+          "MID": [
+            "Juan Balanta",
+            "Armen Ambartsumyan",
+            "Zidane Banjaqui",
+            "Maxence Carlier",
+            "Karen Muradyan",
+            "Alwyn Tera",
+            "Bernardo Dias",
+            "Artur Serobyan",
+            "França"
+          ],
+          "ATT": [
+            "Zhirayr Shaghoyan",
+            "Arayik Eloyan",
+            "Alioune Ndour",
+            "Sandro Lima"
+          ]
+        }
+      },
+      "AZ Alkmaar": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 72 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 24,
+        "list_b_players": {
+          "GK": [
+            "Nick Homan",
+            "Kiyani Zeggen",
+            "Koen Schilder",
+            "Quenten Attigah",
+            "Jur Schipper"
+          ],
+          "DEF": [
+            "Mathijs Menu",
+            "Jeremiah Esajas",
+            "Jesper Zwart",
+            "Kiani Inge",
+            "Kevin van Ouytsel",
+            "Rayan Atikallah",
+            "Iain De Jongh",
+            "Saviola Simons",
+            "Calvin Carrilho",
+            "Hessel de Wit"
+          ],
+          "MID": [
+            "Tómas Johannessen",
+            "Julian Oerip",
+            "Julian Sijbrands",
+            "Bohdan Budko",
+            "Rick Luijer",
+            "Adam Ouaziz"
+          ],
+          "ATT": [
+            "Wassim Bouziane",
+            "Jasper Hartog",
+            "Yoël van den Ban"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Benfica": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 57 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 11,
+        "list_b_players": {
+          "GK": [
+            "Diogo Ferreira",
+            "Arnas Voitinovičius",
+            "Leonardo Lopes"
+          ],
+          "DEF": [
+            "João Fonseca",
+            "Daniel Banjaqui",
+            "José Neto",
+            "Rui Silva"
+          ],
+          "MID": [
+            "Miguel Figueiredo",
+            "Gonçalo Moreira",
+            "Martim Ferreira",
+            "Tiago Freitas"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Beşiktaş": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 112 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 6,
+        "list_b_players": {
+          "GK": [
+            "Tuğra Yeşilyurt"
+          ],
+          "DEF": [
+            "Mustafa Yortaç"
+          ],
+          "MID": [
+            "Ali Pağda",
+            "Ozan Sevim"
+          ],
+          "ATT": [
+            "Mustafa Hekimoğlu",
+            "Ahmet Bircan"
+          ]
+        },
+        "list_a_players": null
+      },
+      "AFC Bournemouth": {
+        "list_a_source": "English official senior register + UEFA List B",
+        "list_a_count": null,
+        "list_b_count": 12,
+        "list_b_players": {
+          "GK": [
+            "Callan McKenna",
+            "Mack Allan"
+          ],
+          "DEF": [
+            "Harold William",
+            "Ameer Ali"
+          ],
+          "MID": [
+            "Charlie Stevens",
+            "Zac Christie",
+            "Ethan Sills",
+            "George Chubinidze"
+          ],
+          "ATT": [
+            "Malcom Dacosta",
+            "Jonathon Stuttle",
+            "Jonny Day",
+            "Eugene Nyarko"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Celje": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 24,
+        "list_b_count": 0,
+        "list_b_players": {},
+        "list_a_players": {
+          "GK": [
+            "Žan-Luk Leban",
+            "Luka Kolar",
+            "Žiga Frelih"
+          ],
+          "DEF": [
+            "Pijus Širvys",
+            "Artemijus Tutyškinas",
+            "Žan Žužek",
+            "Alpha Diounkou",
+            "Leonardo Koutris",
+            "Lukasz Bejger",
+            "Matic Ivanšek"
+          ],
+          "MID": [
+            "Darko Hrka",
+            "Benjamin Verbič",
+            "Mario Kvesić",
+            "Svit Sešlar",
+            "Milot Avdyli",
+            "Papa Daniel",
+            "Luka Vešner Tičić",
+            "Andrej Kotnik",
+            "Mark Zabukovnik",
+            "Veton Tusha"
+          ],
+          "ATT": [
+            "Blaž Kramer",
+            "Dejan Suhovršnik",
+            "Armandas Kučys",
+            "Yaya Dukuly"
+          ]
+        }
+      },
+      "Celta": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 90 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 8,
+        "list_b_players": {
+          "GK": [
+            "Marcos González"
+          ],
+          "DEF": [
+            "Anxo Rodríguez",
+            "Germain Milla",
+            "Pablo Gavián"
+          ],
+          "MID": [
+            "Andrés Antañón",
+            "Hugo Burcio",
+            "Óscar Marcos"
+          ],
+          "ATT": [
+            "Ángel Arcos"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Celtic": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 90 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 22,
+        "list_b_players": {
+          "GK": [
+            "Aidan Rice",
+            "Marcus Gill",
+            "Corey Shaw",
+            "Cameron Patterson"
+          ],
+          "DEF": [
+            "Samuel Isiguzo",
+            "Hayden Borland",
+            "Samuel Sedwell",
+            "Joshua Mulgrew",
+            "Michael Charlton",
+            "Joseph Haney",
+            "Hassan Dembele",
+            "Aodhan Taylor"
+          ],
+          "MID": [
+            "Sean McArdle",
+            "Thomas Hatton",
+            "Rhys Dargie",
+            "Cole Crawford",
+            "Owen Hartington",
+            "Kayden Daly"
+          ],
+          "ATT": [
+            "Calvin Keenan",
+            "Emmanuel Obidiwe",
+            "Lucas Clearie",
+            "Ezekiel Molife"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Crystal Palace": {
+        "list_a_source": "English official senior register + UEFA List B",
+        "list_a_count": null,
+        "list_b_count": 31,
+        "list_b_players": {
+          "GK": [
+            "Thiago Speroni",
+            "Lucca Benetton"
+          ],
+          "DEF": [
+            "George King",
+            "Caleb Kporha",
+            "Tyler Whyte",
+            "Dean Benamar",
+            "Charlie Walker-Smith",
+            "Sean Somade",
+            "Jasper Judd",
+            "Jacob Fasida",
+            "Remi Ahazie-Shittu",
+            "Kwasi Baah",
+            "Anthony Barrett",
+            "Dylan Monk",
+            "Malik Tejan"
+          ],
+          "MID": [
+            "Joseph Gibbard",
+            "Sebastian Williams",
+            "Kai-Reece Adams-Collman",
+            "Chuks Okoli",
+            "Euan Danaher",
+            "Nathanael Kalembo",
+            "Raihaan Anderson",
+            "Makai Bernard-Ferguson",
+            "Ajean-Ray Greaves",
+            "Aiden Morgan",
+            "Daniel Owoade",
+            "Joel Drakes-Thomas",
+            "Jay-Emmanuel Jordan",
+            "Jamar Lee",
+            "Kayden Moses",
+            "Sebastian Bonsu-Amako"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Ferencváros": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 6,
+        "list_b_players": {
+          "GK": [
+            "Dániel Radnóti"
+          ],
+          "DEF": [
+            "Csongor Lakatos"
+          ],
+          "MID": [
+            "Ádám Bagi",
+            "Ádám Madarász"
+          ],
+          "ATT": [
+            "Zétény Varga",
+            "Szilárd Szabó"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Ádám Varga",
+            "Levente Őri",
+            "Dénes Dibusz"
+          ],
+          "DEF": [
+            "Mariano Gómez",
+            "Nathan Zohoré",
+            "Attila Osváth",
+            "Cadu",
+            "Endre Botka",
+            "Toon Raemaekers",
+            "Olivér Nagy"
+          ],
+          "MID": [
+            "Ádám Nagy",
+            "Veljko Birmančević",
+            "Naby Keïta",
+            "Jonathan Levi",
+            "Daniel Arzani",
+            "Kristoffer Zachariassen",
+            "Marius Corbu",
+            "Matúš Bero",
+            "Callum O'Dowda",
+            "Habib Maïga",
+            "Philippe Rommens"
+          ],
+          "ATT": [
+            "Bamidele Yusuf",
+            "Franko Kovačević",
+            "Lenny Joseph",
+            "Krisztián Lisztes"
+          ]
+        }
+      },
+      "GNK Dinamo": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 56 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 9,
+        "list_b_players": {
+          "DEF": [
+            "Noa Mikić",
+            "Krešimir Radoš",
+            "Nikola Radnić"
+          ],
+          "MID": [
+            "Jona Benkotić",
+            "Tomas Baković",
+            "Sven Šunta",
+            "Josip Brundić"
+          ],
+          "ATT": [
+            "Karlo Zulfić",
+            "Mislav Ćutuk"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Hapoel Beer-Sheva": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 2,
+        "list_b_players": {
+          "DEF": [
+            "Shlomo Dahan"
+          ],
+          "MID": [
+            "Yonatan Gilboa"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Ofir Marciano",
+            "Marco Wolff",
+            "Jonathan Shani"
+          ],
+          "DEF": [
+            "Guy Mizrahi",
+            "Matan Baltaxa",
+            "Miguel Vítor",
+            "Pedro Amador",
+            "Itay Rotman",
+            "Ofir Davidzada",
+            "Idan Nachmias",
+            "Djibril Diop"
+          ],
+          "MID": [
+            "Eliel Peretz",
+            "Mohammad Kanaan",
+            "Dan Biton",
+            "Amir Ganah",
+            "Amankwah Forson",
+            "Lucas Ventura",
+            "Niv Yehoshuha"
+          ],
+          "ATT": [
+            "Zahi Ahmad",
+            "Yonas Malede",
+            "Javon East",
+            "Mohammad Abu Rumi",
+            "Igor Zlatanović",
+            "João Victor",
+            "Adrián Ugarriza"
+          ]
+        }
+      },
+      "Hoffenheim": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 84 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 17,
+        "list_b_players": {
+          "GK": [
+            "Nico Biedermann",
+            "Tim Philipp"
+          ],
+          "DEF": [
+            "Tristan Spranger",
+            "Maxime Ndong Penda",
+            "Matthew Moore",
+            "Maximilian Theuer",
+            "Tom Fiederer"
+          ],
+          "MID": [
+            "Alex Honajzer",
+            "Tiago Poller",
+            "Florian Micheler",
+            "Blessing Makanda",
+            "Emil Kramer",
+            "Kryštof Čížek"
+          ],
+          "ATT": [
+            "Max Moerstedt",
+            "Jykese Fields",
+            "Lion Wagenbach",
+            "Zain Biazid"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Jagiellonia Białystok": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 45 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 6,
+        "list_b_players": {
+          "GK": [
+            "Krzysztof Lewczuk",
+            "Jakub Rabiczko"
+          ],
+          "DEF": [
+            "Bartłomiej Krasiewicz",
+            "Krystian Tymoszczuk",
+            "Maciej Kuczyński"
+          ],
+          "MID": [
+            "Olaf Pawelczyk"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Juventus": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 103 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 6,
+        "list_b_players": {
+          "GK": [
+            "Riccardo Radu",
+            "Raffaele Huli"
+          ],
+          "DEF": [
+            "Filippo Pagnucco",
+            "Niccolò Rizzo",
+            "Francesco Verde"
+          ],
+          "MID": [
+            "Augusto Owusu"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Lech Poznań": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 43 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 10,
+        "list_b_players": {
+          "GK": [
+            "Wiktor Obremski",
+            "Aleks Olsztyn"
+          ],
+          "DEF": [
+            "Michał Gurgul",
+            "Wojciech Mońka",
+            "Piotr Bartczak",
+            "Hubert Janyszka"
+          ],
+          "MID": [
+            "Eryk Śledziński",
+            "Karol Delikat"
+          ],
+          "ATT": [
+            "Kamil Jakóbczyk",
+            "Wojciech Szymczak"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Bayer Leverkusen": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 77 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 2,
+        "list_b_players": {
+          "DEF": [
+            "Ben Hawighorst"
+          ],
+          "MID": [
+            "Gabriel Minutillo"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Levski Sofia": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 21,
+        "list_b_count": 8,
+        "list_b_players": {
+          "GK": [
+            "Ognian Vladimirov"
+          ],
+          "DEF": [
+            "Stoyan Dobrev",
+            "Anton Manov",
+            "Hristo Argirov"
+          ],
+          "MID": [
+            "Ivo Motev",
+            "Radostin Stoilov",
+            "Sasho Grancharov"
+          ],
+          "ATT": [
+            "Stivan Stoyanchov"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Martin Lukov",
+            "Svetoslav Vutsov"
+          ],
+          "DEF": [
+            "Hevertton Santos",
+            "Maicon",
+            "Christian Makoun",
+            "Álex Centelles",
+            "Aldair Neves",
+            "Nikola Serafimov",
+            "Kristian Dimitrov"
+          ],
+          "MID": [
+            "Marko Grujić",
+            "Asen Mitkov",
+            "Gašper Trdin",
+            "Mehdi Moubarik",
+            "Mazire Soula",
+            "Serginho",
+            "Akram Bouras"
+          ],
+          "ATT": [
+            "Reinaldo",
+            "Juan Perea",
+            "Armstrong Oko-Flex",
+            "Everton Bala",
+            "David Kusso"
+          ]
+        }
+      },
+      "Lillestrøm": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 28 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 3,
+        "list_b_players": {
+          "GK": [
+            "Lazar Babic"
+          ],
+          "DEF": [
+            "Filip Reshane",
+            "Isa Jallow"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Lyon": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 66 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 20,
+        "list_b_players": {
+          "GK": [
+            "Justin Bengui",
+            "Yvann Konan",
+            "Matthias Da Silva",
+            "Mathis Iwosso",
+            "Axel Barreau"
+          ],
+          "DEF": [
+            "Angel Garcia",
+            "Timothée Dutot",
+            "Adam Alioui",
+            "Billy-Paul Mavudia",
+            "Walid Nechab",
+            "Kylian Negri",
+            "Emanuel Pampi",
+            "Titalom Penka",
+            "Aaron Trincat"
+          ],
+          "MID": [
+            "Mathys De Carvalho",
+            "Melvyn Otobo",
+            "Tiago Goncalves",
+            "Hedi Chekhab",
+            "Amine Lazrak",
+            "Haktan Şener"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Marseille": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 99 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 15,
+        "list_b_players": {
+          "GK": [
+            "Ibrahim Gomis"
+          ],
+          "DEF": [
+            "Rayan Ouro Bang Na",
+            "Hilan Hamzaoui",
+            "Anis Doubal",
+            "Paolo Trigano",
+            "Kelyann Bezahaf"
+          ],
+          "MID": [
+            "Tadjidine Mmadi",
+            "Yanis Sellami",
+            "Max Corbon",
+            "Alexandre Issanga"
+          ],
+          "ATT": [
+            "Antoine Valero",
+            "Keyliane Abdallah",
+            "Said Remadnia",
+            "Mathis Clement",
+            "Ugo Kadmiri"
+          ]
+        },
+        "list_a_players": null
+      },
+      "AC Milan": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 97 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 12,
+        "list_b_players": {
+          "GK": [
+            "Matteo Pittarella",
+            "Lèo-Paul Bouyer",
+            "Lorenzo Torriani"
+          ],
+          "DEF": [
+            "Davide Bartesaghi",
+            "Valeri Vladimirov",
+            "Emanuele Borsani",
+            "Nirash Perera"
+          ],
+          "MID": [
+            "Christian Comotto",
+            "Lorenzo Ossola",
+            "Luca Menon",
+            "Silvano Vos"
+          ],
+          "ATT": [
+            "Francesco Camarda"
+          ]
+        },
+        "list_a_players": null
+      },
+      "NEC Nijmegen": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 100 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 5,
+        "list_b_players": {
+          "GK": [
+            "Freek Entius",
+            "Martijn Overmars"
+          ],
+          "DEF": [
+            "Merijn Van De Wiel",
+            "Yassin Moslih"
+          ],
+          "MID": [
+            "Sam De Laat"
+          ]
+        },
+        "list_a_players": null
+      },
+      "OFI Crete": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 23,
+        "list_b_count": 8,
+        "list_b_players": {
+          "GK": [
+            "Manuel Kalafatis"
+          ],
+          "DEF": [
+            "Eleftherios Kontekas",
+            "Konstantinos Lagoudakis",
+            "Pavlos Kainourgiakis"
+          ],
+          "MID": [
+            "Athanasios Asmarianakis",
+            "Athanasios Sitmalidis",
+            "Emmanouil Chnaris"
+          ],
+          "ATT": [
+            "Charalampos Antonakakis"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Klidman Lilo",
+            "Panagiotis Katsikas",
+            "Nikolaos Christogeorgos"
+          ],
+          "DEF": [
+            "Krešimir Krizmanić",
+            "Nikolaos Athanasiou",
+            "Konstantinos Kostoulas",
+            "Achilleas Poungouras",
+            "Christos Shelis",
+            "Borja González",
+            "Lorenzo Dickmann",
+            "Dimitris Nikolaou"
+          ],
+          "MID": [
+            "Zisis Karachalios",
+            "Georgios Kanellopoulos",
+            "Thanasis Androutsos",
+            "Ioannis Apostolakis",
+            "Thiago Romano",
+            "Andreas Bouchalakis"
+          ],
+          "ATT": [
+            "Aaron Leya Iseka",
+            "Aitor Cantalapiedra",
+            "Taxiarchis Fountas",
+            "Thiago Nuss",
+            "Kenan Kodro",
+            "Ioannis Theodosoulakis"
+          ]
+        }
+      },
+      "Olympiacos": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 88 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 8,
+        "list_b_players": {
+          "GK": [
+            "Georgios Kouraklis",
+            "Iason Georgakopoulos"
+          ],
+          "DEF": [
+            "Konstantinos Tanoulis",
+            "Nektarios Alafakis",
+            "Georgios Siozios"
+          ],
+          "MID": [
+            "Theofanis Bakoulas",
+            "Christos Filis",
+            "Paschalis Toufakis"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Omonia Nicosia": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 18,
+        "list_b_count": 15,
+        "list_b_players": {
+          "GK": [
+            "Pantelis Michail",
+            "Giorgos Chistodoulou"
+          ],
+          "DEF": [
+            "Michalis Antoniou",
+            "Christos Konstantinidis",
+            "Panagiotis Christoforou",
+            "Athos Kounounis",
+            "Christos Kittou"
+          ],
+          "MID": [
+            "Panagiotis Andreou",
+            "Andreas Christou",
+            "Ilias Stylianou",
+            "Chrysis Evangelou",
+            "Theos Kazakaios"
+          ],
+          "ATT": [
+            "Angelos Neophytou",
+            "Vladimiros Savva",
+            "Konstantinos Panagi"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Thomas Kaminski",
+            "Fabiano"
+          ],
+          "DEF": [
+            "Senou Coulibaly",
+            "Stefan Simič",
+            "Jure Balkovec",
+            "Ľubomír Šatka",
+            "Loïc Négo",
+            "Jean-Kevin Duverne"
+          ],
+          "MID": [
+            "Ewandro",
+            "Mateo Marić",
+            "Luuk Brouwers"
+          ],
+          "ATT": [
+            "Jaden Montnor",
+            "Andronikos Kakoullis",
+            "Tasos Chatzigiovanis",
+            "Florin Tănase",
+            "Mihlali Mayambela",
+            "Muamer Tankovic",
+            "Lois Diony"
+          ]
+        }
+      },
+      "Real Sociedad": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 78 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 9,
+        "list_b_players": {
+          "GK": [
+            "Kevin Folgado"
+          ],
+          "DEF": [
+            "Jon Martín",
+            "Ibai Aguirre",
+            "Gorka Carrera"
+          ],
+          "MID": [
+            "Alex Marchal",
+            "Arkaitz Mariezkurrena",
+            "Tomas Carbonell",
+            "Lander Astiazaran"
+          ],
+          "ATT": [
+            "Dani Díaz"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Rennes": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 18,
+        "list_b_players": {
+          "GK": [
+            "Thao Mouapa Mwa Meuraillo",
+            "Noé Le Page"
+          ],
+          "DEF": [
+            "Mahamadou Nagida",
+            "Kenny Assignon",
+            "Issa Habri",
+            "Isiaka Soukouna",
+            "Yaël Thebault",
+            "Junior Ake",
+            "Ruben Lomet",
+            "Joseph Peter",
+            "Rio Saint Surin",
+            "Firmin Thetiot"
+          ],
+          "MID": [
+            "Djibril Diallo",
+            "Florian Truffert",
+            "Noah Loufoundou",
+            "Steeve Mvodo",
+            "Chibuike Ugochukwu",
+            "Alexis Bernard"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Nicolas Lemaître",
+            "Brice Samba",
+            "Kilian Belazzoug"
+          ],
+          "DEF": [
+            "Charlie Cresswell",
+            "Gonçalo Oliveira",
+            "Bryan Reynolds",
+            "Anthony Rouault",
+            "Quentin Merlin",
+            "Alidu Seidu",
+            "Abdelhamid Aït Boudlal",
+            "Przemysław Frankowski"
+          ],
+          "MID": [
+            "Djaoui Cisse",
+            "Ludovic Blas",
+            "Sebastian Szymański",
+            "Valentin Rongier",
+            "Adrien Thomasson",
+            "Mahdi Camara",
+            "Henrick Do Marcolino"
+          ],
+          "ATT": [
+            "Esteban Lepaul",
+            "Musa Al-Taamari",
+            "Eliezer Mayenda",
+            "Boulaye Dia",
+            "Alexander Legendre",
+            "Arnaud Nordin",
+            "Issa Soumaré"
+          ]
+        }
+      },
+      "Red Bull Salzburg": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 45 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 1,
+        "list_b_players": {
+          "GK": [
+            "Christian Zawieschitzky"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Sunderland": {
+        "list_a_source": "English official senior register + UEFA List B",
+        "list_a_count": null,
+        "list_b_count": 13,
+        "list_b_players": {
+          "GK": [
+            "Benjamin Metcalf",
+            "Joseph Cowan"
+          ],
+          "DEF": [
+            "Jenson Jones",
+            "Joseph Neild",
+            "Ben Kindon",
+            "Archie Lightfoot"
+          ],
+          "MID": [
+            "Charles Dinsdale",
+            "Jack Whittaker",
+            "Liam Hunt",
+            "Felix Scott"
+          ],
+          "ATT": [
+            "Finn Geragusian",
+            "Trey Ogunsuyi",
+            "Tom Proctor"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Torreense": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 24,
+        "list_b_count": 12,
+        "list_b_players": {
+          "GK": [
+            "Silas Bjerre",
+            "Bruno Sousa",
+            "Francisco Carvalho"
+          ],
+          "DEF": [
+            "Mateus Medeiro"
+          ],
+          "MID": [
+            "Diogo Fonseca",
+            "Rodrigo Esteves",
+            "Gustavo Rijo",
+            "David Morgado"
+          ],
+          "ATT": [
+            "Daniel Noro",
+            "Marco Silva",
+            "Ricardo Santos",
+            "Robim Dâmaso"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Lucas Paes",
+            "Adriel"
+          ],
+          "DEF": [
+            "Stopira",
+            "Juan María",
+            "Volnei Feltes",
+            "Mohamed Ali Diadié",
+            "David Carneiro",
+            "Javi Vázquez",
+            "Jonathan Mutombo",
+            "Rodrigo Guerreiro",
+            "Vasco Silva",
+            "Danny Ramos"
+          ],
+          "MID": [
+            "Amine Oudrhiri",
+            "Álex Alfaro",
+            "Nuha Jatta",
+            "André Simões"
+          ],
+          "ATT": [
+            "Dany Jean",
+            "Manu Pozo",
+            "Jorge Aguirre",
+            "Musa Drammeh",
+            "Karem Zoabi",
+            "Malik Abubakari",
+            "Luis Quintero",
+            "João Marques"
+          ]
+        }
+      },
+      "Union Saint-Gilloise": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 58 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 5,
+        "list_b_players": {
+          "GK": [
+            "Giorgi Kavlashvili"
+          ],
+          "DEF": [
+            "Daniel Tshilanda"
+          ],
+          "MID": [
+            "Rodrigo Rosado",
+            "Youssef Hamoutahar"
+          ],
+          "ATT": [
+            "Sekou Keita"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Viktoria Plzeň": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 41 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 4,
+        "list_b_players": {
+          "GK": [
+            "Matěj Hacaperka",
+            "Viktor Baier"
+          ],
+          "DEF": [
+            "Jan Paluska"
+          ],
+          "MID": [
+            "Jiří Panoš"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Sparta Praha": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 49 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 15,
+        "list_b_players": {
+          "GK": [
+            "Lukáš Franc",
+            "Benjamin Hruška",
+            "Štěpán Dyntar"
+          ],
+          "DEF": [
+            "Matěj Diviš",
+            "Vojtěch Novák",
+            "Jeremy Rebibo",
+            "Maxim Kotíšek"
+          ],
+          "MID": [
+            "Lewis Azaka",
+            "Hugo Sochůrek",
+            "Jan Feit",
+            "Jonáš Topič",
+            "Simon Pavlo",
+            "Vincent Kotíšek",
+            "Arsen Vitarigov",
+            "Chinguun Bolorbold"
+          ]
+        },
+        "list_a_players": null
+      },
+      "SK Sturm Graz": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 41 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 6,
+        "list_b_players": {
+          "GK": [
+            "Christoph Wiener-Pucher",
+            "Nico Knezevic"
+          ],
+          "MID": [
+            "Mate Grgic",
+            "Jonas Petritsch"
+          ],
+          "ATT": [
+            "Richmond Osayantin",
+            "Jonas Peinhart"
+          ]
+        },
+        "list_a_players": null
+      },
+      "_summary": {
+        "club_entries": 36,
+        "official_list_a_clubs_manually_transcribed": 9,
+        "profile_archive_fallback_clubs": 24,
+        "list_a_player_count_known_or_profile_estimate": 640,
+        "list_b_player_count": 364
+      }
+    },
+    "Conference League": {
+      "Aarhus": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 91 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 13,
+        "list_b_players": {
+          "GK": [
+            "Otto Lyhne",
+            "Marius Van der Raad"
+          ],
+          "DEF": [
+            "Luka Callø",
+            "Christian Storch",
+            "Liam Eggert",
+            "William Laugesen"
+          ],
+          "MID": [
+            "Oskar Haugstrup",
+            "Zander Grantzau",
+            "Adam Fuglsang"
+          ],
+          "ATT": [
+            "Tómas Kristjánsson",
+            "Stefen Tchamche",
+            "Frederik Emmery",
+            "Mark Ian Steffensen"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Ajax": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 51 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 15,
+        "list_b_players": {
+          "GK": [
+            "Aymean El Hani"
+          ],
+          "DEF": [
+            "Jorthy Mokio",
+            "Aaron Bouwman",
+            "Dies Janse",
+            "Ryan van de Pavert",
+            "Jinairo Johnson",
+            "Luca Messori"
+          ],
+          "MID": [
+            "Rayane Bounida",
+            "Mark Verkuijl",
+            "Mylo van der Lans",
+            "Tijn Peters",
+            "Damián van der Vaart",
+            "Avery Appiah",
+            "Mohamed Abdalla",
+            "Abdellah Ouazane"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Atalanta": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 153 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 9,
+        "list_b_players": {
+          "GK": [
+            "Mattia Sonzogni"
+          ],
+          "DEF": [
+            "Relja Obrić",
+            "Isaac Isoa",
+            "Albert Navarro"
+          ],
+          "MID": [
+            "Javison Idele",
+            "Federico Steffanoni",
+            "Alberto Manzoni"
+          ],
+          "ATT": [
+            "Andrea Bonanomi",
+            "Henry Camara"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Borac": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 2,
+        "list_b_players": {
+          "MID": [
+            "Pavle Đajić"
+          ],
+          "ATT": [
+            "Matej Deket"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Damjan Shiskovski",
+            "Nikola Ćetković",
+            "Mladen Jurkas"
+          ],
+          "DEF": [
+            "Bart Meijers",
+            "Abel Pascual",
+            "Branimir Cipetić",
+            "Siniša Saničanin",
+            "Sebastijan Herera",
+            "Viktor Rogan",
+            "Erik Riđan",
+            "Jurich Carolina",
+            "Nemanja Jakšić"
+          ],
+          "MID": [
+            "Amer Hiroš",
+            "Anderson Esiti",
+            "Srđan Grahovac",
+            "Miloš Jojić",
+            "Ivan Kukavica",
+            "Stojan Vranješ",
+            "Ante Roguljić",
+            "Stefan Savić",
+            "Sandi Ogrinec"
+          ],
+          "ATT": [
+            "Luka Juričić",
+            "David Vuković",
+            "Amar Milak",
+            "Dani Romera"
+          ]
+        }
+      },
+      "Braga": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 83 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 10,
+        "list_b_players": {
+          "GK": [
+            "Romário Cunha",
+            "Matheus Santos",
+            "Renato Amorim"
+          ],
+          "MID": [
+            "Diego Rodrigues",
+            "Guilherme Barbosa",
+            "João Lomba",
+            "Tiago Ferreira",
+            "Rodrigo Marques",
+            "João Trovisco",
+            "António Gil"
+          ]
+        },
+        "list_a_players": null
+      },
+      "SK Brann": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 31 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 6,
+        "list_b_players": {
+          "GK": [
+            "Håkon Hellesøy"
+          ],
+          "DEF": [
+            "Jonas Torsvik",
+            "Andreas Wilhelmsen"
+          ],
+          "MID": [
+            "Sondre Blumenfeld Vindenes",
+            "Brage Haugen"
+          ],
+          "ATT": [
+            "Julian Lægreid"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Brighton & Hove Albion": {
+        "list_a_source": "English official senior register + UEFA List B",
+        "list_a_count": null,
+        "list_b_count": 13,
+        "list_b_players": {
+          "GK": [
+            "Steven Hall",
+            "Lorenz Ferdinand",
+            "Liam Doyle"
+          ],
+          "MID": [
+            "Shane Nti",
+            "Darius Lane",
+            "Jesse Middleton",
+            "Younes Ibrahim",
+            "Zachary Brennan",
+            "Bode Newnham-Reeve"
+          ],
+          "ATT": [
+            "Nehemiah Oriola",
+            "Aidan West",
+            "Tyler Silsby",
+            "Adam Brett"
+          ]
+        },
+        "list_a_players": null
+      },
+      "FC København": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 80 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 6,
+        "list_b_players": {
+          "GK": [
+            "Tobias Breum-Harild",
+            "Gustav Fritz"
+          ],
+          "MID": [
+            "Hunor Németh",
+            "Marvin Nasnas",
+            "Gunnar Olsen"
+          ],
+          "ATT": [
+            "Viktor Dadason"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Crvena zvezda": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 46 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 6,
+        "list_b_players": {
+          "GK": [
+            "Savo Radanović"
+          ],
+          "DEF": [
+            "Matej Strika",
+            "Stefan Gudelj"
+          ],
+          "MID": [
+            "Vasilije Kostov",
+            "Matej Gashtarov"
+          ],
+          "ATT": [
+            "Dimitrije Šarić"
+          ]
+        },
+        "list_a_players": null
+      },
+      "CSKA Sofia": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 5,
+        "list_b_players": {
+          "GK": [
+            "Georgi Gerginov"
+          ],
+          "DEF": [
+            "Lachezar Ivanov",
+            "Bozhidar Petrov"
+          ],
+          "MID": [
+            "Alesandro Nikolov"
+          ],
+          "ATT": [
+            "Yulian Gilov"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Fedor Lapoukhov",
+            "Dimitar Evtimov",
+            "Daniel Nikolov"
+          ],
+          "DEF": [
+            "Pastor",
+            "Tamimou Ouorou",
+            "Dinis Almeida",
+            "Jean-Philippe Gbamin",
+            "Teodor Ivanov",
+            "Angelo Martino",
+            "Andrey Yordanov",
+            "Facundo Rodrigues",
+            "Aleks Tunchev"
+          ],
+          "MID": [
+            "Bruno Jordão",
+            "Maks Ebong",
+            "Stefano Sensi",
+            "Mohamed Brahimi",
+            "Petko Panayotov",
+            "Catalin Itu",
+            "Georgi Chorbadzhiyski",
+            "Isaac Solet",
+            "James Eto'o"
+          ],
+          "ATT": [
+            "Leandro Godoy",
+            "Joel Zwarts",
+            "Ioannis Pittas",
+            "Vasil Kaymakanov"
+          ]
+        }
+      },
+      "Egnatia": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 21,
+        "list_b_count": 0,
+        "list_b_players": {},
+        "list_a_players": {
+          "GK": [
+            "Levani Tandilashvili",
+            "Bruno Puja",
+            "Mario Dajsinani"
+          ],
+          "DEF": [
+            "Zamig Aliyev",
+            "Alessandro Kacbufi",
+            "Edison Ndreca",
+            "Guillem Jaime",
+            "Numan Ajetovikj",
+            "Andrey Yago",
+            "Eneo Bitri",
+            "Geralb Smajli"
+          ],
+          "MID": [
+            "Albano Aleksi",
+            "Fernando Medeiros",
+            "Ibrahim Diabate",
+            "Altin Kryeziu",
+            "Karim Loukili",
+            "Ledio Beqja"
+          ],
+          "ATT": [
+            "Daniel Adjessa",
+            "Alessandro Albanese",
+            "Ildi Gruda",
+            "Jurguens Montenegro"
+          ]
+        }
+      },
+      "Freiburg": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 74 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 5,
+        "list_b_players": {
+          "GK": [
+            "Kilian Katz",
+            "Max Stiefvater"
+          ],
+          "MID": [
+            "Rouven Tarnutzer",
+            "Jannik Veit"
+          ],
+          "ATT": [
+            "Leon Čatak"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Gent": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 93 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 16,
+        "list_b_players": {
+          "GK": [
+            "Bas Evers",
+            "Noa Vandenabeele",
+            "Victor De Coninck"
+          ],
+          "DEF": [
+            "Gilles De Meyer",
+            "Abdoul Ayinde",
+            "Hannes Vernemmen",
+            "Preben Blondeel",
+            "Trey Kongolo",
+            "Victor Vandenbroucke"
+          ],
+          "MID": [
+            "Mohammed El Âdfaoui",
+            "Joachim Djamba Shango",
+            "Oleksandr Soroka",
+            "Gyano Vanderdonck",
+            "Ruslan Vydysh"
+          ],
+          "ATT": [
+            "Abubakar Abdullahi",
+            "Ali Donny Sylla"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Getafe": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 116 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 2,
+        "list_b_players": {
+          "MID": [
+            "Alberto Risco"
+          ],
+          "ATT": [
+            "Marcos Pachon"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Hajduk Split": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 44 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 7,
+        "list_b_players": {
+          "GK": [
+            "Davyd Fesyuk"
+          ],
+          "DEF": [
+            "Roko Gabrić",
+            "Marino Skelin",
+            "Luka Hodak"
+          ],
+          "MID": [
+            "Adam Huram",
+            "Illia Kutia"
+          ],
+          "ATT": [
+            "Roko Brajković"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Hearts": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 123 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 18,
+        "list_b_players": {
+          "GK": [
+            "Jack Lyon",
+            "Aiden Duncan",
+            "Finlay Jamieson"
+          ],
+          "DEF": [
+            "Matthew Gillies",
+            "Euan Glasgow",
+            "Alfie Wilson",
+            "Allan Clark",
+            "Robbie Flockhart"
+          ],
+          "MID": [
+            "Gus Stevenson",
+            "Charlie Sanders",
+            "Stanley Wilson",
+            "Liam Walker",
+            "Cameron Clark",
+            "Peter Kellock"
+          ],
+          "ATT": [
+            "Jayden Mathie",
+            "Connor Dow",
+            "Sam Dickov",
+            "Sinan Kaharevic"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Iberia Tbilisi": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 3,
+        "list_b_players": {
+          "DEF": [
+            "Giorgi Gogsadze",
+            "Giorgi Chanturia"
+          ],
+          "MID": [
+            "Daniel Kvartskhava"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Tornike Megrelishvili",
+            "Revaz Kurtanidze",
+            "Giorgi Makaridze"
+          ],
+          "DEF": [
+            "Phillip Cancar",
+            "Vahid Selimovic",
+            "Jemal-Giorgi Jinjolava",
+            "Ibrahim Alhassan",
+            "Sebastian Figueredo",
+            "Aleksandre Amisulashvili",
+            "Nikoloz Botchorishvili",
+            "Jean-Marc Tiboue",
+            "Giorgi Kobuladze"
+          ],
+          "MID": [
+            "Nikoloz Dadiani",
+            "Bakar Kardava",
+            "Zviad Natchkhebia",
+            "Andria Bartishvili",
+            "Nika Sikharulashvili",
+            "Eldar Kuliiev",
+            "Giorgi Kutsia",
+            "Shotiko Tsamalashvili"
+          ],
+          "ATT": [
+            "Amirani Dzagania",
+            "Stephen Ende",
+            "Lucas Café",
+            "Vakho Bedoshvili",
+            "Lado Chikhradze"
+          ]
+        }
+      },
+      "Inter Escaldes": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 19,
+        "list_b_count": 7,
+        "list_b_players": {
+          "GK": [
+            "Rodrigo Rosaria Fernandes"
+          ],
+          "DEF": [
+            "Diego Azevedo Fernandes",
+            "Enric Barisich Sepulveda"
+          ],
+          "MID": [
+            "Luque Martos Arnau",
+            "Didac Molina Perez"
+          ],
+          "ATT": [
+            "Alex Prelado",
+            "Tiago Andre Gouveia Moreira"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Pol",
+            "Javi Díaz"
+          ],
+          "DEF": [
+            "Anwar Hernández",
+            "Jilmar Torres",
+            "Alex Sánchez",
+            "Dacu",
+            "Robin Lafarge",
+            "Marc Rodriguez",
+            "Maurizio Pochettino"
+          ],
+          "MID": [
+            "Víctor Alonso",
+            "Juan Cámara",
+            "David López",
+            "Pablo Molina",
+            "Lamine Diaby"
+          ],
+          "ATT": [
+            "Faysal Chouaib",
+            "Domi Berlanga",
+            "Soule Sidibe",
+            "Borja Arellano",
+            "Rafinha"
+          ]
+        }
+      },
+      "Jablonec": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 40 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 2,
+        "list_b_players": {
+          "DEF": [
+            "Antonín Malý"
+          ],
+          "MID": [
+            "Dominik Melka"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Kairat Almaty": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 20,
+        "list_b_count": 5,
+        "list_b_players": {
+          "GK": [
+            "Danila Buch",
+            "Bakhtiyar Aldashev"
+          ],
+          "DEF": [
+            "Adlan Nurgaliyev",
+            "Daniyar Tashpulatov"
+          ],
+          "MID": [
+            "Mukhamedali Abish"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Temirlan Anarbekov",
+            "Sherhan Kalmurza"
+          ],
+          "DEF": [
+            "Luís Mata",
+            "Damir Kassabulat",
+            "Lev Kurgin",
+            "Aleksandr Martynovich",
+            "Alexandr Mrynskiy",
+            "Alexandr Shirobokov",
+            "Lucas Áfrico"
+          ],
+          "MID": [
+            "Adilet Sadybekov",
+            "Olzhas Baibek",
+            "Jaakko Oksanen",
+            "Azamat Tuyakbayev",
+            "Oiva Jukkola",
+            "Yerkin Tapalov",
+            "Gustavo Mendonça"
+          ],
+          "ATT": [
+            "Edmilson",
+            "Mansur Birkurmanov",
+            "Marc Gual",
+            "Ismail Bekbolat"
+          ]
+        }
+      },
+      "Kauno Žalgiris": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 22,
+        "list_b_count": 5,
+        "list_b_players": {
+          "MID": [
+            "Vėjas Pocius",
+            "Adomas Užkurnys",
+            "Titas Milius"
+          ],
+          "GK": [
+            "Markas Racius",
+            "Vilius Dovydas"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Deividas Mikelionis",
+            "Tomas Švedkauskas"
+          ],
+          "DEF": [
+            "Anton Tolordava",
+            "Aldayr Hernandez",
+            "Marko Konatar",
+            "Nosa Edokpolor",
+            "Joris Moutachy",
+            "Lirim Kastrati",
+            "Rokas Lekiatas"
+          ],
+          "MID": [
+            "Amine Benchaib",
+            "Yukiyoshi Karashima",
+            "Gratas Sirgėdas",
+            "Vykintas Slivka",
+            "Léo Ribeiro",
+            "Ivan Fiolić",
+            "Anthony Kalik",
+            "Franco Baldassarra",
+            "Fabien Ourega"
+          ],
+          "ATT": [
+            "Leon Kreković",
+            "Renan Oliveira",
+            "Motiejus Burba",
+            "Gabriel Debeljuh"
+          ]
+        }
+      },
+      "KuPS": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 25,
+        "list_b_count": 4,
+        "list_b_players": {
+          "DEF": [
+            "Rasmus Tikkanen"
+          ],
+          "MID": [
+            "Joni Kivijärvi",
+            "Veikko Lahtela"
+          ],
+          "GK": [
+            "Miilo Pitkänen"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Johannes Kreidl",
+            "Hemmo Riihimäki"
+          ],
+          "DEF": [
+            "Kasim Nuhu",
+            "Samuel Pasanen",
+            "Arttu Lötjönen",
+            "Bob Nii Armah",
+            "Clinton Antwi",
+            "Brahima Magassa",
+            "Ricardo Araujo",
+            "Taneli Hämäläinen"
+          ],
+          "MID": [
+            "Saku Heiskanen",
+            "Petteri Pennanen",
+            "Valentin Gasc",
+            "Niilo Kujasalo",
+            "Tommi Jyry",
+            "Akseli Puukko",
+            "Julius Eskesen"
+          ],
+          "ATT": [
+            "Saku Savolainen",
+            "Gustav Engvall",
+            "Jaime Moreno",
+            "Ayman Aiki",
+            "Arttu Heinonen",
+            "Piotr Parzyszek",
+            "Joslyn Luyeye-Lutumba",
+            "Saikou Touray"
+          ]
+        }
+      },
+      "Lincoln Red Imps": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 22,
+        "list_b_count": 0,
+        "list_b_players": {},
+        "list_a_players": {
+          "GK": [
+            "Nauzet Santana",
+            "Jaylan Hankins",
+            "Mark Hamm"
+          ],
+          "DEF": [
+            "Ethan Jolley",
+            "Christian Rutjens",
+            "Gabri Cardozo",
+            "Bernardo Lopes",
+            "Ethan Britto",
+            "Julliani Eersteling"
+          ],
+          "MID": [
+            "Nico Clara",
+            "Mandi",
+            "Álvaro Romero",
+            "Toni",
+            "Graeme Torrilla",
+            "Joe"
+          ],
+          "ATT": [
+            "Lee Casciaro",
+            "Kike Gómez",
+            "Álex Mula",
+            "Yussef Flalhi Idrissi",
+            "Nano",
+            "Facundo Alvarez",
+            "Manu Toledano"
+          ]
+        }
+      },
+      "Lugano": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 43 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 2,
+        "list_b_players": {
+          "MID": [
+            "Christian Raffa"
+          ],
+          "ATT": [
+            "Nicolò Puddu"
+          ]
+        },
+        "list_a_players": null
+      },
+      "FC Midtjylland": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 105 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 10,
+        "list_b_players": {
+          "GK": [
+            "Sigurður Ingvason",
+            "Jonas Holmgaard",
+            "Sebastian Lindhardt"
+          ],
+          "DEF": [
+            "Egill Orri Arnarsson",
+            "Magne Kristensen"
+          ],
+          "MID": [
+            "Sofus Johannesen",
+            "Frederik Vestergaard"
+          ],
+          "ATT": [
+            "James Alphinas",
+            "Julius Emefile",
+            "Alberto Velasquez"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Mjällby": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 46 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 4,
+        "list_b_players": {
+          "MID": [
+            "Edon Oremalm Murseli",
+            "Isak Andersen",
+            "Charles Rosén"
+          ],
+          "ATT": [
+            "Olle Nilsson Löv"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Monaco": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 68 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 5,
+        "list_b_players": {
+          "DEF": [
+            "Christian Mawissa",
+            "Samuel Nibombe",
+            "Ilane Toure"
+          ],
+          "MID": [
+            "Pape Cabral"
+          ],
+          "ATT": [
+            "Iliès Belmokhtar"
+          ]
+        },
+        "list_a_players": null
+      },
+      "FC Nordsjælland": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 89 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 7,
+        "list_b_players": {
+          "GK": [
+            "Andreas Søndenbroe",
+            "Carl Kristoffersen"
+          ],
+          "DEF": [
+            "Markus Walker",
+            "Victor Gustafsen",
+            "Villads Rutkjær"
+          ],
+          "MID": [
+            "Villum Berthelsen"
+          ],
+          "ATT": [
+            "William Faber"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Pafos FC": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 22,
+        "list_b_count": 5,
+        "list_b_players": {
+          "DEF": [
+            "Melinos Kais"
+          ],
+          "MID": [
+            "Georgios Michael",
+            "Christos Evzona"
+          ],
+          "ATT": [
+            "Panagiotis Siderenios"
+          ],
+          "GK": [
+            "Petros Petrou"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Michalis Papastylianou",
+            "Andreas Andreou",
+            "Charalambos Kyriakidis",
+            "Radosław Majecki"
+          ],
+          "DEF": [
+            "Samy Mmaee",
+            "David Luiz",
+            "David Goldar",
+            "Nicholas Ioannou",
+            "Kosmas Ioannou"
+          ],
+          "MID": [
+            "Guga",
+            "Quina",
+            "Ken Sema",
+            "Moumi",
+            "Biel",
+            "Ivan Šunjić",
+            "Vlad Dragomir",
+            "Alexandre Brito",
+            "Pêpê"
+          ],
+          "ATT": [
+            "Bruno",
+            "Lelê",
+            "Anderson",
+            "João Correia"
+          ]
+        }
+      },
+      "Panathinaikos": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 102 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 5,
+        "list_b_players": {
+          "GK": [
+            "Christos Geitonas"
+          ],
+          "DEF": [
+            "Vasileios Lavdas"
+          ],
+          "MID": [
+            "Panagiotis Biniaris"
+          ],
+          "ATT": [
+            "Ioannis Bokos",
+            "Iason Nempis"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Riga FC": {
+        "list_a_source": "UEFA official squad page, List A",
+        "list_a_count": 21,
+        "list_b_count": 1,
+        "list_b_players": {
+          "GK": [
+            "Mārcis Kazainis"
+          ]
+        },
+        "list_a_players": {
+          "GK": [
+            "Kenan Pirić",
+            "Frenks Orols"
+          ],
+          "DEF": [
+            "Karl Wassom",
+            "Raivis Jurkovskis",
+            "Andrés Salazar",
+            "Baba Musah",
+            "Maksims Toņiševs",
+            "Paulo Eduardo",
+            "Antonijs Černomordijs"
+          ],
+          "MID": [
+            "Orlando Galo",
+            "Coli Saco",
+            "Raki Aouani",
+            "Iago Siqueira",
+            "Caio Ferreira",
+            "Samuel Pedro",
+            "Salah Oulad",
+            "Meissa Diop",
+            "Ahmed Ankrah"
+          ],
+          "ATT": [
+            "Reginaldo Ramires",
+            "Muhammed Badamosi",
+            "Abdulrahman Taiwo"
+          ]
+        }
+      },
+      "Sint-Truiden": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 93 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 5,
+        "list_b_players": {
+          "DEF": [
+            "Rune Verheyden"
+          ],
+          "MID": [
+            "Arthur Alexis"
+          ],
+          "ATT": [
+            "Jay-David Mbalanda",
+            "Matice Vandegaer",
+            "Moustafa Camara"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Thun": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 30 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 3,
+        "list_b_players": {
+          "MID": [
+            "Adam Ilic",
+            "Amir Maaroufi"
+          ],
+          "ATT": [
+            "Simon Lengen"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Trabzonspor": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 110 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 9,
+        "list_b_players": {
+          "GK": [
+            "Onuralp Çevikkan",
+            "Erol Can Çolak"
+          ],
+          "DEF": [
+            "Esad Turan Uzun",
+            "Ahmet Berat Tekke"
+          ],
+          "MID": [
+            "Kuzey Akçay",
+            "Yiğithan Çubukçu",
+            "Oğuzhan Ertem"
+          ],
+          "ATT": [
+            "Ahmet Cemil Güren",
+            "Hakan Yılmaz"
+          ]
+        },
+        "list_a_players": null
+      },
+      "FC Twente": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 84 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 11,
+        "list_b_players": {
+          "GK": [
+            "Yannick Gerritsen",
+            "Siebe Van Lange"
+          ],
+          "DEF": [
+            "Ruud Nijstad",
+            "Bjorn Titulaer",
+            "Jip Meilink",
+            "Juliën Mesbahi"
+          ],
+          "MID": [
+            "Benjamin Nagel",
+            "Tijn Tusveld"
+          ],
+          "ATT": [
+            "Lucas Vennegoor of Hesselink",
+            "Owen Panneflek",
+            "Nigel Groenewald"
+          ]
+        },
+        "list_a_players": null
+      },
+      "Universitatea Craiova": {
+        "list_a_source": "Embedded historical profile archive (2026-07-06; 50 profiles; not current-roster proof)",
+        "list_a_count": 18,
+        "list_b_count": 0,
+        "list_b_players": {},
+        "list_a_players": null
+      },
+      "_summary": {
+        "club_entries": 36,
+        "official_list_a_clubs_manually_transcribed": 11,
+        "profile_archive_fallback_clubs": 24,
+        "list_a_player_count_known_or_profile_estimate": 679,
+        "list_b_player_count": 226
+      }
+    }
+  }
+}

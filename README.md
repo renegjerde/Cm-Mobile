@@ -1,16 +1,11 @@
-# CM Mobile v3.63 – permanent UEFA List B snapshot
+# CM Mobile v3.64 – Complete European Player Database
 
-## Files
-- `index.html` – complete game source.
-- `VERSION.txt` – version marker.
-- `PLAYER_AUDIT_REPORT.md` – source and migration notes.
-- `UEFA_LIST_B_SNAPSHOT_2026-11-14.json` – readable copy of the permanent player-name/position snapshot.
-- `README.md` – deployment instructions.
+- Erstatt `index.html` i GitHub-repositoriets rot med filen fra denne pakken.
+- Sett `VERSION.txt` til `v3.64`.
+- `supabase_cm_mobile.sql` er beholdt fra v3.63 og trenger ikke kjøres på nytt hvis v3.59-tabellen allerede er opprettet.
+- Åpne spillet etter publisering. Lagrede karrierer kjører en engangsmigrering: List A v2 og List B v2.
+- Lag med kamphistorikk, overføringer, manuelle endringer eller verifiserte spillerregistreringer beskyttes mot automatisk utskifting.
+- Alle List B-spillere blir vanlige klubbspillere i spillopplevelsen; ingen UI-markering.
+- Spillet er fortsatt offline-first og foretar ingen UEFA-nettoppdateringer.
 
-## What's new
-UEFA List B players from the last completed round in each 2026/27 European competition are merged permanently into the normal club squads. This is a fixed offline snapshot dated 14 November 2026.
-
-No later UEFA updates are fetched or applied. There is no List A/List B label in the game UI. Existing club records are retained; only missing names are appended.
-
-## Publish
-Replace the repository root `index.html` and `VERSION.txt` with the files in this package. Commit and publish through the repository's configured Pages workflow. Existing Supabase SQL is unchanged.
+Se `PLAYER_AUDIT_REPORT.md` og `UEFA_PLAYER_DATABASE_SNAPSHOT_2026-11-14.json` for dekning og kildebegrensninger.
