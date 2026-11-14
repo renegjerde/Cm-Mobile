@@ -1,0 +1,1840 @@
+{
+  "Champions League": {
+    "AEK Athens": {
+      "GK": [
+        "Marios Balamotis"
+      ]
+    },
+    "Arsenal": {
+      "GK": [
+        "Khari Ranson",
+        "Jack Porter",
+        "Jack Talbot"
+      ],
+      "DEF": [
+        "Brayden Clarke",
+        "Joshua Ogunnaike",
+        "Josiah King",
+        "Teshaun Murisa",
+        "Abraham Owusu-Gyasi",
+        "Patrick Stachow",
+        "Joshua Tahou",
+        "Hakeem Abubakar",
+        "Elyon Mbala",
+        "Marli Salmon",
+        "Joshua Sesay"
+      ],
+      "MID": [
+        "Andre Annous",
+        "Ife Ibrahim",
+        "Theo Julienne",
+        "Louie Copley",
+        "Myles Lewis-Skelly",
+        "Max Dowman",
+        "Brando Bailey-Joseph",
+        "Maalik Hashi",
+        "Saurap Sampang",
+        "Emerson Nwaneri",
+        "Charlie Purdy"
+      ],
+      "ATT": [
+        "Ceadach O'Neill",
+        "Louis Zečević-John",
+        "Marley Frohock",
+        "Bowen Phillips",
+        "Jayden Oba"
+      ]
+    },
+    "Aston Villa": {
+      "GK": [
+        "Owen Asemota",
+        "Sam Lewis",
+        "Theo Houston",
+        "Rhys Oakley",
+        "Jack Allan",
+        "Jayden Garthwaite"
+      ],
+      "DEF": [
+        "Vincely Mudame",
+        "Travis Patterson",
+        "Harry Pinnell",
+        "Leon Routh",
+        "TJ Carroll",
+        "Ashton McWilliams",
+        "Teddie Bloomfield",
+        "Clay Atkins",
+        "Farid Addey",
+        "MJ Lyeli",
+        "Kairi Ketebu",
+        "Curtis Mitchell"
+      ],
+      "MID": [
+        "Lennon Moss",
+        "George Hemmings",
+        "Cole Brannigan",
+        "Rodrigo Fortes",
+        "Vinnie Hayward",
+        "Keilan Quinn",
+        "Woody Burgess",
+        "Jahmi Kellyman",
+        "Olly Lloyd",
+        "Lennon Melhuish"
+      ],
+      "ATT": [
+        "Jamaldeen Jimoh-Aloba",
+        "Erin Orebowale",
+        "Rory Wilson",
+        "Alfie Lynskey",
+        "Mason Cotcher",
+        "Trai-Varn Mulley",
+        "Max Jenner",
+        "Tay'Veon Smithen",
+        "Oscar Johnson",
+        "Jack McGrath",
+        "Markie Meade",
+        "Daniel Adediran",
+        "Oliver Bindley",
+        "Josh Blake",
+        "Rio Hammond"
+      ]
+    },
+    "Atleti": {
+      "GK": [
+        "Salvador Esquivel",
+        "Alvaro Moreno",
+        "Daniel Rubio",
+        "Miguel Olarieta"
+      ],
+      "DEF": [
+        "Romeo Hueso",
+        "Jorge Domínguez",
+        "Miguel Gil",
+        "Cristian Grant",
+        "Daniel Perez",
+        "Adrian Almeida",
+        "Pablo Pan",
+        "Adrián Martínez",
+        "David Arza"
+      ],
+      "MID": [
+        "Taufyk Zanzi",
+        "Jorge Castillo",
+        "Ruben Gomez",
+        "David Fernandez"
+      ],
+      "ATT": [
+        "Sergio Esteban",
+        "Miguel Llorente",
+        "Jesus Barrios",
+        "Abdou Kemo Badji",
+        "Joel Sanchez",
+        "Gonzalo Gross"
+      ]
+    },
+    "Bodø/Glimt": {
+      "GK": [
+        "Martin Lund Andersen",
+        "Isak Sjong"
+      ],
+      "DEF": [
+        "Matias Jaiteh",
+        "Mathias Blix Olsen"
+      ],
+      "MID": [
+        "Kasper Solhaug",
+        "Levi Monsen Yeboah",
+        "Erling Eliassen",
+        "Jesper Rabben Nygård"
+      ],
+      "ATT": [
+        "Hindrin Chooly"
+      ]
+    },
+    "Borussia Dortmund": {
+      "DEF": [
+        "Jan Luca Riedl",
+        "Miguel Adje",
+        "Luca Reggiani"
+      ],
+      "MID": [
+        "Enzo Dos Santos",
+        "Mussa Kaba"
+      ],
+      "ATT": [
+        "Samuele Inácio",
+        "Mathis Albert"
+      ]
+    },
+    "Barcelona": {
+      "GK": [
+        "Eder Aller",
+        "Iker Rodriguez"
+      ],
+      "DEF": [
+        "Pesquer",
+        "Landry Farré",
+        "Guillem Victor",
+        "Alex Campos"
+      ],
+      "MID": [
+        "Brian Fariñas",
+        "Orian Goren",
+        "Pedro Villar"
+      ],
+      "ATT": [
+        "Jesse Bisiwu",
+        "Hamza Abdelkarim",
+        "Shane Kluivert"
+      ]
+    },
+    "Bayern München": {
+      "GK": [
+        "Jannis Bärtl",
+        "David Poder-Stiube"
+      ],
+      "DEF": [
+        "Cassiano Kiala",
+        "Filip Pavić"
+      ],
+      "MID": [
+        "Erblin Osmani",
+        "Lennart Karl",
+        "Tim Binder",
+        "David Daiber"
+      ],
+      "ATT": [
+        "Noah Codjo-Evora"
+      ]
+    },
+    "Club Brugge": {
+      "GK": [
+        "Axl De Corte",
+        "Argus Vanden Driessche",
+        "Thibeau Kestemont"
+      ],
+      "DEF": [
+        "Jorne Spileers",
+        "Kyriani Sabbe",
+        "Alexander Vandeperre",
+        "Wout Verlinden",
+        "Axl Wins"
+      ],
+      "MID": [
+        "Joaquin Seys",
+        "Jessi Da Silva",
+        "Lucas Delorge",
+        "Gianluca Okon",
+        "Mohamed Elbay",
+        "Naim Amengai"
+      ],
+      "ATT": [
+        "Jakke Van Britsom"
+      ]
+    },
+    "Como": {
+      "GK": [
+        "Lorenzo Luigi Ginelli"
+      ],
+      "DEF": [
+        "Federico Grilli"
+      ],
+      "MID": [
+        "Riccardo Cassano",
+        "Matteo Papaccioli"
+      ]
+    },
+    "Fenerbahçe": {
+      "GK": [
+        "Kuzey Sapaz",
+        "Yasir Caklı"
+      ],
+      "DEF": [
+        "Çağan Sarıdikmen",
+        "Bedirhan Korkmaz",
+        "Gökmen Özdemir"
+      ],
+      "MID": [
+        "Efe Fettahoğlu",
+        "Emin Sayar",
+        "Güner Ekici",
+        "Emirhan Ateş"
+      ],
+      "ATT": [
+        "Alaettin Ekici"
+      ]
+    },
+    "Feyenoord": {
+      "GK": [
+        "Stenn de Mol",
+        "Tim Haksteeg"
+      ],
+      "DEF": [
+        "Thijs Kraaijeveld",
+        "Givairo Read",
+        "Tijme Wessels",
+        "Marleyson Cruz",
+        "Twan Schens",
+        "Hakeem Agboluaje",
+        "Matthew Mparaganda",
+        "Dani Slory",
+        "Boaz Plantinga"
+      ],
+      "MID": [
+        "Tobias van den Elshout",
+        "Nick de Koning",
+        "Nassim El Harmouz",
+        "Kevin Khan",
+        "Zino Sneijer",
+        "Luca Dahl Tomasson"
+      ],
+      "ATT": [
+        "Jivayno Zinhagel",
+        "Shaqueel van Persie",
+        "Arman Nahany",
+        "Izu Onunta",
+        "Kelvin Neijenhuis"
+      ]
+    },
+    "Galatasaray": {
+      "DEF": [
+        "Dağhan Kahraman",
+        "Cihan Akgün"
+      ],
+      "MID": [
+        "Oğulcan Yançel",
+        "Eyüp Karasu",
+        "Furkan Koçak",
+        "Berat Luş",
+        "Onur Yıldız"
+      ],
+      "ATT": [
+        "Arda Tagay",
+        "Ada Yüzgeç"
+      ]
+    },
+    "Inter": {
+      "DEF": [
+        "Francesco Stante",
+        "Leonardo Bovio"
+      ],
+      "MID": [
+        "Aleksandar Stanković"
+      ]
+    },
+    "LASK": {
+      "GK": [
+        "Christof Katzmayr"
+      ],
+      "DEF": [
+        "Jakob Wansch",
+        "Ryan Rodriguez German",
+        "Luca Ortner",
+        "Armin Midzic",
+        "Jonas Ilk",
+        "Alan Wimmer"
+      ],
+      "ATT": [
+        "Matthias Hartl",
+        "Paul Krapf"
+      ]
+    },
+    "Leipzig": {
+      "GK": [
+        "Franz Hantschmann",
+        "Janos Kanyai",
+        "Elian Hähner"
+      ],
+      "MID": [
+        "Antonio Nusa",
+        "Assan Ouédraogo",
+        "Benno Kaltefleiter",
+        "Viggo Gebel"
+      ]
+    },
+    "Lens": {
+      "GK": [
+        "Daivy Lefranc-Yeboah",
+        "Arthur Mogo Njimfo",
+        "Fedwan Messaoudi"
+      ],
+      "DEF": [
+        "Djulian Fernoc",
+        "Noé Kemtchoum"
+      ],
+      "MID": [
+        "Léopold Joursky",
+        "Nathanaël Gane Bernardino",
+        "Lucas Robbe"
+      ],
+      "ATT": [
+        "Mohamed Seddik",
+        "Mezian Mesloub Soares"
+      ]
+    },
+    "Lille": {
+      "GK": [
+        "Zadig Lanssade",
+        "Thomas Sajous"
+      ],
+      "MID": [
+        "Yeli Traore"
+      ]
+    },
+    "Liverpool": {
+      "GK": [
+        "Bailey Hall"
+      ],
+      "DEF": [
+        "Joseph Bradshaw",
+        "Oliver O'Connor",
+        "DJ Esdaille",
+        "Cameron Williams",
+        "Lucas Pitt",
+        "Wellity Lucky"
+      ],
+      "ATT": [
+        "Rio Ngumoha",
+        "Jayden Danns",
+        "Finn Inglethorpe",
+        "Josh Sonni-Lambie",
+        "Clae Ewing"
+      ]
+    },
+    "Manchester City": {
+      "GK": [
+        "Max-Edgar Chabot"
+      ],
+      "DEF": [
+        "Kaden Braithwaite"
+      ],
+      "MID": [
+        "Nico O’Reilly",
+        "Floyd Samba"
+      ]
+    },
+    "Manchester United": {
+      "DEF": [
+        "Leny Yoro",
+        "Harry Amass",
+        "Jaydan Kamason",
+        "Daniel Armer",
+        "Albert Mills"
+      ],
+      "MID": [
+        "Kobbie Mainoo",
+        "Jack Fletcher",
+        "Tyler Fletcher",
+        "Jim Thwaites"
+      ],
+      "ATT": [
+        "Shea Lacey"
+      ]
+    },
+    "Napoli": {
+      "GK": [
+        "Claudio Pugliese",
+        "David Spinelli"
+      ],
+      "DEF": [
+        "Claudio Lieto"
+      ],
+      "MID": [
+        "Andrea Chiummariello"
+      ]
+    },
+    "Paris": {
+      "GK": [
+        "Arthur Vignaud",
+        "Adam Mouak",
+        "Arthur Bar"
+      ],
+      "DEF": [
+        "David Boly"
+      ]
+    },
+    "Porto": {
+      "GK": [
+        "Gonçalo Ribeiro"
+      ],
+      "DEF": [
+        "Martim Fernandes",
+        "Luis Gomes",
+        "Martim Cunha",
+        "Martim Chelmik"
+      ],
+      "MID": [
+        "Tiago Silva",
+        "Bernardo Lima",
+        "João Teixeira"
+      ]
+    },
+    "PSV": {
+      "GK": [
+        "Tijn Smolenaars",
+        "Stijn Kuijsten",
+        "Jim Aerts",
+        "Kane Aerts"
+      ],
+      "DEF": [
+        "Michael Bresser",
+        "Wessel Kuhn",
+        "Fabian Merién",
+        "Floris Bos",
+        "Madi Nsosemo",
+        "Dyran Stam",
+        "Brent Jonkers",
+        "Rivas Manuhutu",
+        "Kyano Penso",
+        "Ezechiel Siani Emaga",
+        "Jorvimar Martina",
+        "Sébastien Ditmer"
+      ],
+      "MID": [
+        "Amir Bouhamdi",
+        "Shuryjano Cornecion",
+        "Boet Mulders",
+        "Gino Verhulst",
+        "Jaden de Guzman",
+        "Loek Schakenraad"
+      ]
+    },
+    "Real Betis": {
+      "GK": [
+        "Manu González",
+        "Victor Kroes"
+      ],
+      "DEF": [
+        "Carlos De Roa",
+        "Jorge Oreiro",
+        "Oscar Masque",
+        "Miguel Cuevas",
+        "Alvaro Díez",
+        "Carlos Lara",
+        "Curro Macías",
+        "Fabian Embalo",
+        "Marcos Solis"
+      ],
+      "MID": [
+        "Ismael Barea",
+        "Rica",
+        "Iván Corralejo",
+        "Miguel Angel Castilla",
+        "Kike Collantes",
+        "Ruben Lidueña",
+        "Marcos Mora",
+        "Miguel Angel"
+      ]
+    },
+    "Real Madrid": {
+      "GK": [
+        "Sergio Mestre",
+        "Javi Navarro",
+        "Illia Voloshyn"
+      ],
+      "DEF": [
+        "Jesús Fortea",
+        "Joan Martínez",
+        "Mario Rivas"
+      ],
+      "MID": [
+        "Thiago Pitarch",
+        "Jorge Cestero",
+        "Diego Villalba",
+        "Gabriel Valero"
+      ]
+    },
+    "Roma": {
+      "GK": [
+        "Giorgio De Marzi"
+      ],
+      "MID": [
+        "Alessandro Di Nunzio"
+      ],
+      "ATT": [
+        "Antonio Arena"
+      ]
+    },
+    "Sabah": {
+      "GK": [
+        "Rauf Ayyubov",
+        "Ravan Mirzammadov"
+      ]
+    },
+    "Shakhtar": {
+      "GK": [
+        "Rostyslav Bahlai"
+      ],
+      "MID": [
+        "Newertton",
+        "Viktor Tsukanov",
+        "Denys Smetana"
+      ]
+    },
+    "Slavia Praha": {
+      "GK": [
+        "Adam Rezek",
+        "Adam Paar",
+        "Ondřej Suchý"
+      ],
+      "DEF": [
+        "Jakub Kolísek",
+        "David Barčot",
+        "Štěpán Chaluš",
+        "Filip Kočvara",
+        "Martin Kovář",
+        "Jáchym Palivec",
+        "Vít Skokan"
+      ],
+      "MID": [
+        "Karel Belžík",
+        "Ondřej Frolík",
+        "Aleksa Ilinčič",
+        "Jakub Kratochvíl",
+        "Ondřej Mašek",
+        "Martin Palaščák"
+      ],
+      "ATT": [
+        "Dan Kohout",
+        "Matěj Kotrba",
+        "Petr Potměšil",
+        "Adam Procházka"
+      ]
+    },
+    "S. Bratislava": {
+      "GK": [
+        "Daniel Gramblička",
+        "Dávid Balog"
+      ],
+      "DEF": [
+        "Matúš Tomáško",
+        "Robert Tománek"
+      ],
+      "MID": [
+        "Leo Hofstädter"
+      ],
+      "ATT": [
+        "Nino Marcelli",
+        "Alexej Maroš"
+      ]
+    },
+    "Sporting CP": {
+      "GK": [
+        "William Lodmell",
+        "Miguel Gouveia",
+        "Guilherme Pires",
+        "Francisco Silva"
+      ],
+      "MID": [
+        "João Simões",
+        "Micael Sanhá",
+        "Diego Farinha",
+        "Rayhan Momade",
+        "Flávio Gonçalves",
+        "Sandro Gambôa",
+        "Ivanildo",
+        "Rafael Camacho",
+        "Martim Almeida",
+        "Eduardo Felicíssimo",
+        "Victor Bastianele",
+        "Leonardo Varela"
+      ]
+    },
+    "Stuttgart": {
+      "GK": [
+        "Dennis Seimen",
+        "Tom Walz",
+        "Lucas Nagel"
+      ],
+      "DEF": [
+        "Maximilian Herwerth",
+        "Yanik Spalt"
+      ],
+      "MID": [
+        "Ertugrul Yigit"
+      ]
+    },
+    "Viking": {
+      "DEF": [
+        "Vetle Auklend"
+      ],
+      "MID": [
+        "Ola Visted",
+        "Tobias Moi",
+        "Jakob Hansen"
+      ]
+    },
+    "Villarreal": {
+      "GK": [
+        "Pablo Polo"
+      ],
+      "MID": [
+        "Diatta Alassane",
+        "Joselillo Gaitán",
+        "Mahamoud Barry",
+        "César Bonafé",
+        "Alvaro Alcaide",
+        "Moussa Traore"
+      ]
+    }
+  },
+  "Europa League": {
+    "Anderlecht": {
+      "GK": [
+        "Mattis Seghers",
+        "Michiel Haentjens",
+        "Kamiel Timmermans"
+      ],
+      "DEF": [
+        "Kaïs Barry",
+        "Ali Maamar"
+      ],
+      "MID": [
+        "Joshua Nga Kana",
+        "Alexander De Ridder",
+        "Noah Kalonji",
+        "Tristan Degreef"
+      ],
+      "ATT": [
+        "Jayden Onia Seke",
+        "Noa Ojea",
+        "Terry Van De Ven"
+      ]
+    },
+    "Ararat-Armenia": {
+      "GK": [
+        "Suren Grigoryan"
+      ],
+      "MID": [
+        "Mikayel Khudaverdyan",
+        "Vahe Petrosyan"
+      ]
+    },
+    "Celje": {},
+    "AZ Alkmaar": {
+      "GK": [
+        "Nick Homan",
+        "Kiyani Zeggen",
+        "Koen Schilder",
+        "Quenten Attigah",
+        "Jur Schipper"
+      ],
+      "DEF": [
+        "Mathijs Menu",
+        "Jeremiah Esajas",
+        "Jesper Zwart",
+        "Kiani Inge",
+        "Kevin van Ouytsel",
+        "Rayan Atikallah",
+        "Iain De Jongh",
+        "Saviola Simons",
+        "Calvin Carrilho",
+        "Hessel de Wit"
+      ],
+      "MID": [
+        "Tómas Johannessen",
+        "Julian Oerip",
+        "Julian Sijbrands",
+        "Bohdan Budko",
+        "Rick Luijer",
+        "Adam Ouaziz"
+      ],
+      "ATT": [
+        "Wassim Bouziane",
+        "Jasper Hartog",
+        "Yoël van den Ban"
+      ]
+    },
+    "Benfica": {
+      "GK": [
+        "Diogo Ferreira",
+        "Arnas Voitinovičius",
+        "Leonardo Lopes"
+      ],
+      "DEF": [
+        "João Fonseca",
+        "Daniel Banjaqui",
+        "José Neto",
+        "Rui Silva"
+      ],
+      "MID": [
+        "Miguel Figueiredo",
+        "Gonçalo Moreira",
+        "Martim Ferreira",
+        "Tiago Freitas"
+      ]
+    },
+    "Beşiktaş": {
+      "GK": [
+        "Tuğra Yeşilyurt"
+      ],
+      "DEF": [
+        "Mustafa Yortaç"
+      ],
+      "MID": [
+        "Ali Pağda",
+        "Ozan Sevim"
+      ],
+      "ATT": [
+        "Mustafa Hekimoğlu",
+        "Ahmet Bircan"
+      ]
+    },
+    "Bournemouth": {
+      "GK": [
+        "Callan McKenna",
+        "Mack Allan"
+      ],
+      "DEF": [
+        "Harold William",
+        "Ameer Ali"
+      ],
+      "MID": [
+        "Charlie Stevens",
+        "Zac Christie",
+        "Ethan Sills",
+        "George Chubinidze"
+      ],
+      "ATT": [
+        "Malcom Dacosta",
+        "Jonathon Stuttle",
+        "Jonny Day",
+        "Eugene Nyarko"
+      ]
+    },
+    "Celta": {
+      "GK": [
+        "Marcos González"
+      ],
+      "DEF": [
+        "Anxo Rodríguez",
+        "Germain Milla",
+        "Pablo Gavián"
+      ],
+      "MID": [
+        "Andrés Antañón",
+        "Hugo Burcio",
+        "Óscar Marcos"
+      ],
+      "ATT": [
+        "Ángel Arcos"
+      ]
+    },
+    "Celtic": {
+      "GK": [
+        "Aidan Rice",
+        "Marcus Gill",
+        "Corey Shaw",
+        "Cameron Patterson"
+      ],
+      "DEF": [
+        "Samuel Isiguzo",
+        "Hayden Borland",
+        "Samuel Sedwell",
+        "Joshua Mulgrew",
+        "Michael Charlton",
+        "Joseph Haney",
+        "Hassan Dembele",
+        "Aodhan Taylor"
+      ],
+      "MID": [
+        "Sean McArdle",
+        "Thomas Hatton",
+        "Rhys Dargie",
+        "Cole Crawford",
+        "Owen Hartington",
+        "Kayden Daly"
+      ],
+      "ATT": [
+        "Calvin Keenan",
+        "Emmanuel Obidiwe",
+        "Lucas Clearie",
+        "Ezekiel Molife"
+      ]
+    },
+    "Crystal Palace": {
+      "GK": [
+        "Thiago Speroni",
+        "Lucca Benetton"
+      ],
+      "DEF": [
+        "George King",
+        "Caleb Kporha",
+        "Tyler Whyte",
+        "Dean Benamar",
+        "Charlie Walker-Smith",
+        "Sean Somade",
+        "Jasper Judd",
+        "Jacob Fasida",
+        "Remi Ahazie-Shittu",
+        "Kwasi Baah",
+        "Anthony Barrett",
+        "Dylan Monk",
+        "Malik Tejan"
+      ],
+      "MID": [
+        "Joseph Gibbard",
+        "Sebastian Williams",
+        "Kai-Reece Adams-Collman",
+        "Chuks Okoli",
+        "Euan Danaher",
+        "Nathanael Kalembo",
+        "Raihaan Anderson",
+        "Makai Bernard-Ferguson",
+        "Ajean-Ray Greaves",
+        "Aiden Morgan",
+        "Daniel Owoade",
+        "Joel Drakes-Thomas",
+        "Jay-Emmanuel Jordan",
+        "Jamar Lee",
+        "Kayden Moses",
+        "Sebastian Bonsu-Amako"
+      ]
+    },
+    "Ferencváros": {
+      "GK": [
+        "Dániel Radnóti"
+      ],
+      "DEF": [
+        "Csongor Lakatos"
+      ],
+      "MID": [
+        "Ádám Bagi",
+        "Ádám Madarász"
+      ],
+      "ATT": [
+        "Zétény Varga",
+        "Szilárd Szabó"
+      ]
+    },
+    "GNK Dinamo": {
+      "DEF": [
+        "Noa Mikić",
+        "Krešimir Radoš",
+        "Nikola Radnić"
+      ],
+      "MID": [
+        "Jona Benkotić",
+        "Tomas Baković",
+        "Sven Šunta",
+        "Josip Brundić"
+      ],
+      "ATT": [
+        "Karlo Zulfić",
+        "Mislav Ćutuk"
+      ]
+    },
+    "H. Beer-Sheva": {
+      "DEF": [
+        "Shlomo Dahan"
+      ],
+      "MID": [
+        "Yonatan Gilboa"
+      ]
+    },
+    "Hoffenheim": {
+      "GK": [
+        "Nico Biedermann",
+        "Tim Philipp"
+      ],
+      "DEF": [
+        "Tristan Spranger",
+        "Maxime Ndong Penda",
+        "Matthew Moore",
+        "Maximilian Theuer",
+        "Tom Fiederer"
+      ],
+      "MID": [
+        "Alex Honajzer",
+        "Tiago Poller",
+        "Florian Micheler",
+        "Blessing Makanda",
+        "Emil Kramer",
+        "Kryštof Čížek"
+      ],
+      "ATT": [
+        "Max Moerstedt",
+        "Jykese Fields",
+        "Lion Wagenbach",
+        "Zain Biazid"
+      ]
+    },
+    "Jagiellonia Białystok": {
+      "GK": [
+        "Krzysztof Lewczuk",
+        "Jakub Rabiczko"
+      ],
+      "DEF": [
+        "Bartłomiej Krasiewicz",
+        "Krystian Tymoszczuk",
+        "Maciej Kuczyński"
+      ],
+      "MID": [
+        "Olaf Pawelczyk"
+      ]
+    },
+    "Juventus": {
+      "GK": [
+        "Riccardo Radu",
+        "Raffaele Huli"
+      ],
+      "DEF": [
+        "Filippo Pagnucco",
+        "Niccolò Rizzo",
+        "Francesco Verde"
+      ],
+      "MID": [
+        "Augusto Owusu"
+      ]
+    },
+    "Lech Poznań": {
+      "GK": [
+        "Wiktor Obremski",
+        "Aleks Olsztyn"
+      ],
+      "DEF": [
+        "Michał Gurgul",
+        "Wojciech Mońka",
+        "Piotr Bartczak",
+        "Hubert Janyszka"
+      ],
+      "MID": [
+        "Eryk Śledziński",
+        "Karol Delikat"
+      ],
+      "ATT": [
+        "Kamil Jakóbczyk",
+        "Wojciech Szymczak"
+      ]
+    },
+    "Leverkusen": {
+      "DEF": [
+        "Ben Hawighorst"
+      ],
+      "MID": [
+        "Gabriel Minutillo"
+      ]
+    },
+    "Levski Sofia": {
+      "GK": [
+        "Ognian Vladimirov"
+      ],
+      "DEF": [
+        "Stoyan Dobrev",
+        "Anton Manov",
+        "Hristo Argirov"
+      ],
+      "MID": [
+        "Ivo Motev",
+        "Radostin Stoilov",
+        "Sasho Grancharov"
+      ],
+      "ATT": [
+        "Stivan Stoyanchov"
+      ]
+    },
+    "Lillestrøm": {
+      "GK": [
+        "Lazar Babic"
+      ],
+      "DEF": [
+        "Filip Reshane",
+        "Isa Jallow"
+      ]
+    },
+    "Lyon": {
+      "GK": [
+        "Justin Bengui",
+        "Yvann Konan",
+        "Matthias Da Silva",
+        "Mathis Iwosso",
+        "Axel Barreau"
+      ],
+      "DEF": [
+        "Angel Garcia",
+        "Timothée Dutot",
+        "Adam Alioui",
+        "Billy-Paul Mavudia",
+        "Walid Nechab",
+        "Kylian Negri",
+        "Emanuel Pampi",
+        "Titalom Penka",
+        "Aaron Trincat"
+      ],
+      "MID": [
+        "Mathys De Carvalho",
+        "Melvyn Otobo",
+        "Tiago Goncalves",
+        "Hedi Chekhab",
+        "Amine Lazrak",
+        "Haktan Şener"
+      ]
+    },
+    "Marseille": {
+      "GK": [
+        "Ibrahim Gomis"
+      ],
+      "DEF": [
+        "Rayan Ouro Bang Na",
+        "Hilan Hamzaoui",
+        "Anis Doubal",
+        "Paolo Trigano",
+        "Kelyann Bezahaf"
+      ],
+      "MID": [
+        "Tadjidine Mmadi",
+        "Yanis Sellami",
+        "Max Corbon",
+        "Alexandre Issanga"
+      ],
+      "ATT": [
+        "Antoine Valero",
+        "Keyliane Abdallah",
+        "Said Remadnia",
+        "Mathis Clement",
+        "Ugo Kadmiri"
+      ]
+    },
+    "Milan": {
+      "GK": [
+        "Matteo Pittarella",
+        "Lèo-Paul Bouyer",
+        "Lorenzo Torriani"
+      ],
+      "DEF": [
+        "Davide Bartesaghi",
+        "Valeri Vladimirov",
+        "Emanuele Borsani",
+        "Nirash Perera"
+      ],
+      "MID": [
+        "Christian Comotto",
+        "Lorenzo Ossola",
+        "Luca Menon",
+        "Silvano Vos"
+      ],
+      "ATT": [
+        "Francesco Camarda"
+      ]
+    },
+    "NEC Nijmegen": {
+      "GK": [
+        "Freek Entius",
+        "Martijn Overmars"
+      ],
+      "DEF": [
+        "Merijn Van De Wiel",
+        "Yassin Moslih"
+      ],
+      "MID": [
+        "Sam De Laat"
+      ]
+    },
+    "OFI Crete": {
+      "GK": [
+        "Manuel Kalafatis"
+      ],
+      "DEF": [
+        "Eleftherios Kontekas",
+        "Konstantinos Lagoudakis",
+        "Pavlos Kainourgiakis"
+      ],
+      "MID": [
+        "Athanasios Asmarianakis",
+        "Athanasios Sitmalidis",
+        "Emmanouil Chnaris"
+      ],
+      "ATT": [
+        "Charalampos Antonakakis"
+      ]
+    },
+    "Olympiacos": {
+      "GK": [
+        "Georgios Kouraklis",
+        "Iason Georgakopoulos"
+      ],
+      "DEF": [
+        "Konstantinos Tanoulis",
+        "Nektarios Alafakis",
+        "Georgios Siozios"
+      ],
+      "MID": [
+        "Theofanis Bakoulas",
+        "Christos Filis",
+        "Paschalis Toufakis"
+      ]
+    },
+    "Omonia Nicosia": {
+      "GK": [
+        "Pantelis Michail",
+        "Giorgos Chistodoulou"
+      ],
+      "DEF": [
+        "Michalis Antoniou",
+        "Christos Konstantinidis",
+        "Panagiotis Christoforou",
+        "Athos Kounounis",
+        "Christos Kittou"
+      ],
+      "MID": [
+        "Panagiotis Andreou",
+        "Andreas Christou",
+        "Ilias Stylianou",
+        "Chrysis Evangelou",
+        "Theos Kazakaios"
+      ],
+      "ATT": [
+        "Angelos Neophytou",
+        "Vladimiros Savva",
+        "Konstantinos Panagi"
+      ]
+    },
+    "Real Sociedad": {
+      "GK": [
+        "Kevin Folgado"
+      ],
+      "DEF": [
+        "Jon Martín",
+        "Ibai Aguirre",
+        "Gorka Carrera"
+      ],
+      "MID": [
+        "Alex Marchal",
+        "Arkaitz Mariezkurrena",
+        "Tomas Carbonell",
+        "Lander Astiazaran"
+      ],
+      "ATT": [
+        "Dani Díaz"
+      ]
+    },
+    "Rennes": {
+      "GK": [
+        "Thao Mouapa Mwa Meuraillo",
+        "Noé Le Page"
+      ],
+      "DEF": [
+        "Mahamadou Nagida",
+        "Kenny Assignon",
+        "Issa Habri",
+        "Isiaka Soukouna",
+        "Yaël Thebault",
+        "Junior Ake",
+        "Ruben Lomet",
+        "Joseph Peter",
+        "Rio Saint Surin",
+        "Firmin Thetiot"
+      ],
+      "MID": [
+        "Djibril Diallo",
+        "Florian Truffert",
+        "Noah Loufoundou",
+        "Steeve Mvodo",
+        "Chibuike Ugochukwu",
+        "Alexis Bernard"
+      ]
+    },
+    "Salzburg": {
+      "GK": [
+        "Christian Zawieschitzky"
+      ]
+    },
+    "Sparta Praha": {
+      "GK": [
+        "Lukáš Franc",
+        "Benjamin Hruška",
+        "Štěpán Dyntar"
+      ],
+      "DEF": [
+        "Matěj Diviš",
+        "Vojtěch Novák",
+        "Jeremy Rebibo",
+        "Maxim Kotíšek"
+      ],
+      "MID": [
+        "Lewis Azaka",
+        "Hugo Sochůrek",
+        "Jan Feit",
+        "Jonáš Topič",
+        "Simon Pavlo",
+        "Vincent Kotíšek",
+        "Arsen Vitarigov",
+        "Chinguun Bolorbold"
+      ]
+    },
+    "Sturm Graz": {
+      "GK": [
+        "Christoph Wiener-Pucher",
+        "Nico Knezevic"
+      ],
+      "MID": [
+        "Mate Grgic",
+        "Jonas Petritsch"
+      ],
+      "ATT": [
+        "Richmond Osayantin",
+        "Jonas Peinhart"
+      ]
+    },
+    "Sunderland": {
+      "GK": [
+        "Benjamin Metcalf",
+        "Joseph Cowan"
+      ],
+      "DEF": [
+        "Jenson Jones",
+        "Joseph Neild",
+        "Ben Kindon",
+        "Archie Lightfoot"
+      ],
+      "MID": [
+        "Charles Dinsdale",
+        "Jack Whittaker",
+        "Liam Hunt",
+        "Felix Scott"
+      ],
+      "ATT": [
+        "Finn Geragusian",
+        "Trey Ogunsuyi",
+        "Tom Proctor"
+      ]
+    },
+    "Torreense": {
+      "GK": [
+        "Silas Bjerre",
+        "Bruno Sousa",
+        "Francisco Carvalho"
+      ],
+      "DEF": [
+        "Mateus Medeiro"
+      ],
+      "MID": [
+        "Diogo Fonseca",
+        "Rodrigo Esteves",
+        "Gustavo Rijo",
+        "David Morgado"
+      ],
+      "ATT": [
+        "Daniel Noro",
+        "Marco Silva",
+        "Ricardo Santos",
+        "Robim Dâmaso"
+      ]
+    },
+    "Union Saint-Gilloise": {
+      "GK": [
+        "Giorgi Kavlashvili"
+      ],
+      "DEF": [
+        "Daniel Tshilanda"
+      ],
+      "MID": [
+        "Rodrigo Rosado",
+        "Youssef Hamoutahar"
+      ],
+      "ATT": [
+        "Sekou Keita"
+      ]
+    },
+    "Viktoria Plzeň": {
+      "GK": [
+        "Matěj Hacaperka",
+        "Viktor Baier"
+      ],
+      "DEF": [
+        "Jan Paluska"
+      ],
+      "MID": [
+        "Jiří Panoš"
+      ]
+    }
+  },
+  "Conference League": {
+    "Aarhus": {
+      "GK": [
+        "Otto Lyhne",
+        "Marius Van der Raad"
+      ],
+      "DEF": [
+        "Luka Callø",
+        "Christian Storch",
+        "Liam Eggert",
+        "William Laugesen"
+      ],
+      "MID": [
+        "Oskar Haugstrup",
+        "Zander Grantzau",
+        "Adam Fuglsang"
+      ],
+      "ATT": [
+        "Tómas Kristjánsson",
+        "Stefen Tchamche",
+        "Frederik Emmery",
+        "Mark Ian Steffensen"
+      ]
+    },
+    "Ajax": {
+      "GK": [
+        "Aymean El Hani"
+      ],
+      "DEF": [
+        "Jorthy Mokio",
+        "Aaron Bouwman",
+        "Dies Janse",
+        "Ryan van de Pavert",
+        "Jinairo Johnson",
+        "Luca Messori"
+      ],
+      "MID": [
+        "Rayane Bounida",
+        "Mark Verkuijl",
+        "Mylo van der Lans",
+        "Tijn Peters",
+        "Damián van der Vaart",
+        "Avery Appiah",
+        "Mohamed Abdalla",
+        "Abdellah Ouazane"
+      ]
+    },
+    "Atalanta": {
+      "GK": [
+        "Mattia Sonzogni"
+      ],
+      "DEF": [
+        "Relja Obrić",
+        "Isaac Isoa",
+        "Albert Navarro"
+      ],
+      "MID": [
+        "Javison Idele",
+        "Federico Steffanoni",
+        "Alberto Manzoni"
+      ],
+      "ATT": [
+        "Andrea Bonanomi",
+        "Henry Camara"
+      ]
+    },
+    "Borac": {
+      "MID": [
+        "Pavle Đajić"
+      ],
+      "ATT": [
+        "Matej Deket"
+      ]
+    },
+    "Braga": {
+      "GK": [
+        "Romário Cunha",
+        "Matheus Santos",
+        "Renato Amorim"
+      ],
+      "MID": [
+        "Diego Rodrigues",
+        "Guilherme Barbosa",
+        "João Lomba",
+        "Tiago Ferreira",
+        "Rodrigo Marques",
+        "João Trovisco",
+        "António Gil"
+      ]
+    },
+    "Brann": {
+      "GK": [
+        "Håkon Hellesøy"
+      ],
+      "DEF": [
+        "Jonas Torsvik",
+        "Andreas Wilhelmsen"
+      ],
+      "MID": [
+        "Sondre Blumenfeld Vindenes",
+        "Brage Haugen"
+      ],
+      "ATT": [
+        "Julian Lægreid"
+      ]
+    },
+    "Brighton": {
+      "GK": [
+        "Steven Hall",
+        "Lorenz Ferdinand",
+        "Liam Doyle"
+      ],
+      "MID": [
+        "Shane Nti",
+        "Darius Lane",
+        "Jesse Middleton",
+        "Younes Ibrahim",
+        "Zachary Brennan",
+        "Bode Newnham-Reeve"
+      ],
+      "ATT": [
+        "Nehemiah Oriola",
+        "Aidan West",
+        "Tyler Silsby",
+        "Adam Brett"
+      ]
+    },
+    "Copenhagen": {
+      "GK": [
+        "Tobias Breum-Harild",
+        "Gustav Fritz"
+      ],
+      "MID": [
+        "Hunor Németh",
+        "Marvin Nasnas",
+        "Gunnar Olsen"
+      ],
+      "ATT": [
+        "Viktor Dadason"
+      ]
+    },
+    "Crvena Zvezda": {
+      "GK": [
+        "Savo Radanović"
+      ],
+      "DEF": [
+        "Matej Strika",
+        "Stefan Gudelj"
+      ],
+      "MID": [
+        "Vasilije Kostov",
+        "Matej Gashtarov"
+      ],
+      "ATT": [
+        "Dimitrije Šarić"
+      ]
+    },
+    "CSKA Sofia": {
+      "GK": [
+        "Georgi Gerginov"
+      ],
+      "DEF": [
+        "Lachezar Ivanov",
+        "Bozhidar Petrov"
+      ],
+      "MID": [
+        "Alesandro Nikolov"
+      ],
+      "ATT": [
+        "Yulian Gilov"
+      ]
+    },
+    "Egnatia": {},
+    "Freiburg": {
+      "GK": [
+        "Kilian Katz",
+        "Max Stiefvater"
+      ],
+      "MID": [
+        "Rouven Tarnutzer",
+        "Jannik Veit"
+      ],
+      "ATT": [
+        "Leon Čatak"
+      ]
+    },
+    "Gent": {
+      "GK": [
+        "Bas Evers",
+        "Noa Vandenabeele",
+        "Victor De Coninck"
+      ],
+      "DEF": [
+        "Gilles De Meyer",
+        "Abdoul Ayinde",
+        "Hannes Vernemmen",
+        "Preben Blondeel",
+        "Trey Kongolo",
+        "Victor Vandenbroucke"
+      ],
+      "MID": [
+        "Mohammed El Âdfaoui",
+        "Joachim Djamba Shango",
+        "Oleksandr Soroka",
+        "Gyano Vanderdonck",
+        "Ruslan Vydysh"
+      ],
+      "ATT": [
+        "Abubakar Abdullahi",
+        "Ali Donny Sylla"
+      ]
+    },
+    "Getafe": {
+      "MID": [
+        "Alberto Risco"
+      ],
+      "ATT": [
+        "Marcos Pachon"
+      ]
+    },
+    "Hajduk Split": {
+      "GK": [
+        "Davyd Fesyuk"
+      ],
+      "DEF": [
+        "Roko Gabrić",
+        "Marino Skelin",
+        "Luka Hodak"
+      ],
+      "MID": [
+        "Adam Huram",
+        "Illia Kutia"
+      ],
+      "ATT": [
+        "Roko Brajković"
+      ]
+    },
+    "Hearts": {
+      "GK": [
+        "Jack Lyon",
+        "Aiden Duncan",
+        "Finlay Jamieson"
+      ],
+      "DEF": [
+        "Matthew Gillies",
+        "Euan Glasgow",
+        "Alfie Wilson",
+        "Allan Clark",
+        "Robbie Flockhart"
+      ],
+      "MID": [
+        "Gus Stevenson",
+        "Charlie Sanders",
+        "Stanley Wilson",
+        "Liam Walker",
+        "Cameron Clark",
+        "Peter Kellock"
+      ],
+      "ATT": [
+        "Jayden Mathie",
+        "Connor Dow",
+        "Sam Dickov",
+        "Sinan Kaharevic"
+      ]
+    },
+    "Iberia Tbilisi": {
+      "DEF": [
+        "Giorgi Gogsadze",
+        "Giorgi Chanturia"
+      ],
+      "MID": [
+        "Daniel Kvartskhava"
+      ]
+    },
+    "Inter Escaldes": {
+      "GK": [
+        "Rodrigo Rosaria Fernandes"
+      ],
+      "DEF": [
+        "Diego Azevedo Fernandes",
+        "Enric Barisich Sepulveda"
+      ],
+      "MID": [
+        "Luque Martos Arnau",
+        "Didac Molina Perez"
+      ],
+      "ATT": [
+        "Alex Prelado",
+        "Tiago Andre Gouveia Moreira"
+      ]
+    },
+    "Jablonec": {
+      "DEF": [
+        "Antonín Malý"
+      ],
+      "MID": [
+        "Dominik Melka"
+      ]
+    },
+    "Kairat": {
+      "GK": [
+        "Danila Buch",
+        "Bakhtiyar Aldashev"
+      ],
+      "DEF": [
+        "Adlan Nurgaliyev",
+        "Daniyar Tashpulatov"
+      ],
+      "MID": [
+        "Mukhamedali Abish"
+      ]
+    },
+    "Kauno Žalgiris": {
+      "MID": [
+        "Vėjas Pocius",
+        "Adomas Užkurnys",
+        "Titas Milius"
+      ]
+    },
+    "KuPS": {
+      "DEF": [
+        "Rasmus Tikkanen"
+      ],
+      "MID": [
+        "Joni Kivijärvi",
+        "Veikko Lahtela"
+      ]
+    },
+    "L. Red Imps": {},
+    "Riga": {},
+    "Lugano": {
+      "MID": [
+        "Christian Raffa"
+      ],
+      "ATT": [
+        "Nicolò Puddu"
+      ]
+    },
+    "Midtjylland": {
+      "GK": [
+        "Sigurður Ingvason",
+        "Jonas Holmgaard",
+        "Sebastian Lindhardt"
+      ],
+      "DEF": [
+        "Egill Orri Arnarsson",
+        "Magne Kristensen"
+      ],
+      "MID": [
+        "Sofus Johannesen",
+        "Frederik Vestergaard"
+      ],
+      "ATT": [
+        "James Alphinas",
+        "Julius Emefile",
+        "Alberto Velasquez"
+      ]
+    },
+    "Mjällby": {
+      "MID": [
+        "Edon Oremalm Murseli",
+        "Isak Andersen",
+        "Charles Rosén"
+      ],
+      "ATT": [
+        "Olle Nilsson Löv"
+      ]
+    },
+    "Monaco": {
+      "DEF": [
+        "Christian Mawissa",
+        "Samuel Nibombe",
+        "Ilane Toure"
+      ],
+      "MID": [
+        "Pape Cabral"
+      ],
+      "ATT": [
+        "Iliès Belmokhtar"
+      ]
+    },
+    "Nordsjælland": {
+      "GK": [
+        "Andreas Søndenbroe",
+        "Carl Kristoffersen"
+      ],
+      "DEF": [
+        "Markus Walker",
+        "Victor Gustafsen",
+        "Villads Rutkjær"
+      ],
+      "MID": [
+        "Villum Berthelsen"
+      ],
+      "ATT": [
+        "William Faber"
+      ]
+    },
+    "Pafos": {
+      "DEF": [
+        "Melinos Kais"
+      ],
+      "MID": [
+        "Georgios Michael",
+        "Christos Evzona"
+      ],
+      "ATT": [
+        "Panagiotis Siderenios"
+      ]
+    },
+    "Panathinaikos": {
+      "GK": [
+        "Christos Geitonas"
+      ],
+      "DEF": [
+        "Vasileios Lavdas"
+      ],
+      "MID": [
+        "Panagiotis Biniaris"
+      ],
+      "ATT": [
+        "Ioannis Bokos",
+        "Iason Nempis"
+      ]
+    },
+    "Sint-Truidense": {
+      "DEF": [
+        "Rune Verheyden"
+      ],
+      "MID": [
+        "Arthur Alexis"
+      ],
+      "ATT": [
+        "Jay-David Mbalanda",
+        "Matice Vandegaer",
+        "Moustafa Camara"
+      ]
+    },
+    "Thun": {
+      "MID": [
+        "Adam Ilic",
+        "Amir Maaroufi"
+      ],
+      "ATT": [
+        "Simon Lengen"
+      ]
+    },
+    "Trabzonspor": {
+      "GK": [
+        "Onuralp Çevikkan",
+        "Erol Can Çolak"
+      ],
+      "DEF": [
+        "Esad Turan Uzun",
+        "Ahmet Berat Tekke"
+      ],
+      "MID": [
+        "Kuzey Akçay",
+        "Yiğithan Çubukçu",
+        "Oğuzhan Ertem"
+      ],
+      "ATT": [
+        "Ahmet Cemil Güren",
+        "Hakan Yılmaz"
+      ]
+    },
+    "U. Craiova": {},
+    "Twente": {
+      "GK": [
+        "Yannick Gerritsen",
+        "Siebe Van Lange"
+      ],
+      "DEF": [
+        "Ruud Nijstad",
+        "Bjorn Titulaer",
+        "Jip Meilink",
+        "Juliën Mesbahi"
+      ],
+      "MID": [
+        "Benjamin Nagel",
+        "Tijn Tusveld"
+      ],
+      "ATT": [
+        "Lucas Vennegoor of Hesselink",
+        "Owen Panneflek",
+        "Nigel Groenewald"
+      ]
+    }
+  }
+}
