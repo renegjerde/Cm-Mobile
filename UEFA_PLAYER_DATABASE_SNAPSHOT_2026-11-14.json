@@ -1,7 +1,7 @@
 {
   "snapshot_date": "2026-11-14",
   "season": "2026/27",
-  "refresh_policy": "static-no-network-no-matchday-refresh",
+  "refresh_policy": "Permanent offline snapshot of official UEFA List A and List B registrations after the last completed November matchweek. No in-season UEFA updates.",
   "competitions": {
     "Champions League": {
       "LASK": {
@@ -1925,8 +1925,8 @@
     },
     "Europa League": {
       "Anderlecht": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 81 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 23,
         "list_b_count": 12,
         "list_b_players": {
           "GK": [
@@ -1950,7 +1950,41 @@
             "Terry Van De Ven"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Colin Coosemans",
+            "Justin Heekeren"
+          ],
+          "DEF": [
+            "Zoumana Keita",
+            "Lucas Hey",
+            "Giulian Biancone",
+            "Oleg Reabciuk",
+            "Ludwig Augustinsson",
+            "Andrew Omobamidele",
+            "Leo Petrot",
+            "Killian Sardella"
+          ],
+          "MID": [
+            "Ilay Camara",
+            "Romeo Amane",
+            "Marten Winkler",
+            "Lukáš Ambros",
+            "Thelo Aasgaard",
+            "Enric Llansana",
+            "Mario Stroeykens",
+            "Marco Kana"
+          ],
+          "ATT": [
+            "Mihajlo Cvetković",
+            "Oliver Antman",
+            "Danylo Sikan",
+            "Tawfik Bentayeb",
+            "Adriano Bertaccini"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 35
       },
       "Ararat-Armenia": {
         "list_a_source": "UEFA official squad page, List A",
@@ -2000,9 +2034,9 @@
         }
       },
       "AZ Alkmaar": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 72 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 24,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
+        "list_b_count": 29,
         "list_b_players": {
           "GK": [
             "Nick Homan",
@@ -2020,15 +2054,20 @@
             "Rayan Atikallah",
             "Iain De Jongh",
             "Saviola Simons",
-            "Calvin Carrilho",
-            "Hessel de Wit"
+            "Calvin Carrilho"
           ],
           "MID": [
+            "Kees Smit",
+            "Elijah Dijkstra",
+            "Rio Robbemond",
+            "Enoch Mastoras",
+            "Tycho de Wit",
             "Tómas Johannessen",
             "Julian Oerip",
             "Julian Sijbrands",
             "Bohdan Budko",
             "Rick Luijer",
+            "Hessel de Wit",
             "Adam Ouaziz"
           ],
           "ATT": [
@@ -2037,12 +2076,48 @@
             "Yoël van den Ban"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Rome-Jayden Owusu-Oduro",
+            "Hobie Verhulst",
+            "Jari De Busser"
+          ],
+          "DEF": [
+            "Seiya Maikuma",
+            "Wouter Goes",
+            "Mateo Chávez",
+            "Andrea Natali",
+            "Wesley Hoedt",
+            "Denso Kasius",
+            "Rion Ichihara",
+            "Mees de Wit"
+          ],
+          "MID": [
+            "Lewis Schouten",
+            "Peer Koopmeiners",
+            "Jordy Clasie",
+            "Stije Resink",
+            "Valdemar Byskov",
+            "Dave Kwakman"
+          ],
+          "ATT": [
+            "Weslley Patati",
+            "Mexx Meerdink",
+            "Ro-Zangelo Daal",
+            "Calvin Stengs",
+            "Bendegúz Kovács",
+            "Jizz Hornkamp",
+            "Ayoub Oufkir",
+            "Jerolldino Bergraaf"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 54
       },
       "Benfica": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 57 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 11,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 22,
+        "list_b_count": 16,
         "list_b_players": {
           "GK": [
             "Diogo Ferreira",
@@ -2060,13 +2135,53 @@
             "Gonçalo Moreira",
             "Martim Ferreira",
             "Tiago Freitas"
+          ],
+          "ATT": [
+            "Gianluca Prestianni",
+            "Anísio Cabral",
+            "Olívio Tomé",
+            "Francisco Silva",
+            "Eduardo Fernandes"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Anatoliy Trubin",
+            "Samuel Soares"
+          ],
+          "DEF": [
+            "Clément Lenglet",
+            "Alessandro Circati",
+            "Alexander Bah",
+            "Samuel Dahl",
+            "Gabriel Índio",
+            "Souffian El Karouani",
+            "Tomás Araújo"
+          ],
+          "MID": [
+            "Enzo Barrenechea",
+            "Fredrik Aursnes",
+            "Georgiy Sudakov",
+            "Manu Silva",
+            "Leandro Barreiro",
+            "João Palhinha"
+          ],
+          "ATT": [
+            "Dodi Lukébakio",
+            "Jakub Kamiński",
+            "Vangelis Pavlidis",
+            "Andreas Schjelderup",
+            "Jhon Durán",
+            "Rafa Silva",
+            "Claudio Echeverri"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 38
       },
       "Beşiktaş": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 112 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
         "list_b_count": 6,
         "list_b_players": {
           "GK": [
@@ -2084,7 +2199,43 @@
             "Ahmet Bircan"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Alexander Nübel",
+            "Doğan Alemdar",
+            "Emir Yaşar"
+          ],
+          "DEF": [
+            "Kassoum Ouattara",
+            "Emmanuel Agbadou",
+            "Taylan Bulut",
+            "Rıdvan Yılmaz",
+            "Tiago Djaló",
+            "Ümit Akdağ",
+            "Emirhan Topçu",
+            "Yasin Özcan",
+            "Michael Murillo"
+          ],
+          "MID": [
+            "Wilfred Ndidi",
+            "Salih Özcan",
+            "Kartal Yılmaz",
+            "Orkun Kökçü",
+            "Junior Olaitan",
+            "Václav Černý",
+            "Leandro Trossard",
+            "Fabio Miretti",
+            "İlhan Fakılı"
+          ],
+          "ATT": [
+            "Hyeongyu Oh",
+            "Ernest Poku",
+            "Dušan Vlahović",
+            "Semih Kılıçsoy"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 31
       },
       "AFC Bournemouth": {
         "list_a_source": "English official senior register + UEFA List B",
@@ -2155,8 +2306,8 @@
         }
       },
       "Celta": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 90 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
         "list_b_count": 8,
         "list_b_players": {
           "GK": [
@@ -2176,12 +2327,48 @@
             "Ángel Arcos"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Altay Bayındır",
+            "Ionuț Radu",
+            "Ivan Villar"
+          ],
+          "DEF": [
+            "Carl Starfelt",
+            "Marcos Alonso",
+            "Abdoulaye Faye",
+            "Sergio Carreira",
+            "Álvaro Núñez",
+            "Javi Rueda",
+            "Yoel Lago",
+            "Javi Rodríguez",
+            "Sebastián Cáceres",
+            "Javi Galán"
+          ],
+          "MID": [
+            "Ilaix Moriba",
+            "Miguel Román",
+            "Aleix Febas",
+            "Hugo Álvarez"
+          ],
+          "ATT": [
+            "Borja Iglesias",
+            "Ferran Jutglà",
+            "Iago Aspas",
+            "Pablo Durán",
+            "Hugo González",
+            "Williot Swedberg",
+            "Couhaib Driouech",
+            "Jones El-Abdellaoui"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 33
       },
       "Celtic": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 90 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 22,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
+        "list_b_count": 27,
         "list_b_players": {
           "GK": [
             "Aidan Rice",
@@ -2205,7 +2392,12 @@
             "Rhys Dargie",
             "Cole Crawford",
             "Owen Hartington",
-            "Kayden Daly"
+            "Kayden Daly",
+            "Conor Daly",
+            "Liam Kennedy",
+            "Nathan Meechan",
+            "Rocco Di Giacomo",
+            "Mark Cingel"
           ],
           "ATT": [
             "Calvin Keenan",
@@ -2214,7 +2406,43 @@
             "Ezekiel Molife"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Viljami Sinisalo",
+            "Sam Johnstone",
+            "Ross Doohan"
+          ],
+          "DEF": [
+            "Alistair Johnston",
+            "Jordan Lotomba",
+            "Liam Scales",
+            "Auston Trusty",
+            "Cameron Carter-Vickers",
+            "Dane Murray",
+            "Colby Donovan",
+            "Anthony Ralston",
+            "Kieran Tierney"
+          ],
+          "MID": [
+            "Hyunjun Yang",
+            "Luke McCowan",
+            "Oliver Sørensen",
+            "Alex Oxlade-Chamberlain",
+            "Mika Baur",
+            "Callum McGregor",
+            "James Forrest"
+          ],
+          "ATT": [
+            "Benjamin Nygren",
+            "Kasper Høgh",
+            "Camilo Durán",
+            "Sebastian Tounekti",
+            "Callum Osmand",
+            "Haissem Hassan"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 52
       },
       "Crystal Palace": {
         "list_a_source": "English official senior register + UEFA List B",
@@ -2318,8 +2546,8 @@
         }
       },
       "GNK Dinamo": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 56 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 23,
         "list_b_count": 9,
         "list_b_players": {
           "DEF": [
@@ -2338,7 +2566,41 @@
             "Mislav Ćutuk"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Danijel Zagorac",
+            "Dominik Kotarski",
+            "Ivan Filipović"
+          ],
+          "DEF": [
+            "Bruno Goda",
+            "Stjepan Radeljić",
+            "Niko Galešić",
+            "Matteo Perez Vinlöf",
+            "Moris Valinčić",
+            "Scott McKenna",
+            "Sergi Domínguez"
+          ],
+          "MID": [
+            "Kirill Kravtsov",
+            "Dani Rodríguez",
+            "Miha Zajc",
+            "Luka Stojković",
+            "Luka Ivanušec",
+            "Iker Almena",
+            "Josip Mišić"
+          ],
+          "ATT": [
+            "Dion Beljo",
+            "Arbër Hoxha",
+            "Smail Prevljak",
+            "Mateo Lisica",
+            "Lukas Kačavenda",
+            "Mislav Oršić"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 32
       },
       "Hapoel Beer-Sheva": {
         "list_a_source": "UEFA official squad page, List A",
@@ -2389,8 +2651,8 @@
         }
       },
       "Hoffenheim": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 84 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
         "list_b_count": 17,
         "list_b_players": {
           "GK": [
@@ -2419,11 +2681,47 @@
             "Zain Biazid"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Oliver Baumann",
+            "Lúkas Petersson",
+            "Luca Philipp"
+          ],
+          "DEF": [
+            "Robin Hranáč",
+            "Sean Dulic",
+            "Ozan Kabak",
+            "Bernardo",
+            "Valentin Gendrey",
+            "Koki Machida",
+            "Natnael Abraha",
+            "Vladimír Coufal",
+            "Mats Rots",
+            "Valentin Lässig"
+          ],
+          "MID": [
+            "Leon Avdullahu",
+            "Patrick Wimmer",
+            "Nathan De Cat",
+            "Wouter Burger",
+            "Tim Lemperle",
+            "Bambasé Conté",
+            "Alexander Prass",
+            "Cajetan Lenz"
+          ],
+          "ATT": [
+            "Adam Hložek",
+            "Fisnik Asllani",
+            "Adam Daghim",
+            "Andrej Kramarić"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 42
       },
       "Jagiellonia Białystok": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 45 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 24,
         "list_b_count": 6,
         "list_b_players": {
           "GK": [
@@ -2439,12 +2737,47 @@
             "Olaf Pawelczyk"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Michał Perchel",
+            "Sławomir Abramowicz"
+          ],
+          "DEF": [
+            "Dušan Stojinović",
+            "Yuki Kobayashi",
+            "Bernardo Vital",
+            "Bartłomiej Wdowik",
+            "Guilherme Montóia",
+            "Rodrigo Conceição",
+            "Apostolos Konstantopoulos",
+            "Szymon Pankiewicz"
+          ],
+          "MID": [
+            "Taras Romanczuk",
+            "Kajetan Szmyt",
+            "Hampus Finndell",
+            "Norbert Wojtuszek",
+            "Anders Klynge",
+            "Sergio Lozano",
+            "Ousmane Sow",
+            "Aleksandar Ćirković",
+            "Kamil Jóźwiak",
+            "Eryk Kozłowski"
+          ],
+          "ATT": [
+            "Jeremy Agbonifo",
+            "Jesús Imaz",
+            "Youssuf Sylla",
+            "Nik Prelec"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 30
       },
       "Juventus": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 103 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 6,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 22,
+        "list_b_count": 10,
         "list_b_players": {
           "GK": [
             "Riccardo Radu",
@@ -2457,13 +2790,52 @@
           ],
           "MID": [
             "Augusto Owusu"
+          ],
+          "ATT": [
+            "Kenan Yıldız",
+            "Arman Durmiši",
+            "Destiny Elimoghale",
+            "Antonio Merola"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Carlo Pinsoglio",
+            "Guglielmo Vicario",
+            "Neto"
+          ],
+          "DEF": [
+            "Zeki Çelik",
+            "Bremer",
+            "Federico Gatti",
+            "Lloyd Kelly",
+            "Pierre Kalulu",
+            "Andrea Cambiaso",
+            "Jhon Lucumi",
+            "Juan Cabal"
+          ],
+          "MID": [
+            "Teun Koopmeiners",
+            "Douglas Luiz",
+            "Kerim Alajbegović",
+            "Weston McKennie",
+            "Pape Sarr"
+          ],
+          "ATT": [
+            "Francisco Conceição",
+            "Randal Kolo Muani",
+            "Jeremie Boga",
+            "Jeff Ekhator",
+            "Nick Woltemade",
+            "Nicolás González"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 32
       },
       "Lech Poznań": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 43 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 21,
         "list_b_count": 10,
         "list_b_players": {
           "GK": [
@@ -2485,11 +2857,43 @@
             "Wojciech Szymczak"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Mateusz Lis",
+            "Mateusz Pruchniewski"
+          ],
+          "DEF": [
+            "Joel Pereira",
+            "Alex Douglas",
+            "João Moutinho",
+            "Robert Gumny",
+            "Terry Yegbe",
+            "Mateusz Skrzypczak"
+          ],
+          "MID": [
+            "Gustav Berggren",
+            "Ali Gholizadeh",
+            "Leo Bengtsson",
+            "Pablo Rodríguez",
+            "Radosław Murawski",
+            "Filip Jagiełło",
+            "Antoni Kozubal",
+            "Luis Palma"
+          ],
+          "ATT": [
+            "Yannick Agnero",
+            "Mikael Ishak",
+            "Patrik Wålemark",
+            "Daniel Håkans",
+            "Allahyar Sayyadmanesh"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 31
       },
       "Bayer Leverkusen": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 77 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 23,
         "list_b_count": 2,
         "list_b_players": {
           "DEF": [
@@ -2499,7 +2903,41 @@
             "Gabriel Minutillo"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Mark Flekken",
+            "Janis Blaswich",
+            "Niklas Lomb"
+          ],
+          "DEF": [
+            "Facundo Medina",
+            "Miguel Gutiérrez",
+            "Jarell Quansah",
+            "Loïc Badé",
+            "Edmond Tapsoba",
+            "Lucas Vázquez",
+            "Guéla Doué"
+          ],
+          "MID": [
+            "Equi Fernández",
+            "Jonas Hofmann",
+            "Robert Andrich",
+            "Malik Tillman",
+            "Aleix García",
+            "Eliesse Ben Seghir",
+            "Ibrahim Maza",
+            "Montrell Culbreath"
+          ],
+          "ATT": [
+            "Afonso Moreira",
+            "Patrik Schick",
+            "Moussa Diaby",
+            "Nathan Tella",
+            "Christian Kofane"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 25
       },
       "Levski Sofia": {
         "list_a_source": "UEFA official squad page, List A",
@@ -2556,8 +2994,8 @@
         }
       },
       "Lillestrøm": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 28 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
         "list_b_count": 3,
         "list_b_players": {
           "GK": [
@@ -2568,12 +3006,48 @@
             "Isa Jallow"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Stefan Hagerup",
+            "Pontus Dahlberg"
+          ],
+          "DEF": [
+            "Lars Ranger",
+            "Sturla Ottesen",
+            "Espen Garnås",
+            "Sander Moen Foss",
+            "Frederik Elkær",
+            "Ruben Gabrielsen",
+            "Stian Kristiansen"
+          ],
+          "MID": [
+            "Harald Woxen",
+            "Gustav Nyheim",
+            "Henrik Melland",
+            "Eric Kitolano",
+            "Kevin Krygård",
+            "Camil Jebara",
+            "Filip Ottosson",
+            "Ylldren Ibrahimaj"
+          ],
+          "ATT": [
+            "Linus Alperud",
+            "Fredrik Gulbrandsen",
+            "Thomas Olsen",
+            "Gustav Nordh",
+            "Felix Vá",
+            "Daniel Bassi",
+            "Seun Akanji",
+            "Yaw Paintsil"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 28
       },
       "Lyon": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 66 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 20,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
+        "list_b_count": 24,
         "list_b_players": {
           "GK": [
             "Justin Bengui",
@@ -2600,13 +3074,55 @@
             "Hedi Chekhab",
             "Amine Lazrak",
             "Haktan Şener"
+          ],
+          "ATT": [
+            "Adil Hamdani",
+            "Mathieu Hoareau",
+            "Nehemie Lurika",
+            "Djibril Merouani"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Dominik Greif",
+            "Rémy Descamps"
+          ],
+          "DEF": [
+            "Nicolás Tagliafico",
+            "Zachary Athekame",
+            "Abner Vinicius",
+            "Moussa Niakhaté",
+            "Felix Bacher",
+            "Ruben Kluivert",
+            "Clinton Mata",
+            "Steeve Kango",
+            "Noham Kamara"
+          ],
+          "MID": [
+            "Mads Bidstrup",
+            "Tanner Tessmann",
+            "Corentin Tolisso",
+            "Pavel Šulc",
+            "Khalis Merah",
+            "Tyler Morton",
+            "Julien Duranville",
+            "Noah Nartey"
+          ],
+          "ATT": [
+            "Ernest Nuamah",
+            "Keito Nakamura",
+            "Loïs Openda",
+            "Kail Boudache",
+            "Alejandro Rodriguez",
+            "Rémi Himbert"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 49
       },
       "Marseille": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 99 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 22,
         "list_b_count": 15,
         "list_b_players": {
           "GK": [
@@ -2633,11 +3149,44 @@
             "Ugo Kadmiri"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Jeffrey de Lange",
+            "Jelle van Neck",
+            "Théo Vermot"
+          ],
+          "DEF": [
+            "CJ Egan-Riley",
+            "Derek Cornelius",
+            "Bamo Meïté",
+            "Nayef Aguerd",
+            "Ulisses Garcia",
+            "Emerson",
+            "Alexi Koum"
+          ],
+          "MID": [
+            "Tochukwu Nnadi",
+            "Angel Gomes",
+            "Himad Abdelli",
+            "Geoffrey Kondogbia",
+            "Timothy Weah",
+            "Pierre-Emile Højbjerg",
+            "Nouhoum Kamissoko",
+            "Amine Harit"
+          ],
+          "ATT": [
+            "Amine Gouiri",
+            "Neal Maupay",
+            "Igor Paixão",
+            "Faris Moumbagna"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 37
       },
       "AC Milan": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 97 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 22,
         "list_b_count": 12,
         "list_b_players": {
           "GK": [
@@ -2661,11 +3210,44 @@
             "Francesco Camarda"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Pietro Terracciano",
+            "Mike Maignan"
+          ],
+          "DEF": [
+            "Pervis Estupiñán",
+            "Koni De Winter",
+            "Sankhoun Diawara",
+            "Fikayo Tomori",
+            "Strahinja Pavlović",
+            "Mario Gila",
+            "Filippo Terracciano",
+            "Matteo Gabbia"
+          ],
+          "MID": [
+            "Ruben Loftus-Cheek",
+            "Adrien Rabiot",
+            "Luka Modrić",
+            "Omari Hutchinson",
+            "Diego Moreira",
+            "Ardon Jashari",
+            "Alexis Saelemaekers",
+            "Alphadjo Cisse",
+            "Yunus Musah"
+          ],
+          "ATT": [
+            "Gonçalo Ramos",
+            "Christian Pulišić",
+            "Samuel Chukwueze"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 34
       },
       "NEC Nijmegen": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 100 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 24,
         "list_b_count": 5,
         "list_b_players": {
           "GK": [
@@ -2680,7 +3262,42 @@
             "Sam De Laat"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Gonzalo Crettaz",
+            "Nikolas Polster",
+            "Joep Geneste"
+          ],
+          "DEF": [
+            "Philippe Sandler",
+            "Perr Schuurs",
+            "Bram Nuytinck",
+            "Tobias Storm",
+            "Ahmetcan Kaplan",
+            "Deveron Fonville",
+            "Almugera Kabar",
+            "Gabriel Brás"
+          ],
+          "MID": [
+            "Darko Nejašmić",
+            "Willum Thor Willumsson",
+            "Dennis Geiger",
+            "Noe Lebreton",
+            "Jamiro Monteiro"
+          ],
+          "ATT": [
+            "Emre Mor",
+            "Tjaronn Chery",
+            "Dušan Tadić",
+            "Kaj Sierhuis",
+            "Bryan Linssen",
+            "Kevin Kers",
+            "Ayodele Thomas",
+            "Clement Bischoff"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 29
       },
       "OFI Crete": {
         "list_a_source": "UEFA official squad page, List A",
@@ -2739,8 +3356,8 @@
         }
       },
       "Olympiacos": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 88 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 21,
         "list_b_count": 8,
         "list_b_players": {
           "GK": [
@@ -2758,7 +3375,39 @@
             "Paschalis Toufakis"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Stefan Ortega",
+            "Dimitrios Stournaras"
+          ],
+          "DEF": [
+            "Manolis Saliakas",
+            "Zinedin Smajlović",
+            "Lorenzo Pirola",
+            "David Carmo",
+            "Marcus Pedersen",
+            "Panagiotis Retsos",
+            "Bruno Onyemaechi"
+          ],
+          "MID": [
+            "Kostas Fortounis",
+            "Gustavo Sá",
+            "Gustavo Puerta",
+            "Remo Freuler",
+            "Chiquinho",
+            "Santiago Hezze",
+            "Nayair Tiknizyan"
+          ],
+          "ATT": [
+            "Gelson Martins",
+            "Roman Yaremchuk",
+            "Leon Bailey",
+            "João Silva",
+            "Armando González"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 29
       },
       "Omonia Nicosia": {
         "list_a_source": "UEFA official squad page, List A",
@@ -2819,8 +3468,8 @@
         }
       },
       "Real Sociedad": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 78 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
         "list_b_count": 9,
         "list_b_players": {
           "GK": [
@@ -2841,7 +3490,43 @@
             "Dani Díaz"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Álex Remiro",
+            "Unai Marrero",
+            "Aitor Fraga"
+          ],
+          "DEF": [
+            "Jon Aramburu",
+            "Aihen Muñoz",
+            "Jon Pacheco",
+            "Sergio Gómez",
+            "Mamadou Sarr",
+            "Héctor Fort",
+            "Luken Beitia"
+          ],
+          "MID": [
+            "Jon Gorrotxategi",
+            "Igor Zubeldia",
+            "Beñat Turrientes",
+            "Mikel Oyarzabal",
+            "Pablo Marín",
+            "Carlos Soler",
+            "Yangel Herrera",
+            "Arsen Zakharyan",
+            "Luka Sučić",
+            "Alex Lebarbier"
+          ],
+          "ATT": [
+            "Ander Barrenetxea",
+            "Orri Óskarsson",
+            "Gonçalo Guedes",
+            "Job Ochieng",
+            "Takefusa Kubo"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 34
       },
       "Rennes": {
         "list_a_source": "UEFA official squad page, List A",
@@ -2910,15 +3595,54 @@
         }
       },
       "Red Bull Salzburg": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 45 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 1,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
+        "list_b_count": 2,
         "list_b_players": {
           "GK": [
             "Christian Zawieschitzky"
+          ],
+          "ATT": [
+            "Edmund Baidoo"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Christian Früchtl",
+            "Nikola Sarcevic"
+          ],
+          "DEF": [
+            "John Mellberg",
+            "Frans Krätzig",
+            "Tim Drexler",
+            "Stefan Lainer",
+            "Dominik Schmid",
+            "Leandro Morgalla",
+            "Kevin Boma",
+            "Valentin Zabransky",
+            "Anrie Chase"
+          ],
+          "MID": [
+            "Soumaila Diabate",
+            "Umut Tohumcu",
+            "Bartosz Mazurek",
+            "Nikolas Veratschnig",
+            "Gaoussou Diakite",
+            "Abubakr Barry",
+            "Aboubacar Camara",
+            "Jesper Lindstrøm",
+            "Justin Omoregie"
+          ],
+          "ATT": [
+            "Haris Tabaković",
+            "Yorbe Vertessen",
+            "Karim Konaté",
+            "Damir Redzic",
+            "Enrique Aguilar"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 27
       },
       "Sunderland": {
         "list_a_source": "English official senior register + UEFA List B",
@@ -3011,8 +3735,8 @@
         }
       },
       "Union Saint-Gilloise": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 58 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 21,
         "list_b_count": 5,
         "list_b_players": {
           "GK": [
@@ -3029,11 +3753,43 @@
             "Sekou Keita"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Vic Chambaere",
+            "Hervé Koffi"
+          ],
+          "DEF": [
+            "Nohim Chibani",
+            "Kamiel Van De Perre",
+            "Denzel De Roeve",
+            "Ross Sykes",
+            "Louis Patris",
+            "Massire Sylla",
+            "Nikki Havenaar",
+            "Ondřej Kričfaluši"
+          ],
+          "MID": [
+            "Adem Zorgane",
+            "Rob Schoofs",
+            "Besfort Zeneli",
+            "Darius Olaru",
+            "Relebohile Mofokeng"
+          ],
+          "ATT": [
+            "Mateo Biondic",
+            "Guilherme Smith",
+            "Kevin Rodriguez",
+            "Dylan Aquino",
+            "Ilan Hurtevent",
+            "Raul Florucz"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 26
       },
       "Viktoria Plzeň": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 41 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 23,
         "list_b_count": 4,
         "list_b_players": {
           "GK": [
@@ -3047,11 +3803,45 @@
             "Jiří Panoš"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Dominik Ťapaj",
+            "Florian Wiegele"
+          ],
+          "DEF": [
+            "Tobiáš Pališčák",
+            "Denis Vavro",
+            "Karel Spáčil",
+            "Merchas Doski",
+            "Adam Gabriel",
+            "Sampson Dweh",
+            "Filip Prebsl"
+          ],
+          "MID": [
+            "Lukáš Červ",
+            "Denis Višinský",
+            "Alexandr Sojka",
+            "Patrik Hrošovský",
+            "Tomáš Ladra",
+            "Cheick Souaré",
+            "Stefan Pirgić",
+            "Amar Memić"
+          ],
+          "ATT": [
+            "Salim Fago Lawal",
+            "Mohamed Touré",
+            "Matěj Vydra",
+            "Baboucarr Faal",
+            "Christophe Kabongo",
+            "Prince Adu"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 27
       },
       "Sparta Praha": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 49 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
         "list_b_count": 15,
         "list_b_players": {
           "GK": [
@@ -3076,11 +3866,47 @@
             "Chinguun Bolorbold"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Jakub Surovčík",
+            "Krisztián Hegyi"
+          ],
+          "DEF": [
+            "Martin Suchomel",
+            "Pavel Kadeřábek",
+            "Jakub Martinec",
+            "Tobias Guddal",
+            "Viktor Vitályos",
+            "Adam Ševínský",
+            "Loïc Mbe Soh",
+            "Ki-Jana Hoever",
+            "Jaroslav Zelený"
+          ],
+          "MID": [
+            "Santiago Eneme",
+            "Josimar Alcócer",
+            "Adam Karabec",
+            "Matěj Ryneš",
+            "John Mercado",
+            "Andrew Irving",
+            "Sivert Mannsverk",
+            "Joao Grimaldo",
+            "Patrik Vydra",
+            "Roman Macek",
+            "Matěj Jurásek"
+          ],
+          "ATT": [
+            "Jonatan Braut Brunes",
+            "Ebrima Singhateh",
+            "Matyáš Vojta"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 40
       },
       "SK Sturm Graz": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 41 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Europa League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
         "list_b_count": 6,
         "list_b_players": {
           "GK": [
@@ -3096,20 +3922,59 @@
             "Jonas Peinhart"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Adam Stejskal",
+            "Ammar Helac",
+            "Elias Lorenz"
+          ],
+          "DEF": [
+            "Joshua Quarshie",
+            "Albert Vallci",
+            "Emran Soglo",
+            "Petar Petrović",
+            "Luís Balbo",
+            "Paul-Friedrich Koller"
+          ],
+          "MID": [
+            "Jon Gorenc Stanković",
+            "Filip Rózga",
+            "Otar Kiteishvili",
+            "Gizo Mamageishvili",
+            "Simon Seidl",
+            "Arjan Malić",
+            "Jürgen Heil",
+            "Luca Weinhandl",
+            "Julian Halwachs",
+            "Jacob Hödl",
+            "Valmir Matoshi"
+          ],
+          "ATT": [
+            "Leon Grgic",
+            "Axel Kayombo",
+            "Oumar Diakité",
+            "Belmin Beganović",
+            "Nelson Weiper"
+          ]
+        },
+        "list_b_source": "Official UEFA Europa League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 31
       },
       "_summary": {
         "club_entries": 36,
-        "official_list_a_clubs_manually_transcribed": 9,
-        "profile_archive_fallback_clubs": 24,
+        "official_list_a_clubs_manually_transcribed": 33,
+        "profile_archive_fallback_clubs": 0,
         "list_a_player_count_known_or_profile_estimate": 640,
-        "list_b_player_count": 364
+        "list_b_player_count": 388,
+        "uefa_verified_clubs": 24,
+        "november_uefa_list_a_players": 566,
+        "november_uefa_list_b_players": 388
       }
     },
     "Conference League": {
       "Aarhus": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 91 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 23,
         "list_b_count": 13,
         "list_b_players": {
           "GK": [
@@ -3134,12 +3999,46 @@
             "Mark Ian Steffensen"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Jesper Hansen",
+            "Mads Hedenstad"
+          ],
+          "DEF": [
+            "Daníel Leó Grétarsson",
+            "Frederik Tingager",
+            "Tobias Mølgaard",
+            "Eric Kahl",
+            "Colin Rösler",
+            "Jacob Andersen",
+            "Rasmus Carstensen",
+            "Mouhammade Camara"
+          ],
+          "MID": [
+            "Magnus Knudsen",
+            "Nikolaj Poulsen",
+            "Markus Solbakken",
+            "Kristian Arnstad",
+            "Gift Links",
+            "Jens Jønsson",
+            "Callum McCowatt",
+            "Mikael Anderson",
+            "Hamuza Sengooba"
+          ],
+          "ATT": [
+            "Sebastian Jørgensen",
+            "Janni Serra",
+            "James Bogere",
+            "Tobias Bech"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 36
       },
       "Ajax": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 51 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 15,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
+        "list_b_count": 17,
         "list_b_players": {
           "GK": [
             "Aymean El Hani"
@@ -3161,13 +4060,53 @@
             "Avery Appiah",
             "Mohamed Abdalla",
             "Abdellah Ouazane"
+          ],
+          "ATT": [
+            "Emre Unuvar",
+            "Pharrel Nash"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Marc-André ter Stegen",
+            "Joeri Heerkens",
+            "Maarten Paes"
+          ],
+          "DEF": [
+            "Lucas Rosa",
+            "Anton Gaaei",
+            "Owen Wijndal",
+            "Thilo Kehrer",
+            "Caio Henrique",
+            "Youri Baas",
+            "Daley Blind",
+            "Jofre Torrents",
+            "Abdoulaye Camara"
+          ],
+          "MID": [
+            "Sofyan Amrabat",
+            "Julian Brandt",
+            "Oscar Gloukh",
+            "Davy Klaassen",
+            "Alejandro Monserrate"
+          ],
+          "ATT": [
+            "Simon Adingra",
+            "Kasper Dolberg",
+            "Viktor Tsygankov",
+            "Oliver Edvardsen",
+            "Steven Berghuis",
+            "Marcos Leonardo",
+            "Diego Pugno",
+            "Tolu Arokodare"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 42
       },
       "Atalanta": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 153 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
         "list_b_count": 9,
         "list_b_players": {
           "GK": [
@@ -3188,7 +4127,43 @@
             "Henry Camara"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Marco Carnesecchi",
+            "Marco Sportiello"
+          ],
+          "DEF": [
+            "Odilon Kossounou",
+            "Isak Hien",
+            "Raoul Bellanova",
+            "Sead Kolašinac",
+            "Thomas Kristensen",
+            "Giorgio Scalvini",
+            "Lorenzo Bernasconi",
+            "Davide Zappacosta"
+          ],
+          "MID": [
+            "Mario Pašalić",
+            "Lazar Vujadin Samardžić",
+            "Éderson",
+            "Franck Kessie",
+            "Sergej Levak",
+            "Nicola Zalewski",
+            "Gianluca Gaetano",
+            "Eljif Elmas"
+          ],
+          "ATT": [
+            "Kamaldeen Sulemana",
+            "Gianluca Scamacca",
+            "Jonathan Rowe",
+            "Charles De Ketelaere",
+            "Giacomo Raspadori",
+            "Tommaso De Nipoti",
+            "Nikola Krstović"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 34
       },
       "Borac": {
         "list_a_source": "UEFA official squad page, List A",
@@ -3239,14 +4214,22 @@
         }
       },
       "Braga": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 83 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 10,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
+        "list_b_count": 23,
         "list_b_players": {
           "GK": [
             "Romário Cunha",
             "Matheus Santos",
             "Renato Amorim"
+          ],
+          "DEF": [
+            "Matheus Araújo",
+            "Edgar Mota",
+            "Guilherme Costa",
+            "João Salvador",
+            "Hélder Faria",
+            "Afonso Sousa"
           ],
           "MID": [
             "Diego Rodrigues",
@@ -3256,20 +4239,64 @@
             "Rodrigo Marques",
             "João Trovisco",
             "António Gil"
+          ],
+          "ATT": [
+            "João Aragão",
+            "Nuno Patrício",
+            "Tomás Gomes",
+            "Rúben Furtado",
+            "Francisco França",
+            "Flinto Costa",
+            "Kauan Kelvin"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Tiago Sá",
+            "Bernardo Fontes",
+            "João Carvalho"
+          ],
+          "DEF": [
+            "Victor Gómez",
+            "Vitor Carvalho",
+            "Diogo Travassos",
+            "Gustaf Lagerbielke",
+            "Sergio Barcia",
+            "Bright Arrey-Mbi",
+            "Adrian Barišić",
+            "Adrian Bajrami",
+            "Fode Pascoal"
+          ],
+          "MID": [
+            "João Moutinho",
+            "Tomas Marques",
+            "Mario Dorgeles",
+            "Denis Huseinbasic",
+            "Jean-Baptiste Gorby",
+            "Demir Ege Tıknaz"
+          ],
+          "ATT": [
+            "Fran Navarro",
+            "Pau Víctor",
+            "Gabriel Silva",
+            "Jovan Milošević",
+            "Jonas Wind",
+            "Ricardo Horta",
+            "Gabri Martínez"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 48
       },
       "SK Brann": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 31 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 6,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 24,
+        "list_b_count": 5,
         "list_b_players": {
           "GK": [
             "Håkon Hellesøy"
           ],
           "DEF": [
-            "Jonas Torsvik",
             "Andreas Wilhelmsen"
           ],
           "MID": [
@@ -3280,7 +4307,42 @@
             "Julian Lægreid"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Mathias Dyngeland",
+            "Simen Vidtun Nilsen",
+            "Tom Bramel"
+          ],
+          "DEF": [
+            "Leo Cornic",
+            "Fredrik Pallesen",
+            "Nana Kwame Boakye",
+            "Jonas Torsvik",
+            "Joachim Soltvedt",
+            "Vetle Dragsnes",
+            "Neraysho Kasanwirjo",
+            "Thore Pedersen"
+          ],
+          "MID": [
+            "Sakarias Opsahl",
+            "Kjartan Már Kjartansson",
+            "Sondre Tronstad",
+            "Kristall Máni Ingason",
+            "Ulrik Mathisen",
+            "Kristian Eriksen",
+            "Jacob Sørensen",
+            "Eggert Aron Gudmundsson",
+            "Niklas Wassberg"
+          ],
+          "ATT": [
+            "Niklas Castro",
+            "Bård Finne",
+            "Sævar Atli Magnússon",
+            "Noah Holm"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 29
       },
       "Brighton & Hove Albion": {
         "list_a_source": "English official senior register + UEFA List B",
@@ -3310,8 +4372,8 @@
         "list_a_players": null
       },
       "FC København": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 80 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 22,
         "list_b_count": 6,
         "list_b_players": {
           "GK": [
@@ -3327,11 +4389,44 @@
             "Viktor Dadason"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Diant Ramaj",
+            "Rúnar Rúnarsson"
+          ],
+          "DEF": [
+            "Felix Beijmo",
+            "Asger Sørensen",
+            "Ákos Markgráf",
+            "Rodrigo Huescas",
+            "Marcos López",
+            "Kenay Myrie",
+            "Junnosuke Suzuki",
+            "Birger Meling",
+            "Henrik Haraldsen"
+          ],
+          "MID": [
+            "Magnus Mattsson",
+            "Robert",
+            "Mads Emil Madsen",
+            "Thomas Delaney",
+            "Alex Král",
+            "William Clem"
+          ],
+          "ATT": [
+            "Maher Carrizo",
+            "Mohamed Elyounoussi",
+            "Thapelo Maseko",
+            "Andreas Cornelius",
+            "Geovanni Ndjee"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 28
       },
       "Crvena zvezda": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 46 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 22,
         "list_b_count": 6,
         "list_b_players": {
           "GK": [
@@ -3349,7 +4444,40 @@
             "Dimitrije Šarić"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Matheus",
+            "Ivan Guteša"
+          ],
+          "DEF": [
+            "Yuta Nakayama",
+            "Miloš Veljković",
+            "Mihailo Ristić",
+            "Franklin Tebo",
+            "Derrick Luckassen"
+          ],
+          "MID": [
+            "Mirko Ivanić",
+            "Mahmudu Bajo",
+            "Aleksandar Katai",
+            "Osman Bukari",
+            "Mohammad Abu Fani",
+            "Yegeon Kim",
+            "Tomas Händel",
+            "Timi Max Elšnik",
+            "Rade Krunić",
+            "Vladimir Lučić"
+          ],
+          "ATT": [
+            "Marko Arnautović",
+            "Kristiyan Balov",
+            "Bamba Dieng",
+            "Muhammed Cham",
+            "Loizos Loizou"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 28
       },
       "CSKA Sofia": {
         "list_a_source": "UEFA official squad page, List A",
@@ -3444,13 +4572,17 @@
         }
       },
       "Freiburg": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 74 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 5,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
+        "list_b_count": 7,
         "list_b_players": {
           "GK": [
             "Kilian Katz",
             "Max Stiefvater"
+          ],
+          "DEF": [
+            "Berkay Yılmaz",
+            "Bruno Ogbus"
           ],
           "MID": [
             "Rouven Tarnutzer",
@@ -3460,11 +4592,47 @@
             "Leon Čatak"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Mio Backhaus",
+            "Florian Müller",
+            "Jannik Huth"
+          ],
+          "DEF": [
+            "Philipp Lienhart",
+            "Anthony Jung",
+            "Lukas Kübler",
+            "Niklas Beste",
+            "Matthias Ginter",
+            "Philipp Treu",
+            "Christian Günter",
+            "Jordy Makengo",
+            "Max Rosenfelder"
+          ],
+          "MID": [
+            "Patrick Osterhage",
+            "Maximilian Eggestein",
+            "Yuito Suzuki",
+            "Yannik Engelhardt",
+            "Rihito Yamamoto",
+            "Vincenzo Grifo",
+            "Mladen Mijajlovic"
+          ],
+          "ATT": [
+            "Derry Scherhant",
+            "Lucas Höler",
+            "Cyriaque Irié",
+            "Igor Matanović",
+            "Mateo Zelic",
+            "Keisuke Goto"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 32
       },
       "Gent": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 93 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 24,
         "list_b_count": 16,
         "list_b_players": {
           "GK": [
@@ -3492,13 +4660,53 @@
             "Ali Donny Sylla"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Kjell Peersman",
+            "Davy Roef"
+          ],
+          "DEF": [
+            "Maksim Paskotši",
+            "Mouhamed Ngom",
+            "Christian Burgess",
+            "Siebe Van Der Heyden",
+            "Mamadou Diallo",
+            "Matties Volckaert"
+          ],
+          "MID": [
+            "László Bénes",
+            "Aimé Omgba",
+            "Kyrell Wilson",
+            "Mathias Delorge",
+            "Matisse Samoise",
+            "Tiago Araújo",
+            "Leonardo Lopes",
+            "Tibe De Vlieger",
+            "Abdelkahar Kadri",
+            "Wout Asselman"
+          ],
+          "ATT": [
+            "Michel-Ange Balikwisha",
+            "Momodou Sonko",
+            "Hyllarion Goore",
+            "Josué Vergara",
+            "El Hadji Seck",
+            "Ibrahima Cissé"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 40
       },
       "Getafe": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 116 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 2,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 21,
+        "list_b_count": 5,
         "list_b_players": {
+          "GK": [
+            "Diego Ferrer",
+            "Djordjije Medenica",
+            "Jorge Benito"
+          ],
           "MID": [
             "Alberto Risco"
           ],
@@ -3506,18 +4714,49 @@
             "Marcos Pachon"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Jiří Letáček",
+            "David Soria"
+          ],
+          "DEF": [
+            "Dakonam Djené",
+            "Davinchi",
+            "Saba Sazonov",
+            "Abdel Abqar",
+            "Sebastián Boselli",
+            "Kiko Femenía",
+            "Andrés García",
+            "Johan Mojica",
+            "Zaid Romero",
+            "Jean Ives Valou"
+          ],
+          "MID": [
+            "Mario Martín",
+            "Nemanja Gudelj",
+            "Ramón Terrats",
+            "Francho Gracia",
+            "Orel Mangala"
+          ],
+          "ATT": [
+            "Borja Mayoral",
+            "Martin Satriano",
+            "Enes Ünal",
+            "Iván Azón"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 26
       },
       "Hajduk Split": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 44 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 7,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 23,
+        "list_b_count": 6,
         "list_b_players": {
           "GK": [
             "Davyd Fesyuk"
           ],
           "DEF": [
-            "Roko Gabrić",
             "Marino Skelin",
             "Luka Hodak"
           ],
@@ -3529,11 +4768,45 @@
             "Roko Brajković"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Ivica Ivušić",
+            "Toni Silić",
+            "Dante Stipica"
+          ],
+          "DEF": [
+            "Roko Gabrić",
+            "Alec Van Hoorenbeeck",
+            "Dennis Hadžikadunić",
+            "Ron Raçi",
+            "Dario Maresic",
+            "Dario Melnjak",
+            "Mathieu Acapandie",
+            "Šimun Hrgović"
+          ],
+          "MID": [
+            "Adrion Pajaziti",
+            "Khalil Fayad",
+            "Anđelo Šutalo",
+            "Leander Dendoncker",
+            "Etnik Brruti",
+            "Alberto Del Moral",
+            "Carlos Martín"
+          ],
+          "ATT": [
+            "Abdoulie Sanyang",
+            "Dalisson",
+            "Marko Livaja",
+            "Michele Šego",
+            "Marin Šotiček"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 29
       },
       "Hearts": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 123 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 23,
         "list_b_count": 18,
         "list_b_players": {
           "GK": [
@@ -3563,7 +4836,41 @@
             "Sinan Kaharevic"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Beau Reus",
+            "Zander Clark",
+            "Ryan Fulton"
+          ],
+          "DEF": [
+            "Christian Borchgrevink",
+            "Stephen Kingsley",
+            "Jamie McCart",
+            "Stuart Findlay",
+            "Harry Milne",
+            "Jordi Altena",
+            "Malachi Fagan-Walcott",
+            "Laurent Mendy"
+          ],
+          "MID": [
+            "Oisin McEntee",
+            "Sabri Guendouz",
+            "Tómas Bent Magnússon",
+            "Finlay Pollock"
+          ],
+          "ATT": [
+            "Calvin Miller",
+            "JJ Williams",
+            "Cláudio Braga",
+            "Pierre Landry Kaboré",
+            "Josh McPake",
+            "James Wilson",
+            "Sabah Kerjota",
+            "Rogers Mato"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 41
       },
       "Iberia Tbilisi": {
         "list_a_source": "UEFA official squad page, List A",
@@ -3666,8 +4973,8 @@
         }
       },
       "Jablonec": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 40 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
         "list_b_count": 2,
         "list_b_players": {
           "DEF": [
@@ -3677,7 +4984,43 @@
             "Dominik Melka"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Michal Kukučka",
+            "Vojtěch Reiner",
+            "Klemen Mihelak"
+          ],
+          "DEF": [
+            "Nemanja Tekijaški",
+            "Daniel Souček",
+            "Dušan Pavlović",
+            "Martin Cedidla",
+            "Matěj Polidar",
+            "Evžen Malý",
+            "Filip Novák"
+          ],
+          "MID": [
+            "Nelson Okeke",
+            "Vakhtang Tchanturishvili",
+            "Filip Zorvan",
+            "Jan Suchan",
+            "David Nykrín",
+            "Richard Sedláček",
+            "Jiří Sláma",
+            "Dominik Hollý",
+            "Sebastián Nebyla",
+            "Adam Kubát",
+            "Garang Kuol"
+          ],
+          "ATT": [
+            "Antonín Růsek",
+            "Saidou Alioum",
+            "Jan Chramosta",
+            "Lamin Jawo"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 27
       },
       "Kairat Almaty": {
         "list_a_source": "UEFA official squad page, List A",
@@ -3866,10 +5209,14 @@
         }
       },
       "Lugano": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 43 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 2,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 22,
+        "list_b_count": 4,
         "list_b_players": {
+          "GK": [
+            "Ahmadou Ndiaye",
+            "Diego Mina"
+          ],
           "MID": [
             "Christian Raffa"
           ],
@@ -3877,11 +5224,44 @@
             "Nicolò Puddu"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "David von Ballmoos",
+            "Felix Gebhardt"
+          ],
+          "DEF": [
+            "Bekhruz Karimov",
+            "Damian Kelvin",
+            "Antonios Papadopoulos",
+            "Ezgjan Alioski",
+            "Lukas Mai",
+            "Joel Bichsel",
+            "Martim Marques",
+            "Daniel Leo",
+            "Mattia Zanotti"
+          ],
+          "MID": [
+            "Anto Grgic",
+            "Renato Steffen",
+            "Ahmed Kendouci",
+            "Uran Bislimi",
+            "Daniel Dos Santos"
+          ],
+          "ATT": [
+            "Albian Ajeti",
+            "Yanis Cimignani",
+            "Beckham Castro",
+            "Elias Pihlström",
+            "Dereck Moncada",
+            "Kevin Behrens"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 26
       },
       "FC Midtjylland": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 105 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 24,
         "list_b_count": 10,
         "list_b_players": {
           "GK": [
@@ -3903,13 +5283,51 @@
             "Alberto Velasquez"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Elias Ólafsson",
+            "Nordin Bakker",
+            "Ovie Ejeheri",
+            "Mark Ugboh"
+          ],
+          "DEF": [
+            "Magnus Jensen",
+            "Ousmane Diao",
+            "Rasmus Kristensen",
+            "Martin Erlić",
+            "Beni Junior",
+            "Mads Bech",
+            "Abdou Aziz Ndiaye",
+            "Victor Bak"
+          ],
+          "MID": [
+            "Philip Billing",
+            "Pedro Bravo",
+            "Hyun-Seok Hong",
+            "Denil Castillo",
+            "Kjell Wätjen",
+            "David Martínez"
+          ],
+          "ATT": [
+            "Mileta Rajovic",
+            "Guesung Cho",
+            "Mikael Uhre",
+            "Stanley Iheanacho",
+            "Mikel Gogorza",
+            "Friday Etim"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 34
       },
       "Mjällby": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 46 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 4,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 25,
+        "list_b_count": 5,
         "list_b_players": {
+          "GK": [
+            "Melker Ahlstrand"
+          ],
           "MID": [
             "Edon Oremalm Murseli",
             "Isak Andersen",
@@ -3919,13 +5337,53 @@
             "Olle Nilsson Löv"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Sebastian Hansen",
+            "Robin Wallinder",
+            "Alexander Lundin"
+          ],
+          "DEF": [
+            "Ludvig Svanberg",
+            "Martin Agnarsson",
+            "Axel Norén",
+            "Abdullah Iqbal",
+            "Tom Pettersson",
+            "Ian Hoffman",
+            "Ludvig Tidstrand",
+            "Tony Miettinen"
+          ],
+          "MID": [
+            "Mads Enggård",
+            "Viktor Gustafson",
+            "Teo Helge",
+            "Jeppe Kjær",
+            "Villiam Granath",
+            "Måns Isaksson",
+            "Jesper Gustavsson",
+            "Áki Samuelsen",
+            "Max Nielsen",
+            "Olle Lindberg",
+            "Romeo Leandersson"
+          ],
+          "ATT": [
+            "Ali Youssef",
+            "Jacob Bergström",
+            "Paul Colley"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 30
       },
       "Monaco": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 68 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 5,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 23,
+        "list_b_count": 7,
         "list_b_players": {
+          "GK": [
+            "Jules Stawiecki",
+            "Loïc Tiamuna Lubaki"
+          ],
           "DEF": [
             "Christian Mawissa",
             "Samuel Nibombe",
@@ -3938,11 +5396,45 @@
             "Iliès Belmokhtar"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Lukas Hrádecký",
+            "Philipp Köhn"
+          ],
+          "DEF": [
+            "Vanderson",
+            "Jordan Teze",
+            "Eric Dier",
+            "Flávio Nazinho",
+            "Mohammed Salisu",
+            "Sadibou Sane"
+          ],
+          "MID": [
+            "Denis Zakaria",
+            "Lamine Camara",
+            "Aleksandr Golovin",
+            "Stanis Idumbo",
+            "Takumi Minamino",
+            "Mamadou Coulibaly",
+            "Edan Diop",
+            "Aymen Assab",
+            "Anis Soubeir",
+            "Safouane Benzahra"
+          ],
+          "ATT": [
+            "Mathys Detourbet",
+            "Folarin Balogun",
+            "Matthis Abline",
+            "Mika Biereth",
+            "Paris Brunner"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 30
       },
       "FC Nordsjælland": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 89 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 24,
         "list_b_count": 7,
         "list_b_players": {
           "GK": [
@@ -3961,7 +5453,42 @@
             "William Faber"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Andreas Hansen",
+            "Jakob Busk",
+            "Carljohan Eriksson"
+          ],
+          "DEF": [
+            "Peter Ankersen",
+            "Tobias Salquist",
+            "Noah Markmann",
+            "Juho Lähteenmäki",
+            "Stephen Acquah",
+            "Runar Norheim",
+            "Victor Nelsson",
+            "Matej Tuka"
+          ],
+          "MID": [
+            "Mark Brink",
+            "Nicklas Røjkjær",
+            "Justin Janssen",
+            "Malte Heyde",
+            "Arthur Israel"
+          ],
+          "ATT": [
+            "Ola Solbakken",
+            "Prince Amoako",
+            "Alexander Lind",
+            "Ibrahim Adel",
+            "Lamine Sadio",
+            "Hjalte Boe",
+            "Mouekeinga Kone",
+            "Rayan Bardghji"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 31
       },
       "Pafos FC": {
         "list_a_source": "UEFA official squad page, List A",
@@ -4016,8 +5543,8 @@
         }
       },
       "Panathinaikos": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 102 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 24,
         "list_b_count": 5,
         "list_b_players": {
           "GK": [
@@ -4034,7 +5561,42 @@
             "Iason Nempis"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Iñaki Peña",
+            "Konstantinos Kotsaris"
+          ],
+          "DEF": [
+            "Davide Calabria",
+            "Georgios Katris",
+            "Stefan de Vrij",
+            "Erik Palmer-Brown",
+            "Sotirios Kontouris",
+            "Triantafyllos Tsapras",
+            "Victor Kristiansen",
+            "Rick van Drongelen",
+            "Giorgos Kyriakopoulos"
+          ],
+          "MID": [
+            "Pedro Chirivella",
+            "Adriano Jagušić",
+            "Vicente Taborda",
+            "Etienne Camara",
+            "Imran Louza",
+            "Facundo Pellistri",
+            "Kings Kangwa"
+          ],
+          "ATT": [
+            "Andrews Tetteh",
+            "Cyriel Dessers",
+            "Santino Andino",
+            "Georgios Kyriopoulos",
+            "Elmin Rastoder",
+            "Levi Garcia"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 29
       },
       "Riga FC": {
         "list_a_source": "UEFA official squad page, List A",
@@ -4078,10 +5640,14 @@
         }
       },
       "Sint-Truiden": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 93 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 5,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 24,
+        "list_b_count": 7,
         "list_b_players": {
+          "GK": [
+            "Yanis Ngoy",
+            "Bryan Dignef"
+          ],
           "DEF": [
             "Rune Verheyden"
           ],
@@ -4094,13 +5660,52 @@
             "Moustafa Camara"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Leo Kokubo",
+            "Matt Lendfers"
+          ],
+          "DEF": [
+            "Taiga Hata",
+            "Kōta Takai",
+            "Shogo Taniguchi",
+            "Wolke Janssens",
+            "Joedrick Pupe",
+            "Visar Musliu",
+            "Jeremy Mbambi",
+            "Robert-Jan Vanwesemael"
+          ],
+          "MID": [
+            "Abdoulaye Sissako",
+            "Ryan Merlen",
+            "Nelson Ishiwatari",
+            "Illyes Benachour",
+            "Alouis Diriken",
+            "Ryotaro Araki"
+          ],
+          "ATT": [
+            "Arbnor Muja",
+            "Samed Baždar",
+            "Ilias Sebaoui",
+            "Nathanaël Mbuku",
+            "Frédéric Soèllé",
+            "Kaito Matsuzawa",
+            "Oumar Diouf",
+            "Shion Shinkawa"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 31
       },
       "Thun": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 30 profiles; not current-roster proof)",
-        "list_a_count": 18,
-        "list_b_count": 3,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 24,
+        "list_b_count": 5,
         "list_b_players": {
+          "GK": [
+            "Dario Wälti",
+            "Leo Stucki"
+          ],
           "MID": [
             "Adam Ilic",
             "Amir Maaroufi"
@@ -4109,11 +5714,46 @@
             "Simon Lengen"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Niklas Steffen",
+            "Tim Spycher"
+          ],
+          "DEF": [
+            "Olivier Mambwa",
+            "Nicolas Bürgy",
+            "Tom Strannegård",
+            "Jan Bamert",
+            "Marco Bürki",
+            "Mats Seiler",
+            "Lucien Dähler",
+            "Fabio Fehr",
+            "Louis Passavant"
+          ],
+          "MID": [
+            "Fabio Saiz",
+            "Nassim Zoukit",
+            "Mattias Käit",
+            "Patrik Kristal",
+            "Justin Roth",
+            "Dorian Derbaci",
+            "Nico Maier",
+            "Nils Reichmuth"
+          ],
+          "ATT": [
+            "Furkan Dursun",
+            "Riccardo Braschi",
+            "Noah Christoffersson",
+            "Marc Gutbub",
+            "Brighton Labeau"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 29
       },
       "Trabzonspor": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 110 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 22,
         "list_b_count": 9,
         "list_b_players": {
           "GK": [
@@ -4134,11 +5774,44 @@
             "Hakan Yılmaz"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Ahmet Doğan Yıldırım",
+            "André Onana"
+          ],
+          "DEF": [
+            "Samet Akaydin",
+            "Stefan Savić",
+            "Mustafa Eskihellaç",
+            "Wagner Pina",
+            "Chibuike Nwaiwu",
+            "Cenk Özkacar",
+            "Arsenii Batahov",
+            "Sidny Lopes Cabral"
+          ],
+          "MID": [
+            "Batista Mendy",
+            "Fabinho",
+            "Ernest Muçi",
+            "Benjamin Bouchouari",
+            "Ozan Tufan",
+            "Tim Jabol-Folcarelli",
+            "Melih Kabasakal"
+          ],
+          "ATT": [
+            "Djú Franculino",
+            "Mohamed Salah",
+            "Paul Onuachu",
+            "Aral Şimşir",
+            "Noah Saviolo"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 31
       },
       "FC Twente": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 84 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 23,
         "list_b_count": 11,
         "list_b_players": {
           "GK": [
@@ -4161,22 +5834,95 @@
             "Nigel Groenewald"
           ]
         },
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Lars Unnerstall",
+            "Joël Drommel",
+            "Remko Pasveer"
+          ],
+          "DEF": [
+            "Michal Rosiak",
+            "Robin Pröpper",
+            "Stav Lemkin",
+            "Bart Van Rooij",
+            "Aske Adelgaard",
+            "Max Bruns"
+          ],
+          "MID": [
+            "Ramiz Zerrouki",
+            "Daouda Weidmann",
+            "Kristian Hlynsson",
+            "Jordy Bawuah",
+            "Thomas van den Belt",
+            "Krzysztof Kurowski",
+            "Sondre Ørjasæter",
+            "Gijs Besselink"
+          ],
+          "ATT": [
+            "Marko Pjaca",
+            "Wout Weghorst",
+            "Younes Taha",
+            "Daan Rots",
+            "Filip Thorvaldsen",
+            "Naci Ünüvar"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 34
       },
       "Universitatea Craiova": {
-        "list_a_source": "Embedded historical profile archive (2026-07-06; 50 profiles; not current-roster proof)",
-        "list_a_count": 18,
+        "list_a_source": "Official UEFA Conference League club squad page; fixed snapshot after last completed matchweek (2026-11-14)",
+        "list_a_count": 24,
         "list_b_count": 0,
         "list_b_players": {},
-        "list_a_players": null
+        "list_a_players": {
+          "GK": [
+            "Alexandru Maxim",
+            "Laurențiu Popescu",
+            "Răzvan Sava"
+          ],
+          "DEF": [
+            "Oleksandr Romanchuk",
+            "Baptiste Roux",
+            "Vladimir Screciu",
+            "Nikola Stevanović",
+            "Adrian Rus",
+            "Ronaldo Webster"
+          ],
+          "MID": [
+            "Alexandru Crețu",
+            "Tudor Băluţă",
+            "Nicușor Bancu",
+            "João Lameira",
+            "Carlos Mora",
+            "Heriberto Tavares",
+            "Alexandru Cicâldău",
+            "Samuel Teles",
+            "David Matei"
+          ],
+          "ATT": [
+            "Steven Nsimba",
+            "Assad Al Hamlawi",
+            "Ștefan Baiaram",
+            "Monday Etim",
+            "Simon Elisor",
+            "Constantin Băsceanu"
+          ]
+        },
+        "list_b_source": "Official UEFA Conference League club squad page; starred List B entries, fixed snapshot (2026-11-14)",
+        "players_total": 24
       },
       "_summary": {
         "club_entries": 36,
-        "official_list_a_clubs_manually_transcribed": 11,
-        "profile_archive_fallback_clubs": 24,
+        "official_list_a_clubs_manually_transcribed": 35,
+        "profile_archive_fallback_clubs": 0,
         "list_a_player_count_known_or_profile_estimate": 679,
-        "list_b_player_count": 226
+        "list_b_player_count": 253,
+        "uefa_verified_clubs": 24,
+        "november_uefa_list_a_players": 566,
+        "november_uefa_list_b_players": 253
       }
     }
-  }
+  },
+  "data_quality_note": "The 48 clubs previously using a July 6 profile archive now use the official UEFA club squad pages transcribed for the November 14 snapshot. Existing saved careers receive a one-time migration; played or manually edited club rosters are preserved and official missing registrations are appended."
 }

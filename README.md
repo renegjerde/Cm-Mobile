@@ -1,11 +1,17 @@
-# CM Mobile v3.64 – Complete European Player Database
+# CM Mobile v3.65 – Official European Squad Snapshot
 
-- Erstatt `index.html` i GitHub-repositoriets rot med filen fra denne pakken.
-- Sett `VERSION.txt` til `v3.64`.
-- `supabase_cm_mobile.sql` er beholdt fra v3.63 og trenger ikke kjøres på nytt hvis v3.59-tabellen allerede er opprettet.
-- Åpne spillet etter publisering. Lagrede karrierer kjører en engangsmigrering: List A v2 og List B v2.
-- Lag med kamphistorikk, overføringer, manuelle endringer eller verifiserte spillerregistreringer beskyttes mot automatisk utskifting.
-- Alle List B-spillere blir vanlige klubbspillere i spillopplevelsen; ingen UI-markering.
-- Spillet er fortsatt offline-first og foretar ingen UEFA-nettoppdateringer.
+## Publisering
+1. Pakk ut ZIP-filen.
+2. Erstatt `index.html` i rotmappen til GitHub-repositoriet.
+3. Erstatt `VERSION.txt` med `v3.65`.
+4. `supabase_cm_mobile.sql` er uendret fra tidligere versjon og skal ikke kjøres på nytt dersom CM Mobile-tabellen allerede er opprettet.
+5. Publiser og åpne spillet. Eksisterende karrierer kjører en engangsmigrering for de 48 oppdaterte Europa-/Conference League-stallene.
 
-Se `PLAYER_AUDIT_REPORT.md` og `UEFA_PLAYER_DATABASE_SNAPSHOT_2026-11-14.json` for dekning og kildebegrensninger.
+## Spillerdatabase
+- De 48 klubbene som tidligere brukte juli-arkivet som List A-reserve, bruker nå offisielle UEFA-troppssider fra november-snapshotet.
+- List A og List B legges sammen i ordinære klubbtrupper.
+- Ingen synlig markering av List B- eller regenererte spillere.
+- Ingen automatiske UEFA-oppdateringer i sesongen.
+- Urørte reserve-/arkivstaller kan erstattes; karrierer med kamphistorikk, manuelle endringer eller overganger beskyttes.
+
+Se `PLAYER_AUDIT_REPORT.md` og `UEFA_PLAYER_DATABASE_SNAPSHOT_2026-11-14.json`.
