@@ -1,52 +1,42 @@
-# CM Mobile – spillerrevisjon, arbeidsrapport v3.61
+# CM Mobile – spillerrevisjon, arbeidsrapport v3.62
 
 Dato: 14. november 2026
-Utgangspunkt: CM Mobile v3.60 Player Audit.
+Utgangspunkt: CM Mobile v3.61 Player Database-pakken.
 
-## Endringer i v3.61
+## Endringer
 
-### Juniorakademier
-- Rivalakademienes mål er redusert fra 4 til 2 spillere per klubb.
-- Eksisterende rivalakademier trimmes ved innlasting av eldre karrierer. De to spillerne med høyest potensial prioriteres, deretter ferdighet og lavere alder.
-- Managerens eget akademi beholdes på 25 spillere med 3-8-8-6-posisjonsfordeling.
-- Rivalakademier fylles opp ved sesongbehandling, ikke midt i sesongen.
-- Akademispillere over 18 år frigis etter eksisterende aldersregel.
-- Det er ikke lagt til synlige merker eller etiketter for genererte spillere.
+### UEFA Champions League 2026/27
+- Innebygd List A for 31 ikke-engelske klubber.
+- Importert antall: 730 spillerregistreringer.
+- Antall klubber: 31.
+- Per klubb: 21–25 navn.
+- Fem engelske UCL-klubber fortsetter å bruke offisielle engelske 2026/27-registreringer.
+- List B er bevisst utelatt fordi den er dynamisk og overlapper klubbens utviklings-/akademiløp.
 
-### Fri transfer
-- `freeAgentSinceSeason` lagres på hver spiller i fri transfer-systemet.
-- Spillere med inngangssesong tidligere enn ny sesong fjernes ved sesongskiftet.
-- Spillere uten historisk inngangssesong i eldre lagringer får nåværende sesong som migreringsdato, slik at de får en hel sesong før første opprydding.
-- Kontraktsutløp ved sesongslutt registreres med kommende sesong som inngangssesong.
-- Juniorer som frigis når sesongen avsluttes registreres tilsvarende med kommende sesong.
-- Nye årlige frie agenter får sesongen de kommer inn som inngangssesong.
-- Den eksisterende pensjoneringsgrensen på 37 år består.
+### Bygging og migrering
+- `buildUEFAListASquad()` bygger offline-spillerobjekter fra offisiell List A.
+- Hver importert spiller får stabil klubbbundet ID, klubbreferanse og intern registreringsmetadata. Metadata er ikke synlig merking i spillet.
+- `competitionSquad()` prøver den offisielle List A-stallen før den oppretter en fiktiv cup-only-stall.
+- Ved migrering av eksisterende karrierer erstattes bare tydelig urørte, rent genererte cup-only-staller. Har klubben kampstatistikk eller registrerte overganger, beholdes den eksisterende stallen.
+- Kampstall og europeisk overgangsregister synkroniseres mot samme offisielle List A-liste.
 
-## Tidligere v3.60-kontroller beholdt
-- Premier League: 20 klubber, 459 seniornavn.
-- Premier League U21-tillegg: 20 klubber, 54 navn.
-- EFL: 72 klubber, 1 479 navn.
-- Identitetsmatch krever stabil karriere-ID, Transfermarkt-ID eller normalisert fullt navn kombinert med samme fødselsdato.
-- Likhet i navn alene utløser ikke automatisk sletting.
-- Lånespillere beholdes i eierklubbens eierskapsdata.
+## Kontroller
+- 31/31 ikke-engelske UCL-klubber dekket.
+- 730 spillere totalt.
+- Ingen duplikate normaliserte spilleridentiteter mellom de 31 UEFA-klubbene.
+- Ingen eksakte normaliserte navneoverlapp mot PL, PL U21-supplement eller EFL-stallene. Dette er en konservativ kontroll; navnelikhet alene brukes fortsatt ikke som automatisk slettekriterium.
+- Runtime-test: 31 klubb-staller bygget, 730 spillere lastet, 8 klubbnavn-aliaser testet og sesongfilter testet. I tillegg bestod fire migreringssperretester: urørt generert stall kan migreres, mens kamphistorikk, annen kilde eller overgangshistorikk beskytter stallen mot automatisk utskifting.
+- Alle innebygde JS-skript syntakskontrollert.
+- ZIP-integritet testet.
 
-## Testresultater for v3.61
-- 9 målrettede assertions bestått.
-- Testet at managerakademiet beholder 25 spillere.
-- Testet at rivalakademier reduseres til to, og at beste prospekter bevares.
-- Testet opprettelse av manglende rivalakademi med to prospekter.
-- Testet at 19-åringer forlater akademiet ved sesongbehandling, og at frigivelsen får riktig inngangssesong.
-- Testet at eldre frie agenter fjernes etter én full sesong.
-- Testet at spillere som kommer inn ved sesonggrensen får en hel sesong før fjerning.
-- Alle innebygde JavaScript-skript syntakskontrollert med Node.js.
-- ZIP-arkivintegritet kontrollert.
+## Bevisste begrensninger
+- Dette er **ikke** full europeisk dekning: Europa League og Conference League står igjen.
+- UCL List B er ikke med. Den kan oppdateres fram mot hver kamp, så dette snapshotet skal ikke omtales som fullstendig UEFA-lagliste.
+- UEFA opplyser at squad-sidene er til praktisk informasjon, ikke bindende, og at UEFA ikke garanterer nøyaktighet eller fullstendighet; klubbene må selv bekrefte registreringene.
+- Profilarkivet (Transfermarkt-snapshot 06.07.2026) kan fortsatt levere historiske profilopplysninger, men bekrefter ikke alene nåværende klubbtilhørighet.
+- Spillere i aktive karrierer med statistikk/overgangshistorikk overskrives ikke automatisk. Det beskytter lagrede karrierer, men betyr at en manuell/ny karriere kan være nødvendig for å se alle nye UEFA-listene dersom den gamle stallen allerede er endret.
+- Det er ikke gjennomført live-test mot brukerens Supabase-instans.
 
-## Ikke ferdigstilt i v3.61
-Full import og kryssjekk av alle 108 UEFA-ligafaseklubbers List A og List B er **ikke** ferdigstilt i denne pakken. Den eldre europeiske arkiv-/kurateringskilden fra 6. juli 2026 er ikke tilstrekkelig bevis på aktuell klubbtilhørighet. Det kreves en egen datainnhentings- og identitetsrevisjon per UEFA-klubb, med kildedato og kryssjekk mot engelske registreringer og alle øvrige europeiske klubber.
-
-UEFA-kildesider (sesong 2026/27):
-- Champions League squad changes, 3. november 2026.
-- Europa League squad changes, 5. november 2026.
-- Conference League squad changes, 4. november 2026.
-
-Disse sidene viser List A-endringer; List B kan oppdateres før hver kamp. Det må derfor lagres hvilken dato hver tropp ble kontrollert.
+## Kilder
+- UEFA Champions League 2026/27 squad changes, siste kontrollerte List A-endringer 3. november 2026; siden oppdateres på kampdager.
+- Offisielle UEFA squad-sider for de 31 klubbene, kontrollert 14. november 2026.
