@@ -1,0 +1,36 @@
+{
+  "targetedPlanning": {
+    "fullSquadQualityNeed": true,
+    "eligibleCoreRenewal": true,
+    "outfieldVeteranNotRenewed": true,
+    "fringePlayerNotRenewed": true,
+    "renewalSeasonGuard": true,
+    "wageCeilingEnforced": true,
+    "academySuccessionConsidered": true,
+    "passed": true,
+    "seasonEndHookBeforeExpiry": true,
+    "strategicTransferIntegration": true
+  },
+  "tenSeasonSimulation": {
+    "seasons": 10,
+    "aiClubs": 24,
+    "initialPlayers": 576,
+    "renewals": 1499,
+    "expiredWithoutRenewal": 393,
+    "duplicateCareerIds": 0,
+    "peakRoster": 24,
+    "wageBudgetViolations": 0,
+    "passed": true
+  },
+  "regressions": {
+    "v372TransferAndExpiryTests": "passed",
+    "v371ProgressionRegression": "passed",
+    "inlineScriptSyntax": "passed",
+    "databaseSchemaChanged": false
+  },
+  "limitations": [
+    "Controlled function-level simulation, not a complete browser career simulation",
+    "No full 20-season simulation of all domestic and European clubs",
+    "No full agent negotiation, promises, signing bonuses or tactical-fit transfer model"
+  ]
+}
