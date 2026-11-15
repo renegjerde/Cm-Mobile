@@ -1,14 +1,17 @@
-# CM Mobile v3.71 – World Development Balance
+# CM Mobile v3.72 – AI Transfer Market & Squad Evolution
 
 ## Release contents
 
 - `index.html` – complete CM Mobile application.
 - `VERSION.txt` – release version.
 - `README.md` – this file.
-- `CHANGELOG_v3.71.md` – v3.71 changes.
-- `WORLD_DEVELOPMENT_BALANCE_REPORT_v3.71.md` – findings, design and limitations.
-- `WORLD_DEVELOPMENT_TEST_RESULTS_v3.71.json` – synthetic cohort results and invariants.
-- `world_development_tests_v371.js` – reproducible Node test harness.
+- `CHANGELOG_v3.72.md` – v3.72 changes.
+- `WORLD_TRANSFER_MARKET_REPORT_v3.72.md` – design, findings and limitations.
+- `AI_TRANSFER_TEST_RESULTS_v3.72.json` – targeted transfer and contract-expiry tests.
+- `ai_transfer_tests_v372.js` – reproducible Node test harness.
+- `WORLD_DEVELOPMENT_REGRESSION_RESULTS_v3.72.json` – previous progression invariants rerun against v3.72 source.
+- `world_development_tests_v372_regression.js` – progression regression harness.
+- `WORLD_DEVELOPMENT_BALANCE_REPORT_v3.71.md` – previous development report.
 - `PLAYER_PROGRESSION_LIFECYCLE_REPORT_v3.70.md` – previous lifecycle report.
 - `LIFECYCLE_TEST_RESULTS_v3.70.json` – previous lifecycle scenarios.
 - `PROGRESSION_REGRESSION_TESTS_v3.70.json` – previous progression regression checks.
@@ -24,23 +27,29 @@
 3. Publish the commit.
 4. Open the existing career and confirm that it loads and saves.
 
-Do not rerun `supabase_cm_mobile.sql`; v3.71 introduces no database schema change.
+Do not rerun `supabase_cm_mobile.sql`; v3.72 introduces no database schema change.
 
 ## Data safety
 
 - No bulk player rebalance or player identity replacement is performed.
-- Existing player attributes are not regenerated.
-- The v3.70 generated-player CA/attribute synchronization remains limited to profiles with v3.69 model provenance.
-- Match development is shared by manager and simulated AI pathways and is capped by PA.
-- Youth academy prospects receive one controlled annual development opportunity after a completed academy season.
-- Recent fixture keys are retained per player to prevent duplicate development without unbounded save growth.
+- Existing player attributes and CA/PA values are not regenerated.
+- AI free-agent recruitment is limited to a suitable player for a real squad/position shortage, at most one per AI club per season.
+- Contract expiry now removes stale mirrored registrations from EFL and European transfer registries, while preserving active loans.
+- EFL match-engine and market roster copies are synchronized after AI moves.
+- Existing transfer history is retained; new AI free-agent moves are separately recorded.
 
 ## Testing
 
-Run the v3.71 progression tests with Node.js:
+Run the targeted transfer tests with Node.js:
 
 ```bash
-node world_development_tests_v371.js
+node ai_transfer_tests_v372.js
 ```
 
-The tests cover synthetic match-development cohorts, academy cohorts, idempotency, PA limits and source integration checks. They are not a substitute for a live browser career-save test or Supabase round-trip.
+Run the retained progression regression tests with Node.js:
+
+```bash
+node world_development_tests_v372_regression.js
+```
+
+These tests use synthetic state and extracted application functions. They are not a substitute for a live browser career-save test or Supabase round-trip.
