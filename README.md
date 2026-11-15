@@ -1,35 +1,42 @@
-# CM Mobile v3.68 – Player Quality Diagnostics
+# CM Mobile v3.69 – Player Generation & Ability Calibration
 
 ## Formål
-v3.68 er et skrivebeskyttet diagnostikksteg for den videre ferdighets-, CA- og PA-revisjonen. Den retter ikke spillerattributter, rating, potensial, posisjoner eller klubbtilhørighet automatisk.
+v3.69 improves the generation of new player profiles and future academy/free-agent intake. It introduces deterministic role-specific attributes, CA-aligned role skills, a dedicated goalkeeper profile and an age/talent-based PA distribution.
 
 ## Publisering
-1. Pakk ut ZIP-filen.
-2. Erstatt `index.html` i rotmappen til GitHub-repositoriet.
-3. Erstatt `VERSION.txt` med `v3.68`.
-4. `supabase_cm_mobile.sql` er uendret; ikke kjør SQL på nytt hvis tabellen allerede finnes.
-5. Publiser og åpne den aktive karrieren. v3.68 inneholder v3.67-identitetsmigreringen; dersom den ikke er kjørt tidligere, kjøres den ved åpning. Lagre karrieren før eksport.
-6. Gå til Spillerstall → Spillinformasjon og diagnostikk → Eksporter ferdighets- og CA/PA-revisjon (JSON).
-7. Last opp `CM_Mobile_Player_Skill_CA_PA_Audit_YYYY-MM-DD.json` for videre analyse.
+1. Unzip this release.
+2. Replace `index.html` in the root of the GitHub repository.
+3. Replace `VERSION.txt` with the included `v3.69` file.
+4. Keep `supabase_cm_mobile.sql` unchanged. Do not rerun SQL if the existing table is already installed.
+5. Publish the site and open the game as usual.
 
-## Nytt i v3.68
-- Utvidet spillerrevisjonseksport til schemaVersion 2.
-- Eksporten viser `gameVersion: v3.68` (rettet feil versjonsmerking fra tidligere eksport).
-- Hver spillerregistrering får et eget `audit`-objekt med CA, PA, PA-headroom, modellkilde, rollebasert ferdighetsindeks, avvik fra rating, spredning i rolle-relevante ferdigheter, posisjons-/rollekompatibilitet og konkrete revisjonssignaler.
-- Sammendraget omfatter modellversjoner, fordelinger etter posisjonsgruppe, alder og register, samt teller for revisjonsflagg.
-- Manglende versjonsmetadata på eldre free-agent- og academy-profilmodeller blir synliggjort uten å endre spillere.
-- Eksporten omfatter fortsatt alle sju materialiserte registre og beholder registeroverlapp.
+## What changes for new players
+- Newly built first-team/world rosters use role-specific deterministic attributes calibrated to the player's existing CA/rating.
+- Newly created European profile players use detailed role profiles rather than the old broad position template.
+- New academy prospects use the age/talent-tier potential distribution.
+- New initial and annual free agents use the new role and PA models.
+- Generated EFL fillers and generic lower-division rosters use the same model.
+- New player records store `attributeModelVersion` and `potentialModelVersion` in `dataQuality`.
 
-## Tolkning
-- `rating` er spillets nåværende rating/CA-felt. `potential` er PA-feltet.
-- `roleSkillIndex` bruker samme rollebaserte vekting som kampmotorens rolleutvelgelse. Den er kun en screeningsindikator og skal ikke forveksles med CA.
-- `paHeadroom` er PA minus rating. Høy/lav margin er et kontrollsignal, ikke automatisk bevis på feil.
-- `broad-position-role-conflict` er en grov kompatibilitetssjekk. Fleksible spillere og kildekonvensjoner må vurderes manuelt.
-- `unusually-flat-role-profile` betyr standardavvik under 3 i de generelle utespillerattributtene (keepersammenlignes med keeperfeltene). Dette er et granskningssignal, ikke en feilklassifisering.
-- All statistikk er per spillerregistrering. Samme spiller kan forekomme i flere registre, og eksportens antall registreringer er ikke antall unike personer.
+## Existing careers and preservation
+- No career-wide recalibration migration is run.
+- Existing valid attributes, rating/CA, potential/PA, age, position and club registration are not overwritten.
+- Existing academy/free-agent players keep their saved values. New prospects and new annual free-agent intake use v3.69.
+- `ensurePlayerAttributes` fills only genuinely missing attribute keys, using a deterministic profile. Existing valid values are preserved.
+- The known verified Gabriele Biancheri position correction, if needed, regenerates the affected outfield profile with the new role model.
+- No player-facing generated-player labels or special markers are added.
 
-## Bevaring og avgrensning
-- Ingen karrieremigrering eller automatisk ferdighetsjustering legges til i v3.68.
-- Ingen spillerdata blir endret av analyseeksporten.
-- Den faktiske tilstanden etter v3.67-migreringen må bekreftes med en ny eksport fra brukerens aktive karriere. Tidligere v3.66-eksport er bare baseline og dokumentasjon, ikke bevis på at en aktiv save er migrert.
-- Ingen live Supabase-save eller full kampmotortest er endret/kjørt i leveransen.
+## Model boundaries
+- `rating` remains the game's current ability/CA field. The v3.69 model does not rewrite existing CA values.
+- For newly materialized player profiles, role-relevant attributes are calibrated so the match-engine role skill index is close to the existing CA/rating. That index remains a role suitability signal, not a replacement CA formula.
+- PA is generated from age, player context, club strength and a deterministic talent-tier draw. Market value is not a direct PA input.
+- PA is never below CA and is capped at 96. Players aged 28+ receive at most four points of additional headroom; players aged 32+ at most two.
+- Attribute and PA values for real named players are still model estimates unless a separately curated value exists. A name/profile match is not presented as an observed skill dataset.
+
+## Testing and limitations
+- Full inline JavaScript passed `node --check`.
+- Synthetic tests covered 8,000 generated profiles across all 16 tactical roles and 80,000 potential samples across academy and free-agent contexts.
+- Model tests verified deterministic repeatability, all 11 attributes, the 25–99 range, outfield keeper-attribute caps, role-skill alignment and PA bounds.
+- This is not a live browser test, a full match-engine simulation, or a test against a live Supabase save. No live career was modified.
+
+See `PLAYER_GENERATION_MODEL_v3.69.md` and `MODEL_TEST_RESULTS_v3.69.json` for implementation and test details.

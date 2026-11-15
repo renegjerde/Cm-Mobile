@@ -1,0 +1,45 @@
+{
+  "version": "v3.69",
+  "testType": "synthetic deterministic model tests",
+  "executedAt": "2026-11-15",
+  "attributeProfiles": {
+    "profilesGenerated": 8000,
+    "tacticalRolesCovered": 16,
+    "missingOrExtraAttributeFields": 0,
+    "nonIntegerOrOutOfRangeValues": 0,
+    "outfieldKeeperSkillCapViolations": 0,
+    "nonDeterministicSeedViolations": 0,
+    "meanAbsoluteRoleSkillDeltaFromCA": 0.25,
+    "p95AbsoluteRoleSkillDeltaFromCA": 0.5,
+    "keepersWithCA60PlusAndHandlingOrReflexBelow50": 0
+  },
+  "potentialSamples": {
+    "academy": {
+      "samples": 40000,
+      "headroom0to3Percent": 11.75,
+      "headroom16PlusPercent": 13.17,
+      "headroom25PlusPercent": 0.74,
+      "meanHeadroom": 9.61
+    },
+    "freeAgent": {
+      "samples": 40000,
+      "headroom0to3Percent": 48.16,
+      "headroom16PlusPercent": 0.72,
+      "headroom25PlusPercent": 0.04,
+      "meanHeadroom": 4.1
+    }
+  },
+  "invariants": {
+    "potentialNeverBelowCurrentAbility": true,
+    "potentialNeverAbove96": true,
+    "age28PlusHeadroomMax4": true,
+    "age32PlusHeadroomMax2": true,
+    "existingValidPlayerDataNotRebalanced": true
+  },
+  "limitations": [
+    "No live browser test",
+    "No full match-engine simulation",
+    "No live Supabase save tested",
+    "Synthetic distributions do not establish real-world player attribute accuracy"
+  ]
+}

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v3.68 — Touchline</title>
+<title>CM Mobile v3.69 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -552,7 +552,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.68</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="cloudAccountBtn" title="Koble til skylagring">☁ Konto</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.69</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="cloudAccountBtn" title="Koble til skylagring">☁ Konto</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -1011,7 +1011,7 @@ function playerDatabaseStatusHTML(players){
  const eflClubs=Object.values(EFL_DIVISIONS).flat().length,englishClubs=CLUBS.filter(c=>['Premier League','Championship','League One','League Two'].includes(clubDivision(c))).length;
  const audit=appState.playerRegistrationAudit||null;
  const auditLine=audit?`<div class="player-meta">Identitetskontroll på tvers av alle spillerregistre: ${audit.scanned} registreringer kontrollert · ${audit.crossClubIdConflicts??audit.confirmedDuplicates??0} kryssklubb-ID-konflikter · ${audit.activeLoanOverlaps||0} registrerte utlånsoverlapp · ${audit.ambiguousNameGroups} navnekollisjoner til manuell kontroll. Navnelikhet alene fører aldri til automatisk sletting.</div>`:'<div class="player-meta">Identitetskontroll kjøres når spillerregistrene bygges.</div>';
- return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v3.68</strong>${auditLine}<div class="player-meta">Innebygd spillerprofilarkiv: ${PLAYER_REFERENCE_STATUS.globalPlayers||EMBEDDED_TM_PROFILES.length} profiler · referansedato ${esc(TM_GLOBAL_REFERENCE_CUTOFF)} · ingen ekstern tilkobling.</div><div class="player-meta">Spillverdener: ${englishClubs} engelske klubbobjekter, inkludert ${eflClubs} EFL-klubber, pluss europeiske klubber. Offisielle seniorlister er innebygd for alle ${eflClubs} EFL-klubber og ${Object.keys(PL_OFFICIAL_ROSTERS_2026_27).length} Premier League-klubber. PL-registeret inneholder ${Object.values(PL_OFFICIAL_ROSTERS_2026_27).reduce((n,a)=>n+a.length,0)} registrerte seniornavn pluss ${Object.values(PL_FIRST_TEAM_U21_SUPPLEMENT_2026_27).reduce((n,a)=>n+a.length,0)} førsteligalagsspillere fra U21-tillegget; EFL-registeret inneholder ${Object.values(EFL_OFFICIAL_ROSTERS_2026_27).reduce((n,a)=>n+a.length,0)}. Førstelagets U21-spillere legges til utover seniorlisten; 3-8-8-6 er en ønsket grunnstruktur, ikke et tak som skjuler unge spillere. Profilarkivet er historisk referansedata, ikke en fasit for aktuell klubbtilhørighet.</div><div class="player-meta">Denne troppen: ${dob}/${rows.length} med kildebasert fødselsdato · ${modelledDob} med simulert fødselsdato i alternativ virkelighet · ${ageUnknown} uten konkret alder · ${fictional} genererte/fiktive identiteter · ${tm} med andre Transfermarkt-profilfelt.</div><div class="player-meta">Kildebaserte fødselsdatoer brukes der de finnes. Hvis en dato mangler, får spilleren en fast, plausibel simulert fødselsdato i spillets alternative virkelighet. Alderen vises alltid konkret, utvikles normalt mellom sesonger og endres ikke ved klubbytte. Spillet henter ikke spillerdata fra nettet.</div></div>`;
+ return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v3.69</strong>${auditLine}<div class="player-meta">Innebygd spillerprofilarkiv: ${PLAYER_REFERENCE_STATUS.globalPlayers||EMBEDDED_TM_PROFILES.length} profiler · referansedato ${esc(TM_GLOBAL_REFERENCE_CUTOFF)} · ingen ekstern tilkobling.</div><div class="player-meta">Spillverdener: ${englishClubs} engelske klubbobjekter, inkludert ${eflClubs} EFL-klubber, pluss europeiske klubber. Offisielle seniorlister er innebygd for alle ${eflClubs} EFL-klubber og ${Object.keys(PL_OFFICIAL_ROSTERS_2026_27).length} Premier League-klubber. PL-registeret inneholder ${Object.values(PL_OFFICIAL_ROSTERS_2026_27).reduce((n,a)=>n+a.length,0)} registrerte seniornavn pluss ${Object.values(PL_FIRST_TEAM_U21_SUPPLEMENT_2026_27).reduce((n,a)=>n+a.length,0)} førsteligalagsspillere fra U21-tillegget; EFL-registeret inneholder ${Object.values(EFL_OFFICIAL_ROSTERS_2026_27).reduce((n,a)=>n+a.length,0)}. Førstelagets U21-spillere legges til utover seniorlisten; 3-8-8-6 er en ønsket grunnstruktur, ikke et tak som skjuler unge spillere. Profilarkivet er historisk referansedata, ikke en fasit for aktuell klubbtilhørighet.</div><div class="player-meta">Denne troppen: ${dob}/${rows.length} med kildebasert fødselsdato · ${modelledDob} med simulert fødselsdato i alternativ virkelighet · ${ageUnknown} uten konkret alder · ${fictional} genererte/fiktive identiteter · ${tm} med andre Transfermarkt-profilfelt.</div><div class="player-meta">Kildebaserte fødselsdatoer brukes der de finnes. Hvis en dato mangler, får spilleren en fast, plausibel simulert fødselsdato i spillets alternative virkelighet. Alderen vises alltid konkret, utvikles normalt mellom sesonger og endres ikke ved klubbytte. Spillet henter ikke spillerdata fra nettet.</div></div>`;
 }
 
 function playerAuditSafeNumber(value){
@@ -1145,7 +1145,7 @@ function collectPlayerAuditDataset(){
   for(const value of Object.values(p.attributes||{}))if(!Number.isFinite(Number(value))||Number(value)<1||Number(value)>100)quality.attributeValuesOutOfRange++;
  }
  const duplicateAudit=typeof auditPlayerRegistrationDuplicates==='function'?auditPlayerRegistrationDuplicates():null;
- return {exportType:'CM Mobile player quality and CA/PA audit dataset',schemaVersion:2,diagnosticVersion:'v3.68',exportedAt:new Date().toISOString(),gameVersion:'v3.68',seasonYear:Number(appState.seasonYear)||null,seasonWeek:Number(appState.week)||null,activeClub:currentClub()?.name||'',activeDivision:appState.activeDivision||'',scopeNote:'Snapshot of player registrations currently materialized in this active career. Registry copies are retained so overlaps and duplicate registrations can be audited; registrationCount is not a count of unique people. All derived audit values are diagnostic flags only; no player data is modified.',summary:{registrationCount:records.length,byRegistry,quality,playerQualityAudit:buildPlayerQualityAudit(records),registrationDuplicateAudit:duplicateAudit},players:records};
+ return {exportType:'CM Mobile player quality and CA/PA audit dataset',schemaVersion:2,diagnosticVersion:'v3.69',exportedAt:new Date().toISOString(),gameVersion:'v3.69',seasonYear:Number(appState.seasonYear)||null,seasonWeek:Number(appState.week)||null,activeClub:currentClub()?.name||'',activeDivision:appState.activeDivision||'',scopeNote:'Snapshot of player registrations currently materialized in this active career. Registry copies are retained so overlaps and duplicate registrations can be audited; registrationCount is not a count of unique people. All derived audit values are diagnostic flags only; no player data is modified.',summary:{registrationCount:records.length,byRegistry,quality,playerQualityAudit:buildPlayerQualityAudit(records),registrationDuplicateAudit:duplicateAudit},players:records};
 }
 function exportPlayerAuditJSON(){
  if(!appState?.started){alert('Start eller åpne en karriere før du eksporterer spillerrevisjonen.');return;}
@@ -1362,34 +1362,17 @@ function makeRealPlayer(name,pos,clubIndex,slot,reference={}){
  const prospectCeiling=ageForDevelopment<=16?64:ageForDevelopment===17?68:ageForDevelopment===18?72:ageForDevelopment===19?76:ageForDevelopment===20?80:ageForDevelopment===21?84:null;
  if(isProspect&&prospectCeiling!==null&&!establishedU21Exceptions.has(prospectKey))rating=Math.min(rating,prospectCeiling);
 
- // v2.41: potential is a deterministic age-curve estimate, with a modest signal from documented market value.
- // Explicit curated ratings/potentials still take precedence; market value is not treated as a direct skill rating.
- const potentialAgeGap=ageForDevelopment<=18?12:ageForDevelopment<=21?9:ageForDevelopment<=24?6:ageForDevelopment<=27?3:ageForDevelopment<=30?1:0;
- const marketTalentSignal=marketValueM>0?Math.max(-1,Math.min(2,(marketRating-rating)*.18)):0;
- const potentialVariance=(seededRandom(stableSeed(name+'|potential|v238'))()*4-2);
- const modelPotential=Math.max(rating,Math.min(96,Math.round(rating+potentialAgeGap+marketTalentSignal+potentialVariance)));
- const potential=Number(known.potential)||modelPotential;
- const attrR=(base,spread,key)=>Math.max(25,Math.min(99,Math.round(base+(seededRandom(stableSeed(name+'|'+key+'|v192'))()*spread*2-spread))));
- let attributes={pace:attrR(rating,7,'pace'),stamina:attrR(rating,6,'stamina'),strength:attrR(rating,7,'strength'),technique:attrR(rating,7,'technique'),creativity:attrR(rating,8,'creativity'),finishing:attrR(rating-9,9,'finishing'),defending:attrR(rating-7,9,'defending'),passing:attrR(rating,7,'passing'),handling:attrR(28,4,'handling'),reflexes:attrR(28,4,'reflexes'),positioning:attrR(rating,7,'positioning')};
- if(pos==='GK'){attributes={...attributes,handling:attrR(rating,6,'handling'),reflexes:attrR(rating+1,6,'reflexes'),positioning:attrR(rating,6,'positioning'),finishing:attrR(25,2,'finishing'),defending:attrR(35,5,'defending'),passing:attrR(rating-2,7,'passing')};}
- if(pos==='DEF'){attributes.defending=attrR(rating+6,6,'defending');attributes.strength=attrR(rating+3,7,'strength');attributes.finishing=attrR(rating-20,7,'finishing');}
- if(pos==='MID'){attributes.passing=attrR(rating+4,6,'passing');attributes.creativity=attrR(rating+3,7,'creativity');}
- if(pos==='ATT'){attributes.finishing=attrR(rating+5,6,'finishing');attributes.pace=attrR(rating+3,7,'pace');}
- const roleOffsets={GK:{handling:2,reflexes:3,positioning:2,passing:-1},LB:{pace:4,stamina:3,defending:1,passing:1,creativity:1,finishing:-4},RB:{pace:4,stamina:3,defending:1,passing:1,creativity:1,finishing:-4},LWB:{pace:5,stamina:4,defending:0,passing:1,creativity:1,finishing:-2},RWB:{pace:5,stamina:4,defending:0,passing:1,creativity:1,finishing:-2},LCB:{defending:5,strength:4,positioning:4,pace:-2,finishing:-8},RCB:{defending:5,strength:4,positioning:4,pace:-2,finishing:-8},CB:{defending:5,strength:4,positioning:4,pace:-2,finishing:-8},DM:{defending:3,passing:2,stamina:3,strength:1,creativity:-1,finishing:-3},CM:{passing:3,technique:2,creativity:2,stamina:2},AM:{creativity:4,technique:3,passing:3,finishing:2,defending:-3},LW:{pace:4,technique:3,creativity:2,finishing:2,defending:-4},RW:{pace:4,technique:3,creativity:2,finishing:2,defending:-4},ST:{finishing:5,positioning:4,strength:2,pace:2,defending:-8}}[role]||{};
- Object.entries(roleOffsets).forEach(([k,v])=>{if(Number.isFinite(attributes[k]))attributes[k]=Math.max(25,Math.min(99,attributes[k]+v));});
- // v2.41: small age-curve adjustments make attribute profiles less flat.
- // Pace/stamina tend to peak earlier; technical and positional attributes can hold or improve later.
- const physicalAgePenalty=ageForDevelopment<=22?0:ageForDevelopment<=27?1:ageForDevelopment<=30?2:ageForDevelopment<=33?4:6;
- const experienceBonus=ageForDevelopment<=22?0:ageForDevelopment<=27?1:ageForDevelopment<=31?2:3;
- const ageAttributeAdjustments={pace:-physicalAgePenalty,stamina:-Math.max(0,physicalAgePenalty-1),positioning:experienceBonus,technique:Math.round(experienceBonus*.5),creativity:experienceBonus,passing:Math.round(experienceBonus*.5)};
- if(pos==='GK'){ageAttributeAdjustments.pace=Math.round(-physicalAgePenalty*.5);ageAttributeAdjustments.reflexes=-Math.max(0,physicalAgePenalty-2);ageAttributeAdjustments.handling=Math.round(experienceBonus*.5);ageAttributeAdjustments.positioning=experienceBonus+1;}
- Object.entries(ageAttributeAdjustments).forEach(([k,v])=>{if(Number.isFinite(attributes[k]))attributes[k]=Math.max(25,Math.min(99,attributes[k]+v));});
+ // v3.69: potential uses an age/talent distribution; market value only contributes indirectly
+ // through the already-computed current rating and is not itself a direct PA assignment.
+ const potential=Number(known.potential)||cm69GeneratePotential(rating,ageForDevelopment,`${name}|${clubIndex}|${slot}|real-roster`,'senior',club.strength);
+ let attributes=cm69GeneratePlayerAttributes(pos,role,rating,internalAge,`${name}|${clubIndex}|${slot}|real-roster`);
  let fplStatAdj={finishing:0,creativity:0,passing:0,defending:0,handling:0,reflexes:0,positioning:0};
  if(fpl&&Number(fpl.minutes)>=180){const mins=Number(fpl.minutes),starts=Math.max(1,Number(fpl.starts)||mins/90),sample=Math.min(1,mins/720);const xg90=(Number(fpl.expected_goals)||0)*90/mins,xa90=(Number(fpl.expected_assists)||0)*90/mins,g90=(Number(fpl.goals_scored)||0)*90/mins,a90=(Number(fpl.assists)||0)*90/mins;fplStatAdj.finishing=Math.max(-3,Math.min(5,((xg90-.12)*8+(g90-xg90)*3)))*sample;fplStatAdj.creativity=Math.max(-3,Math.min(4,((xa90-.06)*10+(a90-xa90)*2)))*sample;fplStatAdj.passing=Math.max(-2,Math.min(3,((Number(fpl.creativity)||0)/mins*90-12)*.12))*sample;if(pos==='DEF'){const csRate=(Number(fpl.clean_sheets)||0)/starts;fplStatAdj.defending=Math.max(-2,Math.min(3,(csRate-.2)*5))*sample;}if(pos==='GK'){const saves90=(Number(fpl.saves)||0)*90/mins;fplStatAdj.reflexes=Math.max(-2,Math.min(4,(saves90-2.5)*1.2))*sample;fplStatAdj.handling=Math.max(-2,Math.min(3,((Number(fpl.penalties_saved)||0)*1.2+(Number(fpl.bonus)||0)/Math.max(1,starts)*.5)))*sample;}}
  Object.entries(fplStatAdj).forEach(([k,v])=>{if(Number.isFinite(attributes[k]))attributes[k]=Math.max(25,Math.min(99,Math.round(attributes[k]+v)));});
+ attributes=cm69AlignRoleAttributes(attributes,role,rating);
  const naturalBase=correction?.naturalPositions||(generatedIdentity?[role]:naturalPositionsFor(name,pos,role));const naturalPositions=[...new Set([role,...(Array.isArray(naturalBase)?naturalBase:[])])];
  const fplStats=fpl?{minutes:Number(fpl.minutes)||0,starts:Number(fpl.starts)||0,total_points:Number(fpl.total_points)||0,goals_scored:Number(fpl.goals_scored)||0,assists:Number(fpl.assists)||0,clean_sheets:Number(fpl.clean_sheets)||0,bonus:Number(fpl.bonus)||0,expected_goals:Number(fpl.expected_goals)||0,expected_assists:Number(fpl.expected_assists)||0,form:Number(fpl.form)||0,now_cost:Number(fpl.now_cost)||0}:null;
- const attributesSource=fpl?'position archetype + current FPL output + player profile':'position archetype + player profile (no live FPL sample)';
+ const attributesSource=fpl?'role archetype + deterministic individual profile + current FPL output':'role archetype + deterministic individual profile';
  // Known embedded market values remain the source of truth. Otherwise estimate value from ability,
  // development headroom, age curve and club level; keep the estimate clearly labelled in dataQuality.
  const ageValueMultiplier=internalAge<21?1.28:internalAge<24?1.18:internalAge<28?1:internalAge<31?.82:internalAge<34?.62:.42;
@@ -1397,7 +1380,7 @@ function makeRealPlayer(name,pos,clubIndex,slot,reference={}){
  const clubValueMultiplier=Math.max(.62,Math.min(1.35,1+(Number(club.strength||60)-60)*.012));
  const fallbackMarketValueM=(Math.max(5,rating-43)**2)/115*ageValueMultiplier*potentialPremium*clubValueMultiplier;
  const valueM=marketValueM>0?marketValueM*TM_EUR_TO_GAME_CURRENCY_RATE:fallbackMarketValueM;
- return {id:clubIndex*1000+slot+1,name,pos,role,naturalPositions,assignedRole:null,age,ageModelValue,dob,estimatedBirthYear,ageSource,rating,attributes,potential,value:Math.max(.1,+valueM.toFixed(1)),valueSource:marketValueM>0?'Transfermarkt market value, EUR converted to game currency':'estimated from rating and age',wage:Math.max(2,Math.round(((rating-45)*.82+(club.strength-65)*.32+(club.budget||30)*.015)*0.88)),fitness:100,morale:75+Math.round(seededRandom(stableSeed(name+'|morale|v192'))()*15),goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,form:fpl&&Number(fpl.minutes)>=180?Math.max(4,Math.min(10,Number(fpl.form)||6.5)):6.5,injured:0,suspended:0,clubIndex,source:reference?.source||(sourceDob?'embedded roster; age calculated from DOB':'embedded roster; in-game age date modeled'),preferredFoot:tm?.foot||'',heightCm:Number(tm?.height)||null,nationality:tm?.nationality||'',transfermarktPosition:tm?.position||'',transfermarktMarketValueEuro:Number(tm?.marketValue)||0,fplStats,transfermarktPlayerId:tm?.id?String(tm.id):'',referenceData:{fpl:!!fpl,transfermarkt:!!tm,tmReferenceDate:tm?.referenceDate||null,transfermarktPlayerId:tm?.id?String(tm.id):''},dataQuality:{dobVerified:!!sourceDob,ageCalculatedFromDob:!!sourceDob,ageEstimated:ageNeedsModel,ageUnknown:false,ageFictional:ageIsFictional,ageModelledDOB,ageSource,positionVerified:!!(correction||tm?.position||fpl),positionSource:correction?.positionSource||null,clubAffiliationVerified:!!reference?.clubVerified,attributesEstimated:true,attributesSource,attributeModelVersion:'v2.41 age-and-position curve',potentialModelVersion:'v2.41 age-and-market signal',transfermarktMatch:!!tm,fplStatsAvailable:!!fpl,marketValueEstimated:!Number(tm?.marketValue),marketValueModelVersion:marketValueM>0?'embedded Transfermarkt snapshot':'v2.41 ability-age-potential-club estimate',wageEstimated:true}};
+ return {id:clubIndex*1000+slot+1,name,pos,role,naturalPositions,assignedRole:null,age,ageModelValue,dob,estimatedBirthYear,ageSource,rating,attributes,potential,value:Math.max(.1,+valueM.toFixed(1)),valueSource:marketValueM>0?'Transfermarkt market value, EUR converted to game currency':'estimated from rating and age',wage:Math.max(2,Math.round(((rating-45)*.82+(club.strength-65)*.32+(club.budget||30)*.015)*0.88)),fitness:100,morale:75+Math.round(seededRandom(stableSeed(name+'|morale|v192'))()*15),goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,form:fpl&&Number(fpl.minutes)>=180?Math.max(4,Math.min(10,Number(fpl.form)||6.5)):6.5,injured:0,suspended:0,clubIndex,source:reference?.source||(sourceDob?'embedded roster; age calculated from DOB':'embedded roster; in-game age date modeled'),preferredFoot:tm?.foot||'',heightCm:Number(tm?.height)||null,nationality:tm?.nationality||'',transfermarktPosition:tm?.position||'',transfermarktMarketValueEuro:Number(tm?.marketValue)||0,fplStats,transfermarktPlayerId:tm?.id?String(tm.id):'',referenceData:{fpl:!!fpl,transfermarkt:!!tm,tmReferenceDate:tm?.referenceDate||null,transfermarktPlayerId:tm?.id?String(tm.id):''},dataQuality:{dobVerified:!!sourceDob,ageCalculatedFromDob:!!sourceDob,ageEstimated:ageNeedsModel,ageUnknown:false,ageFictional:ageIsFictional,ageModelledDOB,ageSource,positionVerified:!!(correction||tm?.position||fpl),positionSource:correction?.positionSource||null,clubAffiliationVerified:!!reference?.clubVerified,attributesEstimated:true,attributesSource,attributeModelVersion:CM69_ATTRIBUTE_MODEL_VERSION,potentialModelVersion:CM69_POTENTIAL_MODEL_VERSION,transfermarktMatch:!!tm,fplStatsAvailable:!!fpl,marketValueEstimated:!Number(tm?.marketValue),marketValueModelVersion:marketValueM>0?'embedded Transfermarkt snapshot':'v2.41 ability-age-potential-club estimate',wageEstimated:true}};
 }
 function refreshPlayerAgeData(player,seasonYear){
  if(!player||!player.name)return player;
@@ -1648,7 +1631,9 @@ function buildRealSquad(clubIndex){
     p.dataQuality={...(p.dataQuality||{}),dobVerified:false,ageCalculatedFromDob:false,ageEstimated:false,ageFictional:true,ageSource:p.ageSource};
     p.age=18+(Math.abs(stableSeed(`${club.name}|fictional-age-v237|${slot}`))%17);p.estimatedBirthYear=(Number(appState.seasonYear)||2026)-p.age;
     p.rating=Math.max(34,Math.min(78,Math.round(club.strength-5+(seed%9))));
-    p.potential=Math.min(85,p.rating+2+(slot%4===0?5:0));
+    p.attributes=cm69GeneratePlayerAttributes(pos,p.role,p.rating,p.age,`${club.name}|${p.id}|efl-new`);
+    p.potential=cm69GeneratePotential(p.rating,p.age,`${club.name}|${p.id}|efl-new`,'lowerLeague',club.strength);
+    p.dataQuality={...(p.dataQuality||{}),...cm69GeneratedModelMetadata()};
     p.value=Math.max(.1,+((p.rating-35)**2/(clubDivision(club)==='Championship'?105:clubDivision(club)==='League One'?145:185)).toFixed(2));
     p.wage=Math.max(1,Math.round((p.rating-35)*(clubDivision(club)==='Championship'?.22:clubDivision(club)==='League One'?.09:.045)));
     counts[pos]=(counts[pos]||0)+1;out.push(p);
@@ -1664,7 +1649,7 @@ function buildRealSquad(clubIndex){
  // For clubs without a full curated list, keep the existing real-name seed layer before filling remaining places with fictional squad players.
  const division=clubDivision(club),seedNames=EFL_SEEDS?.[division]?.[club.name];
  if(seedNames){const fallbackPositions=['GK','DEF','DEF','MID','ATT','MID'];String(seedNames).split('|').filter(Boolean).forEach((name,i)=>{if(out.length>=25||out.some(p=>normalisePlayerName(p.name)===normalisePlayerName(name)))return;const tm=findTransfermarktRecord(name,null,club.name),fallbackPos=fallbackPositions[i]||'MID',pos=tm?tmProfilePositionGroup(tm,0):fallbackPos;out.push(makeRealPlayer(name,pos,clubIndex,out.length,{tm,source:'EFL seeded real-player name; 2026/27 squad membership pending verification',clubVerified:false}));});}
- if(out.length<25){const posList=['GK','GK','GK','DEF','DEF','DEF','DEF','DEF','DEF','DEF','DEF','MID','MID','MID','MID','MID','MID','MID','MID','ATT','ATT','ATT','ATT','ATT','ATT'];const first=typeof EFL_FIRST!=='undefined'?EFL_FIRST:['Alex','Ben','Charlie','Daniel','Ethan'];const last=typeof EFL_LAST!=='undefined'?EFL_LAST:['Adams','Brown','Clarke','Davies','Smith'];for(let i=out.length;i<25;i++){const pos=posList[i],seed=stableSeed(club.name+'|generated|' +i),name=first[seed%first.length]+' '+last[stableSeed(club.name+'|surname|'+i)%last.length];if(out.some(p=>normalisePlayerName(p.name)===normalisePlayerName(name)))continue;out.push(makeRealPlayer(name,pos,clubIndex,i,{source:'Generated lower-league squad; fictional identity',clubVerified:false}));out[out.length-1].source='Generated lower-league squad; fictional identity';out[out.length-1].rating=Math.max(38,Math.min(78,Math.round(club.strength-4+(seed%11))));out[out.length-1].potential=Math.min(85,out[out.length-1].rating+(i%4===0?6:2));out[out.length-1].value=Math.max(.1,+((out[out.length-1].rating-35)**2/150).toFixed(2));out[out.length-1].wage=Math.max(1,Math.round((out[out.length-1].rating-35)*(clubDivision(club)==='Championship'?.22:clubDivision(club)==='League One'?.09:.045)));}}
+ if(out.length<25){const posList=['GK','GK','GK','DEF','DEF','DEF','DEF','DEF','DEF','DEF','DEF','MID','MID','MID','MID','MID','MID','MID','MID','ATT','ATT','ATT','ATT','ATT','ATT'];const first=typeof EFL_FIRST!=='undefined'?EFL_FIRST:['Alex','Ben','Charlie','Daniel','Ethan'];const last=typeof EFL_LAST!=='undefined'?EFL_LAST:['Adams','Brown','Clarke','Davies','Smith'];for(let i=out.length;i<25;i++){const pos=posList[i],seed=stableSeed(club.name+'|generated|' +i),name=first[seed%first.length]+' '+last[stableSeed(club.name+'|surname|'+i)%last.length];if(out.some(p=>normalisePlayerName(p.name)===normalisePlayerName(name)))continue;out.push(makeRealPlayer(name,pos,clubIndex,i,{source:'Generated lower-league squad; fictional identity',clubVerified:false}));const player=out[out.length-1];player.source='Generated lower-league squad; fictional identity';player.rating=Math.max(38,Math.min(78,Math.round(club.strength-4+(seed%11))));player.attributes=cm69GeneratePlayerAttributes(pos,player.role,player.rating,player.age,`${club.name}|${player.id}|lower-league-new`);player.potential=cm69GeneratePotential(player.rating,player.age,`${club.name}|${player.id}|lower-league-new`,'lowerLeague',club.strength);player.dataQuality={...(player.dataQuality||{}),...cm69GeneratedModelMetadata()};player.value=Math.max(.1,+((player.rating-35)**2/150).toFixed(2));player.wage=Math.max(1,Math.round((player.rating-35)*(clubDivision(club)==='Championship'?.22:clubDivision(club)==='League One'?.09:.045)));}}
  return out.slice(0,25);
 }
 function buildWorldDatabase(){const world=Array.from({length:CLUBS.length},()=>[]);CLUBS.forEach((c,i)=>{if(clubDivision(c)==='Premier League')world[i]=buildRealSquad(i)});return world}
@@ -1709,15 +1694,130 @@ function generateAttributes(pos,base){
  if(pos==="MID") return {...common,pace:r(base,11),stamina:r(base+5,9),strength:r(base-2,10),technique:r(base+4,9),creativity:r(base+5,10),finishing:r(base-5,12),defending:r(base-4,12),passing:r(base+6,9),handling:r(25,5),reflexes:r(25,5),positioning:r(base+1,10)};
  return {...common,pace:r(base+5,10),stamina:r(base,10),strength:r(base-2,12),technique:r(base+4,10),creativity:r(base+1,11),finishing:r(base+8,9),defending:r(base-18,12),passing:r(base,10),handling:r(25,5),reflexes:r(25,5),positioning:r(base+4,10)};
 }
+
+// v3.69: deterministic individual role profiles for newly generated/materialized players.
+// Existing saved attributes are intentionally left untouched; this model is used only for new
+// player creation and missing-attribute backfills.
+const CM69_ATTRIBUTE_MODEL_VERSION='v3.69 role-archetype calibrated individual profile';
+const CM69_POTENTIAL_MODEL_VERSION='v3.69 age-and-talent distribution';
+const CM69_ATTRIBUTE_KEYS=['pace','stamina','strength','technique','creativity','finishing','defending','passing','handling','reflexes','positioning'];
+const CM69_ROLE_WEIGHTS={
+ GK:{handling:.34,reflexes:.36,positioning:.30},
+ LB:{defending:.30,pace:.24,stamina:.20,passing:.14,strength:.12},RB:{defending:.30,pace:.24,stamina:.20,passing:.14,strength:.12},
+ LWB:{defending:.30,pace:.24,stamina:.20,passing:.14,strength:.12},RWB:{defending:.30,pace:.24,stamina:.20,passing:.14,strength:.12},
+ LCB:{defending:.38,strength:.24,positioning:.16,passing:.12,pace:.10},RCB:{defending:.38,strength:.24,positioning:.16,passing:.12,pace:.10},CB:{defending:.38,strength:.24,positioning:.16,passing:.12,pace:.10},
+ DM:{defending:.24,passing:.24,stamina:.20,strength:.12,technique:.10,creativity:.10},
+ CM:{passing:.23,technique:.18,creativity:.18,stamina:.17,pace:.12,defending:.12},LM:{passing:.23,technique:.18,creativity:.18,stamina:.17,pace:.12,defending:.12},RM:{passing:.23,technique:.18,creativity:.18,stamina:.17,pace:.12,defending:.12},
+ AM:{creativity:.27,passing:.22,technique:.20,finishing:.16,pace:.15},
+ LW:{pace:.24,technique:.22,creativity:.17,finishing:.18,passing:.10,stamina:.09},RW:{pace:.24,technique:.22,creativity:.17,finishing:.18,passing:.10,stamina:.09},
+ ST:{finishing:.34,pace:.18,strength:.16,technique:.14,positioning:.18}
+};
+const CM69_ROLE_BASE={
+ GK:{pace:-9,stamina:-7,strength:-2,technique:-7,creativity:-9,finishing:-48,defending:-19,passing:-4,handling:2,reflexes:3,positioning:2},
+ LB:{pace:5,stamina:4,strength:1,technique:1,creativity:0,finishing:-13,defending:2,passing:2,handling:-37,reflexes:-37,positioning:3},RB:{pace:5,stamina:4,strength:1,technique:1,creativity:0,finishing:-13,defending:2,passing:2,handling:-37,reflexes:-37,positioning:3},
+ LWB:{pace:7,stamina:6,strength:0,technique:1,creativity:1,finishing:-10,defending:0,passing:2,handling:-37,reflexes:-37,positioning:2},RWB:{pace:7,stamina:6,strength:0,technique:1,creativity:1,finishing:-10,defending:0,passing:2,handling:-37,reflexes:-37,positioning:2},
+ LCB:{pace:-2,stamina:1,strength:6,technique:-1,creativity:-2,finishing:-23,defending:8,passing:0,handling:-37,reflexes:-37,positioning:7},RCB:{pace:-2,stamina:1,strength:6,technique:-1,creativity:-2,finishing:-23,defending:8,passing:0,handling:-37,reflexes:-37,positioning:7},CB:{pace:-2,stamina:1,strength:6,technique:-1,creativity:-2,finishing:-23,defending:8,passing:0,handling:-37,reflexes:-37,positioning:7},
+ DM:{pace:-1,stamina:5,strength:3,technique:1,creativity:0,finishing:-13,defending:6,passing:4,handling:-37,reflexes:-37,positioning:4},
+ CM:{pace:1,stamina:3,strength:0,technique:3,creativity:4,finishing:-3,defending:1,passing:5,handling:-37,reflexes:-37,positioning:2},
+ LM:{pace:4,stamina:4,strength:-1,technique:2,creativity:2,finishing:-4,defending:0,passing:3,handling:-37,reflexes:-37,positioning:1},RM:{pace:4,stamina:4,strength:-1,technique:2,creativity:2,finishing:-4,defending:0,passing:3,handling:-37,reflexes:-37,positioning:1},
+ AM:{pace:2,stamina:0,strength:-2,technique:5,creativity:7,finishing:2,defending:-9,passing:5,handling:-37,reflexes:-37,positioning:2},
+ LW:{pace:7,stamina:2,strength:-2,technique:5,creativity:4,finishing:5,defending:-12,passing:1,handling:-37,reflexes:-37,positioning:3},RW:{pace:7,stamina:2,strength:-2,technique:5,creativity:4,finishing:5,defending:-12,passing:1,handling:-37,reflexes:-37,positioning:3},
+ ST:{pace:3,stamina:0,strength:3,technique:2,creativity:-2,finishing:8,defending:-18,passing:-1,handling:-37,reflexes:-37,positioning:7}
+};
+const CM69_ROLE_STYLES={
+ GK:[{handling:3,reflexes:4,positioning:2,passing:-3,pace:-2},{pace:4,passing:5,technique:3,handling:-1,reflexes:-1,creativity:2},{handling:1,reflexes:1,positioning:5,passing:2,stamina:1}],
+ LB:[{pace:4,stamina:3,passing:2,creativity:1,defending:-1},{technique:4,passing:4,creativity:2,pace:1},{defending:4,positioning:3,strength:2,pace:-2}],
+ RB:[{pace:4,stamina:3,passing:2,creativity:1,defending:-1},{technique:4,passing:4,creativity:2,pace:1},{defending:4,positioning:3,strength:2,pace:-2}],
+ LWB:[{pace:4,stamina:4,passing:2,creativity:2,defending:-2},{technique:4,passing:3,creativity:3,pace:2},{defending:3,positioning:3,strength:2}],RWB:[{pace:4,stamina:4,passing:2,creativity:2,defending:-2},{technique:4,passing:3,creativity:3,pace:2},{defending:3,positioning:3,strength:2}],
+ LCB:[{strength:4,defending:3,pace:-2,positioning:2},{passing:5,technique:4,creativity:2,defending:1},{pace:4,stamina:2,positioning:3,defending:1}],RCB:[{strength:4,defending:3,pace:-2,positioning:2},{passing:5,technique:4,creativity:2,defending:1},{pace:4,stamina:2,positioning:3,defending:1}],CB:[{strength:4,defending:3,pace:-2,positioning:2},{passing:5,technique:4,creativity:2,defending:1},{pace:4,stamina:2,positioning:3,defending:1}],
+ DM:[{defending:5,strength:3,passing:1,creativity:-2},{passing:5,technique:3,creativity:3,defending:-1},{stamina:4,pace:2,defending:2,finishing:1}],
+ CM:[{passing:5,creativity:4,technique:3,defending:-2},{stamina:5,pace:3,strength:2,passing:1},{defending:4,stamina:3,strength:2,creativity:-2}],
+ LM:[{pace:4,stamina:3,passing:3,creativity:2},{technique:4,creativity:3,finishing:2,defending:-2}],RM:[{pace:4,stamina:3,passing:3,creativity:2},{technique:4,creativity:3,finishing:2,defending:-2}],
+ AM:[{creativity:6,passing:4,technique:3,finishing:1,defending:-3},{pace:4,finishing:4,stamina:2,creativity:2},{passing:5,technique:4,positioning:2,pace:-1}],
+ LW:[{pace:5,technique:4,finishing:3,passing:-1},{passing:4,creativity:4,technique:3,finishing:-1},{pace:4,stamina:3,defending:1,creativity:1}],
+ RW:[{pace:5,technique:4,finishing:3,passing:-1},{passing:4,creativity:4,technique:3,finishing:-1},{pace:4,stamina:3,defending:1,creativity:1}],
+ ST:[{finishing:6,positioning:4,pace:2,passing:-3,creativity:-2},{strength:7,finishing:3,pace:-3,stamina:1},{pace:4,stamina:4,defending:2,finishing:1},{creativity:5,passing:5,technique:3,finishing:1,strength:-2}]
+};
+function cm69NormalizeRole(pos,role){
+ const r=String(role||'').toUpperCase();
+ if(pos==='GK')return 'GK';
+ if(CM69_ROLE_WEIGHTS[r])return r;
+ return pos==='DEF'?'CB':pos==='MID'?'CM':'ST';
+}
+function cm69RoleScore(attributes,role){
+ const weights=CM69_ROLE_WEIGHTS[role]||CM69_ROLE_WEIGHTS[cm69NormalizeRole('MID',role)];
+ return Object.entries(weights).reduce((sum,[key,weight])=>sum+(Number(attributes?.[key])||50)*weight,0);
+}
+function cm69AlignRoleAttributes(attributes,role,rating){
+ const out={...attributes},weights=CM69_ROLE_WEIGHTS[role]||CM69_ROLE_WEIGHTS.CM;
+ const target=Math.max(25,Math.min(99,Number(rating)||50));
+ for(let pass=0;pass<3;pass++){
+  const delta=target-cm69RoleScore(out,role);
+  if(Math.abs(delta)<.55)break;
+  const shift=delta*.92;
+  Object.keys(weights).forEach(key=>{out[key]=Math.max(25,Math.min(99,Math.round(Number(out[key]||50)+shift)));});
+ }
+ return out;
+}
+function cm69GeneratePlayerAttributes(pos,role,rating,age,seedKey){
+ const p=String(pos||'MID').toUpperCase(),r=cm69NormalizeRole(p,role),base=Number(rating)||55,years=Number.isFinite(Number(age))?Number(age):24;
+ const offsets=CM69_ROLE_BASE[r]||CM69_ROLE_BASE.CM,styles=CM69_ROLE_STYLES[r]||CM69_ROLE_STYLES.CM;
+ const styleRng=seededRandom(stableSeed(`${seedKey||'new-player'}|${r}|style|v369`));
+ const style=styles[Math.floor(styleRng()*styles.length)]||{};
+ const spreads={pace:7,stamina:7,strength:7,technique:7,creativity:8,finishing:9,defending:8,passing:7,handling:4,reflexes:4,positioning:7};
+ const out={};
+ for(const key of CM69_ATTRIBUTE_KEYS){
+  if(p!=='GK'&&(key==='handling'||key==='reflexes')){
+   const n=seededRandom(stableSeed(`${seedKey||'new-player'}|${r}|${key}|v369`))();out[key]=25+Math.floor(n*7);continue;
+  }
+  const n=seededRandom(stableSeed(`${seedKey||'new-player'}|${r}|${key}|v369`))();
+  let ageAdjust=0;
+  if(key==='pace')ageAdjust=years>=34?-5:years>=31?-3:years>=28?-1:years<=20?1:0;
+  if(key==='stamina')ageAdjust=years>=34?-3:years>=31?-2:years>=28?-1:0;
+  if(['technique','creativity','passing','positioning'].includes(key))ageAdjust=years>=28?Math.min(3,Math.floor((years-26)/3)):0;
+  if(p==='GK'&&key==='reflexes'&&years>=34)ageAdjust-=2;
+  const center=base+(Number(offsets[key])||0)+(Number(style[key])||0)+ageAdjust;
+  out[key]=Math.max(25,Math.min(99,Math.round(center+(n*2-1)*spreads[key])));
+ }
+ return cm69AlignRoleAttributes(out,r,base);
+}
+function cm69GeneratePotential(rating,age,seedKey,context='senior',clubStrength=50){
+ const current=Math.max(25,Math.min(99,Math.round(Number(rating)||50))),years=Number.isFinite(Number(age))?Number(age):25;
+ const rng=seededRandom(stableSeed(`${seedKey||'new-player'}|potential|v369`)),quality=Math.max(0,Math.min(1,(Number(clubStrength||50)-40)/55));
+ const ageBase=years<=16?6:years<=18?5:years<=20?4:years<=23?2:years<=27?1:0;
+ let eliteChance=context==='youth'?.004+quality*.007:context==='freeAgent'?.0012:.0008;
+ let highChance=context==='youth'?.055+quality*.045:context==='freeAgent'?.032:.024;
+ const solidChance=context==='youth'?.24:.16,lowHeadroomChance=context==='youth'?.12:context==='freeAgent'?.18:.12;
+ if(current>=82&&years<=21){eliteChance+=.004;highChance+=.025;}
+ if(years>23){eliteChance*=.2;highChance*=.45;}
+ if(years>27){eliteChance=0;highChance*=.35;}
+ const roll=rng();let gap;
+ if(roll<eliteChance){gap=ageBase+(context==='youth'?22:18)+Math.floor(rng()*(context==='youth'?11:9));}
+ else if(roll<eliteChance+highChance){gap=ageBase+(context==='youth'?10:8)+Math.floor(rng()*(context==='youth'?9:8));}
+ else if(roll<eliteChance+highChance+solidChance){gap=ageBase+(context==='youth'?5:3)+Math.floor(rng()*(context==='youth'?7:6));}
+ else if(roll<eliteChance+highChance+solidChance+lowHeadroomChance){gap=Math.floor(rng()*4);}
+ else{gap=ageBase+Math.floor(rng()*(context==='youth'?6:5));}
+ if(years>=28)gap=Math.min(gap,years>=32?2:4);
+ if(years>=24&&context!=='youth')gap=Math.min(gap,years>=28?4:8);
+ return Math.max(current,Math.min(96,current+gap));
+}
+function cm69GeneratedModelMetadata(){
+ return {attributesEstimated:true,attributesSource:'role-specific archetype with deterministic individual variation',attributeModelVersion:CM69_ATTRIBUTE_MODEL_VERSION,potentialModelVersion:CM69_POTENTIAL_MODEL_VERSION};
+}
 function ensurePlayerAttributes(p){
- if(!p.attributes||typeof p.attributes!=="object")p.attributes=generateAttributes(p.pos,p.rating||65);
- else {const defaults=generateAttributes(p.pos,p.rating||65);for(const k of Object.keys(defaults))if(!Number.isFinite(Number(p.attributes[k])))p.attributes[k]=defaults[k];}
+ if(!p||typeof p!=='object')return p;
+ const role=p.role||defaultRoleFor(p.name||'Player',p.pos||'MID',0),seedKey=String(p.careerId||p.id||`${p.name||'player'}|${p.pos||'MID'}`);
+ const defaults=cm69GeneratePlayerAttributes(p.pos||'MID',role,Number(p.rating)||65,Number(p.age)||24,`${seedKey}|missing-attribute-backfill`);
+ let changed=false;
+ if(!p.attributes||typeof p.attributes!=='object'){p.attributes=defaults;changed=true;}
+ else for(const key of CM69_ATTRIBUTE_KEYS)if(!Number.isFinite(Number(p.attributes[key]))){p.attributes[key]=defaults[key];changed=true;}
+ if(changed){p.dataQuality=p.dataQuality&&typeof p.dataQuality==='object'?p.dataQuality:{};p.dataQuality.attributeBackfillModelVersion=CM69_ATTRIBUTE_MODEL_VERSION;if(!p.dataQuality.attributeModelVersion)p.dataQuality.attributeModelVersion=CM69_ATTRIBUTE_MODEL_VERSION;}
  return p;
 }
 const ATTRIBUTE_LABELS={pace:"Hurtighet",stamina:"Utholdenhet",strength:"Styrke",technique:"Teknikk",creativity:"Kreativitet",finishing:"Avslutninger",defending:"Forsvar",passing:"Pasninger",handling:"Keepergrep",reflexes:"Reflekser",positioning:"Posisjonering"};
 function attributeMarkup(p){
  const keys=p.pos==="GK"?["handling","reflexes","positioning","passing","stamina","strength"]:p.pos==="DEF"?["pace","stamina","strength","defending","passing","technique"]:p.pos==="MID"?["stamina","pace","passing","technique","creativity","defending"]:["pace","stamina","finishing","technique","creativity","strength"];
- const a=p.attributes||generateAttributes(p.pos,p.rating||65);
+ const a=p.attributes||cm69GeneratePlayerAttributes(p.pos,p.role,Number(p.rating)||65,Number(p.age)||24,`${p.careerId||p.id||p.name}|display-fallback-v369`);
  return `<div class="attrs">${keys.map(k=>`<span class="attr">${ATTRIBUTE_LABELS[k]} ${a[k]}</span>`).join("")}</div>`;
 }
 
@@ -1860,21 +1960,17 @@ function reviewAllClubFinancesForNewSeason(rankings,previousSeason,movement){
 const YOUTH_ACADEMY_TARGETS={GK:3,DEF:8,MID:8,ATT:6};
 const RIVAL_YOUTH_ACADEMY_TARGET=2;
 function makeYouthProspect(clubName,division,idx,season,forcedPos=null){
- const rng=seededRandom(stableSeed(`youth|${clubName}|${season}|${idx}|${forcedPos||'ANY'}`));
+ const seedKey=`youth|${clubName}|${season}|${idx}|${forcedPos||'ANY'}`;
+ const rng=seededRandom(stableSeed(seedKey));
  const pos=forcedPos||['GK','DEF','MID','ATT'][Math.floor(rng()*4)],base=division==='Premier League'?58:division==='Championship'?52:division==='League One'?47:42;
  const strength=(CLUBS.find(c=>c.name===clubName)?.strength)||(appState.lowerLeagues?.[division]?.rows||[]).find(c=>c.name===clubName)?.strength||50;
  const age=15+Math.floor(rng()*4),rating=Math.max(35,Math.min(Math.min(68,base+12),Math.round(base-9+rng()*18)));
- // A mixed intake: a rare standout, a smaller group of strong prospects, and a larger development group.
- const tierRoll=rng();let potential;
- if(tierRoll<.045){potential=Math.round(87+rng()*10+Math.max(0,strength-65)*.08);}
- else if(tierRoll<.30){potential=Math.round(base+15+rng()*20+Math.max(0,strength-60)*.10);}
- else {potential=Math.round(base-4+rng()*25+Math.max(0,strength-65)*.06);}
- potential=Math.max(rating,Math.min(97,potential));
  const first=['Charlie','Theo','Mason','Rory','Alfie','Noah','Elliot','Jayden','Finley','Harvey','Oscar','Luca','Isaac','Dylan','Reuben','Kian','Max','Toby','Leon','Jude'];
  const last=['Bennett','Clarke','Hughes','Parker','Mitchell','Reed','Turner','Ward','Cooper','Bailey','Morgan','Foster','Hayes','Price','Brooks','Ellis','Gray','Wood','Kelly','Mills'];
  const name=first[Math.floor(rng()*first.length)]+' '+last[Math.floor(rng()*last.length)];
- const role=defaultRoleFor(name,pos,idx),value=+Math.max(.03,((Math.max(1,rating-35)**2)/150)*(potential-rating>25?1.15:.65)).toFixed(2);
- return {id:`Y-${stableSeed(clubName+'|'+season+'|'+pos+'|'+idx)}`,name,pos,role,naturalPositions:naturalPositionsFor(name,pos,role),age,rating,attributes:generateAttributes(pos,rating),potential,value,wage:Math.max(1,Math.round((rating-35)*.24)),fitness:100,morale:70,goals:0,assists:0,apps:0,minutes:0,form:6.3,injured:0,suspended:0,clubName,division,academySeason:season,marketEligibleSeason:season+1,youth:true,source:'Generated in-game academy prospect'};
+ const role=defaultRoleFor(name,pos,idx),potential=cm69GeneratePotential(rating,age,seedKey,'youth',strength);
+ const attributes=cm69GeneratePlayerAttributes(pos,role,rating,age,seedKey),value=+Math.max(.03,((Math.max(1,rating-35)**2)/150)*(potential-rating>25?1.15:.65)).toFixed(2);
+ return {id:`Y-${stableSeed(clubName+'|'+season+'|'+pos+'|'+idx)}`,name,pos,role,naturalPositions:naturalPositionsFor(name,pos,role),age,rating,attributes,potential,value,wage:Math.max(1,Math.round((rating-35)*.24)),fitness:100,morale:70,goals:0,assists:0,apps:0,minutes:0,form:6.3,injured:0,suspended:0,clubName,division,academySeason:season,marketEligibleSeason:season+1,youth:true,source:'Generated in-game academy prospect',dataQuality:cm69GeneratedModelMetadata()};
 }
 function releaseYouthToFreeAgency(p,clubName,entrySeason=Number(appState.seasonYear)||2026){
  ensureTransferPool();
@@ -2170,9 +2266,9 @@ function applyKnownPlayerPositionCorrections(){
  const fix=p=>{
   if(!p||normalisePlayerName(p.name)!=='gabriele biancheri'||seen.has(p))return;
   seen.add(p);const wasKeeper=String(p.pos||'').toUpperCase()==='GK'||String(p.role||'').toUpperCase()==='GK'||(Array.isArray(p.naturalPositions)&&p.naturalPositions.includes('GK'));p.pos='ATT';p.role='ST';p.naturalPositions=['ST','LW','RW'];
-  if(wasKeeper)p.attributes=generateAttributes('ATT',Number(p.rating)||60);
+  if(wasKeeper)p.attributes=cm69GeneratePlayerAttributes('ATT','ST',Number(p.rating)||60,Number(p.age)||24,`${p.careerId||p.id||p.name}|position-correction-v369`);
   if(p.assignedRole==='GK')p.assignedRole=null;
-  if(p.dataQuality&&typeof p.dataQuality==='object')p.dataQuality.positionVerified=true;
+  if(p.dataQuality&&typeof p.dataQuality==='object'){p.dataQuality.positionVerified=true;p.dataQuality.attributeModelVersion=CM69_ATTRIBUTE_MODEL_VERSION;p.dataQuality.attributesEstimated=true;p.dataQuality.attributesSource='role archetype + deterministic individual profile after verified position correction';}
  };
  (appState.squad||[]).forEach(fix);
  (appState.worldSquads||[]).forEach(r=>(r||[]).forEach(fix));
@@ -3454,7 +3550,11 @@ function ensureTransferPool(){
   const first=['Luca','Mateo','Ethan','Noah','Milan','Theo','Alex','Rayan','Oscar','Daniel','Samir','Ibrahim','Jonas','Leon','Nico','Adam','Tomas','Yusuf','Kai','Felix','Amir','Hugo','Liam','Dario','Rafael','Callum','Elliot','Moussa','Jude','Enzo'];
   const last=['Petrovic','Andersen','Mensah','Kovac','Laurent','Silva','Okafor','Diallo','Costa','Novak','Bennett','Hughes','Moreno','Walsh','Jensen','Fletcher','Santos','Nielsen','Mendes','Bakker','Keller','Fernandez','Ibrahimovic','Campbell','Miller','Adeyemi','Moretti','Khan','Schmidt','Rossi'];
   const positions=['GK','DEF','MID','ATT'];
-  for(let i=0;i<100;i++){const rng=seededRandom(stableSeed('free-agent-'+i));const pos=positions[i%4];const age=17+Math.floor(rng()*18);const rating=52+Math.floor(rng()*25);const name=first[Math.floor(rng()*first.length)]+' '+last[Math.floor(rng()*last.length)];const id='FA-'+i;const role=defaultRoleFor(name,pos,i);const potential=Math.min(92,Math.max(rating,rating+(age<22?8:age<25?4:1)+Math.floor(rng()*7)));appState.freeAgents.push({id,name,pos,role,naturalPositions:naturalPositionsFor(name,pos,role),age,rating,attributes:generateAttributes(pos,rating),potential,value:Math.max(.25,+((Math.max(5,rating-45)**2)/100*(age<23?1.3:age>30?.6:1)).toFixed(1)),wage:Math.max(2,Math.round((rating-45)*.8)),fitness:100,morale:70,goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,form:6.5,injured:0,suspended:0,clubIndex:-1,freeAgentSinceSeason:Number(appState.seasonYear)||2026,source:'Generated free-agent prospect'});}
+  for(let i=0;i<100;i++){
+   const seedKey=`free-agent-initial|${i}`,rng=seededRandom(stableSeed(seedKey)),pos=positions[i%4],age=17+Math.floor(rng()*18),rating=52+Math.floor(rng()*25),name=first[Math.floor(rng()*first.length)]+' '+last[Math.floor(rng()*last.length)],id='FA-'+i,role=defaultRoleFor(name,pos,i);
+   const potential=cm69GeneratePotential(rating,age,seedKey,'freeAgent',50),attributes=cm69GeneratePlayerAttributes(pos,role,rating,age,seedKey);
+   appState.freeAgents.push({id,name,pos,role,naturalPositions:naturalPositionsFor(name,pos,role),age,rating,attributes,potential,value:Math.max(.25,+((Math.max(5,rating-45)**2)/100*(age<23?1.3:age>30?.6:1)).toFixed(1)),wage:Math.max(2,Math.round((rating-45)*.8)),fitness:100,morale:70,goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,form:6.5,injured:0,suspended:0,clubIndex:-1,freeAgentSinceSeason:Number(appState.seasonYear)||2026,source:'Generated free-agent prospect',dataQuality:cm69GeneratedModelMetadata()});
+  }
  }
  appState.freeAgentPoolInitialized=true;
  if(!Number.isFinite(Number(appState.freeAgentPoolSeason)))appState.freeAgentPoolSeason=Number(appState.seasonYear)||2026;
@@ -3472,8 +3572,9 @@ function makeAnnualFreeAgent(index,season){
  const last=['Petrovic','Andersen','Mensah','Kovac','Laurent','Silva','Okafor','Diallo','Costa','Novak','Bennett','Hughes','Moreno','Walsh','Jensen','Fletcher','Santos','Nielsen','Mendes','Bakker','Keller','Fernandez','Ibrahimovic','Campbell','Miller','Adeyemi','Moretti','Khan','Schmidt','Rossi'];
  const pos=['GK','DEF','MID','ATT'][index%4],age=17+Math.floor(rng()*15),rating=46+Math.floor(rng()*31);
  const name=first[Math.floor(rng()*first.length)]+' '+last[Math.floor(rng()*last.length)];
- const role=defaultRoleFor(name,pos,index),potential=Math.min(93,Math.max(rating,rating+(age<22?7:age<26?4:1)+Math.floor(rng()*9)));
- return {id:`FA-${season}-${index}`,name,pos,role,naturalPositions:naturalPositionsFor(name,pos,role),age,rating,attributes:generateAttributes(pos,rating),potential,value:Math.max(.15,+((Math.max(5,rating-45)**2)/100*(age<23?1.25:age>30?.6:1)).toFixed(1)),wage:Math.max(2,Math.round((rating-45)*.8)),fitness:100,morale:70,goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,form:6.5,injured:0,suspended:0,clubIndex:-1,freeAgentSinceSeason:season,source:'Seasonal free-agent intake',freeAgentIntakeSeason:season};
+ const role=defaultRoleFor(name,pos,index),seedKey=`free-agent-intake|${season}|${index}`;
+ const potential=cm69GeneratePotential(rating,age,seedKey,'freeAgent',50),attributes=cm69GeneratePlayerAttributes(pos,role,rating,age,seedKey);
+ return {id:`FA-${season}-${index}`,name,pos,role,naturalPositions:naturalPositionsFor(name,pos,role),age,rating,attributes,potential,value:Math.max(.15,+((Math.max(5,rating-45)**2)/100*(age<23?1.25:age>30?.6:1)).toFixed(1)),wage:Math.max(2,Math.round((rating-45)*.8)),fitness:100,morale:70,goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,form:6.5,injured:0,suspended:0,clubIndex:-1,freeAgentSinceSeason:season,source:'Seasonal free-agent intake',freeAgentIntakeSeason:season,dataQuality:cm69GeneratedModelMetadata()};
 }
 function refreshFreeAgentsForNewSeason(){
  ensureTransferPool();const season=Number(appState.seasonYear)||2026;
@@ -5334,8 +5435,9 @@ function makeEuropeanProfilePlayer(profile,team,pos,index){
  const tmDob=repairedTransfermarktDOB(profile),age=tmDob?ageAtSeasonStart(tmDob):null;
  const mv=Number(profile.marketValue)||0,mvM=mv/1000000,marketRating=mvM>0?48+11*Math.log(1+mvM/2):null;
  const rating=Math.max(38,Math.min(94,Math.round(marketRating!==null?marketRating*.72+(Number(team.strength)||60)*.28:Number(team.strength)||60)));
- const role=tmProfileRole(profile,pos,index),attributes=generateAttributes(pos,rating);
- const fromSnapshot=profile.squadMembershipSource==='Embedded Transfermarkt club snapshot';return {id:`${team.name}-${profile.id||normalisePlayerName(profile.name)}-${index}`,name:profile.name,pos,role,naturalPositions:[role],rating,attributes,fitness:100,morale:70,form:6.5,age,dob:tmDob||null,ageSource:tmDob?'Transfermarkt DOB (snapshot 2026-07-06)':'age unverified: no trusted date of birth',potential:Math.min(96,rating+(Number.isFinite(age)&&age<=21?7:3)),value:Math.max(.1,+(mvM>0?mvM*.844:(Math.max(5,rating-45)**2)/100).toFixed(1)),preferredFoot:profile.foot||'',heightCm:Number(profile.height||profile.height_in_cm)||null,transfermarktPosition:profile.position||'',transfermarktMarketValueEuro:mv,transfermarktPlayerId:String(profile.id||profile.transfermarktPlayerId||''),realNameVerified:true,squadMembershipVerified:profile.squadMembershipVerified===true,squadSnapshotDate:profile.squadSnapshotDate||null,referenceData:{transfermarkt:true,tmReferenceDate:TM_GLOBAL_REFERENCE_CUTOFF,rosterSnapshotDate:profile.squadSnapshotDate||null,transfermarktPlayerId:String(profile.id||profile.transfermarktPlayerId||'')},source:fromSnapshot?profile.rosterSourceNote:`Offline player-profile archive ${TM_GLOBAL_REFERENCE_CUTOFF}; club membership based on the explicit curated in-game roster list`};
+ const role=tmProfileRole(profile,pos,index),seedKey=`europe-profile|${team.name}|${profile.id||profile.name}`;
+ const attributes=cm69GeneratePlayerAttributes(pos,role,rating,age||27,seedKey),potential=cm69GeneratePotential(rating,age||27,seedKey,'senior',Number(team.strength)||60);
+ const fromSnapshot=profile.squadMembershipSource==='Embedded Transfermarkt club snapshot';return {id:`${team.name}-${profile.id||normalisePlayerName(profile.name)}-${index}`,name:profile.name,pos,role,naturalPositions:[role],rating,attributes,fitness:100,morale:70,form:6.5,age,dob:tmDob||null,ageSource:tmDob?'Transfermarkt DOB (snapshot 2026-07-06)':'age unverified: no trusted date of birth',potential,value:Math.max(.1,+(mvM>0?mvM*.844:(Math.max(5,rating-45)**2)/100).toFixed(1)),preferredFoot:profile.foot||'',heightCm:Number(profile.height||profile.height_in_cm)||null,transfermarktPosition:profile.position||'',transfermarktMarketValueEuro:mv,transfermarktPlayerId:String(profile.id||profile.transfermarktPlayerId||''),realNameVerified:true,squadMembershipVerified:profile.squadMembershipVerified===true,squadSnapshotDate:profile.squadSnapshotDate||null,referenceData:{transfermarkt:true,tmReferenceDate:TM_GLOBAL_REFERENCE_CUTOFF,rosterSnapshotDate:profile.squadSnapshotDate||null,transfermarktPlayerId:String(profile.id||profile.transfermarktPlayerId||'')},source:fromSnapshot?profile.rosterSourceNote:`Offline player-profile archive ${TM_GLOBAL_REFERENCE_CUTOFF}; club membership based on the explicit curated in-game roster list`,dataQuality:cm69GeneratedModelMetadata()};
 }
 function copyCompetitionPlayer(p,clubName){
  return {...p,attributes:{...(p.attributes||{})},clubName:p.clubName||clubName,fitness:100,morale:p.morale||75,form:p.form||6.5};
@@ -6496,7 +6598,11 @@ function moveClubsBetweenDivisions(){
 }
 function buildGenericRosterForClub(club,index,strength){
  const positions=['GK','GK','DEF','DEF','DEF','DEF','DEF','DEF','MID','MID','MID','MID','MID','MID','ATT','ATT','ATT','ATT','ATT','ATT','DEF','MID','ATT','MID','GK'];
- return positions.map((pos,i)=>{const rating=Math.max(42,Math.min(83,Math.round(strength+(stableSeed(`${club.name}|${i}`)%13)-6)));return {id:index*1000+i+1,name:`${club.name} ${pos==='GK'?'Keeper':pos==='DEF'?'Defender':pos==='MID'?'Midfielder':'Forward'} ${i+1}`,pos,role:defaultRoleFor(`${club.name}-${i}`,pos,i),naturalPositions:naturalPositionsFor(`${club.name}-${i}`,pos,defaultRoleFor(`${club.name}-${i}`,pos,i)),rating,attributes:generateAttributes(pos,rating),potential:Math.min(92,rating+(i%5)+2),age:19+(i*7%16),value:Math.max(.2,+((rating-40)**2/120).toFixed(1)),wage:Math.max(2,Math.round((rating-40)*.62)),fitness:100,morale:72,form:6.5,goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,injured:0,suspended:0,clubIndex:index,source:'Generated lower-division squad'}});
+ return positions.map((pos,i)=>{
+  const seedKey=`generic-roster|${club.name}|${index}|${i}`,rating=Math.max(42,Math.min(83,Math.round(strength+(stableSeed(`${club.name}|${i}`)%13)-6))),age=19+(i*7%16),name=`${club.name} ${pos==='GK'?'Keeper':pos==='DEF'?'Defender':pos==='MID'?'Midfielder':'Forward'} ${i+1}`,role=defaultRoleFor(`${club.name}-${i}`,pos,i);
+  const attributes=cm69GeneratePlayerAttributes(pos,role,rating,age,seedKey),potential=cm69GeneratePotential(rating,age,seedKey,'lowerLeague',strength);
+  return {id:index*1000+i+1,name,pos,role,naturalPositions:naturalPositionsFor(`${club.name}-${i}`,pos,role),rating,attributes,potential,age,value:Math.max(.2,+((rating-40)**2/120).toFixed(1)),wage:Math.max(2,Math.round((rating-40)*.62)),fitness:100,morale:72,form:6.5,goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,injured:0,suspended:0,clubIndex:index,source:'Generated lower-division squad',dataQuality:cm69GeneratedModelMetadata()};
+ });
 }
 function processScheduledDomesticCups(round){
  const throughWeek=Math.max(0,Number(round)||0);
@@ -10198,7 +10304,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.68 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.69 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
