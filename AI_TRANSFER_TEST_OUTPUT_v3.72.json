@@ -1,0 +1,17 @@
+{
+  "expiry": {
+    "uniqueExpired": 5,
+    "freeAgentsCreated": 5,
+    "loansPreserved": true,
+    "europeanAndEFLClean": true
+  },
+  "recruitment": {
+    "signings": 2,
+    "eflMirrorSynced": true,
+    "repeatGuard": true
+  },
+  "integration": {
+    "aiWindowHook": true,
+    "eflTransferMirrorHook": true
+  }
+}

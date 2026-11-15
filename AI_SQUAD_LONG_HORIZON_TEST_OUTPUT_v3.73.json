@@ -1,0 +1,12 @@
+{
+  "seasons": 10,
+  "aiClubs": 24,
+  "initialPlayers": 576,
+  "renewals": 1499,
+  "expiredWithoutRenewal": 393,
+  "duplicateCareerIds": 0,
+  "peakRoster": 24,
+  "wageBudgetViolations": 0,
+  "allRenewalsWithinWagePolicy": true,
+  "passed": true
+}

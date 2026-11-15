@@ -1,0 +1,158 @@
+{
+  "version": "3.77",
+  "tests": 7,
+  "passed": 7,
+  "results": [
+    {
+      "scenario": "europe-to-europe",
+      "transfer": {
+        "type": "ai-european-market",
+        "playerName": "ESGK0",
+        "playerCareerId": "ESGK0",
+        "from": "Euro Seller",
+        "to": "Euro Buyer",
+        "fee": 10,
+        "week": 1,
+        "seasonYear": 2026,
+        "transferDate": "2026-07-01",
+        "calendarPhase": "preseason",
+        "preseasonWeek": 1,
+        "transferTypeLabel": "AI-overgang Europa–Europa",
+        "position": "GK",
+        "fromType": "european",
+        "toType": "european"
+      },
+      "sourceRemaining": 50,
+      "uniqueCareerIdentityCopies": 1,
+      "CAandPApreserved": true,
+      "eflFinanceSynchronized": true
+    },
+    {
+      "scenario": "efl-to-europe",
+      "transfer": {
+        "type": "ai-european-market",
+        "playerName": "EFSGK0",
+        "playerCareerId": "EFSGK0",
+        "from": "EFL Seller",
+        "to": "Euro Buyer",
+        "fee": 10,
+        "week": 1,
+        "seasonYear": 2026,
+        "transferDate": "2026-07-01",
+        "calendarPhase": "preseason",
+        "preseasonWeek": 1,
+        "transferTypeLabel": "AI-overgang internasjonal",
+        "position": "GK",
+        "fromType": "efl",
+        "toType": "european"
+      },
+      "sourceRemaining": 50,
+      "uniqueCareerIdentityCopies": 1,
+      "CAandPApreserved": true,
+      "eflFinanceSynchronized": true
+    },
+    {
+      "scenario": "europe-to-efl",
+      "transfer": {
+        "type": "ai-european-market",
+        "playerName": "ESGK0",
+        "playerCareerId": "ESGK0",
+        "from": "Euro Seller",
+        "to": "EFL Buyer",
+        "fee": 10,
+        "week": 1,
+        "seasonYear": 2026,
+        "transferDate": "2026-07-01",
+        "calendarPhase": "preseason",
+        "preseasonWeek": 1,
+        "transferTypeLabel": "AI-overgang internasjonal",
+        "position": "GK",
+        "fromType": "european",
+        "toType": "efl"
+      },
+      "sourceRemaining": 50,
+      "uniqueCareerIdentityCopies": 1,
+      "CAandPApreserved": true,
+      "eflFinanceSynchronized": true
+    },
+    {
+      "scenario": "europe-to-pl",
+      "transfer": {
+        "type": "ai-european-market",
+        "playerName": "ESGK0",
+        "playerCareerId": "ESGK0",
+        "from": "Euro Seller",
+        "to": "PL Buyer",
+        "fee": 10,
+        "week": 1,
+        "seasonYear": 2026,
+        "transferDate": "2026-07-01",
+        "calendarPhase": "preseason",
+        "preseasonWeek": 1,
+        "transferTypeLabel": "AI-overgang internasjonal",
+        "position": "GK",
+        "fromType": "european",
+        "toType": "pl"
+      },
+      "sourceRemaining": 75,
+      "uniqueCareerIdentityCopies": 1,
+      "CAandPApreserved": true,
+      "eflFinanceSynchronized": true
+    },
+    {
+      "scenario": "efl-world-to-europe",
+      "transfer": {
+        "type": "ai-european-market",
+        "playerName": "EFSWGK0",
+        "playerCareerId": "EFSWGK0",
+        "from": "EFL Seller",
+        "to": "Euro Buyer",
+        "fee": 10,
+        "week": 1,
+        "seasonYear": 2026,
+        "transferDate": "2026-07-01",
+        "calendarPhase": "preseason",
+        "preseasonWeek": 1,
+        "transferTypeLabel": "AI-overgang internasjonal",
+        "position": "GK",
+        "fromType": "pl",
+        "toType": "european"
+      },
+      "sourceRemaining": 50,
+      "uniqueCareerIdentityCopies": 1,
+      "CAandPApreserved": true,
+      "eflFinanceSynchronized": true
+    },
+    {
+      "scenario": "europe-to-efl-world",
+      "transfer": {
+        "type": "ai-european-market",
+        "playerName": "ESGK0",
+        "playerCareerId": "ESGK0",
+        "from": "Euro Seller",
+        "to": "EFL Buyer",
+        "fee": 10,
+        "week": 1,
+        "seasonYear": 2026,
+        "transferDate": "2026-07-01",
+        "calendarPhase": "preseason",
+        "preseasonWeek": 1,
+        "transferTypeLabel": "AI-overgang internasjonal",
+        "position": "GK",
+        "fromType": "european",
+        "toType": "pl"
+      },
+      "sourceRemaining": 50,
+      "uniqueCareerIdentityCopies": 1,
+      "CAandPApreserved": true,
+      "eflFinanceSynchronized": true
+    },
+    {
+      "scenario": "manager-exclusion-and-domestic-market-coverage",
+      "managerClubExcluded": true,
+      "premierLeagueAIIncluded": true,
+      "eflAIIncluded": true,
+      "canonicalEFLWorldSquadRecognized": true
+    }
+  ]
+}

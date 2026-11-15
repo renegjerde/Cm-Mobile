@@ -1,0 +1,18 @@
+{
+  "strategicQualityNeed": {
+    "GK": 2,
+    "DEF": 3,
+    "MID": 3,
+    "ATT": 3
+  },
+  "strategicShortages": 11,
+  "eligibleRenewals": [
+    "core-mid"
+  ],
+  "seasonRenewals": 1,
+  "wageCeilingEnforced": true,
+  "youthSuccessionEnforced": true,
+  "seasonEndHookBeforeExpiry": true,
+  "strategicTransferIntegration": true,
+  "passed": true
+}

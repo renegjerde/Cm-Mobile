@@ -1,0 +1,22 @@
+{
+  "version": "3.77",
+  "inlineScriptBlocks": 3,
+  "results": [
+    {
+      "block": 1,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "block": 2,
+      "passed": true,
+      "error": ""
+    },
+    {
+      "block": 3,
+      "passed": true,
+      "error": ""
+    }
+  ],
+  "allPassed": true
+}

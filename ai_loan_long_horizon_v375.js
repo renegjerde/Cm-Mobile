@@ -1,6 +1,6 @@
 const fs=require('fs'),vm=require('vm');const source=fs.readFileSync(__dirname+'/index.html','utf8');
 function extract(name){const start=source.indexOf('function '+name+'(');if(start<0)throw Error('missing '+name);const open=source.indexOf('{',start);let i=open+1,d=1;for(;i<source.length&&d;i++){if(source[i]==='{')d++;else if(source[i]==='}')d--;}return source.slice(start,i);}
-const names=['aiPosGroup','aiSquadCounts','aiLoanClubEntries','aiLoanParentRoster','aiLoanBorrowerRoster','processAIAutonomousLoans','archiveAIAutonomousLoanSpell','processAIAutonomousLoanReturns'];
+const names=['aiPosGroup','aiSquadCounts','aiLoanClubEntries','aiLoanParentRoster','aiLoanBorrowerRoster','processAIAutonomousLoans','archiveAIAutonomousLoanSpell','processAIAutonomousLoanMonitoring','processAIAutonomousLoanReturns'];
 function player(id,pos,age,rating){return {id,careerId:id,name:id,pos,age,rating,potential:Math.min(95,rating+18),apps:0,minutes:0,goals:0,assists:0,attributes:{},competitionStats:{},wage:10};}
 const clubs=[{name:'Manager FC',strength:60}];for(let i=1;i<=11;i++)clubs.push({name:'Parent '+i,strength:70});for(let i=1;i<=12;i++)clubs.push({name:'Borrower '+i,strength:60});clubs.push({name:'User Club',strength:60});
 const worldSquads=clubs.map(()=>[]);
