@@ -1,0 +1,17 @@
+[
+  {
+    "script": 1,
+    "ok": true,
+    "stderr": ""
+  },
+  {
+    "script": 2,
+    "ok": true,
+    "stderr": ""
+  },
+  {
+    "script": 3,
+    "ok": true,
+    "stderr": ""
+  }
+]

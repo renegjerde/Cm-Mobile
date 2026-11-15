@@ -1994,8 +1994,9 @@ function makeYouthProspect(clubName,division,idx,season,forcedPos=null){
  const seedKey=`youth|${clubName}|${season}|${idx}|${forcedPos||'ANY'}`;
  const rng=seededRandom(stableSeed(seedKey));
  const pos=forcedPos||['GK','DEF','MID','ATT'][Math.floor(rng()*4)],base=division==='Premier League'?58:division==='Championship'?52:division==='League One'?47:42;
- const strength=(CLUBS.find(c=>c.name===clubName)?.strength)||(appState.lowerLeagues?.[division]?.rows||[]).find(c=>c.name===clubName)?.strength||50;
- const age=15+Math.floor(rng()*4),rating=Math.max(35,Math.min(Math.min(68,base+12),Math.round(base-9+rng()*18)));
+ const strength=(CLUBS.find(c=>c.name===clubName)?.strength)||(appState.lowerLeagues?.[division]?.rows||[]).find(c=>c.name===clubName)?.strength||Number(appState.europeanTransferClubData?.[clubName]?.strength)||50;
+ const academyBase=division==='Europe'?Math.max(42,Math.min(68,Math.round(Number(appState.europeanTransferClubData?.[clubName]?.strength)||58))):base;
+ const age=15+Math.floor(rng()*4),rating=Math.max(35,Math.min(Math.min(68,academyBase+12),Math.round(academyBase-9+rng()*18)));
  const first=['Charlie','Theo','Mason','Rory','Alfie','Noah','Elliot','Jayden','Finley','Harvey','Oscar','Luca','Isaac','Dylan','Reuben','Kian','Max','Toby','Leon','Jude'];
  const last=['Bennett','Clarke','Hughes','Parker','Mitchell','Reed','Turner','Ward','Cooper','Bailey','Morgan','Foster','Hayes','Price','Brooks','Ellis','Gray','Wood','Kelly','Mills'];
  const name=first[Math.floor(rng()*first.length)]+' '+last[Math.floor(rng()*last.length)];
@@ -2055,6 +2056,11 @@ function aiAcademyRosterForClub(clubName,division){
   if(!lowerClub)return null;
   return {roster,clubIndex:-1,club:lowerClub,division:div,mirror:false};
  }
+ const europeanRoster=appState.europeanTransferSquads?.[clubName];
+ if(Array.isArray(europeanRoster)){
+  const meta=appState.europeanTransferClubData?.[clubName]||{};
+  return {roster:europeanRoster,clubIndex:-1,club:{name:clubName,strength:Number(meta.strength)||(europeanRoster.length?europeanRoster.reduce((sum,p)=>sum+(Number(p.rating)||0),0)/europeanRoster.length:50)},division:'Europe',mirror:false,european:true};
+ }
  return null;
 }
 function processAIAcademyPromotion(clubInfo,prospect,season){
@@ -2079,9 +2085,9 @@ function processAIAcademyPromotion(clubInfo,prospect,season){
  const proposedWage=Math.max(1,Math.round((rating-35)*.24));
  if(wageBudget>0&&wageBill+proposedWage>wageBudget*1.12)return false;
  const careerId=String(prospect.careerId||playerCareerIdentity(prospect));
- const duplicate=(appState.worldSquads||[]).some(roster=>(roster||[]).some(p=>playerCareerIdentity(p)===careerId))||Object.values(appState.eflPlayerDatabase||{}).some(byClub=>Object.values(byClub||{}).some(roster=>(roster||[]).some(p=>playerCareerIdentity(p)===careerId)));
+ const duplicate=(appState.worldSquads||[]).some(roster=>(roster||[]).some(p=>playerCareerIdentity(p)===careerId))||Object.values(appState.eflPlayerDatabase||{}).some(byClub=>Object.values(byClub||{}).some(roster=>(roster||[]).some(p=>playerCareerIdentity(p)===careerId)))||Object.values(appState.europeanTransferSquads||{}).some(roster=>(roster||[]).some(p=>playerCareerIdentity(p)===careerId));
  if(duplicate)return false;
- const promoted={...prospect,careerId,id:`AI-YOUTH-${stableSeed(careerId+'|'+clubName+'|'+season)}`,clubName,division:target.division||clubDivision(target.club),clubIndex:target.clubIndex,youth:false,academyPromoted:true,academyPromotionSeason:Number(season),source:'AI academy promotion',apps:0,minutes:0,goals:0,assists:0,fitness:100,morale:Math.max(65,Number(prospect.morale)||70),wage:proposedWage};
+ const promoted={...prospect,careerId,id:`AI-YOUTH-${stableSeed(careerId+'|'+clubName+'|'+season)}`,clubName,division:target.division||clubDivision(target.club),clubIndex:target.clubIndex,internationalClub:target.european===true?true:!!prospect.internationalClub,youth:false,academyPromoted:true,academyPromotionSeason:Number(season),source:'AI academy promotion',apps:0,minutes:0,goals:0,assists:0,fitness:100,morale:Math.max(65,Number(prospect.morale)||70),wage:proposedWage};
  target.roster.push(promoted);
  if(target.mirror&&target.clubIndex>=0)syncEFLWorldRosterMirror(target.clubIndex);
  appState.aiAcademyPromotionHistory=history;history.push({season:Number(season),clubName,playerName:promoted.name,playerCareerId:careerId,position:group,rating,potential:Number(promoted.potential)||rating});
@@ -2093,7 +2099,9 @@ function ensureYouthAcademies(newSeason=false){
  if(!appState.youthAcademies)appState.youthAcademies={};
  const season=Number(appState.seasonYear)||2026;
  const firstMigration=Number(appState.youthAcademyRosterVersion||0)<1;
- const clubs=[...CLUBS.map(c=>({name:c.name,division:clubDivision(c),strength:c.strength})),...Object.entries(appState.lowerLeagues||{}).flatMap(([division,d])=>(d.rows||[]).map(c=>({name:c.name,division,strength:c.strength})))];
+ const domesticNames=new Set([...CLUBS.map(c=>domesticClubKey(c.name)),...Object.values(appState.lowerLeagues||{}).flatMap(d=>(d.rows||[]).map(c=>domesticClubKey(c.name)))]);
+ const europeanClubs=Object.entries(appState.europeanTransferSquads||{}).filter(([name,roster])=>Array.isArray(roster)&&roster.length>0&&!domesticNames.has(domesticClubKey(name))).map(([name,roster])=>({name,division:'Europe',strength:Number(appState.europeanTransferClubData?.[name]?.strength)||(roster.reduce((sum,p)=>sum+(Number(p.rating)||0),0)/Math.max(1,roster.length))||50}));
+ const clubs=[...CLUBS.map(c=>({name:c.name,division:clubDivision(c),strength:c.strength})),...Object.entries(appState.lowerLeagues||{}).flatMap(([division,d])=>(d.rows||[]).map(c=>({name:c.name,division,strength:c.strength}))),...europeanClubs];
  const processSeason=newSeason&&Number(appState.youthAcademyLastProcessedSeason||0)<season;
  for(const c of clubs){
   const academyWasMissing=!Array.isArray(appState.youthAcademies[c.name]);
@@ -4218,7 +4226,33 @@ function archiveAIAutonomousLoanSpell(player,borrowerName){
   if(!exists)player.careerHistory.push({season:`${season} · lån (${borrowerName})`,clubName:borrowerName,...stats,competitions:JSON.parse(JSON.stringify(player.competitionStats||{})),loanSpell:true});
  }
 }
+function processAIAutonomousLoanMonitoring(today=gameDateForCurrentState()){
+ const season=Number(appState.seasonYear)||2026,week=Number(appState.week)||1;
+ if(week<20)return 0;
+ let recalled=0;
+ for(const borrower of aiLoanClubEntries()){
+  const roster=aiLoanBorrowerRoster(borrower);if(!Array.isArray(roster))continue;
+  const candidates=roster.filter(p=>p?.aiManagedLoan===true&&p.loanStatus==='in'&&Number(p.aiLoanRecallSeason||0)!==season&&(Number(p.apps)||0)<2&&(Number(p.minutes)||0)<180);
+  for(const p of candidates){
+   const parentType=p.loanParentType||'pl',parentName=p.loanParentClubName||'',parentDivision=p.loanParentDivision||'',parentIndex=Number(p.loanParentClubIndex);
+   const parent=parentType==='efl'?appState.eflPlayerDatabase?.[parentDivision]?.[parentName]:appState.worldSquads?.[parentIndex];
+   if(!Array.isArray(parent))continue;
+   archiveAIAutonomousLoanSpell(p,borrower.name);
+   const identity=playerCareerIdentity(p),returnedPlayer={...p,clubIndex:parentType==='pl'?parentIndex:-1,clubName:parentName,division:parentDivision||clubDivision(CLUBS[parentIndex]),aiLoanRecallSeason:season};
+   ['loanStatus','aiManagedLoan','loanParentType','loanParentClubIndex','loanParentDivision','loanParentClubName','loanBorrowerType','loanBorrowerClubIndex','loanBorrowerDivision','loanBorrowerClubName','loanStartDate','loanEndDate','loanDurationWeeks','loanWageShare','loanFee'].forEach(k=>delete returnedPlayer[k]);
+   CAREER_STAT_KEYS.forEach(k=>returnedPlayer[k]=0);returnedPlayer.competitionStats={};
+   const ix=roster.findIndex(x=>playerCareerIdentity(x)===identity);if(ix>=0)roster.splice(ix,1);
+   placePlayerInRoster(parent,returnedPlayer);if(parentType==='pl')syncEFLWorldRosterMirror(parentIndex);
+   appState.transferHistory=appState.transferHistory||[];appState.transferHistory.push({type:'ai-loan-recall',playerName:p.name,playerCareerId:identity,from:borrower.name,to:parentName,fee:0,week,seasonYear:season,transferDate:today,transferTypeLabel:'AI-utlån tilbakekalt – manglende spilletid'});
+   appState.aiLoanRecallHistory=appState.aiLoanRecallHistory||[];appState.aiLoanRecallHistory.push({season,week,playerName:p.name,playerCareerId:identity,from:borrower.name,to:parentName,apps:Number(p.apps)||0,minutes:Number(p.minutes)||0});
+   appState.log=appState.log||[];appState.log.push(`${p.name} ble hentet hjem fra ${borrower.name} fordi han fikk for lite spilletid.`);recalled++;
+  }
+ }
+ if(appState.aiLoanRecallHistory?.length>500)appState.aiLoanRecallHistory=appState.aiLoanRecallHistory.slice(-500);
+ return recalled;
+}
 function processAIAutonomousLoanReturns(today=gameDateForCurrentState()){
+ processAIAutonomousLoanMonitoring(today);
  let returned=0;
  const entries=aiLoanClubEntries();
  for(const borrower of entries){
@@ -10628,7 +10662,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.75 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.76 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){

@@ -1,0 +1,48 @@
+{
+  "version": "3.76",
+  "suites": [
+    {
+      "name": "v3.72 AI transfer regression",
+      "passed": true
+    },
+    {
+      "name": "v3.72 world development regression",
+      "passed": true
+    },
+    {
+      "name": "v3.73 AI squad planning targeted",
+      "passed": true
+    },
+    {
+      "name": "v3.73 AI squad planning long horizon",
+      "passed": true
+    },
+    {
+      "name": "v3.74 academy promotion",
+      "passed": true
+    },
+    {
+      "name": "v3.75 PL/EFL AI loans and returns",
+      "passed": true
+    },
+    {
+      "name": "v3.76 European academy integration",
+      "passed": true
+    },
+    {
+      "name": "v3.76 AI loan monitoring",
+      "passed": true
+    },
+    {
+      "name": "v3.76 ten-season loan lifecycle",
+      "passed": true
+    },
+    {
+      "name": "inline JavaScript syntax (3 blocks)",
+      "passed": true
+    }
+  ],
+  "all_passed": true,
+  "browser_ui_test": false,
+  "supabase_round_trip_test": false
+}

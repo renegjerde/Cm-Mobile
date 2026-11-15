@@ -1,0 +1,20 @@
+{
+  "version": "3.75",
+  "testFixtures": 2,
+  "checksPassed": 17,
+  "plLoanCreated": 1,
+  "duplicateSeasonRun": 0,
+  "plLoanReturned": 1,
+  "plWageSplitCorrect": true,
+  "loanAppsArchived": 14,
+  "identityPreserved": true,
+  "metadataCleared": true,
+  "idempotentReturn": true,
+  "eflLoanCreated": 1,
+  "eflLoanReturned": 1,
+  "loanedPlayerSelectedForAILeagueXI": true,
+  "eflWageSplitCorrect": true,
+  "loanedPlayersProtectedFromAIResale": true,
+  "seasonAndWeeklyReturnHooks": true,
+  "blockedWithoutPositionalNeed": true
+}
