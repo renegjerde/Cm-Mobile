@@ -1000,12 +1000,53 @@ function playerDatabaseStatusHTML(players){
  return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.80</strong>${auditLine}<div class="player-meta">Innebygd spillerprofilarkiv: ${PLAYER_REFERENCE_STATUS.globalPlayers||EMBEDDED_TM_PROFILES.length} profiler · referansedato ${esc(TM_GLOBAL_REFERENCE_CUTOFF)} · ingen ekstern tilkobling.</div><div class="player-meta">Spillverdener: ${englishClubs} engelske klubbobjekter, inkludert ${eflClubs} EFL-klubber, pluss europeiske klubber. Offisielle seniorlister er innebygd for alle ${eflClubs} EFL-klubber og ${Object.keys(PL_OFFICIAL_ROSTERS_2026_27).length} Premier League-klubber. PL-registeret inneholder ${Object.values(PL_OFFICIAL_ROSTERS_2026_27).reduce((n,a)=>n+a.length,0)} registrerte seniornavn pluss ${Object.values(PL_FIRST_TEAM_U21_SUPPLEMENT_2026_27).reduce((n,a)=>n+a.length,0)} førsteligalagsspillere fra U21-tillegget; EFL-registeret inneholder ${Object.values(EFL_OFFICIAL_ROSTERS_2026_27).reduce((n,a)=>n+a.length,0)}. Førstelagets U21-spillere legges til utover seniorlisten; 3-8-8-6 er en ønsket grunnstruktur, ikke et tak som skjuler unge spillere. Profilarkivet er historisk referansedata, ikke en fasit for aktuell klubbtilhørighet.</div><div class="player-meta">Denne troppen: ${dob}/${rows.length} med kildebasert fødselsdato · ${modelledDob} med simulert fødselsdato i alternativ virkelighet · ${ageUnknown} uten konkret alder · ${fictional} genererte/fiktive identiteter · ${tm} med andre Transfermarkt-profilfelt.</div><div class="player-meta">Kildebaserte fødselsdatoer brukes der de finnes. Hvis en dato mangler, får spilleren en fast, plausibel simulert fødselsdato i spillets alternative virkelighet. Alderen vises alltid konkret, utvikles normalt mellom sesonger og endres ikke ved klubbytte. Spillet henter ikke spillerdata fra nettet.</div></div>`;
 }
 
+function collectPlayerAuditDataset(){
+ const records=[];
+ const clonePlayer=p=>{try{return JSON.parse(JSON.stringify(p));}catch(e){return {name:p?.name||null,id:p?.id||null,serializationError:String(e)};}};
+ const add=(p,registry,clubName,division='')=>{
+  if(!p||typeof p!=='object'||!p.name)return;
+  records.push({registry,clubName:clubName||p.clubName||'',division:division||p.division||'',player:clonePlayer(p)});
+ };
+ (appState.worldSquads||[]).forEach((roster,ci)=>(roster||[]).forEach(p=>add(p,'worldSquads',CLUBS[ci]?.name||p.clubName||'',clubDivision(CLUBS[ci]||{}))));
+ for(const [division,clubs] of Object.entries(appState.eflPlayerDatabase||{}))for(const [clubName,roster] of Object.entries(clubs||{}))for(const p of roster||[])add(p,'eflPlayerDatabase',clubName,division);
+ for(const [clubName,roster] of Object.entries(appState.europeanTransferSquads||{}))for(const p of roster||[])add(p,'europeanTransferSquads',clubName,appState.europeanTransferClubData?.[clubName]?.country||'Europe');
+ for(const [clubName,roster] of Object.entries(appState.cupOnlySquads||{}))for(const p of roster||[])add(p,'cupOnlySquads',clubName,'Cup-only');
+ (appState.squad||[]).forEach(p=>add(p,'currentManagerSquad',currentClub()?.name||p.clubName||'',appState.activeDivision||''));
+ (appState.freeAgents||[]).forEach(p=>add(p,'freeAgents','Free agents',''));
+ for(const [clubName,roster] of Object.entries(appState.youthAcademies||{}))for(const p of roster||[])add(p,'youthAcademies',clubName,'Youth academy');
+ const validDob=v=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(String(v||'')))return false;const d=new Date(String(v)+'T00:00:00Z');return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===v;};
+ const byRegistry={},quality={verifiedDOB:0,modelledDOB:0,missingDOB:0,missingPosition:0,missingRole:0,missingAttributes:0,missingRating:0,missingPotential:0,potentialBelowCurrent:0,attributeValuesOutOfRange:0};
+ for(const r of records){
+  byRegistry[r.registry]=(byRegistry[r.registry]||0)+1;
+  const p=r.player,hasDob=validDob(p.dob);
+  if(p.dataQuality?.dobVerified===true&&hasDob)quality.verifiedDOB++;
+  else if(p.dataQuality?.ageModelledDOB===true&&hasDob)quality.modelledDOB++;
+  else if(!hasDob)quality.missingDOB++;
+  if(!p.pos)quality.missingPosition++;
+  if(!p.role)quality.missingRole++;
+  if(!p.attributes||typeof p.attributes!=='object')quality.missingAttributes++;
+  if(!Number.isFinite(Number(p.rating)))quality.missingRating++;
+  if(!Number.isFinite(Number(p.potential)))quality.missingPotential++;
+  if(Number.isFinite(Number(p.rating))&&Number.isFinite(Number(p.potential))&&Number(p.potential)<Number(p.rating))quality.potentialBelowCurrent++;
+  for(const value of Object.values(p.attributes||{}))if(!Number.isFinite(Number(value))||Number(value)<1||Number(value)>100)quality.attributeValuesOutOfRange++;
+ }
+ const duplicateAudit=typeof auditPlayerRegistrationDuplicates==='function'?auditPlayerRegistrationDuplicates():null;
+ return {exportType:'CM Mobile player audit dataset',schemaVersion:1,exportedAt:new Date().toISOString(),gameVersion:'v3.66',seasonYear:Number(appState.seasonYear)||null,seasonWeek:Number(appState.week)||null,activeClub:currentClub()?.name||'',activeDivision:appState.activeDivision||'',scopeNote:'Snapshot of player registrations currently materialized in this active career. Registry copies are retained as separate records so overlaps and duplicate registrations can be audited; registrationCount is not a count of unique people.',summary:{registrationCount:records.length,byRegistry,quality,registrationDuplicateAudit:duplicateAudit},players:records};
+}
+function exportPlayerAuditJSON(){
+ if(!appState?.started){alert('Start eller åpne en karriere før du eksporterer spillerrevisjonen.');return;}
+ const data=collectPlayerAuditDataset(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a'),stamp=new Date().toISOString().slice(0,10);
+ a.href=url;a.download=`CM_Mobile_Player_Audit_${stamp}.json`;document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1500);
+ alert(`Spillereksport klar: ${data.summary.registrationCount} spillerregistreringer fra ${Object.keys(data.summary.byRegistry).length} registre. Eksporten inneholder også alle individuelle ferdigheter og datakvalitetsfelter.`);
+}
 function squadDiagnosticsPanel(players){
  const rows=Array.isArray(players)?players:[];
- const withDob=rows.filter(p=>p&&p.dob).length;
  const playerRows=rows.slice().sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'no')).map(p=>`<div class="diagnostic-player-row"><strong>${esc(p.name||'Ukjent spiller')}</strong><span>${esc(playerAgeText(p))}</span><span>${p.dob?`Fødselsdato ${esc(p.dob)}`:'Ingen fødselsdato'} · Kilde: ${esc(p.ageSource||'ukjent')}</span></div>`).join('');
- return `<details class="diagnostics-panel"><summary><span>Spillinformasjon og diagnostikk</span></summary><div class="diagnostics-content">${playerDatabaseStatusHTML(rows)}<details class="diagnostics-subpanel"><summary>Kontroller aldersdata per spiller</summary><div class="diagnostic-player-list">${playerRows||'<p class="muted">Ingen spillere å kontrollere.</p>'}</div></details></div></details>`;
+ return `<details class="diagnostics-panel"><summary><span>Spillinformasjon og diagnostikk</span></summary><div class="diagnostics-content">${playerDatabaseStatusHTML(rows)}<div class="notice" style="margin:10px 0"><strong>Full spillerrevisjon</strong><div class="player-meta">Eksporterer spillerregistreringene fra alle materialiserte registre i denne karrieren, inkludert ferdigheter, posisjoner, CA/PA, fødselsdatoer, kilder og datakvalitet. Overlappende registre beholdes for kontroll.</div><button class="primary" style="width:100%;margin-top:9px" onclick="exportPlayerAuditJSON()">Eksporter hele spillerbasen (JSON) ↓</button></div><details class="diagnostics-subpanel"><summary>Kontroller aldersdata per spiller</summary><div class="diagnostic-player-list">${playerRows||'<p class="muted">Ingen spillere å kontrollere.</p>'}</div></details></div></details>`;
 }
+
 function naturalPositionsFor(name,pos,role){
  const known=knownPlayerPositionOverride(name);if(known)return known.naturalPositions.slice();
  const explicit={

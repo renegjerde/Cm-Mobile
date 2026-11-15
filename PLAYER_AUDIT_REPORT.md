@@ -1,4 +1,4 @@
-# CM Mobile v3.65 – offisielt UEFA-register for Europa League og Conference League
+# CM Mobile v3.66 – spillerrevisjonseksport og offisielt UEFA-register
 
 Dato for fast datasnapshot: **14. november 2026**  
 Utgangspunkt: CM Mobile v3.64, med historisk profilarkiv som reserve for 48 klubber.  
@@ -49,3 +49,12 @@ Kildesider for oversikt over endringer:
 - UEFA Conference League 2026/27 squad changes (oppdatert 4. november 2026).
 
 `UEFA_PLAYER_DATABASE_SNAPSHOT_2026-11-14.json` inneholder klubblister, kildestatus, List A- og List B-navn for revisjon.
+
+
+## v3.66 – diagnostikkeksport
+
+Spillinformasjon og diagnostikk på troppssiden har fått en skrivebeskyttet eksportfunksjon for den aktive karrieren. Eksporten samler spillerregistreringer fra `worldSquads`, `eflPlayerDatabase`, `europeanTransferSquads`, `cupOnlySquads`, `squad`, `freeAgents` og `youthAcademies`. Hver rad beholder register, klubb og divisjon samt hele spillerobjektet.
+
+Eksportens sammendrag teller registreringer per register og flagger blant annet verifiserte/modellerte/manglende fødselsdatoer, manglende posisjon/rolle/attributter, manglende rating/potensial, PA under CA og attributtverdier utenfor 1–100. Den inkluderer også den eksisterende registreringsduplikatkontrollen. Registeroverlapp bevares med hensikt; rapportens registreringstall er derfor ikke et antall unike personer. Eksporten omfatter bare karrieren som er åpen, er skrivebeskyttet og endrer ikke lagrede spillerdata.
+
+Denne funksjonen er et datainnsamlingssteg, ikke en full kvalitetsdom: automatiske flagg må vurderes mot kildene før spillere korrigeres.
