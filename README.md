@@ -1,38 +1,35 @@
-# CM Mobile v3.67 – Identity & Registration Integrity
+# CM Mobile v3.68 – Player Quality Diagnostics
+
+## Formål
+v3.68 er et skrivebeskyttet diagnostikksteg for den videre ferdighets-, CA- og PA-revisjonen. Den retter ikke spillerattributter, rating, potensial, posisjoner eller klubbtilhørighet automatisk.
 
 ## Publisering
 1. Pakk ut ZIP-filen.
 2. Erstatt `index.html` i rotmappen til GitHub-repositoriet.
-3. Erstatt `VERSION.txt` med `v3.67`.
-4. `supabase_cm_mobile.sql` er uendret fra tidligere versjoner og skal ikke kjøres på nytt dersom CM Mobile-tabellen allerede er opprettet.
-5. Publiser og åpne spillet. Eksisterende karrierer kjører en engangsmigrering for identitets- og registreringsintegritet.
+3. Erstatt `VERSION.txt` med `v3.68`.
+4. `supabase_cm_mobile.sql` er uendret; ikke kjør SQL på nytt hvis tabellen allerede finnes.
+5. Publiser og åpne den aktive karrieren. v3.68 inneholder v3.67-identitetsmigreringen; dersom den ikke er kjørt tidligere, kjøres den ved åpning. Lagre karrieren før eksport.
+6. Gå til Spillerstall → Spillinformasjon og diagnostikk → Eksporter ferdighets- og CA/PA-revisjon (JSON).
+7. Last opp `CM_Mobile_Player_Skill_CA_PA_Audit_YYYY-MM-DD.json` for videre analyse.
 
-## Hva v3.67 retter
-- Genererte/fiktive spilleridentiteter kan ikke lenger arve eller bruke Transfermarkt-ID-er, profiler eller profilbaserte posisjons-/markedsverdifelt.
-- Profilmatch for genererte spillere blokkeres før eksternt profiloppslag. Genererte navn kan heller ikke hente inn kuraterte rating-/PA-verdier, FPL-statistikk eller navnebaserte posisjonsroller fra en ekte spiller med samme navn.
-- Eksisterende genererte spillerregistreringer med uverifiserte eksterne identitetsfelt får fjernet disse referansene. Numerisk rating, potensial og attributtverdier overskrives ikke; registreringene flagges for senere ferdighetsrevisjon.
-- Genererte spillere får en posisjonsrolle som samsvarer med sin lagrede posisjonsgruppe i stedet for en rolle som kan ha kommet fra en navnekollisjon i profilarkivet.
-- UEFA-navneindeksen omfatter nå List A og List B, i tillegg til PL/EFL. Det hindrer at en spillerprofil fra en annen UEFA-klubb automatisk kobles til en navnebror.
-- Benfica-oppføringene for Leonardo Lopes og Francisco Silva korrigeres klubbspesifikt med UEFA/Benfica-profilenes fødselsdato og posisjonsgruppe. Samtidige Sporting CP-/Gent-identiteter beholdes som egne spillere.
-- Offisielle utlån for Claudio Echeverri (Manchester City → Benfica) og Georgie Gent (Barnsley → Boston United) merkes eksplisitt som utlån. De telles som gyldige utlånsoverlapp i identitetsrevisjonen, ikke som vanlige dubletter.
-- Offisielle utlån kan ikke forlenges/tilbakekalles fra den generiske lånemenyen, og utlånte spillere kan ikke legges på overgangslisten eller brukes av moderklubben. Eksakte startdatoer legges ikke inn uten bekreftet kilde; Georgie Gents slutt er bare angitt som vinduet desember 2026.
-- Registreringsrevisjonen teller nå alle sju materialiserte registre: `worldSquads`, `eflPlayerDatabase`, `europeanTransferSquads`, `cupOnlySquads`, `squad`, `freeAgents` og `youthAcademies`.
+## Nytt i v3.68
+- Utvidet spillerrevisjonseksport til schemaVersion 2.
+- Eksporten viser `gameVersion: v3.68` (rettet feil versjonsmerking fra tidligere eksport).
+- Hver spillerregistrering får et eget `audit`-objekt med CA, PA, PA-headroom, modellkilde, rollebasert ferdighetsindeks, avvik fra rating, spredning i rolle-relevante ferdigheter, posisjons-/rollekompatibilitet og konkrete revisjonssignaler.
+- Sammendraget omfatter modellversjoner, fordelinger etter posisjonsgruppe, alder og register, samt teller for revisjonsflagg.
+- Manglende versjonsmetadata på eldre free-agent- og academy-profilmodeller blir synliggjort uten å endre spillere.
+- Eksporten omfatter fortsatt alle sju materialiserte registre og beholder registeroverlapp.
 
-## Migrering og bevaring
-- Engangsmigrering styres av `playerIdentityIntegrityVersion`.
-- Migreringen rydder kun identitets- og profilreferanser for genererte spillere; den massejusterer ikke ferdigheter, rating eller potensial.
-- De to navngitte UEFA-korreksjonene er avgrenset til den oppgitte klubben. Samme navn i andre klubber blir ikke slått sammen.
-- Utlån lagres med eget `registeredLoanId`. Ukjent lånegebyr og lønnsfordeling forblir eksplisitt ukjent. I budsjettmodellen legges lønnskostnaden midlertidig hos moderklubben og ikke låneklubben for å unngå dobbel kostnadsføring; dette er ikke en påstand om den faktiske avtalen.
-- `UEFA_PLAYER_DATABASE_SNAPSHOT_2026-11-14.json` er uendret. UEFA-listene oppdateres ikke automatisk.
-- `supabase_cm_mobile.sql` er uendret.
+## Tolkning
+- `rating` er spillets nåværende rating/CA-felt. `potential` er PA-feltet.
+- `roleSkillIndex` bruker samme rollebaserte vekting som kampmotorens rolleutvelgelse. Den er kun en screeningsindikator og skal ikke forveksles med CA.
+- `paHeadroom` er PA minus rating. Høy/lav margin er et kontrollsignal, ikke automatisk bevis på feil.
+- `broad-position-role-conflict` er en grov kompatibilitetssjekk. Fleksible spillere og kildekonvensjoner må vurderes manuelt.
+- `unusually-flat-role-profile` betyr standardavvik under 3 i de generelle utespillerattributtene (keepersammenlignes med keeperfeltene). Dette er et granskningssignal, ikke en feilklassifisering.
+- All statistikk er per spillerregistrering. Samme spiller kan forekomme i flere registre, og eksportens antall registreringer er ikke antall unike personer.
 
-## Hva som gjenstår etter v3.67
-- De 112 genererte spillerregistreringene som tidligere bar uverifiserte Transfermarkt-ID-er, beholder sine eksisterende ratinger, attributter og potensial. Disse er flagget for neste ferdighets- og CA/PA-revisjon.
-- Posisjoner og rolleprofiler for øvrige spillere må fortsatt vurderes mot individuelle kilder.
-- Ferdigheter og potensial er fortsatt modellberegnet for store deler av databasen. v3.67 gjør ikke krav på å ha løst dette.
-
-## Datakilder og avgrensning
-- UEFA/Benfica-spilleroppføringer for Leonardo Lopes og Francisco Silva er korrigert etter de klubbspesifikke UEFA-/Benfica-oppføringene i november 2026.
-- Manchester City → Benfica-utlånet for Claudio Echeverri og Barnsley → Boston United-utlånet for Georgie Gent er lagt inn som separate registreringsforhold.
-- Eksisterende karrierer må åpnes i v3.67 før engangsmigreringen blir kjørt. Migreringen er kodebasert og lagres i den aktive karrieren ved normal lagring.
-- Ingen live Supabase-karriere ble endret eller direkte testet i leveranseprosessen.
+## Bevaring og avgrensning
+- Ingen karrieremigrering eller automatisk ferdighetsjustering legges til i v3.68.
+- Ingen spillerdata blir endret av analyseeksporten.
+- Den faktiske tilstanden etter v3.67-migreringen må bekreftes med en ny eksport fra brukerens aktive karriere. Tidligere v3.66-eksport er bare baseline og dokumentasjon, ikke bevis på at en aktiv save er migrert.
+- Ingen live Supabase-save eller full kampmotortest er endret/kjørt i leveransen.
