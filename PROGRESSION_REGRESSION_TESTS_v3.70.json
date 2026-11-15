@@ -1,0 +1,16 @@
+{
+  "roleSync": {
+    "rolesCovered": 16,
+    "checks": 6400,
+    "maxDelta": 0.5499999999999972,
+    "violations": 0,
+    "keeperCoreViolations": 0
+  },
+  "legacyAttributesUnchanged": true,
+  "sourcePatchChecks": {
+    "preseasonUsesSync": true,
+    "matchDevelopmentUsesSync": true,
+    "annualAgeingUsesSync": true,
+    "eflFallbackRegeneratesAttributes": true
+  }
+}

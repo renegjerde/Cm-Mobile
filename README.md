@@ -1,42 +1,42 @@
-# CM Mobile v3.69 – Player Generation & Ability Calibration
+# CM Mobile v3.70 – Player Progression Synchronization
 
-## Formål
-v3.69 improves the generation of new player profiles and future academy/free-agent intake. It introduces deterministic role-specific attributes, CA-aligned role skills, a dedicated goalkeeper profile and an age/talent-based PA distribution.
+## Release contents
 
-## Publisering
-1. Unzip this release.
-2. Replace `index.html` in the root of the GitHub repository.
-3. Replace `VERSION.txt` with the included `v3.69` file.
-4. Keep `supabase_cm_mobile.sql` unchanged. Do not rerun SQL if the existing table is already installed.
-5. Publish the site and open the game as usual.
+- `index.html` – complete CM Mobile application.
+- `VERSION.txt` – release version.
+- `README.md` – this file.
+- `CHANGELOG_v3.70.md` – v3.70 changes.
+- `PLAYER_PROGRESSION_LIFECYCLE_REPORT_v3.70.md` – ten-season test findings.
+- `LIFECYCLE_TEST_RESULTS_v3.70.json` – detailed synthetic scenario results.
+- `PROGRESSION_REGRESSION_TESTS_v3.70.json` – regression assertions.
+- `lifecycle_tests.js` – reproducible Node test harness.
+- `PLAYER_GENERATION_MODEL_v3.69.md` – the v3.69 generation model retained for reference.
+- `PLAYER_QUALITY_BASELINE_v3.68.md` – prior audit baseline.
+- `UEFA_PLAYER_DATABASE_SNAPSHOT_2026-11-14.json` – embedded UEFA reference snapshot.
+- `supabase_cm_mobile.sql` – unchanged database script from v3.69.
 
-## What changes for new players
-- Newly built first-team/world rosters use role-specific deterministic attributes calibrated to the player's existing CA/rating.
-- Newly created European profile players use detailed role profiles rather than the old broad position template.
-- New academy prospects use the age/talent-tier potential distribution.
-- New initial and annual free agents use the new role and PA models.
-- Generated EFL fillers and generic lower-division rosters use the same model.
-- New player records store `attributeModelVersion` and `potentialModelVersion` in `dataQuality`.
+## Publish
 
-## Existing careers and preservation
-- No career-wide recalibration migration is run.
-- Existing valid attributes, rating/CA, potential/PA, age, position and club registration are not overwritten.
-- Existing academy/free-agent players keep their saved values. New prospects and new annual free-agent intake use v3.69.
-- `ensurePlayerAttributes` fills only genuinely missing attribute keys, using a deterministic profile. Existing valid values are preserved.
-- The known verified Gabriele Biancheri position correction, if needed, regenerates the affected outfield profile with the new role model.
-- No player-facing generated-player labels or special markers are added.
+1. Extract this ZIP.
+2. Replace the application files in the existing GitHub repository with the included release files.
+3. Publish the commit.
+4. Open the existing career and confirm it loads and saves.
 
-## Model boundaries
-- `rating` remains the game's current ability/CA field. The v3.69 model does not rewrite existing CA values.
-- For newly materialized player profiles, role-relevant attributes are calibrated so the match-engine role skill index is close to the existing CA/rating. That index remains a role suitability signal, not a replacement CA formula.
-- PA is generated from age, player context, club strength and a deterministic talent-tier draw. Market value is not a direct PA input.
-- PA is never below CA and is capped at 96. Players aged 28+ receive at most four points of additional headroom; players aged 32+ at most two.
-- Attribute and PA values for real named players are still model estimates unless a separately curated value exists. A name/profile match is not presented as an observed skill dataset.
+Do not rerun `supabase_cm_mobile.sql`; v3.70 introduces no database schema change.
 
-## Testing and limitations
-- Full inline JavaScript passed `node --check`.
-- Synthetic tests covered 8,000 generated profiles across all 16 tactical roles and 80,000 potential samples across academy and free-agent contexts.
-- Model tests verified deterministic repeatability, all 11 attributes, the 25–99 range, outfield keeper-attribute caps, role-skill alignment and PA bounds.
-- This is not a live browser test, a full match-engine simulation, or a test against a live Supabase save. No live career was modified.
+## Data safety
 
-See `PLAYER_GENERATION_MODEL_v3.69.md` and `MODEL_TEST_RESULTS_v3.69.json` for implementation and test details.
+- No bulk player rebalance is run.
+- A player is attribute-synchronized only when their model metadata identifies the v3.69 generated role-archetype model and their CA changes through normal development or ageing.
+- Legacy player attributes are left untouched by the new synchronizer.
+- The corrected EFL fallback generator affects newly generated players when that fallback path is used.
+
+## Testing
+
+The release passed inline JavaScript syntax checking, v3.69 model tests, constructor tests, 24 ten-season scenarios, and 6,400 role-synchronization regression checks. This does not replace a live browser, campaign-save or full match-engine test.
+
+Run the lifecycle regression harness with Node.js from this folder:
+
+```bash
+node lifecycle_tests.js
+```
