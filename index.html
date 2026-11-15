@@ -1871,6 +1871,58 @@ function baselineFinance(name,strength,div){
  const wage=Math.round(wageBase*wealth*(.78+(stableSeed(name+' wages')%45)/100));
  return {division:div,transferBudget:transfer,wageBudget:wage,wageBill:0,financialStatus:'stable'};
 }
+function europeanWeeklyOperatingRevenueM(clubName,strength=60){
+ // Conservative revenue tiers for the permanent UEFA roster universe; values are £m/week.
+ const s=Number(strength)||60;
+ const base=s>=84?1.85:s>=78?1.35:s>=72?1.05:s>=66?.82:s>=60?.62:s>=54?.46:s>=48?.34:.26;
+ const capacity=STADIUMS[clubName]||(s>=82?60000:s>=75?50000:s>=68?40000:s>=60?30000:s>=52?22000:14000);
+ const stadium=Math.max(.68,Math.min(1.38,Math.pow(capacity/30000,.30)));
+ const commercial=clubCommercialFactor(clubName,s);
+ return +(base*stadium*commercial).toFixed(3);
+}
+function europeanClubWageBudgetBase(strength){
+ const s=Number(strength)||55;
+ return Math.max(45,Math.round(430*Math.pow(Math.max(38,s)/65,2.0)));
+}
+function ensureEuropeanClubFinanceRecords(){
+ if(!appState.clubFinances||typeof appState.clubFinances!=='object')appState.clubFinances={};
+ for(const [name,roster] of Object.entries(appState.europeanTransferSquads||{})){
+  if(!Array.isArray(roster))continue;
+  const meta=appState.europeanTransferClubData?.[name]||{};
+  const strength=Number(meta.strength)||58;
+  const f=appState.clubFinances[name]||(appState.clubFinances[name]={division:'Europe',transferBudget:Number(meta.budget)||.2,wageBudget:europeanClubWageBudgetBase(strength),wageBill:0,financialStatus:'stable'});
+  f.division='Europe';
+  if(Number.isFinite(Number(meta.budget)))f.transferBudget=Number(meta.budget);
+  else meta.budget=Number(f.transferBudget)||.2;
+  const wageBill=roster.reduce((sum,p)=>sum+(Number(p?.wage)||0),0);
+  f.wageBill=wageBill;
+  if(!f.wageBudgetInitialized){f.wageBudget=Math.max(europeanClubWageBudgetBase(strength),Math.ceil(wageBill/.88));f.wageBudgetInitialized=true;}
+  f.financialStatus=wageBill>Number(f.wageBudget||0)?'under-pressure':'stable';
+ }
+}
+function reviewEuropeanClubFinancesForNewSeason(){
+ ensureEuropeanClubFinanceRecords();
+ for(const [name,roster] of Object.entries(appState.europeanTransferSquads||{})){
+  if(!Array.isArray(roster))continue;
+  const meta=appState.europeanTransferClubData?.[name]||{};
+  const strength=Number(meta.strength)||58;
+  const f=appState.clubFinances[name];
+  const oldBudget=Math.max(1,Number(f.wageBudget)||europeanClubWageBudgetBase(strength));
+  const wageBill=roster.reduce((sum,p)=>sum+(Number(p?.wage)||0),0);
+  const revenue=europeanWeeklyOperatingRevenueM(name,strength);
+  const cash=Number(meta.budget??f.transferBudget)||0;
+  const cashFactor=cash<0?.88:cash>35?1.06:cash>12?1.025:cash<2?.94:1;
+  const incomeFactor=Math.max(.88,Math.min(1.12,.94+revenue/.9*.08));
+  let target=europeanClubWageBudgetBase(strength)*cashFactor*incomeFactor;
+  target=Math.max(oldBudget*.88,Math.min(oldBudget*1.12,target));
+  target=Math.max(6,Math.round(target));
+  f.division='Europe';f.wageBill=wageBill;f.wageBudget=target;f.wageBudgetInitialized=true;
+  f.wageBudgetReviewedSeason=Number(appState.seasonYear)||2027;
+  f.weeklyIncomeM=revenue;f.weeklyNetM=+(revenue-wageBill/1000).toFixed(3);
+  f.transferBudget=cash;f.financialStatus=wageBill>target?'under-pressure':cash<0?'under-pressure':'stable';
+  f.lastSeasonReview={season:(Number(appState.seasonYear)||2027)-1,division:'Europe',weeklyIncomeM:revenue,wageBill,wageBudget:target,transferBudget:cash,reputation:Number(meta.strength)||strength};
+ }
+}
 function initClubFinances(force=false){
  const migrating=!!appState.clubFinances&&Number(appState.financeVersion||0)<FINANCE_VERSION;
  if(migrating&&!appState.financeWageMigration213){
@@ -1901,6 +1953,7 @@ function initClubFinances(force=false){
   }
   f.financialStatus=f.wageBill>f.wageBudget?'under-pressure':'stable';
  });
+ ensureEuropeanClubFinanceRecords();
  appState.financeVersion=FINANCE_VERSION;
 }
 function getClubFinance(name=currentClub().name){initClubFinances();return appState.clubFinances[name]||baselineFinance(name,60,divisionForClubName(name));}
@@ -1986,6 +2039,7 @@ function reviewAllClubFinancesForNewSeason(rankings,previousSeason,movement){
   f.lastSeasonReview={season:Number(previousSeason)||Number(appState.seasonYear)-1,rank,total,division:div,promoted:promoted.has(name),relegated:relegated.has(name),weeklyIncomeM:revenue,wageBill,wageBudget:target,transferBudget:transfer,reputation:f.reputation};
   if(isUser){appState.budget=Math.max(0,Number(appState.budget)||0);f.transferBudget=appState.budget;club.budget=appState.budget;}
  }
+ reviewEuropeanClubFinancesForNewSeason();
  appState.financeVersion=FINANCE_VERSION;appState.wagePolicyVersion=WAGE_POLICY_VERSION;
 }
 const YOUTH_ACADEMY_TARGETS={GK:3,DEF:8,MID:8,ATT:6};
@@ -2203,6 +2257,24 @@ function processWeeklyClubEconomy(){
    if(!finance.weeklyEconomyInitializedBefore)club.budget=Number.isFinite(Number(club.budget))?Number(club.budget):Number(finance.transferBudget)||.2;
    club.budget=Math.max(.05,+(Number(club.budget||0)+netM).toFixed(2));finance.transferBudget=club.budget;finance.weeklyIncomeM=revenueM;finance.wageBill=weeklyK;finance.weeklyNetM=netM;finance.weeklyEconomyInitializedBefore=true;
   }
+ }
+ // Permanent European squads also earn operating income and pay their weekly first-team wages.
+ // This runs on the same preseason and league-week cadence as the English clubs.
+ ensureEuropeanClubFinanceRecords();
+ for(const [clubName,roster] of Object.entries(appState.europeanTransferSquads||{})){
+  if(!Array.isArray(roster))continue;
+  const meta=appState.europeanTransferClubData?.[clubName]||{};
+  const finance=appState.clubFinances[clubName]||(appState.clubFinances[clubName]={division:'Europe',transferBudget:Number(meta.budget)||.2,wageBudget:europeanClubWageBudgetBase(meta.strength),wageBill:0});
+  const weeklyK=roster.reduce((sum,p)=>sum+(Number(p?.wage)||0),0);
+  const revenueM=europeanWeeklyOperatingRevenueM(clubName,meta.strength);
+  const netM=+(revenueM-weeklyK/1000).toFixed(3);
+  const cash=Number(meta.budget??finance.transferBudget)||0;
+  const ceiling=meta.strength>=84?150:meta.strength>=78?110:meta.strength>=72?80:meta.strength>=66?55:meta.strength>=60?35:meta.strength>=54?22:12;
+  const nextCash=+Math.max(-ceiling*.35,Math.min(ceiling,cash+netM)).toFixed(2);
+  meta.budget=nextCash;finance.transferBudget=nextCash;finance.division='Europe';
+  finance.weeklyIncomeM=revenueM;finance.wageBill=weeklyK;finance.weeklyNetM=netM;
+  finance.financialStatus=weeklyK>Number(finance.wageBudget||0)||nextCash<0?'under-pressure':'stable';
+  finance.weeklyEconomyInitializedBefore=true;
  }
 }
 function payWeeklyWages(){processWeeklyClubEconomy();}
@@ -3966,6 +4038,7 @@ function ensureEuropeanTransferWorld(){
  const currentSeason=Number(appState.seasonYear)||2026;
  runPlayerIdentityIntegrityMigration();
  const needsDedup=createdRoster||Number(appState.europeanTransferDedupVersion||0)!==2||Number(appState.europeanTransferDedupSeasonYear||0)!==currentSeason;
+ ensureEuropeanClubFinanceRecords();
  appState.playerRegistrationAudit=auditPlayerRegistrationDuplicates();
  appState.playerRegistrationAuditVersion=2;
  if(!needsDedup)return;
@@ -10754,7 +10827,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.78 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.79 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){

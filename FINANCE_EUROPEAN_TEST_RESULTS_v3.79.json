@@ -1,0 +1,19 @@
+{
+  "passed": 14,
+  "clubs": 2,
+  "weeklyCashFlow": true,
+  "wageBills": true,
+  "annualReview": true,
+  "elite": {
+    "incomeM": 2.278,
+    "wageBillK": 550,
+    "weeklyNetM": 1.728,
+    "budget": -52.5
+  },
+  "small": {
+    "incomeM": 0.419,
+    "wageBillK": 198,
+    "weeklyNetM": 0.221,
+    "budget": 22
+  }
+}

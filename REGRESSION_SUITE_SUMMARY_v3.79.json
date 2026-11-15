@@ -1,0 +1,67 @@
+{
+  "version": "3.79",
+  "targetedFinanceTests": {
+    "passed": 14,
+    "clubs": 2,
+    "coverage": [
+      "European finance record initialization",
+      "transfer-market metadata remains authoritative",
+      "weekly income accrual",
+      "weekly wage deductions",
+      "transfer budget synchronization",
+      "annual wage-budget review",
+      "bounded annual wage-budget movement",
+      "strength-tier cash ceilings",
+      "downside buffer"
+    ]
+  },
+  "retainedRegressionSuites": [
+    {
+      "suite": "AI international transfer and negotiation",
+      "version": "3.78",
+      "tests": 9,
+      "passed": 9
+    },
+    {
+      "suite": "AI youth-loan monitoring",
+      "version": "3.76",
+      "passed": true
+    },
+    {
+      "suite": "Academy pathways and senior promotion",
+      "version": "3.74",
+      "passed": true
+    },
+    {
+      "suite": "Long-horizon AI squad planning",
+      "version": "3.73",
+      "seasons": 10,
+      "clubs": 24,
+      "initialPlayers": 576,
+      "passed": true
+    },
+    {
+      "suite": "World player development",
+      "version": "3.72",
+      "scenarioPlayers": 3000,
+      "academyProspects": 5000,
+      "years": 10,
+      "passed": true
+    }
+  ],
+  "inlineScriptSyntax": {
+    "blocks": 3,
+    "passed": 3
+  },
+  "database": {
+    "sqlByteIdenticalTo": "3.78",
+    "schemaChanged": false,
+    "migrationRequired": false
+  },
+  "limitations": [
+    "European income is modeled from strength, stadium-size proxy and commercial factor, not real accounts.",
+    "No country-specific broadcasting, tax, debt interest, owner funding, attendance-by-match or UEFA prize distributions.",
+    "No formal administration, points deductions or liquidation model.",
+    "No full browser UI test or Supabase round-trip test."
+  ]
+}
