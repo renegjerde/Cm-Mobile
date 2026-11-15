@@ -1,0 +1,39 @@
+{
+  "version": "3.71",
+  "scenarioPlayers": 3000,
+  "years": 10,
+  "matchCohorts": {
+    "manager": {
+      "players": 1000,
+      "averageMatchGains": 7.77,
+      "averageFinalCA": 62.74,
+      "maxFinalCA": 84
+    },
+    "premierLeagueAI": {
+      "players": 1000,
+      "averageMatchGains": 7.761,
+      "averageFinalCA": 62.74,
+      "maxFinalCA": 84
+    },
+    "eflAI": {
+      "players": 1000,
+      "averageMatchGains": 9.148,
+      "averageFinalCA": 64.12,
+      "maxFinalCA": 84
+    }
+  },
+  "academy": {
+    "players": 5000,
+    "totalAnnualDevelopmentEvents": 6724,
+    "averageFinalCA": 50.44,
+    "potentialViolations": 0
+  },
+  "invariants": {
+    "duplicateFixtureIdempotent": true,
+    "zeroMinutesNoDevelopment": true,
+    "allPlayerGroupsWithinPA": true,
+    "academyWithinPA": true,
+    "legacyAttributesUntouched": true,
+    "allFiveIntegrationPathsPresent": true
+  }
+}

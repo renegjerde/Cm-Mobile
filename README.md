@@ -1,42 +1,46 @@
-# CM Mobile v3.70 – Player Progression Synchronization
+# CM Mobile v3.71 – World Development Balance
 
 ## Release contents
 
 - `index.html` – complete CM Mobile application.
 - `VERSION.txt` – release version.
 - `README.md` – this file.
-- `CHANGELOG_v3.70.md` – v3.70 changes.
-- `PLAYER_PROGRESSION_LIFECYCLE_REPORT_v3.70.md` – ten-season test findings.
-- `LIFECYCLE_TEST_RESULTS_v3.70.json` – detailed synthetic scenario results.
-- `PROGRESSION_REGRESSION_TESTS_v3.70.json` – regression assertions.
-- `lifecycle_tests.js` – reproducible Node test harness.
-- `PLAYER_GENERATION_MODEL_v3.69.md` – the v3.69 generation model retained for reference.
-- `PLAYER_QUALITY_BASELINE_v3.68.md` – prior audit baseline.
+- `CHANGELOG_v3.71.md` – v3.71 changes.
+- `WORLD_DEVELOPMENT_BALANCE_REPORT_v3.71.md` – findings, design and limitations.
+- `WORLD_DEVELOPMENT_TEST_RESULTS_v3.71.json` – synthetic cohort results and invariants.
+- `world_development_tests_v371.js` – reproducible Node test harness.
+- `PLAYER_PROGRESSION_LIFECYCLE_REPORT_v3.70.md` – previous lifecycle report.
+- `LIFECYCLE_TEST_RESULTS_v3.70.json` – previous lifecycle scenarios.
+- `PROGRESSION_REGRESSION_TESTS_v3.70.json` – previous progression regression checks.
+- `PLAYER_GENERATION_MODEL_v3.69.md` – retained player-generation model reference.
+- `PLAYER_QUALITY_BASELINE_v3.68.md` – prior quality baseline.
 - `UEFA_PLAYER_DATABASE_SNAPSHOT_2026-11-14.json` – embedded UEFA reference snapshot.
-- `supabase_cm_mobile.sql` – unchanged database script from v3.69.
+- `supabase_cm_mobile.sql` – unchanged database script.
 
 ## Publish
 
 1. Extract this ZIP.
 2. Replace the application files in the existing GitHub repository with the included release files.
 3. Publish the commit.
-4. Open the existing career and confirm it loads and saves.
+4. Open the existing career and confirm that it loads and saves.
 
-Do not rerun `supabase_cm_mobile.sql`; v3.70 introduces no database schema change.
+Do not rerun `supabase_cm_mobile.sql`; v3.71 introduces no database schema change.
 
 ## Data safety
 
-- No bulk player rebalance is run.
-- A player is attribute-synchronized only when their model metadata identifies the v3.69 generated role-archetype model and their CA changes through normal development or ageing.
-- Legacy player attributes are left untouched by the new synchronizer.
-- The corrected EFL fallback generator affects newly generated players when that fallback path is used.
+- No bulk player rebalance or player identity replacement is performed.
+- Existing player attributes are not regenerated.
+- The v3.70 generated-player CA/attribute synchronization remains limited to profiles with v3.69 model provenance.
+- Match development is shared by manager and simulated AI pathways and is capped by PA.
+- Youth academy prospects receive one controlled annual development opportunity after a completed academy season.
+- Recent fixture keys are retained per player to prevent duplicate development without unbounded save growth.
 
 ## Testing
 
-The release passed inline JavaScript syntax checking, v3.69 model tests, constructor tests, 24 ten-season scenarios, and 6,400 role-synchronization regression checks. This does not replace a live browser, campaign-save or full match-engine test.
-
-Run the lifecycle regression harness with Node.js from this folder:
+Run the v3.71 progression tests with Node.js:
 
 ```bash
-node lifecycle_tests.js
+node world_development_tests_v371.js
 ```
+
+The tests cover synthetic match-development cohorts, academy cohorts, idempotency, PA limits and source integration checks. They are not a substitute for a live browser career-save test or Supabase round-trip.

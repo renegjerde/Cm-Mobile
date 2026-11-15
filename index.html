@@ -1814,7 +1814,7 @@ function cm70SyncGeneratedAttributesWithCA(player){
  const before=cm69RoleScore(player.attributes,role);
  if(Math.abs(before-target)<.55)return false;
  player.attributes=cm69AlignRoleAttributes(player.attributes,role,target);
- player.dataQuality.lastAbilitySyncVersion='v3.70';
+ player.dataQuality.lastAbilitySyncVersion='v3.71';
  return true;
 }
 function cm70SetPlayerRating(player,nextRating,reason='development'){
@@ -2063,6 +2063,7 @@ function ensureYouthAcademies(newSeason=false){
    for(const p of cohort){
     if(!Number.isFinite(Number(p.academySeason)))p.academySeason=season-1;
     const hadFullSeason=season>Number(p.academySeason);
+    if(hadFullSeason)developYouthAcademyProspect(p,c.name,season-1);
     p.age=Math.min(19,Math.max(15,(Number(p.age)||15)+1));
     if(Number(p.age)>18&&hadFullSeason)releaseYouthToFreeAgency(p,c.name);
     else if(Number(p.age)<=18)retained.push(p);
@@ -5261,7 +5262,8 @@ function lowerLeagueGoalScorer(xi,rng,goalMethod='open-play'){
 function recordLowerLeagueMatch(data,division,rowA,rowB,ga,gb,seed,roundNo){
  data.playerStats=data.playerStats||{};data.matchLog=Array.isArray(data.matchLog)?data.matchLog:[];
  const xiA=lowerLeagueMatchXI(rowA,division),xiB=lowerLeagueMatchXI(rowB,division);
- xiA.forEach(p=>{const st=lowerLeagueStatRow(data,p,rowA.name);st.apps++;addCompetitionStat(st,division,'apps');addCompetitionStat(st,division,'minutes',90);p.apps=(Number(p.apps)||0)+1;p.minutes=(Number(p.minutes)||0)+90;addCompetitionStat(p,division,'apps');addCompetitionStat(p,division,'minutes',90);});xiB.forEach(p=>{const st=lowerLeagueStatRow(data,p,rowB.name);st.apps++;addCompetitionStat(st,division,'apps');addCompetitionStat(st,division,'minutes',90);p.apps=(Number(p.apps)||0)+1;p.minutes=(Number(p.minutes)||0)+90;addCompetitionStat(p,division,'apps');addCompetitionStat(p,division,'minutes',90);});
+ const matchKey=`LOWER-${Number(appState.seasonYear)||2026}-${division}-${Number(roundNo)||1}-${rowA.name}-${rowB.name}`;
+ xiA.forEach(p=>{const st=lowerLeagueStatRow(data,p,rowA.name);st.apps++;addCompetitionStat(st,division,'apps');addCompetitionStat(st,division,'minutes',90);p.apps=(Number(p.apps)||0)+1;p.minutes=(Number(p.minutes)||0)+90;addCompetitionStat(p,division,'apps');addCompetitionStat(p,division,'minutes',90);applyPlayerMatchExperienceDevelopment(p,90,matchKey);});xiB.forEach(p=>{const st=lowerLeagueStatRow(data,p,rowB.name);st.apps++;addCompetitionStat(st,division,'apps');addCompetitionStat(st,division,'minutes',90);p.apps=(Number(p.apps)||0)+1;p.minutes=(Number(p.minutes)||0)+90;addCompetitionStat(p,division,'apps');addCompetitionStat(p,division,'minutes',90);applyPlayerMatchExperienceDevelopment(p,90,matchKey);});
  const rng=seededRandom((seed^0x9E3779B9)>>>0),events=[];
  const sides=[{row:rowA,xi:xiA,goals:ga,side:'A'},{row:rowB,xi:xiB,goals:gb,side:'B'}];
  sides.forEach(team=>{for(let i=0;i<team.goals;i++){
@@ -5811,11 +5813,40 @@ function cupPlayerBySource(roster,sourcePlayer){
  const id=String(sourcePlayer.sourcePlayerId??sourcePlayer.id??''),career=String(sourcePlayer.careerId||'');
  return roster.find(p=>id&&String(p.id)===id)||roster.find(p=>career&&String(p.careerId||'')===career)||roster.find(p=>normalisePlayerName(p.name)===normalisePlayerName(sourcePlayer.name))||null;
 }
+function applyPlayerMatchExperienceDevelopment(player,minutesPlayed,matchKey){
+ if(!player||!player.name)return false;
+ const age=Number(player.age),minutes=Math.max(0,Math.min(120,Number(minutesPlayed)||0));
+ if(age<16||age>23||minutes<=0||Number(player.rating)>=Number(player.potential||player.rating))return false;
+ const key=String(matchKey||'');if(!key)return false;
+ const seen=Array.isArray(player.developmentMatchKeys)?player.developmentMatchKeys:[];
+ if(seen.includes(key))return false;
+ const chance=playerDevelopmentChanceFromMinutes(age,minutes);
+ const rng=seededRandom(stableSeed(`${playerCareerIdentity(player)}|match-development|${key}`));
+ player.developmentMatchKeys=[...seen.slice(-39),key];
+ if(rng()>=chance)return false;
+ const before=Number(player.rating)||0;
+ cm70SetPlayerRating(player,Math.min(Number(player.potential),before+1),'match-experience');
+ return Number(player.rating)>before;
+}
+function developYouthAcademyProspect(p,clubName,season){
+ if(!p||!p.name)return false;
+ const age=Number(p.age)||15,rating=Number(p.rating)||35,potential=Number(p.potential)||rating;
+ if(age<15||age>18||rating>=potential)return false;
+ const gap=Math.max(0,potential-rating),ageFactor=age<=16?1:age===17?.88:.72;
+ const participation=Number(p.academyTrainingAttendance??.9);
+ const chance=Math.max(.12,Math.min(.78,(.34+Math.min(24,gap)*.014)*ageFactor*Math.max(.55,Math.min(1,participation))));
+ const rng=seededRandom(stableSeed(`${playerCareerIdentity(p)}|academy-development|${season}|${clubName}`));
+ if(rng()>=chance)return false;
+ const gain=rng()<.08&&gap>=2?2:1;
+ cm70SetPlayerRating(p,Math.min(potential,rating+gain),'academy-development');
+ p.academyDevelopmentSeasons=[...(Array.isArray(p.academyDevelopmentSeasons)?p.academyDevelopmentSeasons:[]),Number(season)].slice(-8);
+ return Number(p.rating)>rating;
+}
 function recordCupRosterStats(team,players,sim,side,competition){
  const roster=rosterForCupMatch(team);if(!Array.isArray(roster))return;
  const xi=(side==='A'?(sim?.xiA||[]):(sim?.xiB||[]));
  const chosen=(players||[]).filter(p=>xi.some(x=>String(x.id)===String(p.id)));
- chosen.forEach(source=>{const target=cupPlayerBySource(roster,source);if(!target)return;target.apps=(Number(target.apps)||0)+1;target.minutes=(Number(target.minutes)||0)+90;addCompetitionStat(target,competition,'apps');addCompetitionStat(target,competition,'minutes',90);});
+ chosen.forEach(source=>{const target=cupPlayerBySource(roster,source);if(!target)return;target.apps=(Number(target.apps)||0)+1;target.minutes=(Number(target.minutes)||0)+90;addCompetitionStat(target,competition,'apps');addCompetitionStat(target,competition,'minutes',90);applyPlayerMatchExperienceDevelopment(target,90,sim?.cmMatchKey);});
  (sim?.chanceList||[]).filter(e=>e.side===side).forEach(e=>{
   if(e.type==='goal'){
    const scorer=roster.find(p=>normalisePlayerName(p.name)===normalisePlayerName(e.scorer));if(scorer){scorer.goals=(Number(scorer.goals)||0)+1;addCompetitionStat(scorer,competition,'goals');}
@@ -5844,6 +5875,7 @@ function applyCupRosterAvailability(teamA,teamB,playersA,playersB,sim,competitio
 function simulateCompetitionMatchRaw(a,b,competition,roundNo,gameNo){
  const pa=competitionSquad(a),pb=competitionSquad(b);
  const sim=simulateMatch(a.strength,b.strength,true,pa,pb,'4-3-3','4-3-3','Balanced','Balanced');
+ sim.cmMatchKey=`CUP-${Number(appState.seasonYear)||2026}-${competition}-${Number(roundNo)||1}-${Number(gameNo)||0}-${a?.name||'A'}-${b?.name||'B'}`;
  recordSimulatedCupPlayerStats(a,b,pa,pb,sim,competition);
  applyCupRosterAvailability(a,b,pa,pb,sim,competition,roundNo,gameNo);
  return {ga:Number(sim.ga)||0,gb:Number(sim.gb)||0,events:sim.events||[],stats:sim.stats||{},raw:sim};
@@ -6248,6 +6280,8 @@ function sortedEuropeanTable(comp){return [...(comp?.table||[])].sort((a,b)=>b.p
 function simulateEuropeanLeagueMatch(homeTeam,awayTeam,compName,matchday,gameNo){
  const pa=competitionSquad(homeTeam),pb=competitionSquad(awayTeam);
  const sim=simulateMatch(homeTeam.strength,awayTeam.strength,true,pa,pb,'4-3-3','4-3-3','Balanced','Balanced');
+ sim.cmMatchKey=`EUROPE-${Number(appState.seasonYear)||2026}-${compName}-${Number(matchday)||1}-${Number(gameNo)||0}-${homeTeam.name}-${awayTeam.name}`;
+ recordSimulatedCupPlayerStats(homeTeam,awayTeam,pa,pb,sim,compName);
  return {round:matchday,home:homeTeam.name,away:awayTeam.name,score:`${sim.ga}–${sim.gb}`,winner:sim.ga===sim.gb?'Uavgjort':sim.ga>sim.gb?homeTeam.name:awayTeam.name,competition:compName,events:sim.events||[],stats:sim.stats||{},isLeaguePhase:true,gameNo};
 }
 function ensureEuropeanCompetitions(reset=false){
@@ -8192,7 +8226,7 @@ function recordSimulatedPlayerStats(clubA,clubB,playersA,playersB,sim,competitio
  const update=(clubIndex,players,side)=>{
   const roster=appState.worldSquads?.[clubIndex];if(!roster)return;
   const chosen=players.filter(p=>sim.xiA.concat(sim.xiB).some(x=>String(x.id)===String(p.id)));
-  chosen.forEach(p=>{const target=roster.find(x=>x.name===p.name);if(!target)return;target.apps=(target.apps||0)+1;target.minutes=(target.minutes||0)+90;addCompetitionStat(target,competition,'apps');addCompetitionStat(target,competition,'minutes',90);});
+  chosen.forEach(p=>{const target=roster.find(x=>x.name===p.name);if(!target)return;target.apps=(target.apps||0)+1;target.minutes=(target.minutes||0)+90;addCompetitionStat(target,competition,'apps');addCompetitionStat(target,competition,'minutes',90);applyPlayerMatchExperienceDevelopment(target,90,`LEAGUE-${Number(appState.seasonYear)||2026}-${Number(appState.week)||1}-${clubA}-${clubB}`);});
   (sim.chanceList||[]).filter(e=>e.side===side).forEach(e=>{if(e.type==='goal'){const scorer=roster.find(p=>p.name===e.scorer);if(scorer){scorer.goals=(scorer.goals||0)+1;addCompetitionStat(scorer,competition,'goals');}if(e.assist){const assister=roster.find(p=>p.name===e.assist);if(assister){assister.assists=(assister.assists||0)+1;addCompetitionStat(assister,competition,'assists');}}}else{const creator=roster.find(p=>p.name===e.player);if(creator){creator.chancesCreated=(creator.chancesCreated||0)+1;addCompetitionStat(creator,competition,'chancesCreated');}}});
   // Cards and availability are applied to the actual player listed on each event below.
  };
@@ -10106,10 +10140,8 @@ function showMatch(c,opp,our,their,home,text,stats,roundResults,goalEvents,userE
      p.fitness=Math.min(100,playerFitnessValue(p)+recoveryBonus);
     }
     // Match experience drives development: full-game minutes count much more than bench or no appearances.
-    const playerAge=Number(p.age),minutesPlayed=Number(playedMinutes)||0;
-    if(playerAge>=16&&playerAge<=23&&Number(p.rating)<Number(p.potential||p.rating)){
-     const developmentChance=playerDevelopmentChanceFromMinutes(playerAge,minutesPlayed);
-     if(Math.random()<developmentChance){cm70SetPlayerRating(p,Math.min(Number(p.potential),Number(p.rating)+1),'match-experience');appState.log.push(`${p.name} har utviklet seg gjennom trening og kamperfaring, og ferdigheten øker til ${p.rating}.`);}
+    if(applyPlayerMatchExperienceDevelopment(p,playedMinutes,engine.matchKey||`LIVE-${Number(appState.seasonYear)||2026}-${Number(appState.week)||1}-${engine.a}-${engine.b}`)){
+     appState.log.push(`${p.name} har utviklet seg gjennom trening og kamperfaring, og ferdigheten øker til ${p.rating}.`);
     }
    });
    for(const e of engine.events){
@@ -10331,7 +10363,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.70 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.71 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
