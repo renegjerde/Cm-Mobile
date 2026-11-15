@@ -1,0 +1,9 @@
+{
+  "annualSeasonHook": true,
+  "ageIncrementBeforePromotion": true,
+  "seniorRosterUpdated": true,
+  "academyRosterCleaned": true,
+  "attributesPreserved": true,
+  "seasonGuard": true,
+  "passed": true
+}

@@ -2040,6 +2040,55 @@ function fillYouthAcademyVacancies(c,cohort){
   }
  }
 }
+function aiAcademyRosterForClub(clubName,division){
+ const clubIndex=CLUBS.findIndex(c=>c.name===clubName);
+ if(clubIndex>=0){
+  if(clubIndex===Number(appState.club))return null;
+  if(!Array.isArray(appState.worldSquads))appState.worldSquads=[];
+  if(!Array.isArray(appState.worldSquads[clubIndex]))appState.worldSquads[clubIndex]=[];
+  return {roster:appState.worldSquads[clubIndex],clubIndex,club:CLUBS[clubIndex],mirror:true};
+ }
+ const div=division||domesticDivisionForClubName(clubName);
+ const roster=appState.eflPlayerDatabase?.[div]?.[clubName];
+ if(Array.isArray(roster)){
+  const lowerClub=(appState.lowerLeagues?.[div]?.rows||[]).find(c=>c.name===clubName);
+  if(!lowerClub)return null;
+  return {roster,clubIndex:-1,club:lowerClub,division:div,mirror:false};
+ }
+ return null;
+}
+function processAIAcademyPromotion(clubInfo,prospect,season){
+ if(!clubInfo||!prospect||!prospect.name)return false;
+ const clubName=clubInfo.name,age=Number(prospect.age),rating=Number(prospect.rating)||0;
+ if(!clubName||clubName===currentClub().name||age<17||age>19)return false;
+ const history=Array.isArray(appState.aiAcademyPromotionHistory)?appState.aiAcademyPromotionHistory:[];
+ if(history.some(x=>x.clubName===clubName&&Number(x.season)===Number(season)))return false;
+ const target=aiAcademyRosterForClub(clubName,clubInfo.division);
+ if(!target||!Array.isArray(target.roster)||target.roster.length>=24)return false;
+ const strength=Number(target.club?.strength)||Number(clubInfo.strength)||50;
+ if(rating<strength-10)return false;
+ const group=aiPosGroup(prospect),same=target.roster.filter(p=>aiPosGroup(p)===group);
+ const positionalTarget=AI_SQUAD_TARGETS[group]||6;
+ const weakest=same.length?Math.min(...same.map(p=>Number(p.rating)||0)):0;
+ const positionalNeed=same.length<positionalTarget;
+ const qualityUpgrade=same.length>0&&rating>=weakest+3&&rating>=strength-7;
+ if(!positionalNeed&&!qualityUpgrade)return false;
+ const finance=appState.clubFinances?.[clubName]||{};
+ const wageBudget=Math.max(0,Number(finance.wageBudget)||0);
+ const wageBill=target.roster.reduce((sum,p)=>sum+(Number(p.wage)||0),0);
+ const proposedWage=Math.max(1,Math.round((rating-35)*.24));
+ if(wageBudget>0&&wageBill+proposedWage>wageBudget*1.12)return false;
+ const careerId=String(prospect.careerId||playerCareerIdentity(prospect));
+ const duplicate=(appState.worldSquads||[]).some(roster=>(roster||[]).some(p=>playerCareerIdentity(p)===careerId))||Object.values(appState.eflPlayerDatabase||{}).some(byClub=>Object.values(byClub||{}).some(roster=>(roster||[]).some(p=>playerCareerIdentity(p)===careerId)));
+ if(duplicate)return false;
+ const promoted={...prospect,careerId,id:`AI-YOUTH-${stableSeed(careerId+'|'+clubName+'|'+season)}`,clubName,division:target.division||clubDivision(target.club),clubIndex:target.clubIndex,youth:false,academyPromoted:true,academyPromotionSeason:Number(season),source:'AI academy promotion',apps:0,minutes:0,goals:0,assists:0,fitness:100,morale:Math.max(65,Number(prospect.morale)||70),wage:proposedWage};
+ target.roster.push(promoted);
+ if(target.mirror&&target.clubIndex>=0)syncEFLWorldRosterMirror(target.clubIndex);
+ appState.aiAcademyPromotionHistory=history;history.push({season:Number(season),clubName,playerName:promoted.name,playerCareerId:careerId,position:group,rating,potential:Number(promoted.potential)||rating});
+ if(history.length>500)appState.aiAcademyPromotionHistory=history.slice(-500);
+ appState.log=appState.log||[];appState.log.push(`${promoted.name} (${group}) ble hentet opp fra akademiet til ${clubName}.`);
+ return true;
+}
 function ensureYouthAcademies(newSeason=false){
  if(!appState.youthAcademies)appState.youthAcademies={};
  const season=Number(appState.seasonYear)||2026;
@@ -2069,11 +2118,13 @@ function ensureYouthAcademies(newSeason=false){
   }
   if(processSeason){
    const retained=[];
-   for(const p of cohort){
+   const processingCohort=c.name!==currentClub().name?cohort.slice().sort((a,b)=>(Number(b.rating)||0)-(Number(a.rating)||0)||(Number(b.potential)||0)-(Number(a.potential)||0)||(Number(a.age)||99)-(Number(b.age)||99)):cohort;
+   for(const p of processingCohort){
     if(!Number.isFinite(Number(p.academySeason)))p.academySeason=season-1;
     const hadFullSeason=season>Number(p.academySeason);
     if(hadFullSeason)developYouthAcademyProspect(p,c.name,season-1);
     p.age=Math.min(19,Math.max(15,(Number(p.age)||15)+1));
+    if(c.name!==currentClub().name&&hadFullSeason&&processAIAcademyPromotion(c,p,season))continue;
     if(Number(p.age)>18&&hadFullSeason)releaseYouthToFreeAgency(p,c.name);
     else if(Number(p.age)<=18)retained.push(p);
     else releaseYouthToFreeAgency(p,c.name);

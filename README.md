@@ -1,42 +1,45 @@
-# CM Mobile v3.73 – AI Squad Planning & Generational Turnover
+# CM Mobile v3.74 – AI Academy Pathways & Senior Promotion
 
 ## Release contents
 
 - `index.html` – complete CM Mobile application.
 - `VERSION.txt` – release version.
 - `README.md` – this file.
-- `CHANGELOG_v3.73.md` – v3.73 changes.
-- `AI_SQUAD_PLANNING_REPORT_v3.73.md` – design, findings and limitations.
-- `AI_SQUAD_PLANNING_TEST_RESULTS_v3.73.json` – targeted and ten-season validation results.
-- `world_planning_tests_v373.js` – targeted squad-planning and contract-renewal tests.
-- `long_horizon_planning_tests_v373.js` – ten-season, 24-club renewal simulation.
-- `ai_transfer_tests_v372.js` – retained transfer and contract-expiry regression harness.
-- `AI_TRANSFER_TEST_RESULTS_v3.72.json` – previous transfer-market test results.
-- `world_development_tests_v372_regression.js` – retained player-progression regression harness.
-- `WORLD_DEVELOPMENT_REGRESSION_RESULTS_v3.72.json` – previous progression test results.
-- Prior v3.70/v3.71 reports, model references and the UEFA player database snapshot.
-- `supabase_cm_mobile.sql` – retained database script; no schema changes in v3.73.
+- `CHANGELOG_v3.74.md` – release changes.
+- `AI_ACADEMY_PATHWAY_REPORT_v3.74.md` – implementation, findings and limitations.
+- `AI_ACADEMY_PATHWAY_TEST_RESULTS_v3.74.json` – targeted and ten-season validation results.
+- `academy_pathway_tests_v374.js` – targeted promotion and safety tests.
+- `academy_season_integration_v374.js` – real annual academy-processing hook test.
+- `academy_long_horizon_v374.js` – ten-season, 24-club academy pathway simulation.
+- v3.73 strategic squad-planning reports and test harnesses.
+- v3.72 transfer-market reports and test harnesses.
+- v3.71/v3.70 progression reports and test results.
+- v3.69 player-generation model reference and player-quality baseline.
+- `UEFA_PLAYER_DATABASE_SNAPSHOT_2026-11-14.json` – retained player database snapshot.
+- `supabase_cm_mobile.sql` – retained database script; no schema changes in v3.74.
 
 ## What changed
 
-AI clubs now assess positional quality as well as headcount when choosing transfer needs. Season-end contract renewals consider club strength, squad role, age, academy succession and wage capacity. Renewals run before the existing contract-expiry cleanup. EFL market rosters are synchronized after renewals.
+AI clubs can now promote suitable 17–19-year-old academy graduates into the senior squad at the annual season transition. Promotion depends on age, a completed academy season, player ability relative to club strength, positional need or quality improvement, available squad capacity and wage capacity. The highest-rated eligible prospects are considered first, with at most one promotion per AI club per season. EFL roster mirrors are synchronized after promotion.
+
+Players who do not qualify continue through the existing academy release process. The manager-controlled club's academy process is unchanged.
 
 ## Publishing
 
-1. Back up the current repository and any career data before replacing files.
+1. Back up the current repository and career data.
 2. Replace the app's current `index.html` with this release's `index.html`.
 3. Keep the existing Supabase project and database schema.
-4. Do **not** rerun `supabase_cm_mobile.sql`; v3.73 introduces no SQL changes.
+4. Do **not** rerun `supabase_cm_mobile.sql`; v3.74 introduces no SQL changes.
 5. Test an existing save and a new career in the browser before treating the release as production-ready.
 
 ## Compatibility and safety
 
-- No mass player rebalance or player identity regeneration.
+- No mass player rebalance or regeneration.
 - No CA/PA recalibration.
-- No replacement of existing career IDs, player attributes or player histories.
-- AI renewal history is bounded to the latest 20 season records; each record stores at most 100 player summaries.
-- The manager-controlled club is excluded from AI renewals.
+- Existing player career identities, attributes, potential and development metadata are preserved on promotion.
+- The user's academy flow is unchanged; autonomous promotions skip the manager-controlled club.
+- Promotion history is bounded to the latest 500 records.
 
 ## Test limitations
 
-The included Node harnesses exercise actual extracted application functions with controlled state. They are not a full browser UI test, Supabase round-trip, or complete simulation of all leagues over 20 seasons. See `AI_SQUAD_PLANNING_REPORT_v3.73.md` for details.
+The included Node harnesses execute extracted application functions with controlled state. They are not a full browser UI test, Supabase round-trip, or complete match/loan simulation. See `AI_ACADEMY_PATHWAY_REPORT_v3.74.md`.

@@ -1,0 +1,42 @@
+{
+  "targetedTests": {
+    "premierLeaguePromotion": true,
+    "lowerLeagueCanonicalRosterPromotion": true,
+    "userClubExcluded": true,
+    "onePromotionPerClubPerSeason": true,
+    "ageAndQualityGates": true,
+    "wageCeilingEnforced": true,
+    "duplicateCareerIdentityBlocked": true,
+    "seasonTransitionHook": true,
+    "passed": true,
+    "annualSeasonHookIntegration": true,
+    "ageIncrementBeforePromotion": true,
+    "attributesPreserved": true
+  },
+  "tenSeasonSimulation": {
+    "seasons": 10,
+    "aiClubs": 24,
+    "academyCandidates": 240,
+    "seniorPromotions": 216,
+    "duplicateCareerIds": 0,
+    "rosterCapViolations": 0,
+    "wageBudgetViolations": 0,
+    "passed": true
+  },
+  "regressions": {
+    "v372TransferAndExpiryTests": "passed",
+    "v373SquadPlanningTests": "passed",
+    "v373TenSeasonRenewalSimulation": "passed",
+    "inlineScriptSyntax": "passed",
+    "databaseSchemaChanged": false,
+    "inlineScriptBlocks": 2,
+    "actualAnnualSeasonIntegration": "passed",
+    "v372ProgressionRegression": "passed"
+  },
+  "limitations": [
+    "Controlled function-level simulation, not a complete browser career simulation",
+    "No guaranteed senior minutes or autonomous loan pathway in this release",
+    "Rival academy intake remains two prospects per club",
+    "No full 20-season simulation of all domestic and European clubs"
+  ]
+}

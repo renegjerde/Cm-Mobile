@@ -1,0 +1,16 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const html=fs.readFileSync(__dirname+'/index.html','utf8');
+function extract(name){const re=new RegExp('function '+name+'\\s*\\('),m=re.exec(html);if(!m)throw Error('Missing '+name);const start=m.index,open=html.indexOf('{',m.index);let d=0,q='',e=false;for(let i=open;i<html.length;i++){const c=html[i];if(q){if(e){e=false;continue;}if(c==='\\'){e=true;continue;}if(c===q)q='';continue;}if(c==='"'||c==="'"||c==='`'){q=c;continue;}if(c==='{')d++;else if(c==='}'&&--d===0)return html.slice(start,i+1);}throw Error('Unclosed '+name);}
+const clubs=[{name:'User FC',strength:70,division:'Premier League'},{name:'AI FC',strength:70,division:'Premier League'}];
+const aiRoster=[];for(let i=0;i<20;i++){const pos=i<2?'GK':i<7?'DEF':i<13?'MID':'ATT';aiRoster.push({id:`senior-${i}`,careerId:`senior-${i}`,name:`Senior ${i}`,pos,rating:65,wage:10});}
+const appState={club:0,seasonYear:2027,youthAcademyLastProcessedSeason:2026,youthAcademyRosterVersion:1,youthAcademies:{'User FC':[],'AI FC':[{id:'academy-graduate',careerId:'academy-graduate',name:'Academy Graduate',pos:'MID',age:17,rating:68,potential:84,wage:2,academySeason:2026,attributes:{passing:70}}]},worldSquads:[[],aiRoster],eflPlayerDatabase:{},lowerLeagues:{},clubFinances:{'AI FC':{wageBudget:1000}},freeAgents:[],log:[],aiAcademyPromotionHistory:[]};
+const context={appState,CLUBS:clubs,YOUTH_ACADEMY_TARGETS:{GK:3,DEF:8,MID:8,ATT:6},RIVAL_YOUTH_ACADEMY_TARGET:2,AI_SQUAD_TARGETS:{GK:3,DEF:8,MID:8,ATT:6},currentClub:()=>clubs[0],clubDivision:c=>c?.division||'Premier League',domesticDivisionForClubName:()=>null,playerCareerIdentity:p=>String(p.careerId||p.id||p.name),stableSeed:s=>{let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;},aiPosGroup:p=>{const x=String(p?.pos||'').toUpperCase();if(x==='GK')return'GK';if(['DEF','CB','LB','RB'].includes(x))return'DEF';if(['MID','DM','CM','AM'].includes(x))return'MID';return'ATT';},syncEFLWorldRosterMirror:()=>{},fillYouthAcademyVacancies:()=>{},developYouthAcademyProspect:()=>false,releaseYouthToFreeAgency:(p,club)=>{appState.freeAgents.push({...p,clubName:'Klubbløs'});},Number,String,Array,Object,Set,Math,console};
+vm.createContext(context);
+for(const n of ['aiAcademyRosterForClub','processAIAcademyPromotion','ensureYouthAcademies'])vm.runInContext(extract(n),context);
+context.ensureYouthAcademies(true);
+assert(appState.worldSquads[1].some(p=>p.careerId==='academy-graduate'),'annual academy processing promotes the eligible rival prospect');
+assert(appState.youthAcademies['AI FC'].length===0,'promoted prospect is removed from academy');
+assert(appState.worldSquads[1].find(p=>p.careerId==='academy-graduate').age===18,'prospect ages by one year before promotion');
+assert(appState.worldSquads[1].find(p=>p.careerId==='academy-graduate').attributes.passing===70,'player attributes survive promotion');
+assert(appState.youthAcademyLastProcessedSeason===2027,'season guard is recorded');
+console.log(JSON.stringify({annualSeasonHook:true,ageIncrementBeforePromotion:true,seniorRosterUpdated:true,academyRosterCleaned:true,attributesPreserved:true,seasonGuard:true,passed:true},null,2));

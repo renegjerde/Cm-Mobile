@@ -1,0 +1,10 @@
+{
+  "seasons": 10,
+  "aiClubs": 24,
+  "academyCandidates": 240,
+  "promotions": 216,
+  "duplicateCareerIds": 0,
+  "rosterCapViolations": 0,
+  "wageBudgetViolations": 0,
+  "passed": true
+}
