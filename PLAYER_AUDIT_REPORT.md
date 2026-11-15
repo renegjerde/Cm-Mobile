@@ -58,3 +58,39 @@ Spillinformasjon og diagnostikk på troppssiden har fått en skrivebeskyttet eks
 Eksportens sammendrag teller registreringer per register og flagger blant annet verifiserte/modellerte/manglende fødselsdatoer, manglende posisjon/rolle/attributter, manglende rating/potensial, PA under CA og attributtverdier utenfor 1–100. Den inkluderer også den eksisterende registreringsduplikatkontrollen. Registeroverlapp bevares med hensikt; rapportens registreringstall er derfor ikke et antall unike personer. Eksporten omfatter bare karrieren som er åpen, er skrivebeskyttet og endrer ikke lagrede spillerdata.
 
 Denne funksjonen er et datainnsamlingssteg, ikke en full kvalitetsdom: automatiske flagg må vurderes mot kildene før spillere korrigeres.
+
+---
+
+# v3.67 – Identity & Registration Integrity (15. november 2026)
+
+## Endringer
+
+1. **Stoppet falsk ekstern identitet på genererte spillere.** `transfermarktIdentityOf` avviser genererte/fiktive identiteter før direkte lagrede ID-felt leses. `makeRealPlayer` avgjør nå syntetisk identitet før det forsøker å slå opp Transfermarkt-profil. Genererte navn får heller ikke arve kuraterte spillerverdier, FPL-statistikk eller navnebaserte posisjonsroller fra en ekte navnebror.
+2. **Ryddet eksisterende kontaminerte registreringer.** Engangsmigreringen fjerner uverifiserte Transfermarkt-ID-er og eksterne profilfelter fra genererte identiteter. Eksisterende rating, attributter og potensial endres ikke; berørte profiler merkes `attributesReviewRequired`.
+3. **Utvidet navnekollisjonskontroll.** Offisielle UEFA List A- og List B-navn inngår nå i klubbscopet profiloppslag. Profil fra en annen klubb kan ikke automatisk kobles til en spiller med samme navn når offisielle registre viser flere klubber.
+4. **Korrigert to klubbspesifikke UEFA-oppføringer.** Benfica-spilleren Leonardo Lopes får fødselsdato 2008-04-06 og keeperposisjon. Benfica-spilleren Francisco Silva får fødselsdato 2007-09-14 og angrepsposisjon. Sporting CP-utgaven av Francisco Silva og Gent-utgaven av Leonardo Lopes beholdes adskilt.
+5. **Registrert to offisielle utlån.** Claudio Echeverri er markert Manchester City → Benfica med sluttdato 30. juni 2027. Georgie Gent er markert Barnsley → Boston United med sluttvindu desember 2026. Startdatoer er ikke lagt inn uten bekreftet dato, og Georgies eksakte sluttdato er ikke kjent i kildematerialet som ble brukt.
+6. **Utvidet revisjonen til alle sju registre.** `scanned` teller nå alle materialiserte spillerregistreringer, også genererte rader som ikke kan brukes som sikker ekstern identitet. Gyldige registrerte utlån får egen type `active-loan-overlap`.
+
+## Bevaringsregler
+
+- Ingen automatisk masseendring av spillerferdigheter, rating eller potensial.
+- Ingen spiller fjernes på grunnlag av navnelikhet alene.
+- Genererte spillere beholder lokale spillidentiteter og karriere-ID-er; det er bare uverifiserte eksterne profilkoblinger som fjernes.
+- Offisielle utlån beholdes som to klubbrelevante registreringer, men identifiseres som samme låneforhold. Ukjent lånegebyr og lønnsfordeling forblir eksplisitt ukjent. For å unngå dobbel kostnadsføring legges lønnskostnaden midlertidig hos moderklubben (100 % i budsjettmodellen, 0 % hos låneklubben). Dette er en teknisk reserveberegning, ikke en dokumentert kontraktsfordeling.
+- Engangsmigreringen styres av `playerIdentityIntegrityVersion=1` og loggfører antall endringer i karrieren.
+
+## Forventet migreringssammendrag
+
+Ved oppstart av en karriere fra den undersøkte v3.66-eksporten forventes migreringen å håndtere 112 genererte spillerregistreringer med uverifiserte Transfermarkt-ID-er (56 ulike karriereidentiteter), to klubbspesifikke UEFA-spillerkorreksjoner og seks registreringsrader for de to utlånsforholdene. Det faktiske antallet på en annen lagret karriere kan avvike dersom spillere eller registre er endret siden eksporten.
+
+## Avgrensning
+
+v3.67 er en identitets- og registreringsreparasjon. Den er ikke den senere ferdighets-/CA/PA-revisjonen. Profilattributter som tidligere kan ha blitt påvirket av feil ekstern identitet er flagget til neste gjennomgang, ikke automatisk omskrevet.
+
+
+## v3.67 – regresjonstest mot spillerrevisjonen fra 15. november
+
+De aktuelle migrerings- og identitetsfunksjonene ble kjørt isolert mot de 10 725 spillerregistreringene i den opplastede v3.66-eksporten. Resultatet var: 112 kontaminerte genererte registreringsrader fra 56 karriereidentiteter ryddet; 2 klubbspesifikke Benfica-korreksjoner; 6 registreringsrader merket som to offisielle utlån; 0 gjenværende genererte identiteter med eksterne profil-ID-er; og alle 112 kontrollerte rating-/attributt-/potensialsett uendret. Etter migreringen viste revisjonen 0 kryssklubb-ID-konflikter, 2 eksplisitte utlånsoverlapp og 1 navnekollisjon som fortsatt krever manuell vurdering. En ny migreringskjøring gjorde 0 endringer.
+
+Hele JavaScript-innholdet i HTML-filen er kontrollert med `node --check`. Dette er syntaks- og isolert migreringsregresjonstest, ikke en full nettleser-/kampmotortest eller en direkte test mot en live Supabase-karriere. Den faktiske lagrede karrieren blir først migrert når den åpnes og lagres i v3.67.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101b2b"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile v3.65 — Touchline</title>
+<title>CM Mobile v3.67 — Touchline</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -552,7 +552,7 @@ select{background:#1c2d42;color:var(--text);border:1px solid var(--line);padding
 
 </style></head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.65</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="cloudAccountBtn" title="Koble til skylagring">☁ Konto</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span><small class="version-tag">v3.67</small></div><div class="season" id="topSeason">TOUCHLINE EDITION · 2026/27</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="cloudAccountBtn" title="Koble til skylagring">☁ Konto</button><button class="ghost header-action" id="manualBtn" title="Åpne spillmanualen">▤ Spillmanual</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -875,17 +875,31 @@ function transfermarktRole(position,foot){
 }
 let tmNameIndexPrimarySource=null,tmNameIndexGlobalSource=null,tmNameIndexPrimary=new Map(),tmNameIndexGlobal=new Map();
 function buildTMNameIndex(rows){const index=new Map();for(const p of (Array.isArray(rows)?rows:[])){const key=normalisePlayerName(p.name);if(!key)continue;if(!index.has(key))index.set(key,[]);index.get(key).push(p);}return index;}
-let officialRosterNameClubIndex=null,officialRosterPLSource=null,officialRosterEFLSource=null;
+let officialRosterNameClubIndex=null,officialRosterPLSource=null,officialRosterEFLSource=null,officialRosterUEFASources=null;
 function officialRosterNameClubMatches(name){
  const key=normalisePlayerName(name);if(!key)return [];
  const pl=typeof PL_OFFICIAL_ROSTERS_2026_27!=='undefined'?PL_OFFICIAL_ROSTERS_2026_27:null;
  const efl=typeof EFL_OFFICIAL_ROSTERS_2026_27!=='undefined'?EFL_OFFICIAL_ROSTERS_2026_27:null;
- if(!officialRosterNameClubIndex||officialRosterPLSource!==pl||officialRosterEFLSource!==efl){
+ const uefaSources=[typeof UEFA_LIST_A_2026_27!=='undefined'?UEFA_LIST_A_2026_27:null,typeof UEFA_LIST_A_EXTRA_2026_27!=='undefined'?UEFA_LIST_A_EXTRA_2026_27:null,typeof UEFA_LIST_B_2026_27!=='undefined'?UEFA_LIST_B_2026_27:null];
+ if(!officialRosterNameClubIndex||officialRosterPLSource!==pl||officialRosterEFLSource!==efl||officialRosterUEFASources?.some((v,i)=>v!==uefaSources[i])||!officialRosterUEFASources){
   const index=new Map();
   const add=(club,names)=>{for(const playerName of names||[]){const k=normalisePlayerName(playerName);if(!k)continue;if(!index.has(k))index.set(k,[]);if(!index.get(k).includes(club))index.get(k).push(club);}};
   if(pl)Object.entries(pl).forEach(([club,names])=>add(club,names));
   if(efl)Object.entries(efl).forEach(([club,names])=>add(club,names));
-  officialRosterNameClubIndex=index;officialRosterPLSource=pl;officialRosterEFLSource=efl;
+  const groups=new Set(['GK','DEF','MID','ATT']);
+  // Supports direct club -> position groups and competition -> club -> position groups.
+  const walkUEFA=(node,clubHint=null)=>{
+   if(!node||typeof node!=='object')return;
+   if(Array.isArray(node))return;
+   const keys=Object.keys(node);
+   if(keys.some(k=>groups.has(k))){for(const group of groups)add(clubHint,node[group]||[]);return;}
+   for(const [childKey,child] of Object.entries(node)){
+    const childIsClub=!!(child&&typeof child==='object'&&!Array.isArray(child)&&Object.keys(child).some(k=>groups.has(k)));
+    walkUEFA(child,childIsClub?childKey:clubHint);
+   }
+  };
+  for(const root of uefaSources)if(root)walkUEFA(root,null);
+  officialRosterNameClubIndex=index;officialRosterPLSource=pl;officialRosterEFLSource=efl;officialRosterUEFASources=uefaSources;
  }
  return officialRosterNameClubIndex.get(key)||[];
 }
@@ -996,8 +1010,8 @@ function playerDatabaseStatusHTML(players){
  const fictional=rows.filter(p=>p.dataQuality?.ageFictional||String(p.ageSource||'').includes('Fiktiv spillerdato')).length;
  const eflClubs=Object.values(EFL_DIVISIONS).flat().length,englishClubs=CLUBS.filter(c=>['Premier League','Championship','League One','League Two'].includes(clubDivision(c))).length;
  const audit=appState.playerRegistrationAudit||null;
- const auditLine=audit?`<div class="player-meta">Duplikatkontroll på tvers av engelske og europeiske spillerstaller: ${audit.scanned} registreringer kontrollert · ${audit.confirmedDuplicates} sikre ID-duplikater · ${audit.ambiguousNameGroups} navnekollisjoner sendt til manuell kontroll. Navnelikhet alene fører aldri til automatisk sletting.</div>`:'<div class="player-meta">Duplikatkontroll kjøres når overgangsregisteret bygges.</div>';
- return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v2.80</strong>${auditLine}<div class="player-meta">Innebygd spillerprofilarkiv: ${PLAYER_REFERENCE_STATUS.globalPlayers||EMBEDDED_TM_PROFILES.length} profiler · referansedato ${esc(TM_GLOBAL_REFERENCE_CUTOFF)} · ingen ekstern tilkobling.</div><div class="player-meta">Spillverdener: ${englishClubs} engelske klubbobjekter, inkludert ${eflClubs} EFL-klubber, pluss europeiske klubber. Offisielle seniorlister er innebygd for alle ${eflClubs} EFL-klubber og ${Object.keys(PL_OFFICIAL_ROSTERS_2026_27).length} Premier League-klubber. PL-registeret inneholder ${Object.values(PL_OFFICIAL_ROSTERS_2026_27).reduce((n,a)=>n+a.length,0)} registrerte seniornavn pluss ${Object.values(PL_FIRST_TEAM_U21_SUPPLEMENT_2026_27).reduce((n,a)=>n+a.length,0)} førsteligalagsspillere fra U21-tillegget; EFL-registeret inneholder ${Object.values(EFL_OFFICIAL_ROSTERS_2026_27).reduce((n,a)=>n+a.length,0)}. Førstelagets U21-spillere legges til utover seniorlisten; 3-8-8-6 er en ønsket grunnstruktur, ikke et tak som skjuler unge spillere. Profilarkivet er historisk referansedata, ikke en fasit for aktuell klubbtilhørighet.</div><div class="player-meta">Denne troppen: ${dob}/${rows.length} med kildebasert fødselsdato · ${modelledDob} med simulert fødselsdato i alternativ virkelighet · ${ageUnknown} uten konkret alder · ${fictional} genererte/fiktive identiteter · ${tm} med andre Transfermarkt-profilfelt.</div><div class="player-meta">Kildebaserte fødselsdatoer brukes der de finnes. Hvis en dato mangler, får spilleren en fast, plausibel simulert fødselsdato i spillets alternative virkelighet. Alderen vises alltid konkret, utvikles normalt mellom sesonger og endres ikke ved klubbytte. Spillet henter ikke spillerdata fra nettet.</div></div>`;
+ const auditLine=audit?`<div class="player-meta">Identitetskontroll på tvers av alle spillerregistre: ${audit.scanned} registreringer kontrollert · ${audit.crossClubIdConflicts??audit.confirmedDuplicates??0} kryssklubb-ID-konflikter · ${audit.activeLoanOverlaps||0} registrerte utlånsoverlapp · ${audit.ambiguousNameGroups} navnekollisjoner til manuell kontroll. Navnelikhet alene fører aldri til automatisk sletting.</div>`:'<div class="player-meta">Identitetskontroll kjøres når spillerregistrene bygges.</div>';
+ return `<div class="notice" style="margin:12px 0"><strong>Spillerdata · v3.67</strong>${auditLine}<div class="player-meta">Innebygd spillerprofilarkiv: ${PLAYER_REFERENCE_STATUS.globalPlayers||EMBEDDED_TM_PROFILES.length} profiler · referansedato ${esc(TM_GLOBAL_REFERENCE_CUTOFF)} · ingen ekstern tilkobling.</div><div class="player-meta">Spillverdener: ${englishClubs} engelske klubbobjekter, inkludert ${eflClubs} EFL-klubber, pluss europeiske klubber. Offisielle seniorlister er innebygd for alle ${eflClubs} EFL-klubber og ${Object.keys(PL_OFFICIAL_ROSTERS_2026_27).length} Premier League-klubber. PL-registeret inneholder ${Object.values(PL_OFFICIAL_ROSTERS_2026_27).reduce((n,a)=>n+a.length,0)} registrerte seniornavn pluss ${Object.values(PL_FIRST_TEAM_U21_SUPPLEMENT_2026_27).reduce((n,a)=>n+a.length,0)} førsteligalagsspillere fra U21-tillegget; EFL-registeret inneholder ${Object.values(EFL_OFFICIAL_ROSTERS_2026_27).reduce((n,a)=>n+a.length,0)}. Førstelagets U21-spillere legges til utover seniorlisten; 3-8-8-6 er en ønsket grunnstruktur, ikke et tak som skjuler unge spillere. Profilarkivet er historisk referansedata, ikke en fasit for aktuell klubbtilhørighet.</div><div class="player-meta">Denne troppen: ${dob}/${rows.length} med kildebasert fødselsdato · ${modelledDob} med simulert fødselsdato i alternativ virkelighet · ${ageUnknown} uten konkret alder · ${fictional} genererte/fiktive identiteter · ${tm} med andre Transfermarkt-profilfelt.</div><div class="player-meta">Kildebaserte fødselsdatoer brukes der de finnes. Hvis en dato mangler, får spilleren en fast, plausibel simulert fødselsdato i spillets alternative virkelighet. Alderen vises alltid konkret, utvikles normalt mellom sesonger og endres ikke ved klubbytte. Spillet henter ikke spillerdata fra nettet.</div></div>`;
 }
 
 function collectPlayerAuditDataset(){
@@ -1205,13 +1219,14 @@ function cmAlternateBirthDate(name,clubName,year,age,id=''){
  return `${birthYear}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
 }
 function makeRealPlayer(name,pos,clubIndex,slot,reference={}){
- const forcedPosition=knownPlayerPositionOverride(name);if(forcedPosition)pos=forcedPosition.pos;
- const club=CLUBS[clubIndex]||{name:reference?.clubName||'EFL Club',strength:Number(reference?.clubStrength)||52,budget:Number(reference?.clubBudget)||30},fpl=reference?.fpl||null,tm=Object.prototype.hasOwnProperty.call(reference||{},'tm')?reference.tm:(findTransfermarktRecord(name,fpl,reference?.clubName||club?.name)||null);
- const known=referenceMapValue(KNOWN_PLAYER_DATA,name)||{},localDob=referenceMapValue(PLAYER_DOBS,name)||null,tmDob=repairedTransfermarktDOB(tm);
- const sourceDob=localDob||tmDob||null;
+ const club=CLUBS[clubIndex]||{name:reference?.clubName||'EFL Club',strength:Number(reference?.clubStrength)||52,budget:Number(reference?.clubBudget)||30};
+ const referenceSource=String(reference?.source||''),generatedIdentity=isGeneratedFictionalPlayer({source:referenceSource});
+ const correction=generatedIdentity?null:verifiedClubSpecificPlayerCorrection(name,reference?.clubName||club?.name);
+ const forcedPosition=generatedIdentity?null:knownPlayerPositionOverride(name);if(correction?.pos)pos=correction.pos;else if(forcedPosition)pos=forcedPosition.pos;
+ const fpl=generatedIdentity?null:(reference?.fpl||null),tm=generatedIdentity?null:(Object.prototype.hasOwnProperty.call(reference||{},'tm')?reference.tm:(findTransfermarktRecord(name,fpl,reference?.clubName||club?.name)||null));
+ const known=generatedIdentity?{}:(referenceMapValue(KNOWN_PLAYER_DATA,name)||{}),localDob=correction?.dob||(generatedIdentity?null:referenceMapValue(PLAYER_DOBS,name)||null),tmDob=repairedTransfermarktDOB(tm);
+ const sourceDob=correction?.dob||localDob||tmDob||null;
  const currentSeason=Number(appState.seasonYear)||2026;
- const referenceSource=String(reference?.source||'');
- const generatedIdentity=/generated\b|fictional identity|identity not verified/i.test(referenceSource);
  const ageNeedsModel=!sourceDob;
  const ageIsFictional=ageNeedsModel&&generatedIdentity;
  const modelAge=ageNeedsModel?cmAlternateAgeForPlayer({name,id:tm?.id||reference?.id||'',pos,clubIndex,clubName:reference?.clubName||club?.name,firstTeamU21Supplement:reference?.firstTeamU21Supplement,u21Eligible:reference?.u21Eligible,source:referenceSource},currentSeason,tm,referenceSource):null;
@@ -1219,11 +1234,11 @@ function makeRealPlayer(name,pos,clubIndex,slot,reference={}){
  const calculatedAge=ageOnISODate(dob,cmSeasonDate(currentSeason));
  const age=Math.max(15,Math.min(45,Number.isFinite(calculatedAge)?Math.floor(calculatedAge):(modelAge||25)));
  const ageUnknown=false,ageModelledDOB=ageNeedsModel;
- const ageSource=sourceDob?(localDob?'Innebygd fødselsdatoliste':'Transfermarkt DOB (embedded offline snapshot)'):(generatedIdentity?'Fiktiv spillerdato (alternativ virkelighet)':'Simulert spillerdato (alternativ virkelighet)');
+ const ageSource=correction?.ageSource||(sourceDob?(localDob?'Innebygd fødselsdatoliste':'Transfermarkt DOB (embedded offline snapshot)'):(generatedIdentity?'Fiktiv spillerdato (alternativ virkelighet)':'Simulert spillerdato (alternativ virkelighet)'));
  const estimatedBirthYear=ageNeedsModel?Number(String(dob).slice(0,4)):null;
  const ageModelValue=ageNeedsModel?age:null;
  const internalAge=Number.isFinite(age)?age:25;
- const tmRole=transfermarktRole(tm?.position,tm?.foot),role=forcedPosition?.role||tmRole||referenceMapValue(PLAYER_ROLES,name)||defaultRoleFor(name,pos,slot);
+ const tmRole=transfermarktRole(tm?.position,tm?.foot),role=correction?.role||forcedPosition?.role||tmRole||(!generatedIdentity?referenceMapValue(PLAYER_ROLES,name):null)||defaultRoleFor(name,pos,slot);
  const roleOffset=pos==='GK'?1:pos==='DEF'?0:pos==='MID'?1:2;
  const marketValueM=(Number(tm?.marketValue)||0)/1000000;
  const marketRating=marketValueM>0?48+11*Math.log(1+marketValueM/2):null;
@@ -1272,7 +1287,7 @@ function makeRealPlayer(name,pos,clubIndex,slot,reference={}){
  let fplStatAdj={finishing:0,creativity:0,passing:0,defending:0,handling:0,reflexes:0,positioning:0};
  if(fpl&&Number(fpl.minutes)>=180){const mins=Number(fpl.minutes),starts=Math.max(1,Number(fpl.starts)||mins/90),sample=Math.min(1,mins/720);const xg90=(Number(fpl.expected_goals)||0)*90/mins,xa90=(Number(fpl.expected_assists)||0)*90/mins,g90=(Number(fpl.goals_scored)||0)*90/mins,a90=(Number(fpl.assists)||0)*90/mins;fplStatAdj.finishing=Math.max(-3,Math.min(5,((xg90-.12)*8+(g90-xg90)*3)))*sample;fplStatAdj.creativity=Math.max(-3,Math.min(4,((xa90-.06)*10+(a90-xa90)*2)))*sample;fplStatAdj.passing=Math.max(-2,Math.min(3,((Number(fpl.creativity)||0)/mins*90-12)*.12))*sample;if(pos==='DEF'){const csRate=(Number(fpl.clean_sheets)||0)/starts;fplStatAdj.defending=Math.max(-2,Math.min(3,(csRate-.2)*5))*sample;}if(pos==='GK'){const saves90=(Number(fpl.saves)||0)*90/mins;fplStatAdj.reflexes=Math.max(-2,Math.min(4,(saves90-2.5)*1.2))*sample;fplStatAdj.handling=Math.max(-2,Math.min(3,((Number(fpl.penalties_saved)||0)*1.2+(Number(fpl.bonus)||0)/Math.max(1,starts)*.5)))*sample;}}
  Object.entries(fplStatAdj).forEach(([k,v])=>{if(Number.isFinite(attributes[k]))attributes[k]=Math.max(25,Math.min(99,Math.round(attributes[k]+v)));});
- const naturalBase=naturalPositionsFor(name,pos,role);const naturalPositions=[...new Set([role,...(Array.isArray(naturalBase)?naturalBase:[])])];
+ const naturalBase=correction?.naturalPositions||(generatedIdentity?[role]:naturalPositionsFor(name,pos,role));const naturalPositions=[...new Set([role,...(Array.isArray(naturalBase)?naturalBase:[])])];
  const fplStats=fpl?{minutes:Number(fpl.minutes)||0,starts:Number(fpl.starts)||0,total_points:Number(fpl.total_points)||0,goals_scored:Number(fpl.goals_scored)||0,assists:Number(fpl.assists)||0,clean_sheets:Number(fpl.clean_sheets)||0,bonus:Number(fpl.bonus)||0,expected_goals:Number(fpl.expected_goals)||0,expected_assists:Number(fpl.expected_assists)||0,form:Number(fpl.form)||0,now_cost:Number(fpl.now_cost)||0}:null;
  const attributesSource=fpl?'position archetype + current FPL output + player profile':'position archetype + player profile (no live FPL sample)';
  // Known embedded market values remain the source of truth. Otherwise estimate value from ability,
@@ -1282,16 +1297,16 @@ function makeRealPlayer(name,pos,clubIndex,slot,reference={}){
  const clubValueMultiplier=Math.max(.62,Math.min(1.35,1+(Number(club.strength||60)-60)*.012));
  const fallbackMarketValueM=(Math.max(5,rating-43)**2)/115*ageValueMultiplier*potentialPremium*clubValueMultiplier;
  const valueM=marketValueM>0?marketValueM*TM_EUR_TO_GAME_CURRENCY_RATE:fallbackMarketValueM;
- return {id:clubIndex*1000+slot+1,name,pos,role,naturalPositions,assignedRole:null,age,ageModelValue,dob,estimatedBirthYear,ageSource,rating,attributes,potential,value:Math.max(.1,+valueM.toFixed(1)),valueSource:marketValueM>0?'Transfermarkt market value, EUR converted to game currency':'estimated from rating and age',wage:Math.max(2,Math.round(((rating-45)*.82+(club.strength-65)*.32+(club.budget||30)*.015)*0.88)),fitness:100,morale:75+Math.round(seededRandom(stableSeed(name+'|morale|v192'))()*15),goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,form:fpl&&Number(fpl.minutes)>=180?Math.max(4,Math.min(10,Number(fpl.form)||6.5)):6.5,injured:0,suspended:0,clubIndex,source:reference?.source||(sourceDob?'embedded roster; age calculated from DOB':'embedded roster; in-game age date modeled'),preferredFoot:tm?.foot||'',heightCm:Number(tm?.height)||null,nationality:tm?.nationality||'',transfermarktPosition:tm?.position||'',transfermarktMarketValueEuro:Number(tm?.marketValue)||0,fplStats,transfermarktPlayerId:tm?.id?String(tm.id):'',referenceData:{fpl:!!fpl,transfermarkt:!!tm,tmReferenceDate:tm?.referenceDate||null,transfermarktPlayerId:tm?.id?String(tm.id):''},dataQuality:{dobVerified:!!sourceDob,ageCalculatedFromDob:!!sourceDob,ageEstimated:ageNeedsModel,ageUnknown:false,ageFictional:ageIsFictional,ageModelledDOB,ageSource,positionVerified:!!(tm?.position||fpl),clubAffiliationVerified:!!reference?.clubVerified,attributesEstimated:true,attributesSource,attributeModelVersion:'v2.41 age-and-position curve',potentialModelVersion:'v2.41 age-and-market signal',transfermarktMatch:!!tm,fplStatsAvailable:!!fpl,marketValueEstimated:!Number(tm?.marketValue),marketValueModelVersion:marketValueM>0?'embedded Transfermarkt snapshot':'v2.41 ability-age-potential-club estimate',wageEstimated:true}};
+ return {id:clubIndex*1000+slot+1,name,pos,role,naturalPositions,assignedRole:null,age,ageModelValue,dob,estimatedBirthYear,ageSource,rating,attributes,potential,value:Math.max(.1,+valueM.toFixed(1)),valueSource:marketValueM>0?'Transfermarkt market value, EUR converted to game currency':'estimated from rating and age',wage:Math.max(2,Math.round(((rating-45)*.82+(club.strength-65)*.32+(club.budget||30)*.015)*0.88)),fitness:100,morale:75+Math.round(seededRandom(stableSeed(name+'|morale|v192'))()*15),goals:0,assists:0,apps:0,minutes:0,yellowCards:0,redCards:0,chancesCreated:0,form:fpl&&Number(fpl.minutes)>=180?Math.max(4,Math.min(10,Number(fpl.form)||6.5)):6.5,injured:0,suspended:0,clubIndex,source:reference?.source||(sourceDob?'embedded roster; age calculated from DOB':'embedded roster; in-game age date modeled'),preferredFoot:tm?.foot||'',heightCm:Number(tm?.height)||null,nationality:tm?.nationality||'',transfermarktPosition:tm?.position||'',transfermarktMarketValueEuro:Number(tm?.marketValue)||0,fplStats,transfermarktPlayerId:tm?.id?String(tm.id):'',referenceData:{fpl:!!fpl,transfermarkt:!!tm,tmReferenceDate:tm?.referenceDate||null,transfermarktPlayerId:tm?.id?String(tm.id):''},dataQuality:{dobVerified:!!sourceDob,ageCalculatedFromDob:!!sourceDob,ageEstimated:ageNeedsModel,ageUnknown:false,ageFictional:ageIsFictional,ageModelledDOB,ageSource,positionVerified:!!(correction||tm?.position||fpl),positionSource:correction?.positionSource||null,clubAffiliationVerified:!!reference?.clubVerified,attributesEstimated:true,attributesSource,attributeModelVersion:'v2.41 age-and-position curve',potentialModelVersion:'v2.41 age-and-market signal',transfermarktMatch:!!tm,fplStatsAvailable:!!fpl,marketValueEstimated:!Number(tm?.marketValue),marketValueModelVersion:marketValueM>0?'embedded Transfermarkt snapshot':'v2.41 ability-age-potential-club estimate',wageEstimated:true}};
 }
 function refreshPlayerAgeData(player,seasonYear){
  if(!player||!player.name)return player;
  const year=Math.max(2026,Number(seasonYear)||2026),targetDate=cmSeasonDate(year);
  const clubName=player.clubName||CLUBS[player.clubIndex]?.name||null;
  const sourceText=String(player.source||'');
- const generatedIdentity=/generated\b|fictional identity|identity not verified/i.test(sourceText);
- const tm=generatedIdentity?null:findTransfermarktRecord(player.name,null,clubName);
- const tmDob=repairedTransfermarktDOB(tm),localDob=generatedIdentity?null:(referenceMapValue(PLAYER_DOBS,player.name)||null);
+ const generatedIdentity=isGeneratedFictionalPlayer(player),correction=verifiedClubSpecificPlayerCorrection(player.name,clubName);
+ const tm=generatedIdentity||correction?null:findTransfermarktRecord(player.name,null,clubName);
+ const tmDob=repairedTransfermarktDOB(tm),localDob=correction?.dob||(generatedIdentity?null:(referenceMapValue(PLAYER_DOBS,player.name)||null));
  const savedDob=typeof player.dob==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(player.dob)?player.dob:null;
  const savedDobIsModelled=player.dataQuality?.ageModelledDOB===true;
  // First use a curated/embedded source date. A previously simulated date is retained across seasons
@@ -1300,7 +1315,7 @@ function refreshPlayerAgeData(player,seasonYear){
  let dob=sourceDob||null,age=null,ageSource='',ageFictional=false,ageModelledDOB=false,ageEstimated=false;
  if(sourceDob){
   age=ageOnISODate(sourceDob,targetDate);
-  ageSource=localDob?'Innebygd fødselsdatoliste':tmDob?'Transfermarkt DOB (embedded offline snapshot)':'Lagret fødselsdato';
+  ageSource=correction?.ageSource||(localDob?'Innebygd fødselsdatoliste':tmDob?'Transfermarkt DOB (embedded offline snapshot)':'Lagret fødselsdato');
  }else{
   const modelledSavedDob=savedDobIsModelled&&savedDob?savedDob:null;
   if(modelledSavedDob){dob=modelledSavedDob;age=ageOnISODate(dob,targetDate);}
@@ -1320,8 +1335,12 @@ function refreshPlayerAgeData(player,seasonYear){
   ageSource=generatedIdentity?'Fiktiv spillerdato (alternativ virkelighet)':'Simulert spillerdato (alternativ virkelighet)';
  }
  age=Math.max(15,Math.min(45,Math.floor(Number(age)||18)));
- const dataQuality={...(player.dataQuality||{}),dobVerified:!!sourceDob,ageCalculatedFromDob:!!sourceDob,ageEstimated,ageUnknown:false,ageFictional,ageModelledDOB,ageSource,profileMatched:!!tm,profileSourceDate:tm?.referenceDate||null};
- return {...player,age,ageModelValue:ageModelledDOB?age:null,dob,estimatedBirthYear:ageModelledDOB?Number(String(dob).slice(0,4)):null,ageSource,dataQuality,referencePosition:tm?.position||player.referencePosition||player.transfermarktPosition||null,referenceFoot:tm?.foot||player.referenceFoot||player.preferredFoot||null,referenceHeight:tm?.height||tm?.height_in_cm||player.referenceHeight||player.heightCm||null,referenceValueEUR:tm?.marketValue??tm?.market_value_in_eur??player.referenceValueEUR??player.transfermarktMarketValueEuro??null,transfermarktPosition:tm?.position||player.transfermarktPosition||'',preferredFoot:tm?.foot||player.preferredFoot||'',heightCm:Number(tm?.height||tm?.height_in_cm)||player.heightCm||null,transfermarktMarketValueEuro:Number(tm?.marketValue??tm?.market_value_in_eur)||player.transfermarktMarketValueEuro||0,transfermarktPlayerId:String(player.transfermarktPlayerId||player.referenceData?.transfermarktPlayerId||tm?.id||''),referenceData:{...(player.referenceData||{}),transfermarkt:!!tm||!!player.referenceData?.transfermarkt,tmReferenceDate:tm?.referenceDate||player.referenceData?.tmReferenceDate||null,transfermarktPlayerId:String(player.transfermarktPlayerId||player.referenceData?.transfermarktPlayerId||tm?.id||'')}};
+  const detachedGeneratedIdentity=generatedIdentity&&Boolean(player.transfermarktPlayerId||player.referenceData?.transfermarktPlayerId||player.dataQuality?.transfermarktMatch||player.dataQuality?.profileMatched);
+  const dataQuality={...(player.dataQuality||{}),dobVerified:!!sourceDob,ageCalculatedFromDob:!!sourceDob,ageEstimated,ageUnknown:false,ageFictional,ageModelledDOB,ageSource,profileMatched:generatedIdentity?false:!!tm,transfermarktMatch:generatedIdentity?false:!!tm||!!player.dataQuality?.transfermarktMatch,profileSourceDate:tm?.referenceDate||null,untrustedExternalIdentityDetached:detachedGeneratedIdentity||!!player.dataQuality?.untrustedExternalIdentityDetached};
+  const cleaned={...player,age,ageModelValue:ageModelledDOB?age:null,dob,estimatedBirthYear:ageModelledDOB?Number(String(dob).slice(0,4)):null,ageSource,dataQuality,referencePosition:generatedIdentity?null:(tm?.position||player.referencePosition||player.transfermarktPosition||null),referenceFoot:generatedIdentity?null:(tm?.foot||player.referenceFoot||player.preferredFoot||null),referenceHeight:generatedIdentity?null:(tm?.height||tm?.height_in_cm||player.referenceHeight||player.heightCm||null),referenceValueEUR:generatedIdentity?null:(tm?.marketValue??tm?.market_value_in_eur??player.referenceValueEUR??player.transfermarktMarketValueEuro??null),transfermarktPosition:generatedIdentity?'':(tm?.position||player.transfermarktPosition||''),preferredFoot:generatedIdentity?'':(tm?.foot||player.preferredFoot||''),heightCm:generatedIdentity?null:(Number(tm?.height||tm?.height_in_cm)||player.heightCm||null),transfermarktMarketValueEuro:generatedIdentity?0:(Number(tm?.marketValue??tm?.market_value_in_eur)||player.transfermarktMarketValueEuro||0),transfermarktPlayerId:generatedIdentity?'':String(player.transfermarktPlayerId||player.referenceData?.transfermarktPlayerId||tm?.id||''),referenceData:{...(player.referenceData||{}),transfermarkt:generatedIdentity?false:!!tm||!!player.referenceData?.transfermarkt,tmReferenceDate:generatedIdentity?null:(tm?.referenceDate||player.referenceData?.tmReferenceDate||null),transfermarktPlayerId:generatedIdentity?'':String(player.transfermarktPlayerId||player.referenceData?.transfermarktPlayerId||tm?.id||'')}};
+  if(generatedIdentity&&cleaned.playerReferenceId)delete cleaned.playerReferenceId;
+  if(generatedIdentity)cleaned.nationality='';
+  return cleaned;
 }
 function normalizeAllPlayerAges(year=Number(appState.seasonYear)||2026,root=appState){
  const y=Math.max(2026,Number(year)||2026),seen=new WeakSet();let checked=0,fictional=0;
@@ -2499,7 +2518,7 @@ function activeLoanRosters(){
  }
  return rosters;
 }
-function loanWageShare(p){return Math.max(0,Math.min(1,Number(p?.loanWageShare??0.5)));}
+function loanWageShare(p){if(p?.registeredLoan===true&&p.loanWageShareKnown!==true)return p.loanStatus==='in'?0:1;if(p?.registeredLoan===true&&!Number.isFinite(Number(p.loanWageShare)))return p.loanStatus==='in'?0:1;return Math.max(0,Math.min(1,Number(p?.loanWageShare??0.5)));}
 function clubWeeklyWageBillK(clubIndex,roster){
  const own=(roster||[]).reduce((sum,p)=>sum+(Number(p.wage)||0)*(p?.loanStatus?loanWageShare(p):1),0);
  let retained=0;
@@ -2594,7 +2613,7 @@ function recallLoan(id){
 }
 function processLoanReturns(){
  const today=gameDateForCurrentState();let returnedCount=0;
- const dueIncoming=(appState.squad||[]).filter(p=>p?.loanStatus==='in'&&String(p.loanEndDate||'')<=today);
+ const dueIncoming=(appState.squad||[]).filter(p=>p?.loanStatus==='in'&&p.registeredLoan!==true&&String(p.loanEndDate||'')<=today);
  dueIncoming.forEach(p=>{
   const borrower=CLUBS[appState.club]?.name||currentClub().name,parentIndex=Number(p.loanParentClubIndex),parentType=p.loanParentType||'pl',parentDivision=p.loanParentDivision||'',parentName=parentType==='efl'?(p.loanParentClubName||'EFL-klubb'):(CLUBS[parentIndex]?.name||p.loanParentClubName||'Moderklubb');
   const stats={};CAREER_STAT_KEYS.forEach(k=>stats[k]=Number(p[k])||0);
@@ -2607,7 +2626,7 @@ function processLoanReturns(){
  });
  // Return players loaned out by the user; their active-season loan stats remain part of the player career.
  for(let ci=0;ci<(appState.worldSquads||[]).length;ci++){
-  if(ci===Number(appState.club))continue;const roster=appState.worldSquads[ci]||[];const due=roster.filter(p=>p?.loanStatus==='out'&&Number(p.loanParentClubIndex)===Number(appState.club)&&String(p.loanEndDate||'')<=today);
+  if(ci===Number(appState.club))continue;const roster=appState.worldSquads[ci]||[];const due=roster.filter(p=>p?.loanStatus==='out'&&p?.registeredLoan!==true&&Number(p.loanParentClubIndex)===Number(appState.club)&&String(p.loanEndDate||'')<=today);
   due.forEach(p=>{
    const borrower=CLUBS[ci]?.name||p.loanBorrowerClubName||'Mottakerklubb',parentName=currentClub().name;const returned={...p,clubIndex:Number(appState.club),clubName:parentName};
    ['loanStatus','loanEndDate','loanParentClubIndex','loanParentClubName','loanBorrowerClubIndex','loanBorrowerClubName','loanStartDate','loanFee','loanWageShare','loanDurationWeeks','loanOriginalClubIndex'].forEach(k=>delete returned[k]);
@@ -2620,7 +2639,7 @@ function processLoanReturns(){
  // Return players loaned by the manager to EFL clubs when their agreed date arrives.
  for(const [division,clubs] of Object.entries(appState.eflPlayerDatabase||{})){
   for(const [clubName,roster] of Object.entries(clubs||{})){
-   const due=(roster||[]).filter(p=>p?.loanStatus==='out'&&Number(p.loanParentClubIndex)===Number(appState.club)&&String(p.loanEndDate||'')<=today);
+   const due=(roster||[]).filter(p=>p?.loanStatus==='out'&&p?.registeredLoan!==true&&Number(p.loanParentClubIndex)===Number(appState.club)&&String(p.loanEndDate||'')<=today);
    due.forEach(p=>{
     const careerId=playerCareerIdentity(p),stats={};CAREER_STAT_KEYS.forEach(k=>stats[k]=Number(p[k])||0);
     if(stats.apps>0||stats.goals>0||stats.assists>0){p.careerStats=p.careerStats&&typeof p.careerStats==='object'?p.careerStats:{};CAREER_STAT_KEYS.forEach(k=>p.careerStats[k]=(Number(p.careerStats[k])||0)+stats[k]);p.careerHistory=Array.isArray(p.careerHistory)?p.careerHistory:[];p.careerHistory.push({season:`${seasonLabel()} · lån`,clubName,...stats,competitions:JSON.parse(JSON.stringify(p.competitionStats||{})),loanSpell:true});}
@@ -3380,26 +3399,37 @@ function refreshFreeAgentsForNewSeason(){
  appState.freeAgentRefreshHistory.push({season,added:additions,expiredAfterSeason,retiredByAge,retired:expiredAfterSeason+retiredByAge});
  appState.log=appState.log||[];appState.log.push(`Klubbløs-listen er oppdatert for ${season}/${String(season+1).slice(-2)}: ${expiredAfterSeason} spillere som ikke fant klubb etter én sesong er fjernet, ${retiredByAge} spillere over 37 er pensjonert og ${additions} nye spillere er kommet inn.`);
 }
-// v3.17: England's September 2026 registered squads are authoritative for current ownership.
-// Keep a durable player reference ID so a July Transfermarkt snapshot cannot leave a transferred
-// player in both an English club and the former European club.
+// v3.67: unverified/generated identities must never inherit external player IDs or profiles.
+// Official registration data is separate from real-world identity verification.
+function isGeneratedFictionalPlayer(player){
+ const src=String(player?.source||'');
+ return /generated\b|fictional identity|placeholder|identity not verified/i.test(src)||player?.dataQuality?.ageFictional===true;
+}
+function verifiedClubSpecificPlayerCorrection(name,clubName){
+ const playerKey=normalisePlayerName(name),clubKey=normalisePlayerName(clubName);
+ if(playerKey==='leonardo lopes'&&clubKey==='benfica')return {dob:'2008-04-06',pos:'GK',role:'GK',naturalPositions:['GK'],ageSource:'UEFA/Benfica official player profile DOB (2026-11-14 snapshot)',positionSource:'UEFA official squad position group: goalkeeper'};
+ if(playerKey==='francisco silva'&&clubKey==='benfica')return {dob:'2007-09-14',pos:'ATT',role:'ST',naturalPositions:['ST'],ageSource:'UEFA Benfica official player profile DOB (2026-11-14 snapshot)',positionSource:'UEFA official squad position group: forward; centre-forward role'};
+ return null;
+}
 function transfermarktIdentityOf(player,clubName){
  if(!player||!player.name)return '';
+ if(isGeneratedFictionalPlayer(player))return '';
  const direct=player.transfermarktPlayerId||player.referenceData?.transfermarktPlayerId||player.playerReferenceId;
  if(direct!==undefined&&direct!==null&&String(direct).trim())return String(direct).trim();
- const src=String(player.source||'');
- if(/generated|fictional identity|placeholder|identity not verified/i.test(src)&&!player.realNameVerified&&!player.squadMembershipVerified)return '';
  const profile=findTransfermarktRecord(player.name,null,clubName||player.clubName||player.currentClubName||null);
  const id=profile?.id?String(profile.id):'';
  if(id){
   player.transfermarktPlayerId=id;
-  player.referenceData={...(player.referenceData||{}),transfermarktPlayerId:id,transfermarkt: true,tmReferenceDate:profile.referenceDate||player.referenceData?.tmReferenceDate||TM_GLOBAL_REFERENCE_CUTOFF};
+  player.referenceData={...(player.referenceData||{}),transfermarktPlayerId:id,transfermarkt:true,tmReferenceDate:profile.referenceDate||player.referenceData?.tmReferenceDate||TM_GLOBAL_REFERENCE_CUTOFF};
  }
  return id;
 }
 function trustedRegistrationDOB(player,clubName){
  if(!player)return '';
  const valid=v=>/^\d{4}-\d{2}-\d{2}$/.test(String(v||''));
+ const correction=verifiedClubSpecificPlayerCorrection(player.name,clubName||player.clubName||player.currentClubName);
+ if(correction?.dob&&valid(correction.dob))return correction.dob;
+ if(isGeneratedFictionalPlayer(player))return '';
  if(player.dataQuality?.dobVerified===true&&valid(player.dob))return String(player.dob);
  const local=referenceMapValue(typeof PLAYER_DOBS!=='undefined'?PLAYER_DOBS:{},player.name);
  if(valid(local))return String(local);
@@ -3486,29 +3516,112 @@ function deduplicateRosterByIdentity(roster,clubName){
  for(const p of Array.isArray(roster)?roster:[]){if(!p)continue;const d=playerIdentityDescriptor(p,clubName,false);if(findSameRegisteredPlayerIndexed(seen,d))continue;identityIndexAdd(seen,d);out.push(p);}
  return out;
 }
+function eachMaterializedPlayerRegistration(callback){
+ const rows=[];
+ (appState.worldSquads||[]).forEach((roster,ci)=>(roster||[]).forEach(player=>rows.push({player,clubName:CLUBS[ci]?.name||player?.clubName||'',scope:'worldSquads'})));
+ (appState.squad||[]).forEach(player=>rows.push({player,clubName:currentClub()?.name||player?.clubName||'',scope:'currentManagerSquad'}));
+ for(const [division,clubs] of Object.entries(appState.eflPlayerDatabase||{}))for(const [clubName,roster] of Object.entries(clubs||{}))for(const player of roster||[])rows.push({player,clubName,scope:`eflPlayerDatabase:${division}`});
+ for(const [clubName,roster] of Object.entries(appState.europeanTransferSquads||{}))for(const player of roster||[])rows.push({player,clubName,scope:'europeanTransferSquads'});
+ for(const [clubName,roster] of Object.entries(appState.cupOnlySquads||{}))for(const player of roster||[])rows.push({player,clubName,scope:'cupOnlySquads'});
+ for(const player of appState.freeAgents||[])rows.push({player,clubName:'Klubbløs',scope:'freeAgents'});
+ for(const [clubName,roster] of Object.entries(appState.youthAcademies||{}))for(const player of roster||[])rows.push({player,clubName,scope:'youthAcademies'});
+ if(typeof callback==='function')rows.forEach(callback);return rows.length;
+}
 function auditPlayerRegistrationDuplicates(){
- const groups=[],entries=[];
- const add=(player,clubName,scope,official=false)=>{
+ const groups=[],entries=[];let scanned=0,ignoredGeneratedRegistrations=0;
+ eachMaterializedPlayerRegistration(({player,clubName,scope})=>{
   if(!player||!player.name)return;
-  const src=String(player.source||'');
-  if(/generated|fictional identity|placeholder|identity not verified/i.test(src)&&!player.squadMembershipVerified&&!player.realNameVerified&&!player.transfermarktPlayerId)return;
-  const d=playerIdentityDescriptor(player,clubName,official);if(!d.nameKey)return;
+  scanned++;
+  if(isGeneratedFictionalPlayer(player)){ignoredGeneratedRegistrations++;return;}
+  const d=playerIdentityDescriptor(player,clubName,false);if(!d.nameKey)return;
   entries.push({...d,scope});
- };
- // Current in-game registrations take precedence over the static reference archive.
- (appState.worldSquads||[]).forEach((roster,ci)=>(roster||[]).forEach(p=>add(p,CLUBS[ci]?.name||p.clubName||'','Premier League/world')));
- for(const [division,clubs] of Object.entries(appState.eflPlayerDatabase||{}))for(const [club,roster] of Object.entries(clubs||{}))for(const p of roster||[])add(p,club,division);
- for(const [club,roster] of Object.entries(appState.europeanTransferSquads||{}))for(const p of roster||[])if(p?.loanStatus!=='out')add(p,club,'Europe');
- for(const [club,roster] of Object.entries(appState.cupOnlySquads||{}))for(const p of roster||[])add(p,club,'Cup-only');
+ });
  const byId=new Map(),byName=new Map();
  for(const d of entries){
   if(d.transfermarktId){if(!byId.has(d.transfermarktId))byId.set(d.transfermarktId,[]);byId.get(d.transfermarktId).push(d);}
   if(d.nameKey){if(!byName.has(d.nameKey))byName.set(d.nameKey,[]);byName.get(d.nameKey).push(d);}
  }
- const seen=new Set();
- for(const [id,list] of byId)if(list.length>1){const clubs=[...new Set(list.map(x=>x.clubName))];if(clubs.length>1){const key='id|'+id;if(!seen.has(key)){seen.add(key);groups.push({type:'confirmed-duplicate',match:'transfermarkt-id',identity:id,name:list[0].player.name,registrations:list.map(x=>({club:x.clubName,scope:x.scope}))});}}}
- for(const [name,list] of byName)if(list.length>1){const clubs=[...new Set(list.map(x=>x.clubName))];if(clubs.length>1){const hasStrong=list.some(a=>list.some(b=>a!==b&&sameRegisteredPlayer(a,b)));if(!hasStrong){const key='name|'+name;if(!seen.has(key)){seen.add(key);groups.push({type:'name-collision-review',match:'name-only',identity:name,name:list[0].player.name,registrations:list.map(x=>({club:x.clubName,scope:x.scope,dob:x.dob||null,transfermarktId:x.transfermarktId||null}))});}}}}
- return {scanned:entries.length,confirmedDuplicates:groups.filter(x=>x.type==='confirmed-duplicate').length,ambiguousNameGroups:groups.filter(x=>x.type==='name-collision-review').length,groups};
+ for(const [id,list] of byId){
+  const clubs=[...new Set(list.map(x=>x.clubName))];if(clubs.length<2)continue;
+  const registeredLoans=list.every(x=>x.player?.registeredLoan===true&&x.player?.registeredLoanId&&['in','out'].includes(x.player?.loanStatus))&&new Set(list.map(x=>x.player.registeredLoanId)).size===1;
+  groups.push({type:registeredLoans?'active-loan-overlap':'cross-club-id-conflict',match:'transfermarkt-id',identity:id,name:list[0].player.name,registeredLoanId:registeredLoans?list[0].player.registeredLoanId:null,registrations:list.map(x=>({club:x.clubName,scope:x.scope,loanStatus:x.player?.loanStatus||null}))});
+ }
+ for(const [name,list] of byName){
+  const clubs=[...new Set(list.map(x=>x.clubName))];if(clubs.length<2)continue;
+  const knownDobs=[...new Set(list.map(x=>x.dob).filter(Boolean))];
+  // Distinct verified birth dates are evidence of separate people, not a duplicate candidate.
+  if(knownDobs.length>1)continue;
+  const hasStrong=list.some(a=>list.some(b=>a!==b&&sameRegisteredPlayer(a,b)));
+  if(!hasStrong)groups.push({type:'name-collision-review',match:'name-only',identity:name,name:list[0].player.name,registrations:list.map(x=>({club:x.clubName,scope:x.scope,dob:x.dob||null,transfermarktId:x.transfermarktId||null}))});
+ }
+ return {scanned,identityEligibleRegistrations:entries.length,ignoredGeneratedRegistrations,confirmedDuplicates:groups.filter(x=>x.type==='cross-club-id-conflict').length,crossClubIdConflicts:groups.filter(x=>x.type==='cross-club-id-conflict').length,activeLoanOverlaps:groups.filter(x=>x.type==='active-loan-overlap').length,ambiguousNameGroups:groups.filter(x=>x.type==='name-collision-review').length,groups};
+}
+
+function genericGeneratedRole(pos,player){
+ const options={GK:['GK'],DEF:['LCB','RCB','LB','RB'],MID:['DM','CM','AM','LM','RM'],ATT:['ST','LW','RW']}[String(pos||'').toUpperCase()];
+ if(!options)return player?.role||'';
+ const raw=String(player?.id||player?.careerId||player?.name||'generated-player');
+ const slotMatch=raw.match(/(?:-|\D)(\d+)$/),slot=slotMatch?Number(slotMatch[1]):Math.abs(stableSeed(raw));
+ return options[Math.abs(Number(slot)||0)%options.length];
+}
+function applyVerifiedPlayerCorrectionToRecord(player,clubName,seasonYear){
+ const correction=verifiedClubSpecificPlayerCorrection(player?.name,clubName);if(!correction)return false;
+ const dob=correction.dob,age=ageOnISODate(dob,cmSeasonDate(seasonYear));
+ Object.assign(player,{dob,age,ageModelValue:null,estimatedBirthYear:null,ageSource:correction.ageSource,pos:correction.pos,role:correction.role,naturalPositions:correction.naturalPositions.slice(),assignedRole:null,transfermarktPlayerId:'',transfermarktPosition:'',preferredFoot:'',heightCm:null,nationality:'',transfermarktMarketValueEuro:0,referencePosition:null,referenceFoot:null,referenceHeight:null,referenceValueEUR:null,valueSource:'Estimated value retained after official identity correction'});
+ player.referenceData={...(player.referenceData||{}),transfermarkt:false,transfermarktPlayerId:'',tmReferenceDate:null};
+ player.dataQuality={...(player.dataQuality||{}),dobVerified:true,ageCalculatedFromDob:true,ageEstimated:false,ageUnknown:false,ageFictional:false,ageModelledDOB:false,ageSource:correction.ageSource,positionVerified:true,positionSource:correction.positionSource,profileMatched:false,transfermarktMatch:false,profileSourceDate:null,marketValueEstimated:true,attributesEstimated:true,attributesReviewRequired:true,identityCorrectionVersion:1};
+ player.identityIntegrity={...(player.identityIntegrity||{}),status:'official-club-specific-correction',version:1};
+ return true;
+}
+function applyOfficialRegisteredLoan(player,loan){
+ player.registeredLoan=true;player.externalRegisteredLoan=true;player.registeredLoanId=loan.id;player.loanStatus=loan.status;
+ player.loanParentClubName=loan.parent;player.loanParentType=loan.parentType;player.loanParentDivision=loan.parentDivision||'';
+ player.loanBorrowerClubName=loan.borrower;player.loanBorrowerType=loan.borrowerType;player.loanBorrowerDivision=loan.borrowerDivision||'';
+ player.loanStartDate=loan.startDate||'';player.loanEndDate=loan.endDate||'';player.loanEndWindow=loan.endWindow||'';player.loanFee=null;player.loanFeeKnown=false;delete player.loanWageShare;player.loanWageShareKnown=false;
+ player.identityIntegrity={...(player.identityIntegrity||{}),officialLoan:loan.id,version:1};
+}
+function runPlayerIdentityIntegrityMigration(){
+ if(Number(appState.playerIdentityIntegrityVersion||0)>=1)return {changed:0,detached:0,corrected:0,loans:0};
+ const seasonYear=Number(appState.seasonYear)||2026;let changed=0,detached=0,corrected=0,loans=0;
+ const generatedSeen=new Set();
+ eachMaterializedPlayerRegistration(({player,clubName})=>{
+  if(!player||!player.name)return;
+  if(isGeneratedFictionalPlayer(player)){
+   const oldId=player.transfermarktPlayerId||player.referenceData?.transfermarktPlayerId||'';
+   if(oldId||player.dataQuality?.transfermarktMatch||player.dataQuality?.profileMatched||player.dataQuality?.untrustedExternalIdentityDetached||player.transfermarktPosition||player.referencePosition||player.referenceFoot||player.referenceHeight||player.referenceValueEUR){
+    player.transfermarktPlayerId='';delete player.playerReferenceId;
+    player.referenceData={...(player.referenceData||{}),transfermarkt:false,transfermarktPlayerId:'',tmReferenceDate:null};
+    player.dataQuality={...(player.dataQuality||{}),profileMatched:false,transfermarktMatch:false,profileSourceDate:null,marketValueEstimated:true,attributesEstimated:true,attributesReviewRequired:true,untrustedExternalIdentityDetached:true};
+    player.transfermarktPosition='';player.transfermarktMarketValueEuro=0;player.preferredFoot='';player.heightCm=null;player.nationality='';player.referencePosition=null;player.referenceFoot=null;player.referenceHeight=null;player.referenceValueEUR=null;
+    if(String(player.valueSource||'').toLowerCase().includes('transfermarkt'))player.valueSource='Estimated value retained after unverified identity detachment';
+    const role=genericGeneratedRole(player.pos,player);if(role){player.role=role;player.naturalPositions=[role];player.assignedRole=null;}
+    player.identityIntegrity={...(player.identityIntegrity||{}),status:'generated-identity-external-profile-detached',version:1};
+    const identity=String(player.careerId||player.id||`${player.name}|${clubName}`);generatedSeen.add(identity);detached++;changed++;
+   }
+  }
+  if(applyVerifiedPlayerCorrectionToRecord(player,clubName,seasonYear)){corrected++;changed++;}
+ });
+ const loanCases=[
+  {id:'2026-27-claudio-echeverri-manchester-city-benfica',name:'Claudio Echeverri',parent:'Manchester City',borrower:'Benfica',parentType:'pl',parentDivision:'Premier League',borrowerType:'europe',borrowerDivision:'Portugal',endDate:'2027-06-30'},
+  {id:'2026-27-georgie-gent-barnsley-boston-united',name:'Georgie Gent',parent:'Barnsley',borrower:'Boston United',parentType:'efl',parentDivision:'League One',borrowerType:'efl',borrowerDivision:'National League',endWindow:'December 2026'}
+ ];
+ for(const loan of loanCases){
+  eachMaterializedPlayerRegistration(({player,clubName})=>{
+   if(!player||normalisePlayerName(player.name)!==normalisePlayerName(loan.name))return;
+   const clubKey=normalisePlayerName(clubName);
+   if(clubKey===normalisePlayerName(loan.parent)&&player.loanStatus!=='out'){
+    applyOfficialRegisteredLoan(player,{...loan,status:'out'});loans++;changed++;
+   }else if(clubKey===normalisePlayerName(loan.borrower)&&player.loanStatus!=='in'){
+    applyOfficialRegisteredLoan(player,{...loan,status:'in'});loans++;changed++;
+   }
+  });
+ }
+ appState.playerIdentityIntegrityVersion=1;
+ appState.playerIdentityIntegrityDate='2026-11-15';
+ appState.playerIdentityIntegritySummary={changed,detachedGeneratedRegistrations:detached,uniqueGeneratedPlayersDetached:generatedSeen.size,officialPlayerCorrections:corrected,registeredLoanRowsUpdated:loans};
+ appState.log=Array.isArray(appState.log)?appState.log:[];
+ appState.log.push(`v3.67 identitetskontroll fullført: ${detached} genererte spillerregistreringer fikk fjernet uverifiserte eksterne identiteter, ${corrected} UEFA-spilleroppføringer korrigert og ${loans} offisielle utlånsregistreringer merket. Ferdigheter, rating og potensial ble ikke overskrevet.`);
+ return appState.playerIdentityIntegritySummary;
 }
 
 function ensureEuropeanTransferWorld(){
@@ -3556,9 +3669,10 @@ function ensureEuropeanTransferWorld(){
  const officialNovemberMigration=applyPermanentUEFAOfficialNovemberRosterMigration();
  if(officialNovemberMigration.added>0||officialNovemberMigration.replaced>0)createdRoster=true;
  const currentSeason=Number(appState.seasonYear)||2026;
+ runPlayerIdentityIntegrityMigration();
  const needsDedup=createdRoster||Number(appState.europeanTransferDedupVersion||0)!==2||Number(appState.europeanTransferDedupSeasonYear||0)!==currentSeason;
  appState.playerRegistrationAudit=auditPlayerRegistrationDuplicates();
- appState.playerRegistrationAuditVersion=1;
+ appState.playerRegistrationAuditVersion=2;
  if(!needsDedup)return;
  const english=englishRegistrationIndex();let removed=0,withinClubRemoved=0;const removals=[];
  for(const [clubName,roster] of Object.entries(appState.europeanTransferSquads)){
@@ -3682,7 +3796,7 @@ function transferOfferActionableNow(offer){
 }
 function transferWindowCalendarText(){const y=Number(appState.seasonYear)||2026;return `Sommer: de fire pre-season-ukene og de to første ligarundene (${y}) · Vinter: 1. januar–1. februar ${y+1} (modellert som GW 19–23).`}
 function listedPlayerIds(){if(!Array.isArray(appState.listedForTransfer))appState.listedForTransfer=[];return appState.listedForTransfer;}
-function listPlayerForTransfer(id){if(!transferWindowOpen()){alert(`Overgangsvinduet er stengt. ${transferWindowCalendarText()}`);return;}const p=appState.squad.find(x=>String(x.id)===String(id));if(!p)return;const ids=listedPlayerIds();if(ids.includes(String(id))){appState.listedForTransfer=ids.filter(x=>x!==String(id));appState.log.push(`${p.name} er tatt av overgangslisten.`);}else{appState.listedForTransfer.push(String(id));appState.log.push(`${p.name} er lagt ut på overgangsmarkedet. Andre klubber får tydelig beskjed om at spilleren kan kjøpes.`);}save();render()}
+function listPlayerForTransfer(id){if(!transferWindowOpen()){alert(`Overgangsvinduet er stengt. ${transferWindowCalendarText()}`);return;}const p=appState.squad.find(x=>String(x.id)===String(id));if(!p)return;if(p.loanStatus){alert('Spillere på utlån kan ikke legges på overgangslisten.');return;}const ids=listedPlayerIds();if(ids.includes(String(id))){appState.listedForTransfer=ids.filter(x=>x!==String(id));appState.log.push(`${p.name} er tatt av overgangslisten.`);}else{appState.listedForTransfer.push(String(id));appState.log.push(`${p.name} er lagt ut på overgangsmarkedet. Andre klubber får tydelig beskjed om at spilleren kan kjøpes.`);}save();render()}
 
 const AI_SQUAD_TARGETS={GK:3,DEF:8,MID:8,ATT:6};
 function aiPosGroup(p){const x=String(p?.pos||p?.position||'').toUpperCase();if(x==='GK'||x.includes('KEEP'))return 'GK';if(['DEF','CB','LB','RB','LWB','RWB'].includes(x)||x.includes('DEF'))return 'DEF';if(['MID','DM','CM','AM','LM','RM','CAM','CDM'].includes(x)||x.includes('MID'))return 'MID';return 'ATT';}
@@ -3976,17 +4090,17 @@ function transferWindowReportModal(){
 }
 function transferInbox(){const offers=(appState.transferOffers||[]).filter(o=>o.status==='pending');return `<section class="card"><div class="section-title"><h2>Bud på dine spillere</h2><span class="pill ${offers.length?'green':''}">${offers.length} ubehandlet</span></div>${offers.length?offers.map(o=>`<div class="player"><div style="min-width:0;flex:1"><div class="player-name">${esc(o.playerName)} <span class="pill">${esc(o.buyerName)}</span></div><div class="player-meta">Gameweek ${o.week} · Bud ${money(o.amount)} · ${o.isYouth?'Klubben byr på et juniortalent':o.listed?'Spilleren var lagt ut for salg':'Klubben tok selv kontakt'}</div><div class="player-meta">${o.star?'Nøkkelspiller – klubben din kan ha grunn til å kreve en høyere sum.':'Vurder budet opp mot spillerens verdi og rolle.'}</div></div><div style="display:flex;flex-direction:column;gap:5px"><button class="primary" onclick="respondTransferOffer('${o.id}','accept')">Godta</button><button onclick="respondTransferOffer('${o.id}','counter')">Krev mer</button><button onclick="respondTransferOffer('${o.id}','reject')">Avslå</button></div></div>`).join(''):`<p class="muted">Ingen nye bud. Bud kommer bare i overgangsvinduene. ${transferWindowCalendarText()}</p>`}</section>`}
 function loanManagementMarkup(){
- const incoming=(appState.squad||[]).filter(p=>p.loanStatus==='in').map(p=>`<div class="player"><div style="flex:1;min-width:0"><strong>${esc(p.name)} · Lånt inn</strong><div class="player-meta">Fra ${esc(p.loanParentClubName||'Moderklubb')} · Til ${esc(p.loanEndDate||'—')} · Din lønnsandel ${Math.round(loanWageShare(p)*100)} %</div></div><button onclick="extendLoan('${String(p.id).replace(/'/g,"\\'")}')">Forleng lån</button></div>`).join('');
+ const incoming=(appState.squad||[]).filter(p=>p.loanStatus==='in').map(p=>p.registeredLoan?`<div class="player"><div style="flex:1;min-width:0"><strong>${esc(p.name)} · Offisielt registrert utlån</strong><div class="player-meta">Fra ${esc(p.loanParentClubName||'Moderklubb')} · ${esc(p.loanEndDate||p.loanEndWindow||'Sluttdato ikke spesifisert')} · Lønnsfordeling ikke bekreftet; kostnaden ligger hos moderklubben i modellen.</div></div></div>`:`<div class="player"><div style="flex:1;min-width:0"><strong>${esc(p.name)} · Lånt inn</strong><div class="player-meta">Fra ${esc(p.loanParentClubName||'Moderklubb')} · Til ${esc(p.loanEndDate||'—')} · Din lønnsandel ${Math.round(loanWageShare(p)*100)} %</div></div><button onclick="extendLoan('${String(p.id).replace(/'/g,"\\'")}')">Forleng lån</button></div>`).join('');
  const outgoingData=[];
- (appState.worldSquads||[]).forEach((r,ci)=>(r||[]).forEach(p=>{if(p.loanStatus==='out'&&Number(p.loanParentClubIndex)===Number(appState.club))outgoingData.push({p,ci});}));
- const eflOutgoing=[];for(const [division,clubs] of Object.entries(appState.eflPlayerDatabase||{}))for(const [clubName,roster] of Object.entries(clubs||{}))for(const p of roster||[])if(p.loanStatus==='out'&&Number(p.loanParentClubIndex)===Number(appState.club))eflOutgoing.push({p,clubName,division});
- const outgoingPL=outgoingData.map(({p,ci})=>`<div class="player"><div style="flex:1;min-width:0"><strong>${esc(p.name)} · Lånt ut</strong><div class="player-meta">Til ${esc(CLUBS[ci]?.name||p.loanBorrowerClubName)} · Til ${esc(p.loanEndDate||'—')} · Mottaker betaler ${Math.round(loanWageShare(p)*100)} % av lønnen</div></div><button onclick="extendLoan('${String(p.id).replace(/'/g,"\\'")}')">Forleng lån</button><button onclick="recallLoan('${String(p.id).replace(/'/g,"\\'")}')">Hent hjem</button></div>`).join('');
- const outgoingEFL=eflOutgoing.map(({p,clubName,division})=>`<div class="player"><div style="flex:1;min-width:0"><strong>${esc(p.name)} · Lånt ut</strong><div class="player-meta">Til ${esc(clubName)} (${esc(division)}) · Til ${esc(p.loanEndDate||'—')} · Mottaker betaler ${Math.round(loanWageShare(p)*100)} % av lønnen</div></div><button onclick="extendLoan('${String(p.id).replace(/'/g,"\\'")}')">Forleng lån</button><button onclick="recallLoan('${String(p.id).replace(/'/g,"\\'")}')">Hent hjem</button></div>`).join('');
+ (appState.worldSquads||[]).forEach((r,ci)=>(r||[]).forEach(p=>{if(p.loanStatus==='out'&&(Number(p.loanParentClubIndex)===Number(appState.club)||(p.registeredLoan&&normalisePlayerName(p.loanParentClubName)===normalisePlayerName(currentClub().name))))outgoingData.push({p,ci});}));
+ const eflOutgoing=[];for(const [division,clubs] of Object.entries(appState.eflPlayerDatabase||{}))for(const [clubName,roster] of Object.entries(clubs||{}))for(const p of roster||[])if(p.loanStatus==='out'&&(Number(p.loanParentClubIndex)===Number(appState.club)||(p.registeredLoan&&normalisePlayerName(p.loanParentClubName)===normalisePlayerName(currentClub().name))))eflOutgoing.push({p,clubName,division});
+ const outgoingPL=outgoingData.map(({p,ci})=>p.registeredLoan?`<div class="player"><div style="flex:1;min-width:0"><strong>${esc(p.name)} · Offisielt registrert utlån</strong><div class="player-meta">Til ${esc(p.loanBorrowerClubName||CLUBS[ci]?.name||'Mottakerklubb')} · ${esc(p.loanEndDate||p.loanEndWindow||'Sluttdato ikke spesifisert')} · Lønnsfordeling ikke bekreftet; kostnaden ligger hos moderklubben i modellen.</div></div></div>`:`<div class="player"><div style="flex:1;min-width:0"><strong>${esc(p.name)} · Lånt ut</strong><div class="player-meta">Til ${esc(CLUBS[ci]?.name||p.loanBorrowerClubName)} · Til ${esc(p.loanEndDate||'—')} · Mottaker betaler ${Math.round(loanWageShare(p)*100)} % av lønnen</div></div><button onclick="extendLoan('${String(p.id).replace(/'/g,"\\'")}')">Forleng lån</button><button onclick="recallLoan('${String(p.id).replace(/'/g,"\\'")}')">Hent hjem</button></div>`).join('');
+ const outgoingEFL=eflOutgoing.map(({p,clubName,division})=>p.registeredLoan?`<div class="player"><div style="flex:1;min-width:0"><strong>${esc(p.name)} · Offisielt registrert utlån</strong><div class="player-meta">Til ${esc(p.loanBorrowerClubName||clubName)} (${esc(p.loanBorrowerDivision||division)}) · ${esc(p.loanEndDate||p.loanEndWindow||'Sluttdato ikke spesifisert')} · Lønnsfordeling ikke bekreftet; kostnaden ligger hos moderklubben i modellen.</div></div></div>`:`<div class="player"><div style="flex:1;min-width:0"><strong>${esc(p.name)} · Lånt ut</strong><div class="player-meta">Til ${esc(clubName)} (${esc(division)}) · Til ${esc(p.loanEndDate||'—')} · Mottaker betaler ${Math.round(loanWageShare(p)*100)} % av lønnen</div></div><button onclick="extendLoan('${String(p.id).replace(/'/g,"\\'")}')">Forleng lån</button><button onclick="recallLoan('${String(p.id).replace(/'/g,"\\'")}')">Hent hjem</button></div>`).join('');
  const outgoing=outgoingPL+outgoingEFL;
  const count=(appState.squad||[]).filter(p=>p.loanStatus==='in').length+outgoingData.length+eflOutgoing.length;
  const empty=!incoming&&!outgoing?'<p class="muted">Ingen aktive låneavtaler.</p>':'';
  const rows=(html)=>html.replace(/class=\"player\"/g,'class=\"player loan-management-player\"');
- return `<details class="card cup-accordion transfer-list-accordion loan-management-accordion" ${window.loanManagementAccordionOpen?'open':''} ontoggle="window.loanManagementAccordionOpen=this.open"><summary class="section-title"><h2>Låneavtaler</h2><span class="pill">${count}</span></summary><div class="loan-management-body">${rows(incoming)}${rows(outgoing)}${empty}<p class="muted">Lønnsfordelingen brukes i ukentlige lønnskostnader. Lån og returer registreres i spillerens overgangshistorikk.</p></div></details>`;
+ return `<details class="card cup-accordion transfer-list-accordion loan-management-accordion" ${window.loanManagementAccordionOpen?'open':''} ontoggle="window.loanManagementAccordionOpen=this.open"><summary class="section-title"><h2>Låneavtaler</h2><span class="pill">${count}</span></summary><div class="loan-management-body">${rows(incoming)}${rows(outgoing)}${empty}<p class="muted">Offisielle utlån vises som registreringsinformasjon og kan ikke forlenges eller tilbakekalles fra denne menyen. Lønnsfordeling er ikke antatt når den ikke er dokumentert.</p></div></details>`;
 }
 function marketPlayersSectionMarkup(){
  const players=filteredMarketPlayers(),shown=players.slice(0,60),open=transferWindowOpen();
@@ -6973,7 +7087,7 @@ function teamPower(index){
  return 60;
 }
 function eligibleSquad(players){
- return players.filter(p=>(p.injured||0)<=0&&(p.suspended||0)<=0).sort((a,b)=>{
+ return players.filter(p=>p?.loanStatus!=='out'&&(p.injured||0)<=0&&(p.suspended||0)<=0).sort((a,b)=>{
   const posOrder={GK:0,DEF:1,MID:2,ATT:3};
   return (posOrder[a.pos]??4)-(posOrder[b.pos]??4)||b.rating-a.rating;
  });
@@ -9984,7 +10098,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.65 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.67 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){
