@@ -2191,7 +2191,7 @@ function processWeeklyClubEconomy(){
    const roster=Array.isArray(appState.eflPlayerDatabase?.[division]?.[club.name])?appState.eflPlayerDatabase[division][club.name]:[];
    // Borrower pays the agreed share; the parent club's retained share is
    // calculated in clubWeeklyWageBillK from activeLoanRosters().
-   const weeklyK=roster.reduce((sum,p)=>sum+(Number(p.wage)||0)*(p?.loanStatus==='out'?loanWageShare(p):1),0),revenueM=weeklyOperatingRevenueM(division,club.strength,club.name),netM=+(revenueM-weeklyK/1000).toFixed(3);
+   const weeklyK=clubWeeklyWageBillK(-1,roster,club.name,division),revenueM=weeklyOperatingRevenueM(division,club.strength,club.name),netM=+(revenueM-weeklyK/1000).toFixed(3);
    if(!finance.weeklyEconomyInitializedBefore)club.budget=Number.isFinite(Number(club.budget))?Number(club.budget):Number(finance.transferBudget)||.2;
    club.budget=Math.max(.05,+(Number(club.budget||0)+netM).toFixed(2));finance.transferBudget=club.budget;finance.weeklyIncomeM=revenueM;finance.wageBill=weeklyK;finance.weeklyNetM=netM;finance.weeklyEconomyInitializedBefore=true;
   }
@@ -2798,11 +2798,13 @@ function activeLoanRosters(){
  return rosters;
 }
 function loanWageShare(p){if(p?.registeredLoan===true&&p.loanWageShareKnown!==true)return p.loanStatus==='in'?0:1;if(p?.registeredLoan===true&&!Number.isFinite(Number(p.loanWageShare)))return p.loanStatus==='in'?0:1;return Math.max(0,Math.min(1,Number(p?.loanWageShare??0.5)));}
-function clubWeeklyWageBillK(clubIndex,roster){
+function clubWeeklyWageBillK(clubIndex,roster,clubName='',division=''){
  const own=(roster||[]).reduce((sum,p)=>sum+(Number(p.wage)||0)*(p?.loanStatus?loanWageShare(p):1),0);
  let retained=0;
  for(const entry of activeLoanRosters())for(const p of entry.roster||[]){
   if(!p?.loanStatus||Number(p.loanParentClubIndex)!==Number(clubIndex))continue;
+  if(Number(clubIndex)<0&&clubName&&normalisePlayerName(p.loanParentClubName)!==normalisePlayerName(clubName))continue;
+  if(Number(clubIndex)<0&&division&&p.loanParentDivision&&p.loanParentDivision!==division)continue;
   retained+=(Number(p.wage)||0)*(1-loanWageShare(p));
  }
  return own+retained;
@@ -2928,6 +2930,7 @@ function processLoanReturns(){
    });
   }
  }
+ returnedCount+=processAIAutonomousLoanReturns(today);
  return returnedCount;
 }
 function loanMarketPlayer(id){
@@ -4131,6 +4134,114 @@ function aiContractRenewalPlan(squad,club,season){
  }
  return {renew,wageBill};
 }
+// v3.75: AI-managed season loans create a development pathway for young fringe players.
+function aiLoanClubEntries(){
+ const entries=[],seen=new Set();
+ (CLUBS||[]).forEach((club,index)=>{
+  if(index===Number(appState.club))return;
+  const roster=appState.worldSquads?.[index];if(!Array.isArray(roster))return;
+  entries.push({type:'pl',index,division:clubDivision(club),name:club.name,strength:Number(club.strength)||55,roster,club});seen.add(domesticClubKey(club.name));
+ });
+ for(const [division,clubs] of Object.entries(appState.eflPlayerDatabase||{}))for(const [name,roster] of Object.entries(clubs||{})){
+  if(seen.has(domesticClubKey(name))||!Array.isArray(roster))continue;
+  const club=(appState.lowerLeagues?.[division]?.rows||[]).find(x=>domesticClubKey(x.name)===domesticClubKey(name));
+  if(!club||name===currentClub().name)continue;
+  entries.push({type:'efl',index:-1,division,name,strength:Number(club.strength)||levelForDivision(division),roster,club});seen.add(domesticClubKey(name));
+ }
+ return entries;
+}
+function aiLoanParentRoster(entry){
+ if(!entry)return null;
+ if(entry.type==='pl')return appState.worldSquads?.[entry.index]||null;
+ return appState.eflPlayerDatabase?.[entry.division]?.[entry.name]||null;
+}
+function aiLoanBorrowerRoster(entry){return aiLoanParentRoster(entry)}
+function processAIAutonomousLoans(){
+ const season=Number(appState.seasonYear)||2026;
+ if(Number(appState.aiLoansLastProcessedSeason||0)>=season)return [];
+ appState.aiLoansLastProcessedSeason=season;
+ const clubs=aiLoanClubEntries(),moved=[],outgoing=new Set(),incoming=new Set();
+ const targets=AI_SQUAD_TARGETS||{GK:3,DEF:8,MID:8,ATT:6};
+ const candidates=[];
+ for(const parent of clubs){
+  const roster=aiLoanParentRoster(parent);if(!Array.isArray(roster)||roster.length<19)continue;
+  const counts=aiSquadCounts(roster);
+  for(let index=0;index<roster.length;index++){
+   const p=roster[index];if(!p||p.loanStatus||p.youth||p.freeAgent||Number(p.aiLoanLastSeason)===season-1||Number(p.age)<18||Number(p.age)>23)continue;
+   const group=aiPosGroup(p),rating=Number(p.rating)||0,age=Number(p.age)||25;
+   if((counts[group]||0)<(targets[group]||6)+1)continue;
+   if(rating>parent.strength+1||rating<parent.strength-13)continue;
+   if(Number(p.apps||0)>7||Number(p.minutes||0)>750)continue;
+   if(Number(p.injured||0)>0)continue;
+   candidates.push({parent,index,p,group,score:(Number(p.potential)||rating)*.35-rating*.15+(23-age)*.8+(Number(p.minutes)||0)*-.002});
+  }
+ }
+ candidates.sort((a,b)=>b.score-a.score||String(a.p.name).localeCompare(String(b.p.name)));
+ for(const item of candidates){
+  const {parent,p,group}=item,parentKey=domesticClubKey(parent.name);
+  if(outgoing.has(parentKey)||p.loanStatus)continue;
+  const identity=playerCareerIdentity(p);
+  const destinations=clubs.filter(target=>{
+   if(target.name===parent.name||target.name===currentClub().name||incoming.has(domesticClubKey(target.name)))return false;
+   const gap=parent.strength-target.strength;if(gap<3||gap>18)return false;
+   const roster=aiLoanBorrowerRoster(target);if(!Array.isArray(roster)||roster.length>=24)return false;
+   if(roster.some(x=>playerCareerIdentity(x)===identity))return false;
+   const same=roster.filter(x=>aiPosGroup(x)===group),need=(targets[group]||6)-same.length;
+   if(need<=0)return false;
+   return (Number(p.rating)||0)>=target.strength-8;
+  }).sort((a,b)=>{
+   const score=x=>Math.abs((parent.strength-x.strength)-9)*.8+Math.max(0,(targets[group]||6)-aiLoanBorrowerRoster(x).filter(q=>aiPosGroup(q)===group).length)*-1;
+   return score(a)-score(b)||a.name.localeCompare(b.name);
+  });
+  if(!destinations.length)continue;
+  const borrower=destinations[0],source=aiLoanParentRoster(parent),target=aiLoanBorrowerRoster(borrower);
+  const at=source.findIndex(x=>playerCareerIdentity(x)===identity);if(at<0)continue;
+  const original=source.splice(at,1)[0],endDate=gameDateForWeek(season,38),startDate=gameDateForPreseason(season,1);
+  const loaned={...original,clubIndex:borrower.index,clubName:borrower.name,division:borrower.division,loanStatus:'in',aiManagedLoan:true,loanParentType:parent.type,loanParentClubIndex:parent.index,loanParentDivision:parent.division,loanParentClubName:parent.name,loanBorrowerType:borrower.type,loanBorrowerClubIndex:borrower.index,loanBorrowerDivision:borrower.division,loanBorrowerClubName:borrower.name,loanStartDate:startDate,loanEndDate:endDate,loanDurationWeeks:38,loanWageShare:.5,aiLoanLastSeason:season,careerId:original.careerId||identity};
+  placePlayerInRoster(target,loaned);
+  outgoing.add(parentKey);incoming.add(domesticClubKey(borrower.name));
+  const record={season,playerName:p.name,playerCareerId:identity,from:parent.name,to:borrower.name,position:group,fromDivision:parent.division,toDivision:borrower.division,endDate};
+  appState.aiLoanHistory=appState.aiLoanHistory||[];appState.aiLoanHistory.push(record);if(appState.aiLoanHistory.length>1000)appState.aiLoanHistory=appState.aiLoanHistory.slice(-1000);
+  appState.transferHistory=appState.transferHistory||[];appState.transferHistory.push({type:'ai-loan',playerName:p.name,playerCareerId:identity,from:parent.name,to:borrower.name,fee:0,week:1,seasonYear:season,transferDate:startDate,transferTypeLabel:'AI-utlån',loanEndDate:endDate,borrowerType:borrower.type,borrowerDivision:borrower.division});
+  moved.push(record);
+ }
+ if(moved.length){appState.log=appState.log||[];appState.log.push(`${moved.length} unge AI-spillere ble lånt ut for å få bedre muligheter til seniorfotball.`);}
+ return moved;
+}
+function archiveAIAutonomousLoanSpell(player,borrowerName){
+ const stats={};CAREER_STAT_KEYS.forEach(k=>stats[k]=Number(player[k])||0);
+ if(stats.apps||stats.minutes||stats.goals||stats.assists){
+  player.careerStats=player.careerStats&&typeof player.careerStats==='object'?player.careerStats:{};
+  CAREER_STAT_KEYS.forEach(k=>player.careerStats[k]=(Number(player.careerStats[k])||0)+stats[k]);
+  player.careerHistory=Array.isArray(player.careerHistory)?player.careerHistory:[];
+  const season=seasonLabel(),exists=player.careerHistory.some(x=>String(x.season)===`${season} · lån (${borrowerName})`);
+  if(!exists)player.careerHistory.push({season:`${season} · lån (${borrowerName})`,clubName:borrowerName,...stats,competitions:JSON.parse(JSON.stringify(player.competitionStats||{})),loanSpell:true});
+ }
+}
+function processAIAutonomousLoanReturns(today=gameDateForCurrentState()){
+ let returned=0;
+ const entries=aiLoanClubEntries();
+ for(const borrower of entries){
+  const roster=aiLoanBorrowerRoster(borrower);if(!Array.isArray(roster))continue;
+  const due=roster.filter(p=>p?.aiManagedLoan===true&&p.loanStatus==='in'&&String(p.loanEndDate||'')<=String(today));
+  for(const p of due){
+   const parentType=p.loanParentType||'pl',parentName=p.loanParentClubName||'',parentDivision=p.loanParentDivision||'',parentIndex=Number(p.loanParentClubIndex);
+   const parent=parentType==='efl'?appState.eflPlayerDatabase?.[parentDivision]?.[parentName]:appState.worldSquads?.[parentIndex];
+   if(!Array.isArray(parent))continue;
+   archiveAIAutonomousLoanSpell(p,borrower.name);
+   const identity=playerCareerIdentity(p);const returnedPlayer={...p,clubIndex:parentType==='pl'?parentIndex:-1,clubName:parentName,division:parentDivision||clubDivision(CLUBS[parentIndex])};
+   ['loanStatus','aiManagedLoan','loanParentType','loanParentClubIndex','loanParentDivision','loanParentClubName','loanBorrowerType','loanBorrowerClubIndex','loanBorrowerDivision','loanBorrowerClubName','loanStartDate','loanEndDate','loanDurationWeeks','loanWageShare','loanFee'].forEach(k=>delete returnedPlayer[k]);
+   CAREER_STAT_KEYS.forEach(k=>returnedPlayer[k]=0);returnedPlayer.competitionStats={};
+   const borrowerRoster=aiLoanBorrowerRoster(borrower);const ix=borrowerRoster.findIndex(x=>playerCareerIdentity(x)===identity);if(ix>=0)borrowerRoster.splice(ix,1);
+   placePlayerInRoster(parent,returnedPlayer);
+   if(parentType==='pl')syncEFLWorldRosterMirror(parentIndex);
+   appState.transferHistory=appState.transferHistory||[];appState.transferHistory.push({type:'loan-return',playerName:p.name,playerCareerId:identity,from:borrower.name,to:parentName,fee:0,week:Number(appState.week)||1,seasonYear:Number(appState.seasonYear)||2026,transferDate:today,transferTypeLabel:'AI-utlån avsluttet'});
+   appState.log=appState.log||[];appState.log.push(`${p.name} returnerte fra AI-utlån hos ${borrower.name} til ${parentName}.`);returned++;
+  }
+ }
+ return returned;
+}
+
 function processAIContractRenewals(completedSeasonYear=Number(appState.seasonYear)||2026){
  const season=Number(completedSeasonYear)||2026,all=[];let renewed=0,skipped=0;
  (appState.worldSquads||[]).forEach((roster,ci)=>{
@@ -4199,7 +4310,7 @@ function processAILeagueTransfers(week=appState.week){
   if(!sellers.length)continue;
   const seller=sellers[Math.floor(rng()*sellers.length)];
   const squad=appState.worldSquads[seller.i]||[];
-  const candidates=squad.map((p,idx)=>({p,idx})).filter(x=>aiPosGroup(x.p)===pos&&!playerMovedInCurrentWindow(x.p,movedThisWindow)).sort((a,b)=>{
+  const candidates=squad.map((p,idx)=>({p,idx})).filter(x=>aiPosGroup(x.p)===pos&&!x.p.loanStatus&&!playerMovedInCurrentWindow(x.p,movedThisWindow)).sort((a,b)=>{
    const score=x=>{const age=Number(x.p.age)||25,rating=Number(x.p.rating)||55,strength=Number(CLUBS[seller.i]?.strength)||65;return (rating>=strength+3?100:0)+(age>=33?-12:age>=30?-5:0)+(Number(x.p.wantsToLeave)?-18:0)+rating;};
    return score(a)-score(b);
   });
@@ -4246,9 +4357,9 @@ function processAIEuropeanTransfers(week=appState.week){
    const pos=positions.length?positions[Math.floor(rng()*positions.length)]:['GK','DEF','MID','ATT'][Math.floor(rng()*4)];
    const englishSellers=[];for(let ci=0;ci<Math.min(CLUBS.length,appState.worldSquads.length||CLUBS.length);ci++){if(ci===Number(appState.club))continue;const squad=appState.worldSquads[ci]||[];const counts=aiSquadCounts(squad);if(counts[pos]>AI_SQUAD_TARGETS[pos]||(squad.length>25&&counts[pos]>=AI_SQUAD_TARGETS[pos]))englishSellers.push({ci,squad});}
    if(!englishSellers.length)continue;seller=englishSellers[Math.floor(rng()*englishSellers.length)];sourceRoster=seller.squad;sourceName=CLUBS[seller.ci]?.name||'Engelsk klubb';sourceIndex=seller.ci;
-   const pool=sourceRoster.map((p,i)=>({p,i})).filter(x=>aiPosGroup(x.p)===pos&&!playerMovedInCurrentWindow(x.p,movedThisWindow)).sort((a,b)=>(Number(a.p.rating)||50)-(Number(b.p.rating)||50));if(!pool.length)continue;const chosen=pool[Math.floor(rng()*Math.max(1,Math.ceil(pool.length*.5)))];player=chosen.p;
+   const pool=sourceRoster.map((p,i)=>({p,i})).filter(x=>aiPosGroup(x.p)===pos&&!x.p.loanStatus&&!playerMovedInCurrentWindow(x.p,movedThisWindow)).sort((a,b)=>(Number(a.p.rating)||50)-(Number(b.p.rating)||50));if(!pool.length)continue;const chosen=pool[Math.floor(rng()*Math.max(1,Math.ceil(pool.length*.5)))];player=chosen.p;
   }else{
-   seller=records[Math.floor(rng()*records.length)];const counts=aiSquadCounts(seller.roster);const positions=Object.entries(counts).filter(([k,v])=>v>AI_SQUAD_TARGETS[k]||(seller.roster.length>25&&v>=AI_SQUAD_TARGETS[k])).map(([k])=>k);if(!positions.length)continue;const pos=positions[Math.floor(rng()*positions.length)];const pool=seller.roster.map((p,i)=>({p,i})).filter(x=>aiPosGroup(x.p)===pos&&!playerMovedInCurrentWindow(x.p,movedThisWindow)).sort((a,b)=>(Number(a.p.rating)||50)-(Number(b.p.rating)||50));if(!pool.length)continue;const chosen=pool[Math.floor(rng()*Math.max(1,Math.ceil(pool.length*.5)))];player=chosen.p;sourceRoster=seller.roster;sourceName=seller.name;
+   seller=records[Math.floor(rng()*records.length)];const counts=aiSquadCounts(seller.roster);const positions=Object.entries(counts).filter(([k,v])=>v>AI_SQUAD_TARGETS[k]||(seller.roster.length>25&&v>=AI_SQUAD_TARGETS[k])).map(([k])=>k);if(!positions.length)continue;const pos=positions[Math.floor(rng()*positions.length)];const pool=seller.roster.map((p,i)=>({p,i})).filter(x=>aiPosGroup(x.p)===pos&&!x.p.loanStatus&&!playerMovedInCurrentWindow(x.p,movedThisWindow)).sort((a,b)=>(Number(a.p.rating)||50)-(Number(b.p.rating)||50));if(!pool.length)continue;const chosen=pool[Math.floor(rng()*Math.max(1,Math.ceil(pool.length*.5)))];player=chosen.p;sourceRoster=seller.roster;sourceName=seller.name;
    const buyers=[];for(let ci=0;ci<Math.min(CLUBS.length,appState.worldSquads.length||CLUBS.length);ci++){if(ci===Number(appState.club))continue;const squad=appState.worldSquads[ci]||[];const needs=aiSquadNeeds(squad);if((needs[pos]>0||squad.length<21)&&Number(CLUBS[ci]?.budget||0)>0)buyers.push({ci,squad});}if(!buyers.length)continue;buyer=buyers[Math.floor(rng()*buyers.length)];
   }
   const id=String(player.careerId||player.id||normalisePlayerName(player.name));if(!id||playerMovedInCurrentWindow(player,movedThisWindow))continue;
@@ -7360,7 +7471,7 @@ function startNewSeason(){
  appState.squad.forEach(p=>{p.goals=0;p.assists=0;p.apps=0;p.minutes=0;p.yellowCards=0;p.redCards=0;p.chancesCreated=0;p.competitionStats={};p.injured=0;p.suspended=0;p.fitness=Math.max(85,p.fitness||90);p.form=6.5;p.morale=Math.max(60,Math.min(95,(p.morale||75)+Math.round(Math.random()*6-3)))});
  ensureAllPlayerContracts();if(Array.isArray(appState.worldSquads))appState.worldSquads[appState.club]=(appState.squad||[]).map(p=>({...p,attributes:{...(p.attributes||{})}}));
  appState.activeDivision=clubDivision(CLUBS[appState.club]);appState.table=activeLeagueClubs().map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
- appState.fixtures=[];ensureFixtures();appState.domesticVersion=0;appState.europeanCompetitions=null;appState.europeanSeason=null;appState.cupCompetitions=null;appState.domesticCalendar=[];appState.lastDomesticRound=0;initDomesticCompetitions();reviewAllClubFinancesForNewSeason(financeRankings,Number(appState.seasonYear)-1,movement);adjustWageBudgetsForNewSeason(finalTable,Number(appState.seasonYear)-1);ensureYouthAcademies(true);save();render();
+ appState.fixtures=[];ensureFixtures();appState.domesticVersion=0;appState.europeanCompetitions=null;appState.europeanSeason=null;appState.cupCompetitions=null;appState.domesticCalendar=[];appState.lastDomesticRound=0;initDomesticCompetitions();reviewAllClubFinancesForNewSeason(financeRankings,Number(appState.seasonYear)-1,movement);adjustWageBudgetsForNewSeason(finalTable,Number(appState.seasonYear)-1);ensureYouthAcademies(true);const aiLoans=processAIAutonomousLoans();appState.lastSeasonSummary.aiLoans=aiLoans.length;save();render();
 }
 
 function startNewCareer(){
@@ -10517,7 +10628,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.73 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.75 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){

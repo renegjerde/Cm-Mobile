@@ -1,0 +1,9 @@
+{
+  "years": 10,
+  "aiClubs": 23,
+  "loanedPlayers": 55,
+  "completedReturns": 55,
+  "peakConcurrentLoans": 11,
+  "duplicateCareerIdentities": 0,
+  "allLoansReturned": true
+}
