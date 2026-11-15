@@ -1,0 +1,70 @@
+{
+  "version": "3.78",
+  "regressionSuites": [
+    {
+      "name": "ai_transfer_tests_v372.js",
+      "passed": true
+    },
+    {
+      "name": "world_development_tests_v372_regression.js",
+      "passed": true
+    },
+    {
+      "name": "world_planning_tests_v373.js",
+      "passed": true
+    },
+    {
+      "name": "long_horizon_planning_tests_v373.js",
+      "passed": true
+    },
+    {
+      "name": "academy_pathway_tests_v374.js",
+      "passed": true
+    },
+    {
+      "name": "academy_season_integration_v374.js",
+      "passed": true
+    },
+    {
+      "name": "academy_long_horizon_v374.js",
+      "passed": true
+    },
+    {
+      "name": "ai_loan_tests_v375.js",
+      "passed": true
+    },
+    {
+      "name": "ai_loan_long_horizon_v375.js",
+      "passed": true
+    },
+    {
+      "name": "ai_youth_loan_monitor_tests_v376.js",
+      "passed": true
+    },
+    {
+      "name": "european_academy_integration_v376.js",
+      "passed": true
+    },
+    {
+      "name": "ai_loan_tests_v376_regression.js",
+      "passed": true
+    },
+    {
+      "name": "ai_loan_long_horizon_v376.js",
+      "passed": true
+    },
+    {
+      "name": "ai_european_market_tests_v378.js",
+      "passed": true
+    }
+  ],
+  "regressionSuitesPassed": 14,
+  "targetedTests": 9,
+  "targetedTestsPassed": 9,
+  "inlineSyntaxBlocks": 3,
+  "inlineSyntaxPassed": true,
+  "sqlSchemaChanged": false,
+  "browserUiTest": false,
+  "supabaseRoundTripTest": false,
+  "allPassed": true
+}

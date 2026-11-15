@@ -1,0 +1,22 @@
+{
+  "version": "3.78",
+  "blocks": 3,
+  "passed": 3,
+  "results": [
+    {
+      "block": 0,
+      "passed": true,
+      "stderr": ""
+    },
+    {
+      "block": 1,
+      "passed": true,
+      "stderr": ""
+    },
+    {
+      "block": 2,
+      "passed": true,
+      "stderr": ""
+    }
+  ]
+}
