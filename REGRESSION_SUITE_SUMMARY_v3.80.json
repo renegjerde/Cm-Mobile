@@ -1,0 +1,398 @@
+{
+  "version": "3.80",
+  "suiteCount": 10,
+  "passedSuites": 10,
+  "allPassed": true,
+  "suites": [
+    {
+      "suite": "uefa_ai_prize_distribution",
+      "file": "uefa_prize_distribution_tests_v380.js",
+      "passed": true,
+      "result": {
+        "passed": 9,
+        "paid": 9,
+        "duplicateRunEntries": 0,
+        "plBudget": 31.9,
+        "europeBudget": 51.1,
+        "eflBudget": 4.7,
+        "userBudget": 20
+      }
+    },
+    {
+      "suite": "uefa_user_prize_parity",
+      "file": "user_uefa_prize_parity_v380.js",
+      "passed": true,
+      "result": {
+        "passed": 4,
+        "finalistLoser": 28,
+        "finalWinner": 53,
+        "semiWinner": 23,
+        "financeMirror": 53
+      }
+    },
+    {
+      "suite": "european_finance",
+      "file": "finance_v379_tests.js",
+      "passed": true,
+      "result": {
+        "passed": 14,
+        "clubs": 2,
+        "weeklyCashFlow": true,
+        "wageBills": true,
+        "annualReview": true,
+        "elite": {
+          "incomeM": 2.278,
+          "wageBillK": 550,
+          "weeklyNetM": 1.728,
+          "budget": -52.5
+        },
+        "small": {
+          "incomeM": 0.419,
+          "wageBillK": 198,
+          "weeklyNetM": 0.221,
+          "budget": 22
+        }
+      }
+    },
+    {
+      "suite": "transfer_negotiations",
+      "file": "ai_european_market_tests_v378.js",
+      "passed": true,
+      "result": {
+        "version": "3.78",
+        "tests": 9,
+        "passed": 9,
+        "results": [
+          {
+            "scenario": "europe-to-europe",
+            "transfer": {
+              "type": "ai-european-market",
+              "playerName": "ESGK0",
+              "playerCareerId": "ESGK0",
+              "from": "Euro Seller",
+              "to": "Euro Buyer",
+              "fee": 10.09,
+              "week": 1,
+              "seasonYear": 2026,
+              "transferDate": "2026-07-01",
+              "calendarPhase": "preseason",
+              "preseasonWeek": 1,
+              "transferTypeLabel": "AI-overgang Europa–Europa",
+              "position": "GK",
+              "fromType": "european",
+              "toType": "european",
+              "askingPrice": 10,
+              "negotiationRounds": 1,
+              "weeklyWage": 21,
+              "contractYears": 4
+            },
+            "sourceRemaining": 50,
+            "uniqueCareerIdentityCopies": 1,
+            "CAandPApreserved": true,
+            "eflFinanceSynchronized": true
+          },
+          {
+            "scenario": "wage-budget-block",
+            "transferBlocked": true,
+            "reason": "wage-budget",
+            "historyRecorded": true
+          },
+          {
+            "scenario": "efl-to-europe",
+            "transfer": {
+              "type": "ai-european-market",
+              "playerName": "EFSGK0",
+              "playerCareerId": "EFSGK0",
+              "from": "EFL Seller",
+              "to": "Euro Buyer",
+              "fee": 10.09,
+              "week": 1,
+              "seasonYear": 2026,
+              "transferDate": "2026-07-01",
+              "calendarPhase": "preseason",
+              "preseasonWeek": 1,
+              "transferTypeLabel": "AI-overgang internasjonal",
+              "position": "GK",
+              "fromType": "efl",
+              "toType": "european",
+              "askingPrice": 10,
+              "negotiationRounds": 1,
+              "weeklyWage": 21,
+              "contractYears": 4
+            },
+            "sourceRemaining": 50,
+            "uniqueCareerIdentityCopies": 1,
+            "CAandPApreserved": true,
+            "eflFinanceSynchronized": true
+          },
+          {
+            "scenario": "europe-to-efl",
+            "transfer": {
+              "type": "ai-european-market",
+              "playerName": "ESGK0",
+              "playerCareerId": "ESGK0",
+              "from": "Euro Seller",
+              "to": "EFL Buyer",
+              "fee": 10.09,
+              "week": 1,
+              "seasonYear": 2026,
+              "transferDate": "2026-07-01",
+              "calendarPhase": "preseason",
+              "preseasonWeek": 1,
+              "transferTypeLabel": "AI-overgang internasjonal",
+              "position": "GK",
+              "fromType": "european",
+              "toType": "efl",
+              "askingPrice": 10,
+              "negotiationRounds": 1,
+              "weeklyWage": 21,
+              "contractYears": 4
+            },
+            "sourceRemaining": 50,
+            "uniqueCareerIdentityCopies": 1,
+            "CAandPApreserved": true,
+            "eflFinanceSynchronized": true
+          },
+          {
+            "scenario": "europe-to-pl",
+            "transfer": {
+              "type": "ai-european-market",
+              "playerName": "ESGK0",
+              "playerCareerId": "ESGK0",
+              "from": "Euro Seller",
+              "to": "PL Buyer",
+              "fee": 10.09,
+              "week": 1,
+              "seasonYear": 2026,
+              "transferDate": "2026-07-01",
+              "calendarPhase": "preseason",
+              "preseasonWeek": 1,
+              "transferTypeLabel": "AI-overgang internasjonal",
+              "position": "GK",
+              "fromType": "european",
+              "toType": "pl",
+              "askingPrice": 10,
+              "negotiationRounds": 1,
+              "weeklyWage": 21,
+              "contractYears": 4
+            },
+            "sourceRemaining": 75,
+            "uniqueCareerIdentityCopies": 1,
+            "CAandPApreserved": true,
+            "eflFinanceSynchronized": true
+          },
+          {
+            "scenario": "efl-world-to-europe",
+            "transfer": {
+              "type": "ai-european-market",
+              "playerName": "EFSWGK0",
+              "playerCareerId": "EFSWGK0",
+              "from": "EFL Seller",
+              "to": "Euro Buyer",
+              "fee": 10.09,
+              "week": 1,
+              "seasonYear": 2026,
+              "transferDate": "2026-07-01",
+              "calendarPhase": "preseason",
+              "preseasonWeek": 1,
+              "transferTypeLabel": "AI-overgang internasjonal",
+              "position": "GK",
+              "fromType": "pl",
+              "toType": "european",
+              "askingPrice": 10,
+              "negotiationRounds": 1,
+              "weeklyWage": 21,
+              "contractYears": 4
+            },
+            "sourceRemaining": 50,
+            "uniqueCareerIdentityCopies": 1,
+            "CAandPApreserved": true,
+            "eflFinanceSynchronized": true
+          },
+          {
+            "scenario": "europe-to-efl-world",
+            "transfer": {
+              "type": "ai-european-market",
+              "playerName": "ESGK0",
+              "playerCareerId": "ESGK0",
+              "from": "Euro Seller",
+              "to": "EFL Buyer",
+              "fee": 10.09,
+              "week": 1,
+              "seasonYear": 2026,
+              "transferDate": "2026-07-01",
+              "calendarPhase": "preseason",
+              "preseasonWeek": 1,
+              "transferTypeLabel": "AI-overgang internasjonal",
+              "position": "GK",
+              "fromType": "european",
+              "toType": "pl",
+              "askingPrice": 10,
+              "negotiationRounds": 1,
+              "weeklyWage": 21,
+              "contractYears": 4
+            },
+            "sourceRemaining": 50,
+            "uniqueCareerIdentityCopies": 1,
+            "CAandPApreserved": true,
+            "eflFinanceSynchronized": true
+          },
+          {
+            "scenario": "manager-exclusion-and-domestic-market-coverage",
+            "managerClubExcluded": true,
+            "premierLeagueAIIncluded": true,
+            "eflAIIncluded": true,
+            "canonicalEFLWorldSquadRecognized": true
+          },
+          {
+            "scenario": "negotiation-edge-cases",
+            "accepted": {
+              "accepted": true,
+              "fee": 18.78,
+              "finalOffer": 18.78,
+              "askingPrice": 20,
+              "sellerReservation": 17.2,
+              "rounds": 0,
+              "wageDemand": 28,
+              "contractYears": 4,
+              "remainingContractYears": 1,
+              "reason": "accepted"
+            },
+            "insufficientBudgetRejected": true,
+            "contractLengthInfluencesPrice": true,
+            "wantsToLeaveInfluencesPrice": true
+          }
+        ]
+      }
+    },
+    {
+      "suite": "ai_loans",
+      "file": "ai_loan_tests_v376_regression.js",
+      "passed": true,
+      "result": {
+        "version": "3.75",
+        "testFixtures": 2,
+        "checksPassed": 17,
+        "plLoanCreated": 1,
+        "duplicateSeasonRun": 0,
+        "plLoanReturned": 1,
+        "plWageSplitCorrect": true,
+        "loanAppsArchived": 14,
+        "identityPreserved": true,
+        "metadataCleared": true,
+        "idempotentReturn": true,
+        "eflLoanCreated": 1,
+        "eflLoanReturned": 1,
+        "loanedPlayerSelectedForAILeagueXI": true,
+        "eflWageSplitCorrect": true,
+        "loanedPlayersProtectedFromAIResale": true,
+        "seasonAndWeeklyReturnHooks": true,
+        "blockedWithoutPositionalNeed": true
+      }
+    },
+    {
+      "suite": "youth_loan_monitoring",
+      "file": "ai_youth_loan_monitor_tests_v376.js",
+      "passed": true,
+      "result": {
+        "version": "3.76",
+        "europeanAcademyPromotion": true,
+        "europeanRosterPreserved": true,
+        "duplicateIdentityBlocked": true,
+        "underusedLoanRecall": 1,
+        "recallHistory": 1,
+        "regularLoaneeProtected": true,
+        "passed": true
+      }
+    },
+    {
+      "suite": "european_academies",
+      "file": "european_academy_integration_v376.js",
+      "passed": true,
+      "result": {
+        "europeanAcademyAddedToSeasonCycle": true,
+        "seasonPromotionIntoCanonicalEuropeanRoster": true,
+        "academyVacanciesRefilled": true,
+        "europeanYouthAbilityScaledToClubStrength": 62,
+        "passed": true
+      }
+    },
+    {
+      "suite": "academy_pathways",
+      "file": "academy_pathway_tests_v374.js",
+      "passed": true,
+      "result": {
+        "premierLeaguePromotion": true,
+        "userClubExcluded": true,
+        "onePromotionPerClubSeason": true,
+        "ageAndQualityGates": true,
+        "eflCanonicalRosterPromotion": true,
+        "wageCeilingEnforced": true,
+        "duplicateIdentityBlocked": true,
+        "seasonTransitionHook": true,
+        "passed": true
+      }
+    },
+    {
+      "suite": "long_horizon_squad_planning",
+      "file": "long_horizon_planning_tests_v373.js",
+      "passed": true,
+      "result": {
+        "seasons": 10,
+        "aiClubs": 24,
+        "initialPlayers": 576,
+        "renewals": 1499,
+        "expiredWithoutRenewal": 393,
+        "duplicateCareerIds": 0,
+        "peakRoster": 24,
+        "wageBudgetViolations": 0,
+        "allRenewalsWithinWagePolicy": true,
+        "passed": true
+      }
+    },
+    {
+      "suite": "long_horizon_player_development",
+      "file": "world_development_tests_v372_regression.js",
+      "passed": true,
+      "result": {
+        "version": "3.72-regression",
+        "scenarioPlayers": 3000,
+        "years": 10,
+        "matchCohorts": {
+          "manager": {
+            "players": 1000,
+            "averageMatchGains": 7.77,
+            "averageFinalCA": 62.74,
+            "maxFinalCA": 84
+          },
+          "premierLeagueAI": {
+            "players": 1000,
+            "averageMatchGains": 7.761,
+            "averageFinalCA": 62.74,
+            "maxFinalCA": 84
+          },
+          "eflAI": {
+            "players": 1000,
+            "averageMatchGains": 9.148,
+            "averageFinalCA": 64.12,
+            "maxFinalCA": 84
+          }
+        },
+        "academy": {
+          "players": 5000,
+          "totalAnnualDevelopmentEvents": 6724,
+          "averageFinalCA": 50.44,
+          "potentialViolations": 0
+        },
+        "invariants": {
+          "duplicateFixtureIdempotent": true,
+          "zeroMinutesNoDevelopment": true,
+          "allPlayerGroupsWithinPA": true,
+          "academyWithinPA": true,
+          "legacyAttributesUntouched": true,
+          "allFiveIntegrationPathsPresent": true
+        }
+      }
+    }
+  ]
+}

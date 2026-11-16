@@ -6492,10 +6492,79 @@ function awardUserCompetitionMatch(competition,roundNo,homeName,awayName,ga,gb,w
  }else if(base==='cup'&&winnerName===user){
   const round=Number(roundNo)||1;const amount=Number(prize.rounds?.[round])||prize.win||0;
   awardCompetitionPrize(`${competition} · avansement`,amount,`${competition}|round|${round}`,`runde ${round}`);
- }else if(isKnockout&&winnerName===user){
-  const round=Number(roundNo)||1;const stageAmount=round>=4?prize.rounds?.champion:round===3?prize.rounds?.semi:round===2?prize.rounds?.quarter:prize.rounds?.round16;
-  awardCompetitionPrize(`${competition} · sluttspillavansement`,Number(stageAmount)||prize.win,`${competition}|knockout|${round}`,`runde ${round}`);
+ }else if(isKnockout&&base==='europe'){
+  const round=Number(roundNo)||1;
+  if(round>=5){
+   const finalistAmount=Number(prize.rounds?.final)||0;
+   awardCompetitionPrize(`${competition} · finalistpremie`,finalistAmount,`${competition}|finalist`,'finaledeltakelse');
+   if(winnerName===user)awardCompetitionPrize(`${competition} · turneringsseier`,Number(prize.rounds?.champion)||0,`${competition}|champion`,'turneringsvinner');
+  }else if(winnerName===user){
+   const stageKey=round===4?'semi':round===3?'quarter':round===2?'round16':'playoff';
+   const stageAmount=Number(prize.rounds?.[stageKey])||prize.win||0;
+   awardCompetitionPrize(`${competition} · sluttspillavansement`,stageAmount,`${competition}|knockout|${round}`,`runde ${round}`);
+  }
  }
+}
+function awardAIClubCompetitionPrize(clubName,amount,uniqueKey,detail=''){
+ amount=Number(amount)||0;if(amount<=0||!clubName||clubName===currentClub().name)return false;
+ const season=Number(appState.seasonYear)||2026;
+ appState.clubCompetitionPrizeLedger=Array.isArray(appState.clubCompetitionPrizeLedger)?appState.clubCompetitionPrizeLedger:[];
+ const key=`${season}|${clubName}|${uniqueKey}`;
+ if(appState.clubCompetitionPrizeLedger.some(x=>x.key===key))return false;
+ let budget=0,kind='';
+ const europeanMeta=appState.europeanTransferClubData?.[clubName];
+ const plIndex=CLUBS.findIndex(c=>c.name===clubName);
+ let lowerRow=null;
+ if(plIndex>=0){kind='pl';budget=Number(CLUBS[plIndex].budget)||Number(appState.clubFinances?.[clubName]?.transferBudget)||0;}
+ else if(europeanMeta){kind='europe';budget=Number(europeanMeta.budget)||Number(appState.clubFinances?.[clubName]?.transferBudget)||0;}
+ else{
+  for(const [division,league] of Object.entries(appState.lowerLeagues||{})){
+   const row=(league.rows||[]).find(c=>c.name===clubName);
+   if(row){kind='efl';lowerRow=row;budget=Number(row.budget)||Number(appState.clubFinances?.[clubName]?.transferBudget)||0;break;}
+  }
+ }
+ if(!kind)return false;
+ const next=+(budget+amount).toFixed(2);
+ if(kind==='pl')CLUBS[plIndex].budget=next;
+ else if(kind==='europe')europeanMeta.budget=next;
+ else lowerRow.budget=next;
+ const finance=appState.clubFinances?.[clubName];if(finance)finance.transferBudget=next;
+ appState.clubCompetitionPrizeLedger.push({key,season,club:clubName,competitionPrize:true,amount,detail,week:Number(appState.week)||1});
+ if(appState.clubCompetitionPrizeLedger.length>5000)appState.clubCompetitionPrizeLedger=appState.clubCompetitionPrizeLedger.slice(-5000);
+ return true;
+}
+function distributeEuropeanCompetitionPrizesAtSeasonEnd(){
+ const paid=[];const season=Number(appState.seasonYear)||2026;
+ for(const [competition,comp] of Object.entries(appState.europeanCompetitions||{})){
+  const prize=COMPETITION_PRIZES[competition];if(!prize||!comp)continue;
+  const clubs=[...new Set((comp.teams||[]).map(t=>t?.name).filter(Boolean))];
+  for(const club of clubs){if(awardAIClubCompetitionPrize(club,prize.participation,`${competition}|participation`,'UEFA-deltakelse'))paid.push({club,competition,amount:prize.participation,reason:'participation'});}
+  for(const result of comp.results||[]){
+   if(!result||result.isEuropeanKnockout||!result.isLeaguePhase)continue;
+   const score=europeanResultScore(result);if(!score)continue;
+   const outcomes=[{club:result.home,for:score.home,against:score.away},{club:result.away,for:score.away,against:score.home}];
+   for(const outcome of outcomes){
+    const amount=outcome.for>outcome.against?prize.win:outcome.for===outcome.against?prize.draw:0;
+    if(amount>0&&awardAIClubCompetitionPrize(outcome.club,amount,`${competition}|${outcome.for>outcome.against?'win':'draw'}|${result.round}|${result.gameNo??result.home+'|'+result.away}` ,`UEFA-ligafase runde ${result.round}`))paid.push({club:outcome.club,competition,amount,reason:'league-result'});
+   }
+  }
+  const stageMap={playoff:'playoff',round16:'round16',quarterfinal:'quarter',semifinal:'semi'};
+  for(const result of comp.results||[]){
+   if(!result?.isEuropeanKnockout||!result.tieWinner)continue;
+   const prizeKey=stageMap[result.knockoutStageKey];if(!prizeKey)continue;
+   const amount=Number(prize.rounds?.[prizeKey])||0;
+   if(amount>0&&awardAIClubCompetitionPrize(result.tieWinner,amount,`${competition}|advance|${result.knockoutStageKey}|${result.tieId||result.round}`,`UEFA-avansement: ${result.knockoutStageName||prizeKey}`))paid.push({club:result.tieWinner,competition,amount,reason:'knockout-advance'});
+  }
+  const finalResults=(comp.results||[]).filter(r=>r?.isEuropeanKnockout&&r.knockoutStageKey==='final');
+  if(finalResults.length){
+   const finalists=[...new Set(finalResults.flatMap(r=>[r.home,r.away]).filter(Boolean))];
+   for(const club of finalists){const amount=Number(prize.rounds?.final)||0;if(amount>0&&awardAIClubCompetitionPrize(club,amount,`${competition}|finalist`, 'UEFA-finale'))paid.push({club,competition,amount,reason:'finalist'});}
+  }
+  if(comp.champion){const amount=Number(prize.rounds?.champion)||0;if(amount>0&&awardAIClubCompetitionPrize(comp.champion,amount,`${competition}|champion`,'UEFA-turneringsvinner'))paid.push({club:comp.champion,competition,amount,reason:'champion'});}
+ }
+ if(paid.length){appState.log=appState.log||[];appState.log.push(`${paid.length} UEFA-premieutbetalinger er fordelt til AI-klubber ved sesongslutt.`);}
+ appState.lastEuropeanPrizeDistribution={season,entries:paid.length,total: +paid.reduce((sum,x)=>sum+x.amount,0).toFixed(2)};
+ return paid;
 }
 function awardLeaguePositionPrize(finalTable,divisionOverride=null){
  const rank=(finalTable||[]).findIndex(t=>t.name===currentClub().name)+1;const division=divisionOverride||clubDivision(currentClub());
@@ -7640,6 +7709,7 @@ function startNewSeason(){
  if(!seasonCompleted()){alert("Spill ferdig sesongen før du starter en ny.");return}
  initDomesticCompetitions();processScheduledDomesticCups(Math.max(Number(appState.week)||1,38));
  if(appState.pendingCupMatch&&["FA Cup","EFL Cup"].includes(appState.pendingCupMatch.competition)){alert("En nasjonal cupkamp gjenstår. Spill cupkampen før du starter neste sesong.");startPendingCupMatch();return}
+ if(appState.pendingCupMatch?.isEuropean){alert("En europeisk cupkamp gjenstår. Spill den siste europacupkampen før du starter neste sesong, slik at turneringspremiene kan fordeles korrekt.");startPendingCupMatch();return}
  if(!confirm(`Starte sesongen ${Number(appState.seasonYear)+1}/${String(Number(appState.seasonYear)+2).slice(-2)}? Klubben og troppen beholdes, mens tabell og sesongstatistikk nullstilles.`))return;
  const finalTable=sortedTable();
  const previousDivision=clubDivision(currentClub());
@@ -7655,6 +7725,7 @@ function startNewSeason(){
  // Commit end-of-season rewards and career archives only after membership validation succeeds.
  appState.lastSeasonSummary=summaryDraft;
  awardLeaguePositionPrize(finalTable,previousDivision);
+ const europeanPrizePayments=distributeEuropeanCompetitionPrizesAtSeasonEnd();appState.lastSeasonSummary.europeanPrizePayments=europeanPrizePayments.length;
  appState.lastSeasonSummary.careerArchive=archivePlayerSeasonStats();
  appState.lastSeasonSummary.movement=movement;appState.lastSeasonSummary.promoted={toPremierLeague:[...(movement.promoted?.Championship||[])],toChampionship:[...(movement.promoted?.['League One']||[])],toLeagueOne:[...(movement.promoted?.['League Two']||[])],toLeagueTwo:[...(movement.promoted?.['National League']||[])],fromRegionalNonLeague:[...(movement.regionalPromoted||[])]};
  ensureTransferPool();const aiRenewals=processAIContractRenewals(Number(appState.seasonYear)||2026);appState.lastSeasonSummary.aiContractRenewals=aiRenewals.renewed;const expiredContracts=processExpiredContracts(Number(appState.seasonYear)||2026);appState.lastSeasonSummary.expiredContracts=expiredContracts;
@@ -10827,7 +10898,7 @@ function restoreMissingPLU21PlayersV324(){
  return {added,skipped};
 }
 
-function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.79 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
+function render(){migrateLeagueSystemSchemaV333();syncActiveDivisionToLowerLeague();invalidateMarketPlayerCache();restoreMissingPLU21PlayersV324();normalizeTransferHistory();if(appState.page!=="tactics"){appState.pitchSelectedSlot=null;appState.pitchPickerAnchor=null;}const pageChanged=lastRenderedPage!==appState.page;lastRenderedPage=appState.page;ensureCareerSystems();expirePendingTransferOffersOutsideWindow();ensureFixtures();repairOvercountedPremierLeagueTableV328();syncManagerNotifications();initDomesticCompetitions();initClubFinances();ensureYouthAcademies();ensureEuropeanCompetitions();ensureEuropeanTransferWorld();document.getElementById("topSeason").textContent=`TOUCHLINE EDITION · v3.80 · ${seasonLabel()} · ${appState.activeDivision||clubDivision(currentClub())} · ${appState.preseasonActive?`PRE-SEASON ${Number(appState.preseasonWeek)||1}/${Number(appState.preseasonWeeks)||4}`:seasonCompleted()?"SESONGSLUTT":"RUNDE "+appState.week}`;document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===appState.page));let pages={home,squad,tactics,transfers,finance:financePage,academy:youthAcademyPage,league,competitions,season:seasonSummary,playerCareer:playerCareerPage};document.getElementById("app").innerHTML=(pages[appState.page]||home)()+transferWindowReportModal();if(!window.__cmLastSaveAt||Date.now()-window.__cmLastSaveAt>350)save();if(pageChanged){window.scrollTo(0,0);requestAnimationFrame(()=>window.scrollTo(0,0));setTimeout(()=>window.scrollTo(0,0),40)}}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
 document.getElementById("careersBtn").addEventListener("click",openCareerManager);
 function openGameManual(){

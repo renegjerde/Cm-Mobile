@@ -1,0 +1,10 @@
+{
+  "version": "3.76",
+  "europeanAcademyPromotion": true,
+  "europeanRosterPreserved": true,
+  "duplicateIdentityBlocked": true,
+  "underusedLoanRecall": 1,
+  "recallHistory": 1,
+  "regularLoaneeProtected": true,
+  "passed": true
+}

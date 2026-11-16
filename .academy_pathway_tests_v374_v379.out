@@ -1,0 +1,11 @@
+{
+  "premierLeaguePromotion": true,
+  "userClubExcluded": true,
+  "onePromotionPerClubSeason": true,
+  "ageAndQualityGates": true,
+  "eflCanonicalRosterPromotion": true,
+  "wageCeilingEnforced": true,
+  "duplicateIdentityBlocked": true,
+  "seasonTransitionHook": true,
+  "passed": true
+}
