@@ -1,0 +1,21 @@
+{
+  "release": "4.0",
+  "passed": 14,
+  "failed": 0,
+  "checks": [
+    "classic edition document title",
+    "visible header has no version tag",
+    "header season has no build branding",
+    "manual/help button removed",
+    "tactics instructional paragraphs removed",
+    "bench instructional copy removed",
+    "match-result instructional hint removed",
+    "technical squad diagnostics not exposed in squad page",
+    "player profiles retained",
+    "clickable squad and opponent XI retained",
+    "career save path retained",
+    "cloud sync path retained",
+    "classic palette and squared panels present",
+    "responsive desktop command strip present"
+  ]
+}

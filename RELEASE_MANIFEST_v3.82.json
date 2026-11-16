@@ -1,0 +1,78 @@
+{
+  "version": "3.82",
+  "release": "Detailed Player Profiles",
+  "entrypoint": "index.html",
+  "sql_changed": false,
+  "sql_sha256": "a72b7bb4b28e7a6e18be76e7848656f62e398b80ec68d45a0fab5ce5472dc983",
+  "tests": {
+    "player_profile": {
+      "version": "3.82",
+      "passed": 9,
+      "failed": 0,
+      "checks": [
+        "European permanent roster player resolves by career identity",
+        "Youth academy prospect resolves",
+        "Opponent XI clone resolves to its source player ID",
+        "Profile renders all eleven attributes and CA/PA",
+        "Profile renders current and archived career statistics",
+        "Profile renders transfer history and contract details",
+        "Opening profile preserves club-roster modal as return destination",
+        "Back returns to original club roster modal",
+        "Player-profile entry point is wired from squad and club/lineup modal"
+      ]
+    },
+    "club_roster_and_xi": {
+      "version": "3.82",
+      "passed": 21,
+      "failed": 0,
+      "checks": [
+        "current Premier League club resolves to manager squad",
+        "other Premier League club resolves to world squad",
+        "Premier League club in UEFA table still resolves domestic squad",
+        "manager EFL club resolves to live squad",
+        "other EFL club resolves to EFL database",
+        "European club resolves to permanent European roster",
+        "club roster modal opens and shows squad details",
+        "domestic opponent preview builds eleven players",
+        "domestic opponent preview uses match formation",
+        "clicking manager team opens full squad",
+        "European cup opponent preview uses competition roster",
+        "null clubIndex does not misidentify opponent as manager club",
+        "modal has accessible dialog and close action",
+        "club roster and opponent XI rows expose player profile links",
+        "UI wiring: domesticStandings",
+        "UI wiring: uefaStandings",
+        "UI wiring: lowerDivisionTables",
+        "UI wiring: seasonSummaryTable",
+        "UI wiring: matchHome",
+        "UI wiring: matchAway",
+        "UI wiring: modalInRender"
+      ]
+    },
+    "inline_script_syntax": {
+      "version": "3.82",
+      "blocks": 3,
+      "results": [
+        {
+          "block": 1,
+          "passed": true,
+          "stderr": ""
+        },
+        {
+          "block": 2,
+          "passed": true,
+          "stderr": ""
+        },
+        {
+          "block": 3,
+          "passed": true,
+          "stderr": ""
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "No full interactive browser test",
+    "No Supabase round-trip test"
+  ]
+}

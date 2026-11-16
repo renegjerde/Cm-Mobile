@@ -1,0 +1,17 @@
+{
+  "version": "3.82",
+  "passed": 9,
+  "failed": 0,
+  "checks": [
+    "European permanent roster player resolves by career identity",
+    "Youth academy prospect resolves",
+    "Opponent XI clone resolves to its source player ID",
+    "Profile renders all eleven attributes and CA/PA",
+    "Profile renders current and archived career statistics",
+    "Profile renders transfer history and contract details",
+    "Opening profile preserves club-roster modal as return destination",
+    "Back returns to original club roster modal",
+    "Player-profile entry point is wired from squad and club/lineup modal"
+  ],
+  "release": "4.0"
+}

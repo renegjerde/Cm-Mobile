@@ -1,0 +1,17 @@
+{
+  "release": "4.0",
+  "name": "CM Mobile Classic Edition",
+  "base": "v3.82",
+  "entrypoint": "index.html",
+  "database_changed": false,
+  "sql_sha256": "a72b7bb4b28e7a6e18be76e7848656f62e398b80ec68d45a0fab5ce5472dc983",
+  "validation": {
+    "inline_js": "2/2 executable blocks",
+    "club_roster_opponent_xi": "21/21",
+    "player_profiles": "9/9",
+    "classic_ui": "14/14",
+    "zip_crc": "passed"
+  },
+  "browser_manual_test": "not completed",
+  "supabase_round_trip": "not completed"
+}

@@ -1,0 +1,18 @@
+const fs=require('fs');
+const s=fs.readFileSync(__dirname+'/index.html','utf8');
+const checks=[];const ok=(name,cond)=>{if(!cond)throw new Error(name);checks.push(name)};
+ok('classic edition document title',s.includes('<title>CM Mobile — Classic Edition</title>'));
+ok('visible header has no version tag',!/<small class="version-tag">/.test(s));
+ok('header season has no build branding',!s.includes('TOUCHLINE EDITION')&&!s.includes('v3.82 · ${seasonLabel()}'));
+ok('manual/help button removed',!s.includes('id="manualBtn"')&&!s.includes('function openGameManual('));
+ok('tactics instructional paragraphs removed',!s.includes('Trykk på spilleren eller posisjonen på banen.')&&!s.includes('Ingen dra-og-slipp.'));
+ok('bench instructional copy removed',!s.includes('Reserver vises nederst, sortert etter taktisk rolle.'));
+ok('match-result instructional hint removed',!s.includes('Trykk for mål, kort og skader'));
+ok('technical squad diagnostics not exposed in squad page',!s.includes('${squadDiagnosticsPanel(all)}'));
+ok('player profiles retained',s.includes('function playerCareerPage(')&&s.includes('openPlayerCareer('));
+ok('clickable squad and opponent XI retained',s.includes('openMatchTeamRoster(\'home\')')&&s.includes('openMatchTeamRoster(\'away\')'));
+ok('career save path retained',s.includes('function save(')&&s.includes('careerSaveKey('));
+ok('cloud sync path retained',s.includes('function cmCloudUpsert('));
+ok('classic palette and squared panels present',s.includes('--panel:#e7ebee')&&s.includes('border-radius:2px'));
+ok('responsive desktop command strip present',s.includes('@media(min-width:800px)')&&s.includes('position:fixed;top:53px'));
+console.log(JSON.stringify({release:'4.0',passed:checks.length,failed:0,checks},null,2));
