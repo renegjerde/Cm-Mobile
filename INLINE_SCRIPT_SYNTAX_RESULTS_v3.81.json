@@ -1,0 +1,19 @@
+{
+  "version": "3.81",
+  "inlineScriptBlocks": 3,
+  "results": [
+    {
+      "block": 1,
+      "status": "PASS"
+    },
+    {
+      "block": 2,
+      "status": "PASS"
+    },
+    {
+      "block": 3,
+      "status": "PASS"
+    }
+  ],
+  "testHarnessSyntax": "PASS"
+}

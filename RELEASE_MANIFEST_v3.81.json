@@ -1,0 +1,387 @@
+{
+  "version": "3.81",
+  "release": "Clickable Club Squads & Opponent Starting XI",
+  "fileCount": 77,
+  "files": [
+    {
+      "path": ".academy_pathway_tests_v374_v379.out",
+      "bytes": 288,
+      "sha256": "997dacb48f6579dc44b4396340170ee9662caff939fa1725b6809c4a93a7b627"
+    },
+    {
+      "path": ".ai_european_market_tests_v378_v379.out",
+      "bytes": 5778,
+      "sha256": "26b32ae5796c667c84eca768f3742458f91be5d6b2ce52239536200b25c9452d"
+    },
+    {
+      "path": ".ai_youth_loan_monitor_tests_v376_v379.out",
+      "bytes": 233,
+      "sha256": "9e44984a1d40f2a0a32caf14a0964e2966afb6abc9ef2f7bbaf54a452b3cff34"
+    },
+    {
+      "path": ".long_horizon_planning_tests_v373_v379.out",
+      "bytes": 247,
+      "sha256": "46c235178a91964a35fb7eed86d5727d35ac80455d9008c5f5806333554076e0"
+    },
+    {
+      "path": ".world_development_tests_v372_regression_v379.out",
+      "bytes": 901,
+      "sha256": "54aaee0a661d6c318484693c6912acbec836184abcb2871a9e6ead8f65d81bd1"
+    },
+    {
+      "path": "ACADEMY_TARGETED_TEST_OUTPUT_v3.74.json",
+      "bytes": 288,
+      "sha256": "997dacb48f6579dc44b4396340170ee9662caff939fa1725b6809c4a93a7b627"
+    },
+    {
+      "path": "AI_ACADEMY_PATHWAY_TEST_RESULTS_v3.74.json",
+      "bytes": 1365,
+      "sha256": "0dbf68f50d197295e08433971f5a6b2316f7fac7985dc2f40b9fc20d3ee12a8f"
+    },
+    {
+      "path": "AI_COMPETITION_REVENUE_REPORT_v3.80.md",
+      "bytes": 3428,
+      "sha256": "3fc6781a3d41f893a1ae15d8b597c0b5cdc091b2255722c6896da1e8b5f5113f"
+    },
+    {
+      "path": "AI_EUROPEAN_MARKET_TEST_RESULTS_v3.77.json",
+      "bytes": 4443,
+      "sha256": "f52a2fb01cb2656a40f9319336e11ae73d40f751b0b76ed090e050de87a2d09d"
+    },
+    {
+      "path": "AI_EUROPEAN_TRANSFER_MARKET_REPORT_v3.77.md",
+      "bytes": 2902,
+      "sha256": "2b03378eb0362a8835db717a2e5a4de56036c084b9c5f7c85e3f300fba3bacd4"
+    },
+    {
+      "path": "AI_GLOBAL_FOOTBALL_ECONOMY_REPORT_v3.79.md",
+      "bytes": 3869,
+      "sha256": "47d45f2f691bd699ba03328d6afa40dcaff83be3dcae79e1e4d2c7dea9571947"
+    },
+    {
+      "path": "AI_LOAN_LONG_HORIZON_RESULTS_v3.75.json",
+      "bytes": 174,
+      "sha256": "343b98ace269c9256994dc1e6daade302a62edef64d45553e94dca9112e4f249"
+    },
+    {
+      "path": "AI_LOAN_LONG_HORIZON_RESULTS_v3.76.json",
+      "bytes": 174,
+      "sha256": "343b98ace269c9256994dc1e6daade302a62edef64d45553e94dca9112e4f249"
+    },
+    {
+      "path": "AI_LOAN_REGRESSION_RESULTS_v3.76.json",
+      "bytes": 525,
+      "sha256": "3b943e95314bc853f3053f0eea79b4c4322f369d04ff35d1738b62c211465647"
+    },
+    {
+      "path": "AI_LOAN_TEST_RESULTS_v3.75.json",
+      "bytes": 525,
+      "sha256": "3b943e95314bc853f3053f0eea79b4c4322f369d04ff35d1738b62c211465647"
+    },
+    {
+      "path": "AI_NEGOTIATION_TEST_RESULTS_v3.78.json",
+      "bytes": 5778,
+      "sha256": "26b32ae5796c667c84eca768f3742458f91be5d6b2ce52239536200b25c9452d"
+    },
+    {
+      "path": "AI_SQUAD_LONG_HORIZON_TEST_OUTPUT_v3.73.json",
+      "bytes": 247,
+      "sha256": "46c235178a91964a35fb7eed86d5727d35ac80455d9008c5f5806333554076e0"
+    },
+    {
+      "path": "AI_SQUAD_PLANNING_TEST_OUTPUT_v3.73.json",
+      "bytes": 346,
+      "sha256": "aedc4e29254844d3abb9382c5478297a9453f90b25a413afe74bbdb7cc01b5cb"
+    },
+    {
+      "path": "AI_SQUAD_PLANNING_TEST_RESULTS_v3.73.json",
+      "bytes": 1087,
+      "sha256": "46a546e3747a0c6251114093128096a2e20419324bcfe62bd268e512efb377fa"
+    },
+    {
+      "path": "AI_TRANSFER_NEGOTIATION_REPORT_v3.78.md",
+      "bytes": 3376,
+      "sha256": "d4aadd43bd049ba0c433c9527c4b033e6f4ff33f11d1559ef9c31a01d43be11e"
+    },
+    {
+      "path": "AI_TRANSFER_TEST_OUTPUT_v3.72.json",
+      "bytes": 314,
+      "sha256": "42a6bbb8feaf493771f976a2ae6485d1333325a1a831a267b4d472586ba975e7"
+    },
+    {
+      "path": "AI_TRANSFER_TEST_RESULTS_v3.72.json",
+      "bytes": 314,
+      "sha256": "42a6bbb8feaf493771f976a2ae6485d1333325a1a831a267b4d472586ba975e7"
+    },
+    {
+      "path": "AI_YOUTH_LOAN_MONITOR_TEST_RESULTS_v3.76.json",
+      "bytes": 232,
+      "sha256": "98bc85a111c4e38d0d9223e4320fc99211fe99e56356dcc1b09b47203dfeb9e3"
+    },
+    {
+      "path": "CHANGELOG_v3.77.md",
+      "bytes": 2270,
+      "sha256": "119dc5e5bdf206bab85e027d33750763ba79badb217398c1e9ff22a7746e5a81"
+    },
+    {
+      "path": "CHANGELOG_v3.78.md",
+      "bytes": 2200,
+      "sha256": "5c22bcae24e7f074d931f4e82b6bd7adb1af3b29d62804b866c2516b05d34301"
+    },
+    {
+      "path": "CHANGELOG_v3.79.md",
+      "bytes": 2523,
+      "sha256": "2b37ab17947fe643c390b3155c88b4b3d588f44b6910afae0749cc1656865f16"
+    },
+    {
+      "path": "CHANGELOG_v3.80.md",
+      "bytes": 3007,
+      "sha256": "178fa9f090289e02f19a0fe744a3b2c3d67d39c1d47f453163c282b026c725ef"
+    },
+    {
+      "path": "CHANGELOG_v3.81.md",
+      "bytes": 1734,
+      "sha256": "8589c43838616a007f994991c929bcf65f6c098317dc6877840b939e16a0e689"
+    },
+    {
+      "path": "CLUB_ROSTER_UI_REPORT_v3.81.md",
+      "bytes": 2365,
+      "sha256": "e40450e1717a12f8e54dcdd36d1d93f3b68b2546bc640e19e9a7a5cab0e315c2"
+    },
+    {
+      "path": "EUROPEAN_ACADEMY_INTEGRATION_RESULTS_v3.76.json",
+      "bytes": 206,
+      "sha256": "95ac8665d78a288440c692251888ae06a8a97b1bb9525d64e9be2e9de3d67135"
+    },
+    {
+      "path": "FINANCE_EUROPEAN_TEST_RESULTS_v3.79.json",
+      "bytes": 315,
+      "sha256": "962d62e63e0d113e12fd2fcfff0d2baec716eeadfd8fa9b12580929147b5f150"
+    },
+    {
+      "path": "INLINE_SCRIPT_SYNTAX_RESULTS_v3.74.json",
+      "bytes": 52,
+      "sha256": "63d043d6895b61b98f7b91dfe7ba9d6e956c88a124ac9879c7c3a8284205f5e7"
+    },
+    {
+      "path": "INLINE_SCRIPT_SYNTAX_RESULTS_v3.75.json",
+      "bytes": 185,
+      "sha256": "4cf401a2d0ac05f08f0c3b137eb9ed3a1643c07abd826cbe0565b30375f16602"
+    },
+    {
+      "path": "INLINE_SCRIPT_SYNTAX_RESULTS_v3.76.json",
+      "bytes": 179,
+      "sha256": "2f2dd9460dfa46c340d6a63761b72bb64eae8889d57b85d9cb42198970a56530"
+    },
+    {
+      "path": "INLINE_SCRIPT_SYNTAX_RESULTS_v3.77.json",
+      "bytes": 303,
+      "sha256": "d9fbb4a06954affbb0fe7da495e170170082a550c838e69fccb87b821cbd1124"
+    },
+    {
+      "path": "INLINE_SCRIPT_SYNTAX_RESULTS_v3.78.json",
+      "bytes": 288,
+      "sha256": "d29fda5c83e963c40d540164fdb12c6f522c16ace9ede934ad6e8033cf3ad2d7"
+    },
+    {
+      "path": "INLINE_SCRIPT_SYNTAX_RESULTS_v3.79.json",
+      "bytes": 361,
+      "sha256": "3d6b2d964dc2f21d423c49d55775a00f00ce9eeda4c1c26af87c5f7d7904cf39"
+    },
+    {
+      "path": "INLINE_SCRIPT_SYNTAX_RESULTS_v3.80.json",
+      "bytes": 234,
+      "sha256": "762493b335e0eb1c7dd16ec2813ffd89034a5282399eaf9aa5bba6dcbd2100a1"
+    },
+    {
+      "path": "INLINE_SCRIPT_SYNTAX_RESULTS_v3.81.json",
+      "bytes": 262,
+      "sha256": "52b8aa6ae5680a809a0a1690eb0e9de0f0396fca78a2ea7407be8eaf4d1a32b8"
+    },
+    {
+      "path": "LIFECYCLE_TEST_RESULTS_v3.70.json",
+      "bytes": 13162,
+      "sha256": "1ce1c97c73f2a68ecc45b64a497f443874fa1bbe6173a229a991e6dd0158bc60"
+    },
+    {
+      "path": "PROGRESSION_REGRESSION_TESTS_v3.70.json",
+      "bytes": 370,
+      "sha256": "71a20267e62f1c91f3d5201f36f14b836169ac161daddebae44de2902a1604bc"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3309,
+      "sha256": "ce0c3e7b8c02c99d55f7608090786256c3b4b79e266d149136eed2ffc3526692"
+    },
+    {
+      "path": "README_v381_addendum.md",
+      "bytes": 601,
+      "sha256": "4c4244d3a007e7cd9e57d77cf10192686b9fe94ac94a0ecdfab547f02da2c002"
+    },
+    {
+      "path": "REGRESSION_SUITE_SUMMARY_v3.77.json",
+      "bytes": 1411,
+      "sha256": "55c150aa68dda114734f86fc33e015b5c31cab85ab2cc41645c493b4800549c6"
+    },
+    {
+      "path": "REGRESSION_SUITE_SUMMARY_v3.78.json",
+      "bytes": 1461,
+      "sha256": "0eb093085d199ce5fa4af3f201d1a6173022965fd12cdae9b23152b77e14ea81"
+    },
+    {
+      "path": "REGRESSION_SUITE_SUMMARY_v3.79.json",
+      "bytes": 1780,
+      "sha256": "1596f65adc802a828f001da7e95333a8105d35cd0bf1218a9f483b6168cd22e1"
+    },
+    {
+      "path": "REGRESSION_SUITE_SUMMARY_v3.80.json",
+      "bytes": 12241,
+      "sha256": "ae8ffaf8ae637f14d62cbac7f320c40bd04cef41d31a4bfbc2b47fc6f2f219d5"
+    },
+    {
+      "path": "ROSTER_UI_TEST_RESULTS_v3.81.json",
+      "bytes": 1037,
+      "sha256": "617fc39869b1ba074fcdcea368bc2ebdadc1f5ddadf97cebc492dd7ddf251df2"
+    },
+    {
+      "path": "SQL_SHA256_v3.80.txt",
+      "bytes": 89,
+      "sha256": "969a3b78ee1749b0a18cb8a2059f77ec94552f5d5cc2b75f9a8b4e62edcea1db"
+    },
+    {
+      "path": "UEFA_PRIZE_DISTRIBUTION_TEST_RESULTS_v3.80.json",
+      "bytes": 143,
+      "sha256": "f13143bb758b4e1996833f8bc2e89d0ade316fcef378772b5daf32cf2d78427c"
+    },
+    {
+      "path": "UEFA_USER_PRIZE_PARITY_RESULTS_v3.80.json",
+      "bytes": 105,
+      "sha256": "04f31fbaf455eb697770da4f1570047674c3ac8f69507bbb7d5a732f8932b098"
+    },
+    {
+      "path": "VERSION.txt",
+      "bytes": 5,
+      "sha256": "7f608261115e8dfe0f70503201cfb67b61552acb8476ded785f59bb564ab0b15"
+    },
+    {
+      "path": "WORLD_DEVELOPMENT_REGRESSION_RESULTS_v3.72.json",
+      "bytes": 900,
+      "sha256": "ef6d50f2aeaed6fe5acd96514ce100de6549cc45ebb62d2bef5200edbe99fd0b"
+    },
+    {
+      "path": "academy_long_horizon_v374.js",
+      "bytes": 3566,
+      "sha256": "0cd4f49e9d3451cbf70a1d751d5792cc5057e24994c18be5817bb41702055744"
+    },
+    {
+      "path": "academy_pathway_tests_v374.js",
+      "bytes": 5335,
+      "sha256": "60be2edcaa65f675a0a2abcaf8c69ab881c6345196db0c3e14ac82118d6fa978"
+    },
+    {
+      "path": "academy_season_integration_v374.js",
+      "bytes": 3293,
+      "sha256": "44ce7d15a9f95c9e65751c7289040239da3a7463871d34366ef5e544f7b5b546"
+    },
+    {
+      "path": "ai_european_market_tests_v377.js",
+      "bytes": 12758,
+      "sha256": "b4d4738e7a53a620813d4195db337a07ad7a602f766b2c5aea7b3df5048403c6"
+    },
+    {
+      "path": "ai_european_market_tests_v378.js",
+      "bytes": 12758,
+      "sha256": "1b283f2b2b8caa6e1d02cb75d12edc37df7ca91ece33956df91323be5ba846c1"
+    },
+    {
+      "path": "ai_loan_long_horizon_v375.js",
+      "bytes": 4130,
+      "sha256": "41d7af42e6d57574040340707524f124c1ffb5f67f7ae7ca41c666e837c79cff"
+    },
+    {
+      "path": "ai_loan_long_horizon_v376.js",
+      "bytes": 4130,
+      "sha256": "41d7af42e6d57574040340707524f124c1ffb5f67f7ae7ca41c666e837c79cff"
+    },
+    {
+      "path": "ai_loan_tests_v375.js",
+      "bytes": 8935,
+      "sha256": "97f556b37f481cde4e3a1ae1216afb890208542c09e8c51ad927182e5fbf7b13"
+    },
+    {
+      "path": "ai_loan_tests_v376_regression.js",
+      "bytes": 8935,
+      "sha256": "97f556b37f481cde4e3a1ae1216afb890208542c09e8c51ad927182e5fbf7b13"
+    },
+    {
+      "path": "ai_transfer_tests_v372.js",
+      "bytes": 11366,
+      "sha256": "00ec56aba1e952a9ce37118d8ba8d560f4282b4ec34a0345b0527a79356691ef"
+    },
+    {
+      "path": "ai_youth_loan_monitor_tests_v376.js",
+      "bytes": 5390,
+      "sha256": "68b9c1250b388a32206d2dacab30ce38864fa2bb9f13c98e032a934d6cfcb0ca"
+    },
+    {
+      "path": "club_roster_ui_tests_v381.js",
+      "bytes": 8149,
+      "sha256": "10608dd4765bbd2e99d28fc74df104c860a62c6c0b20b6b76c6b21a7d18747b8"
+    },
+    {
+      "path": "european_academy_integration_v376.js",
+      "bytes": 3312,
+      "sha256": "9afdb9a33a0089ecf229f41deb245395918e24443f25bb8b51be0c9281910120"
+    },
+    {
+      "path": "finance_v379_tests.js",
+      "bytes": 4473,
+      "sha256": "09f3e5293ad1b78f636edc99649533dcfa0004cdc84d672617eaabf28020c7fb"
+    },
+    {
+      "path": "index.html",
+      "bytes": 6796054,
+      "sha256": "05c549d5a908525af29a4aded4d51a0f234821ad55a25e9588e17a831234ae31"
+    },
+    {
+      "path": "long_horizon_planning_tests_v373.js",
+      "bytes": 3933,
+      "sha256": "6325bd4a27b97774eefffc080e266693ec7b24714487bd5d84ccc8424d58c9bb"
+    },
+    {
+      "path": "patch_v378.py",
+      "bytes": 6489,
+      "sha256": "86e87e04262f9fa6f9230e378f484bc0271eb571a405b34bb41f87d72d20e565"
+    },
+    {
+      "path": "patch_v379.py",
+      "bytes": 6202,
+      "sha256": "e7dbfd0b857947ff80603c888bb8ca2129d3c7170642b2c54f3caaf9683cf4e0"
+    },
+    {
+      "path": "supabase_cm_mobile.sql",
+      "bytes": 1767,
+      "sha256": "a72b7bb4b28e7a6e18be76e7848656f62e398b80ec68d45a0fab5ce5472dc983"
+    },
+    {
+      "path": "uefa_prize_distribution_tests_v380.js",
+      "bytes": 3801,
+      "sha256": "a58dc12f4acc53819025b1c8d91b2020a4db544bfcd5285a02fade8c4d83b0e6"
+    },
+    {
+      "path": "user_uefa_prize_parity_v380.js",
+      "bytes": 2225,
+      "sha256": "61591a042122ff4b7c523a7de42eeeecabebc8def766b722acff9fb0450f7ab7"
+    },
+    {
+      "path": "world_development_tests_v372_regression.js",
+      "bytes": 6641,
+      "sha256": "53449113b97019de9bb7e954c75f4041bff03c5a40f4122cd8af1dbe3e334071"
+    },
+    {
+      "path": "world_planning_tests_v373.js",
+      "bytes": 5372,
+      "sha256": "3f9f15bcd437551c5050f83dd662e1fec1b4bae7b34e2b80635e9cd9b37b963d"
+    }
+  ]
+}
