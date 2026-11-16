@@ -1,0 +1,59 @@
+{
+  "total": 13,
+  "passed": 13,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "Identity audit is classified as internal",
+      "passed": true
+    },
+    {
+      "name": "UEFA roster audit is classified as internal",
+      "passed": true
+    },
+    {
+      "name": "List B snapshot log is classified as internal",
+      "passed": true
+    },
+    {
+      "name": "Normal transfer news remains visible",
+      "passed": true
+    },
+    {
+      "name": "Normal UEFA match news remains visible",
+      "passed": true
+    },
+    {
+      "name": "Technical audit is not classified into manager notifications",
+      "passed": true
+    },
+    {
+      "name": "Player transfer is still classified as transfer news",
+      "passed": true
+    },
+    {
+      "name": "Home news excludes all technical audit rows",
+      "passed": true
+    },
+    {
+      "name": "Home news keeps real football news",
+      "passed": true
+    },
+    {
+      "name": "Legacy internal notification is removed from manager inbox",
+      "passed": true
+    },
+    {
+      "name": "Diagnostic app log is retained unchanged",
+      "passed": true
+    },
+    {
+      "name": "Internal log advances cursor without creating a new notice",
+      "passed": true
+    },
+    {
+      "name": "Valid football notification remains in manager inbox",
+      "passed": true
+    }
+  ]
+}

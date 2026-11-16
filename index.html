@@ -2789,7 +2789,19 @@ function queueManagerNotification(id,title,message,page='home',severity='normal'
  appState.managerNotifications.push({id,title,message,page,severity,read:false,createdAt:Date.now()});
  if(appState.managerNotifications.length>60)appState.managerNotifications=appState.managerNotifications.slice(-60);
 }
+function isInternalSystemLog(message){
+ const text=String(message||'').trim();
+ if(!text)return true;
+ // Keep technical migrations/audits in the saved diagnostic log, but never expose them as manager news.
+ return /^(?:v\d+(?:\.\d+)*\s+identitetskontroll\b|UEFA\s+v\d+(?:\.\d+)*\s*:|UEFA\s+List\s+[AB]\b|klubb- og divisjonskontroll\b|FA Cup-registrering reparert\b|Carabao Cup-registrering reparert\b|tropperegister oppdatert\b|kampprogrammet ble reparert\b|kamptabellen ble synkronisert\b|ligatabellen ble rekonstruert\b|ligasesongen ble nullstilt\b|tabellrad for .+ ble opprettet automatisk\b|U21-troppsmigrering\b|aldersoppdatering\b|\d+ UEFA-premieutbetalinger er fordelt til AI-klubber\b|AI-kontraktsplanlegging\b|kamptabellen ble synkronisert\b|kampstart feilet\b|FEIL:)/i.test(text)
+  || /(?:identitetskontroll fullført|offisielt novemberregister|staller kontrollert mot permanent november-snapshot|fast snapshot per \d{4}-\d{2}-\d{2}|lagt permanent inn i klubbregistrene|ingen videre UEFA-oppdateringer|ingen fremtidige UEFA-oppdateringer|arkivstaller erstattet|karrierebeskyttede staller bevart|kuraterte .* spillerstaller synkronisert|regresjonstest|syntakskontroll|zip-integritet)/i.test(text);
+}
+function homeNewsMarkup(){
+ const items=(Array.isArray(appState.log)?appState.log:[]).filter(message=>!isInternalSystemLog(message)).slice(-3).reverse();
+ return items.length?items.map(message=>`<div class="home-news-row">${esc(message)}</div>`).join(''):`<div class="muted">Ingen nyheter.</div>`;
+}
 function classifyManagerLog(message){
+ if(isInternalSystemLog(message))return null;
  const text=String(message||'');const lower=text.toLocaleLowerCase('no');
  // Active bids get their own actionable cards and should not appear a second time as generic news.
  if(/har lagt inn bud på|vist interesse og lagt inn bud|nytt bud mottatt/.test(lower))return null;
@@ -2802,6 +2814,8 @@ function classifyManagerLog(message){
 }
 function syncManagerNotifications(){
  if(!Array.isArray(appState.managerNotifications))appState.managerNotifications=[];
+ // Remove stale technical notices created by earlier builds; diagnostic entries remain in appState.log.
+ appState.managerNotifications=appState.managerNotifications.filter(n=>!isInternalSystemLog(n?.message));
  const log=Array.isArray(appState.log)?appState.log:[];
  const rawCursor=appState.managerNotificationLogCursor;
  if(!Number.isFinite(Number(rawCursor))){
@@ -2897,7 +2911,7 @@ function home(){
  <div class="home-shortcuts"><button onclick="setPage('squad')">♟ Tropp</button><button onclick="setPage('transfers')">⇄ Overganger</button><button onclick="setPage('finance')">£ Økonomi</button></div>
  <div class="home-metrics"><div class="home-metric"><small>Overgangsbudsjett</small><strong class="positive">${money(appState.budget)}</strong><span class="sub">Tilgjengelig</span></div><div class="home-metric"><small>Lønn per uke</small><strong>${money(weeklyWages)}</strong><span class="sub">${appState.squad.length} spillere i troppen</span></div><div class="home-metric"><small>Spilte ligakamper</small><strong>${Number.isFinite(Number(t.p))?Number(t.p):0}</strong><span class="sub">${done?'Sesong fullført':`Av ${Math.max(0,activeLeagueClubs().length*2-2)} mulige`}</span></div><div class="home-metric"><small>Netto drift / uke</small><strong class="${net<0?'negative':'positive'}">${money(net)}</strong><span class="sub">Lønnsramme ${money(getClubFinance().wageBudget/1000)}/uke</span></div></div>
  
- <section class="card home-section"><div class="section-title" style="margin-top:0"><h2>Siste nytt</h2><span class="muted">Klubbfeed</span></div>${appState.log.length?appState.log.slice(-3).reverse().map(x=>`<div class="home-news-row">${esc(x)}</div>`).join(''):`<div class="muted">Ingen nyheter.</div>`}</section>`;
+ <section class="card home-section"><div class="section-title" style="margin-top:0"><h2>Siste nytt</h2><span class="muted">Klubbfeed</span></div>${homeNewsMarkup()}</section>`;
 }
 
 let squadPositionFilter="ALL";

@@ -27,3 +27,10 @@ The interface has been restyled as a compact, information-dense football managem
 
 ## Validation limitations
 Automated syntax and feature regression checks do not replace full manual browser testing on real mobile and desktop devices or a Supabase round-trip. Complete that acceptance test before describing the release as production-certified.
+
+
+## v4.0.2 – Notification cleanup
+- Internal technical audit/migration messages are hidden from the manager-facing alert inbox and home news feed.
+- Real football news and existing career data are retained. Diagnostic log entries are not deleted.
+- No database changes. Do not rerun `supabase_cm_mobile.sql`.
+- See `NOTIFICATION_CLEANUP_REPORT_v4.0.2.md` and `notification_cleanup_tests_v4.0.2.js`.
