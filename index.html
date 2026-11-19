@@ -2144,10 +2144,11 @@ function reviewAllClubFinancesForNewSeason(rankings,previousSeason,movement){
  const rankByName=rankings||{};
  const promoted=new Set(Object.values(movement?.promoted||{}).flat());
  const relegated=new Set(Object.values(movement?.relegated||{}).flat());
- const all=[];
- CLUBS.forEach((c,i)=>all.push({club:c,name:c.name,division:clubDivision(c),roster:i===Number(appState.club)?(appState.squad||[]):(appState.worldSquads?.[i]||[]),isUser:i===Number(appState.club)}));
+ const all=[],seenClubNames=new Set();
+ CLUBS.forEach((c,i)=>{const key=domesticClubKey(c.name);if(seenClubNames.has(key))return;seenClubNames.add(key);all.push({club:c,name:c.name,division:clubDivision(c),roster:i===Number(appState.club)?(appState.squad||[]):(appState.worldSquads?.[i]||[]),isUser:i===Number(appState.club)});});
  for(const [div,league] of Object.entries(appState.lowerLeagues||{})) for(const c of league.rows||[]){
-  let roster=[];for(const group of Object.values(appState.eflPlayerDatabase?.[div]||{})) if(Array.isArray(group)&&group.length&&group[0]?.clubName===c.name){roster=group;break;}
+  const key=domesticClubKey(c.name);if(seenClubNames.has(key))continue;seenClubNames.add(key);
+  let roster=appState.eflPlayerDatabase?.[div]?.[c.name]||[];
   all.push({club:c,name:c.name,division:clubDivision(c)||div,roster,isUser:c.name===currentClub().name});
  }
  for(const item of all){
@@ -2398,8 +2399,10 @@ function processWeeklyClubEconomy(){
   finance.weeklyEconomyInitializedBefore=true;
  });
  // Lower-division clubs receive smaller gate, sponsorship and broadcast income too.
+ const canonicalDomesticNames=new Set((CLUBS||[]).map(c=>domesticClubKey(c.name)));
  for(const [division,league] of Object.entries(appState.lowerLeagues||{})){
   for(const club of league.rows||[]){
+   if(canonicalDomesticNames.has(domesticClubKey(club.name)))continue;
    const finance=appState.clubFinances[club.name]||(appState.clubFinances[club.name]=baselineFinance(club.name,club.strength,division));
    const roster=Array.isArray(appState.eflPlayerDatabase?.[division]?.[club.name])?appState.eflPlayerDatabase[division][club.name]:[];
    // Borrower pays the agreed share; the parent club's retained share is
@@ -4541,14 +4544,23 @@ function processAIAutonomousLoanReturns(today=gameDateForCurrentState()){
 
 function processAIContractRenewals(completedSeasonYear=Number(appState.seasonYear)||2026){
  const season=Number(completedSeasonYear)||2026,all=[];let renewed=0,skipped=0;
- (appState.worldSquads||[]).forEach((roster,ci)=>{
-  if(ci===Number(appState.club)||!Array.isArray(roster))return;
-  const club=CLUBS[ci];if(!club)return;
-  const plan=aiContractRenewalPlan(roster,club,season);
-  renewed+=plan.renew.length;skipped+=0;
-  if(plan.renew.length){all.push(...plan.renew);syncEFLWorldRosterMirror(ci);}
- });
- if(renewed){appState.aiContractRenewalHistory=appState.aiContractRenewalHistory||[];appState.aiContractRenewalHistory.push({season,renewed,players:all.slice(0,100)});if(appState.aiContractRenewalHistory.length>20)appState.aiContractRenewalHistory=appState.aiContractRenewalHistory.slice(-20);appState.log=appState.log||[];appState.log.push(`AI-kontraktsplanlegging: ${renewed} nøkkelspillere fikk forlenget kontrakten før utløp.`);}
+ const apply=(roster,club)=>{
+  if(!Array.isArray(roster)||!club)return;
+  const plan=aiContractRenewalPlan(roster,club,season);renewed+=plan.renew.length;
+  if(plan.renew.length)all.push(...plan.renew);
+ };
+ (appState.worldSquads||[]).forEach((roster,ci)=>{if(ci===Number(appState.club))return;const club=CLUBS[ci];if(club){const before=renewed;apply(roster,club);if(renewed>before)syncEFLWorldRosterMirror(ci);}});
+ // Continental clubs use the same renewal rules, wage ceilings and succession logic.
+ for(const [name,roster] of Object.entries(appState.europeanTransferSquads||{})){
+  const meta=appState.europeanTransferClubData?.[name]||{};
+  apply(roster,{name,strength:Number(meta.strength)||58,division:'Europe'});
+ }
+ if(renewed){
+  appState.aiContractRenewalHistory=appState.aiContractRenewalHistory||[];
+  appState.aiContractRenewalHistory.push({season,renewed,players:all.slice(0,100)});
+  if(appState.aiContractRenewalHistory.length>20)appState.aiContractRenewalHistory=appState.aiContractRenewalHistory.slice(-20);
+  appState.log=appState.log||[];appState.log.push(`AI-kontraktsplanlegging: ${renewed} nøkkelspillere fikk forlenget kontrakten før utløp.`);
+ }
  return {renewed,skipped,players:all};
 }
 function syncEFLWorldRosterMirror(clubIndex){
@@ -7846,61 +7858,63 @@ function seasonSummary(){
 }
 function processCareerAgeing(){
  const season=Number(appState.seasonYear)||2026;
- const retired=[]; const declined=[];
- function agePlayer(p,clubLabel,isUser){
+ const retired=[],declined=[],seen=new Map(),retiredIds=new Set();
+ function agePlayer(p,clubLabel){
   if(!p||!p.name)return true;
+  const identity=playerCareerIdentity(p);
+  if(seen.has(identity)){
+   const source=seen.get(identity);
+   // Registries may hold copies (notably EFL match/market mirrors). Keep the
+   // annual career state identical without aging the same person twice.
+   ['age','rating','potential','value','attributes','dataQuality','ageModelValue'].forEach(k=>{if(source[k]!==undefined)p[k]=k==='attributes'?{...(source.attributes||{})}:k==='dataQuality'?{...(source.dataQuality||{})}:source[k];});
+   return !retiredIds.has(identity);
+  }
   if(Number.isFinite(p.age)){p.age=Math.max(16,Number(p.age)+1);if(p.dataQuality?.ageUnknown===true)p.ageModelValue=p.age;}
-  const age=p.age, pos=p.pos||'MID';
-  // Development before prime; natural decline is gradual and varies by position.
-  const rng=seededRandom(stableSeed(`${p.name}|ageing|${season}|${clubLabel}`));
+  const age=Number(p.age)||25,pos=p.pos||'MID';
+  const rng=seededRandom(stableSeed(`${identity}|ageing|${season}|${clubLabel}`));
   const peak=pos==='GK'?31:pos==='DEF'?29:pos==='MID'?28:27;
-  const potential=Number(p.potential||p.rating||60);
-  const rating=Number(p.rating||60);
-  const ratingBeforeAgeing=rating;
-  const lastSeasonMinutes=Math.max(0,Number(p.minutes)||0);
-  const seasonParticipation=Math.min(1,lastSeasonMinutes/2250);
-  if(age<=22 && rating<potential && rng()<(.22+(potential-rating)*.012)*(.30+.70*seasonParticipation)){
-    p.rating=Math.min(potential,rating+(rng()<.18?2:1));
-  }else if(age>peak){
-    const years=age-peak;
-    const baseChance=Math.min(.82,.13+years*.075+(pos==='GK'?-0.08:0));
-    // Match minutes help older players retain ability, without removing natural age decline.
-    const chance=baseChance*(1-.38*seasonParticipation);
-    if(rng()<chance){
-      const fall=age>=35&&rng()<(.22*(1-.45*seasonParticipation))?2:1;
-      p.rating=Math.max(25,rating-fall);
-      if(p.rating<rating)declined.push(`${p.name} (${clubLabel})`);
-    }
+  const potential=Number(p.potential||p.rating||60),rating=Number(p.rating||60),ratingBeforeAgeing=rating;
+  const lastSeasonMinutes=Math.max(0,Number(p.minutes)||0),seasonParticipation=Math.min(1,lastSeasonMinutes/2250);
+  if(age<=22&&rating<potential&&rng()<(.22+(potential-rating)*.012)*(.30+.70*seasonParticipation))p.rating=Math.min(potential,rating+(rng()<.18?2:1));
+  else if(age>peak){
+   const years=age-peak,baseChance=Math.min(.82,.13+years*.075+(pos==='GK'?-0.08:0));
+   const chance=baseChance*(1-.38*seasonParticipation);
+   if(rng()<chance){const fall=age>=35&&rng()<(.22*(1-.45*seasonParticipation))?2:1;p.rating=Math.max(25,rating-fall);if(p.rating<rating)declined.push(`${p.name} (${clubLabel})`);}
   }
   if(Number(p.rating)!==ratingBeforeAgeing)cm70SyncGeneratedAttributesWithCA(p);
-  // Value falls as age rises, even when rating is maintained.
   const ageFactor=age<=22?1.12:age<=27?1:age<=30?.86:age<=33?.65:age<=35?.42:.25;
-  p.value=Math.max(.05,+((Math.max(1,p.rating-40)**2/120)*ageFactor).toFixed(2));
-  // Retirement risk grows after 34; keep goalkeepers active longer on average.
-  const retirementAge=pos==='GK'?38:35;
-  const yearsOver=age-retirementAge;
+  p.value=Math.max(.05,+((Math.max(1,Number(p.rating||60)-40)**2/120)*ageFactor).toFixed(2));
+  const retirementAge=pos==='GK'?38:35,yearsOver=age-retirementAge;
   const retireChance=yearsOver<0?0:Math.min(.78,.10+yearsOver*.16);
-  if(age>=retirementAge && rng()<retireChance){retired.push(`${p.name} (${clubLabel}, ${age} år)`);return false;}
-  return true;
+  const keep=!(age>=retirementAge&&rng()<retireChance);
+  seen.set(identity,p);
+  if(!keep){retiredIds.add(identity);retired.push(`${p.name} (${clubLabel}, ${age} år)`);}
+  return keep;
  }
- appState.squad=(appState.squad||[]).filter(p=>agePlayer(p,currentClub().name,true));
+ appState.squad=(appState.squad||[]).filter(p=>agePlayer(p,currentClub().name));
  (appState.worldSquads||[]).forEach((roster,ci)=>{
-   const club=CLUBS[ci]?.name||`Klubb ${ci+1}`;
-   appState.worldSquads[ci]=(roster||[]).filter(p=>agePlayer(p,club,false));
+  if(ci===Number(appState.club))return;
+  const club=CLUBS[ci]?.name||`Klubb ${ci+1}`;
+  appState.worldSquads[ci]=(roster||[]).filter(p=>agePlayer(p,club));
  });
- // Lower-league players, including PL players on EFL loan, also receive their
- // annual development/ageing pass. They are not present in worldSquads while loaned out.
+ // EFL database is a second registration/match mirror. Age unique EFL-only
+ // records, but synchronize duplicates from the canonical player already aged.
  for(const [division,clubs] of Object.entries(appState.eflPlayerDatabase||{})){
   for(const [clubName,roster] of Object.entries(clubs||{})){
-   appState.eflPlayerDatabase[division][clubName]=(roster||[]).filter(p=>agePlayer(p,clubName,false));
+   appState.eflPlayerDatabase[division][clubName]=(roster||[]).filter(p=>agePlayer(p,clubName));
   }
  }
- // Retiring players leave genuine vacancies. Do not auto-promote or generate junior replacements.
- // Keep the manager's authoritative first-team squad aligned with the simulated world roster.
+ // Permanent continental squads now participate in the same annual career cycle.
+ for(const [clubName,roster] of Object.entries(appState.europeanTransferSquads||{})){
+  appState.europeanTransferSquads[clubName]=(roster||[]).filter(p=>agePlayer(p,clubName));
+ }
+ // Ensure the manager's mirrored match-engine roster remains authoritative.
  if(Array.isArray(appState.worldSquads)&&appState.worldSquads[appState.club])appState.worldSquads[appState.club]=(appState.squad||[]).map(p=>({...p,attributes:{...(p.attributes||{})}}));
+ appState.log=appState.log||[];
  appState.log.push(`Aldersoppdatering: ${declined.length} spillere fikk redusert ferdighet${declined.length===1?'':'er'}; ${retired.length} la opp.`);
- if(retired.length) appState.log.push(`Pensjoneringer: ${retired.slice(0,12).join('; ')}${retired.length>12?' …':''}`);
+ if(retired.length)appState.log.push(`Pensjoneringer: ${retired.slice(0,12).join('; ')}${retired.length>12?' …':''}`);
  appState.retirementHistory=[...(appState.retirementHistory||[]),{season,retired:retired.slice(),declined:declined.length}];
+ return {season,aged:seen.size,retired:retired.length,declined:declined.length};
 }
 // v2.52: archive completed-season totals before reset and keep a stable career identity across transfers.
 const CAREER_STAT_KEYS=['apps','minutes','goals','assists','yellowCards','redCards','chancesCreated'];
@@ -7913,24 +7927,30 @@ function placePlayerInRoster(roster,player){
  const key=playerCareerIdentity(player);const clean=uniquePlayersByCareer(roster).filter(p=>playerCareerIdentity(p)!==key);clean.push(player);return clean;
 }
 function archivePlayerSeasonStats(){
- const season=seasonLabel();
- const unique=new Map();
- (appState.worldSquads||[]).forEach(roster=>(roster||[]).forEach(p=>{if(p)unique.set(playerCareerIdentity(p),p)}));
- (appState.squad||[]).forEach(p=>{if(p)unique.set(playerCareerIdentity(p),p)});
+ const season=seasonLabel(),unique=new Map();
+ const addRoster=(roster,clubName,overwrite=false)=>{(roster||[]).forEach(p=>{if(!p)return;const id=playerCareerIdentity(p);if(overwrite||!unique.has(id))unique.set(id,{player:p,clubName:clubName||p.clubName||'Ukjent klubb'});});};
+ (appState.worldSquads||[]).forEach((roster,ci)=>addRoster(roster,CLUBS[ci]?.name));
+ // The manager's own squad is authoritative over its worldSquads mirror.
+ addRoster(appState.squad,currentClub().name,true);
+ for(const [division,clubs] of Object.entries(appState.eflPlayerDatabase||{}))for(const [clubName,roster] of Object.entries(clubs||{}))addRoster(roster,clubName);
+ for(const [clubName,roster] of Object.entries(appState.europeanTransferSquads||{}))addRoster(roster,clubName);
  let archived=0,skipped=0;
- unique.forEach((p,id)=>{
-  p.careerId=p.careerId||id;
-  p.careerHistory=Array.isArray(p.careerHistory)?p.careerHistory:[];
-  const hadCareerStats=!!(p.careerStats&&typeof p.careerStats==='object');
-  p.careerStats=hadCareerStats?p.careerStats:{};
+ unique.forEach(({player:p,clubName},id)=>{
+  p.careerId=p.careerId||id;p.careerHistory=Array.isArray(p.careerHistory)?p.careerHistory:[];
+  const hadCareerStats=!!(p.careerStats&&typeof p.careerStats==='object');p.careerStats=hadCareerStats?p.careerStats:{};
   CAREER_STAT_KEYS.forEach(k=>p.careerStats[k]=Number(p.careerStats[k])||0);
   if(!hadCareerStats&&p.careerHistory.length)CAREER_STAT_KEYS.forEach(k=>p.careerStats[k]=p.careerHistory.reduce((n,x)=>n+(Number(x[k])||0),0));
   if(p.careerHistory.some(row=>String(row.season)===String(season))){skipped++;return;}
-  const row={season,clubName:CLUBS[p.clubIndex]?.name||p.clubName||currentClub().name,apps:0,minutes:0,goals:0,assists:0,yellowCards:0,redCards:0,chancesCreated:0,competitions:{}};
-  CAREER_STAT_KEYS.forEach(k=>{row[k]=Number(p[k])||0;p.careerStats[k]+=row[k]});
-  Object.entries(p.competitionStats||{}).forEach(([competition,stat])=>{row.competitions[competition]={};CAREER_STAT_KEYS.forEach(k=>row.competitions[competition][k]=Number(stat?.[k])||0)});
+  const row={season,clubName,apps:0,minutes:0,goals:0,assists:0,yellowCards:0,redCards:0,chancesCreated:0,competitions:{}};
+  CAREER_STAT_KEYS.forEach(k=>{row[k]=Number(p[k])||0;p.careerStats[k]+=row[k];});
+  Object.entries(p.competitionStats||{}).forEach(([competition,stat])=>{row.competitions[competition]={};CAREER_STAT_KEYS.forEach(k=>row.competitions[competition][k]=Number(stat?.[k])||0);});
   p.careerHistory.push(row);archived++;
  });
+ // Mirror archived totals to secondary registry copies so transfer-market and match views agree.
+ const syncCareer=(roster)=>{(roster||[]).forEach(copy=>{const canonical=unique.get(playerCareerIdentity(copy))?.player;if(!canonical||canonical===copy)return;copy.careerId=canonical.careerId;copy.careerStats={...(canonical.careerStats||{})};copy.careerHistory=(canonical.careerHistory||[]).map(r=>({...r,competitions:Object.fromEntries(Object.entries(r.competitions||{}).map(([k,v])=>[k,{...v}]))}));});};
+ (appState.worldSquads||[]).forEach(syncCareer);syncCareer(appState.squad);
+ for(const clubs of Object.values(appState.eflPlayerDatabase||{}))for(const roster of Object.values(clubs||{}))syncCareer(roster);
+ for(const roster of Object.values(appState.europeanTransferSquads||{}))syncCareer(roster);
  return {season,playersSeen:unique.size,archived,skipped};
 }
 function careerStatsAudit(){
@@ -7993,6 +8013,7 @@ function startNewSeason(){
  appState.discipline={};processCareerAgeing();
  (appState.worldSquads||[]).forEach(roster=>(roster||[]).forEach(p=>{p.goals=0;p.assists=0;p.apps=0;p.minutes=0;p.yellowCards=0;p.redCards=0;p.chancesCreated=0;p.competitionStats={};}));
  for(const clubs of Object.values(appState.eflPlayerDatabase||{}))for(const roster of Object.values(clubs||{}))for(const p of roster||[]){p.goals=0;p.assists=0;p.apps=0;p.minutes=0;p.yellowCards=0;p.redCards=0;p.chancesCreated=0;p.competitionStats={};}
+ for(const roster of Object.values(appState.europeanTransferSquads||{}))for(const p of roster||[]){p.goals=0;p.assists=0;p.apps=0;p.minutes=0;p.yellowCards=0;p.redCards=0;p.chancesCreated=0;p.competitionStats={};}
  appState.squad.forEach(p=>{p.goals=0;p.assists=0;p.apps=0;p.minutes=0;p.yellowCards=0;p.redCards=0;p.chancesCreated=0;p.competitionStats={};p.injured=0;p.suspended=0;p.fitness=Math.max(85,p.fitness||90);p.form=6.5;p.morale=Math.max(60,Math.min(95,(p.morale||75)+Math.round(Math.random()*6-3)))});
  ensureAllPlayerContracts();if(Array.isArray(appState.worldSquads))appState.worldSquads[appState.club]=(appState.squad||[]).map(p=>({...p,attributes:{...(p.attributes||{})}}));
  appState.activeDivision=clubDivision(CLUBS[appState.club]);appState.table=activeLeagueClubs().map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
@@ -8266,79 +8287,50 @@ function summarizeMatchBatch(results){
 
 function simulateMatch(powerA,powerB,homeA,playersA=[],playersB=[],formationA="4-3-3",formationB="4-3-3",mentalityA="Balanced",mentalityB="Balanced"){
  const xiA=assignTacticalRoles(createMatchLineup(playersA,formationA,"A"),formationA),xiB=assignTacticalRoles(createMatchLineup(playersB,formationB,"B"),formationB);
- const tactical={Defensive:-1.6,Balanced:0,Attacking:1.6,"High press":1.1};
- const mentalA=tactical[mentalityA]||0, mentalB=tactical[mentalityB]||0;
- const avg=xi=>xi.length?xi.reduce((s,p)=>s+p.rating,0)/xi.length:65;
+ const initialXiA=xiA.slice(),initialXiB=xiB.slice(),playerMinutesA={},playerMinutesB={};
+ initialXiA.forEach(p=>playerMinutesA[String(p.id)]=90);initialXiB.forEach(p=>playerMinutesB[String(p.id)]=90);
+ const benchA=(playersA||[]).filter(p=>!initialXiA.some(x=>String(x.id)===String(p.id))),benchB=(playersB||[]).filter(p=>!initialXiB.some(x=>String(x.id)===String(p.id)));
+ const subs={A:0,B:0},cautions={A:new Map(),B:new Map()},removed={A:new Set(),B:new Set()},substitutionEvents=[];
+ const tactical={Defensive:-1.6,Balanced:0,Attacking:1.6,"High press":1.1},mentalA=tactical[mentalityA]||0,mentalB=tactical[mentalityB]||0;
+ const avg=xi=>xi.length?xi.reduce((sum,p)=>sum+p.rating,0)/xi.length:55;
  const gkA=xiA.find(p=>p.pos==="GK")?.rating||65,gkB=xiB.find(p=>p.pos==="GK")?.rating||65;
- const attackA=avg(xiA.filter(p=>p.pos==="ATT"||p.pos==="MID"))+mentalA+(homeA?1.8:0);
- const attackB=avg(xiB.filter(p=>p.pos==="ATT"||p.pos==="MID"))+mentalB+(homeA?0:1.8);
- const defenseA=avg(xiA.filter(p=>p.pos==="DEF"))+gkA*.22;
- const defenseB=avg(xiB.filter(p=>p.pos==="DEF"))+gkB*.22;
- const events=[],stats={shotsA:0,shotsB:0,onA:0,onB:0,possessionA:50,bigA:0,bigB:0};
- let scoreA=0,scoreB=0;
- const minute=()=>1+Math.floor(Math.random()*90);
- const scorerFor=(xi,side)=>{
-  const candidates=xi.filter(p=>p.pos==="ATT"||p.pos==="MID");
-  const picked=weightedPick(candidates,candidates.map(p=>Math.max(1,p.rating-45)*(p.pos==="ATT"?1.6:p.pos==="MID"?0.85:0.2)));
-  if(picked)return {name:picked.name,id:picked.id};
-  return {name:side==="A"?"Angriper":"Spiss",id:null};
- };
- const assistantFor=(xi,scorerId,goalMethod)=>assistForGoal(xi,scorerId,goalMethod,p=>Number(p.rating)||60)?.name||null;
- const chanceList=[];
- // Minute-by-minute chance generation. Goal probability depends on chance quality, finishing,
- // relative attack/defence and goalkeeper strength.
+ const attackA=avg(xiA.filter(p=>p.pos==="ATT"||p.pos==="MID"))+mentalA+(homeA?1.8:0),attackB=avg(xiB.filter(p=>p.pos==="ATT"||p.pos==="MID"))+mentalB+(homeA?0:1.8);
+ const defenseA=avg(xiA.filter(p=>p.pos==="DEF"))+gkA*.22,defenseB=avg(xiB.filter(p=>p.pos==="DEF"))+gkB*.22;
+ const events=[],stats={shotsA:0,shotsB:0,onA:0,onB:0,possessionA:50,bigA:0,bigB:0};let scoreA=0,scoreB=0;
+ const scorerFor=(xi,side)=>{const candidates=xi.filter(p=>p.pos==="ATT"||p.pos==="MID"),picked=weightedPick(candidates,candidates.map(p=>Math.max(1,p.rating-45)*(p.pos==="ATT"?1.6:p.pos==="MID"?.85:.2)));return picked?{name:picked.name,id:picked.id}:{name:side==="A"?"Angriper":"Spiss",id:null};};
+ const assistantFor=(xi,id,method)=>assistForGoal(xi,id,method,p=>Number(p.rating)||60)?.name||null,chanceList=[];
+ const removePlayer=(side,xi,p,m)=>{const id=String(p.id);if(removed[side].has(id))return;removed[side].add(id);const minutes=side==="A"?playerMinutesA:playerMinutesB;minutes[id]=m;const ix=xi.findIndex(x=>String(x.id)===id);if(ix>=0)xi.splice(ix,1);if(m<90&&subs[side]<3){const bench=side==="A"?benchA:benchB;const replacement=bench.filter(x=>!removed[side].has(String(x.id))).sort((a,b)=>(String(a.pos)===String(p.pos)?-1:0)-(String(b.pos)===String(p.pos)?-1:0)||(Number(b.rating)||0)-(Number(a.rating)||0))[0];if(replacement&&String(replacement.pos)===String(p.pos)){subs[side]++;xi.push(replacement);minutes[String(replacement.id)]=90-m;substitutionEvents.push({minute:m,side,type:"substitution",player:p.name,playerId:p.id,substitute:replacement.name,substituteId:replacement.id,reason:"Skade"});}}};
  for(let m=1;m<=90;m++){
-  const chancesThisMinute=(Math.random()<0.205?1:0)+(Math.random()<0.018?1:0);
-  for(let k=0;k<chancesThisMinute;k++){
-   // Compress extreme team mismatches: the stronger side gets more chances,
-   // but a large rating gap must not erase the underdog from the match.
-   const matchupGap=clamp((attackA-defenseB)-(attackB-defenseA),-18,18);
-   const sideProbabilityA=clamp(.5+matchupGap*.006,.36,.64);
-   const side=Math.random()<sideProbabilityA?"A":"B";
-   const xi=side==="A"?xiA:xiB, attack=side==="A"?attackA:attackB, defence=side==="A"?defenseB:defenseA, keeper=side==="A"?gkB:gkA;
-   const attackers=xi.filter(p=>p.pos==="ATT"||p.pos==="MID");
-   const shooter=weightedPick(attackers,attackers.map(p=>Math.max(1,shotFinishingScore(p)-35)*(p.pos==="ATT"?1.6:p.pos==="MID"?.75:0.15)));
-   const finishing=shooter?shotFinishingScore(shooter):65;
-   const technique=shooter?matchAttribute(shooter,"technique",60):60;
-   // Keep individual chance quality responsive to attack-v-defence, but bound
-   // the matchup contribution so very weak teams retain a plausible scoring route.
-   const matchupQualityEdge=clamp(attack-defence,-12,12);
-   const quality=Math.max(.045,Math.min(.72,.145+matchupQualityEdge*.0035+(finishing-65)*.0036+(technique-60)*.0012+(Math.random()*.16)));
-   const onTarget=Math.random()<Math.max(.16,Math.min(.78,.31+(finishing-60)*.007+(technique-60)*.0025));
-   if(side==="A"){stats.shotsA++;if(onTarget)stats.onA++}else{stats.shotsB++;if(onTarget)stats.onB++}
-   const keeperPlayers=(side==="A"?xiB:xiA).filter(p=>p.pos==="GK");
-   const keeperPlayer=keeperPlayers[0];
-   const keeperSkill=keeperPlayer?keeperShotStoppingScore(keeperPlayer):keeper;
-   const savedByKeeper=Math.max(.10,Math.min(.70,.34+(keeperSkill-65)*.009));
-   const scored=onTarget&&Math.random()<quality*(1-savedByKeeper)*2.2;
-   let event={minute:m,side,type:"chance",player:shooter?.name||"Angriper",onTarget,quality:+quality.toFixed(2)};
-   if(scored){
-    scoreA+=side==="A"?1:0;scoreB+=side==="B"?1:0;
-    const goalMethod=sampleGoalMethod();
-    const fallback=shooter?{name:shooter.name,id:shooter.id}:scorerFor(xi,side);
-    const scorerObj=goalScorerFor(xi,goalMethod,fallback,p=>Number(p.rating)||60)||fallback;
-    const assist=assistantFor(xi,scorerObj.id,goalMethod);
-    event={minute:m,side,type:"goal",scorer:scorerObj.name,scorerId:scorerObj.id,assist,goalMethod,score:`${scoreA}–${scoreB}`,onTarget:true,quality:+quality.toFixed(2)};
-   }
+  const chances=(Math.random()<.205?1:0)+(Math.random()<.018?1:0);
+  for(let k=0;k<chances;k++){
+   const liveAttackA=avg(xiA.filter(p=>p.pos==="ATT"||p.pos==="MID"))+mentalA+(homeA?1.8:0),liveAttackB=avg(xiB.filter(p=>p.pos==="ATT"||p.pos==="MID"))+mentalB+(homeA?0:1.8),liveDefenceA=avg(xiA.filter(p=>p.pos==="DEF"))+(xiA.find(p=>p.pos==="GK")?.rating||48)*.22,liveDefenceB=avg(xiB.filter(p=>p.pos==="DEF"))+(xiB.find(p=>p.pos==="GK")?.rating||48)*.22;
+   const gap=clamp((liveAttackA-liveDefenceB)-(liveAttackB-liveDefenceA),-18,18),side=Math.random()<clamp(.5+gap*.006,.36,.64)?"A":"B",xi=side==="A"?xiA:xiB,op=side==="A"?xiB:xiA;
+   if(!xi.length)continue;
+   const attack=side==="A"?liveAttackA:liveAttackB,defence=side==="A"?liveDefenceB:liveDefenceA,keeper=side==="A"?gkB:gkA;
+   const attackers=xi.filter(p=>p.pos==="ATT"||p.pos==="MID"),shooter=weightedPick(attackers,attackers.map(p=>Math.max(1,shotFinishingScore(p)-35)*(p.pos==="ATT"?1.6:p.pos==="MID"?.75:.15)));
+   const finishing=shooter?shotFinishingScore(shooter):65,technique=shooter?matchAttribute(shooter,"technique",60):60;
+   const quality=Math.max(.045,Math.min(.72,.145+clamp(attack-defence,-12,12)*.0035+(finishing-65)*.0036+(technique-60)*.0012+Math.random()*.16));
+   const onTarget=Math.random()<clamp(.31+(finishing-60)*.007+(technique-60)*.0025,.16,.78);
+   if(side==="A"){stats.shotsA++;if(onTarget)stats.onA++;}else{stats.shotsB++;if(onTarget)stats.onB++;}
+   const keeperPlayer=op.find(p=>p.pos==="GK"),keeperSkill=keeperPlayer?keeperShotStoppingScore(keeperPlayer):keeper,saved=Math.max(.10,Math.min(.70,.34+(keeperSkill-65)*.009));
+   let event={minute:m,side,type:"chance",player:shooter?.name||"Angriper",playerId:shooter?.id??null,onTarget,quality:+quality.toFixed(2)};
+   if(onTarget&&Math.random()<quality*(1-saved)*2.2){scoreA+=side==="A"?1:0;scoreB+=side==="B"?1:0;const method=sampleGoalMethod(),fallback=shooter?{name:shooter.name,id:shooter.id}:scorerFor(xi,side),scorer=goalScorerFor(xi,method,fallback,p=>Number(p.rating)||60)||fallback,assist=assistantFor(xi,scorer.id,method);event={minute:m,side,type:"goal",scorer:scorer.name,scorerId:scorer.id,assist,goalMethod:method,score:`${scoreA}–${scoreB}`,onTarget:true,quality:+quality.toFixed(2)};}
    chanceList.push(event);
   }
   const incident=(type,prob,reason)=>{
-   if(Math.random()>=prob)return;
-   const side=Math.random()<.5?"A":"B",xi=side==="A"?xiA:xiB;
-   const candidates=xi.filter(p=>p&&(!((type==='injury')&&p.pos==='GK')||Math.random()<.2));
-   const weights=candidates.map(p=>type==='injury'?playerInjuryWeight(p,m):Math.max(1,(p.attributes?.defending||p.rating||60)-35));
-   const player=weightedPick(candidates,weights);if(!player)return;
-   const event={minute:m,side,type,player:player.name||"Spiller",playerId:player.id??null,reason};
-   if(type==='red'){const offence=directRedOffence();event.reason=offence.label;event.redCardReason=offence.code;event.suspensionMatches=offence.matches;}
+   if(Math.random()>=prob)return;const side=Math.random()<.5?"A":"B",xi=side==="A"?xiA:xiB;
+   const candidates=xi.filter(p=>p&&(!(type==='injury'&&p.pos==='GK')||Math.random()<.2));if(!candidates.length)return;
+   const weights=candidates.map(p=>type==='injury'?playerInjuryWeight(p,m):Math.max(1,(p.attributes?.defending||p.rating||60)-35)),player=weightedPick(candidates,weights);if(!player)return;
+   let event={minute:m,side,type,player:player.name||"Spiller",playerId:player.id??null,reason};
+   if(type==='yellow'){const id=String(player.id),count=(cautions[side].get(id)||0)+1;cautions[side].set(id,count);if(count>=2){event={...event,type:'red',reason:'Andre gule kort – automatisk utvisning',redCardReason:'second-yellow',suspensionMatches:1,secondYellow:true};removePlayer(side,xi,player,m);}}
+   else if(type==='red'){const offence=directRedOffence();event.reason=offence.label;event.redCardReason=offence.code;event.suspensionMatches=offence.matches;removePlayer(side,xi,player,m);}
+   else if(type==='injury'){event.reason='Skade under kamp';removePlayer(side,xi,player,m);}
    events.push(event);
   };
-  incident("yellow",.0416,"Gult kort");
-  incident("red",.0013,"Rødt kort");
-  incident("injury",matchInjuryProbability([...xiA,...xiB],[mentalityA,mentalityB],m),"Skade under kamp");
+  incident('yellow',.0416,'Gult kort');incident('red',.0013,'Rødt kort');incident('injury',matchInjuryProbability([...xiA,...xiB],[mentalityA,mentalityB],m),'Skade under kamp');
  }
- events.push(...chanceList.filter(e=>e.type==="goal"));
- stats.possessionA=Math.max(30,Math.min(70,Math.round(50+(attackA-attackB)*.6+(homeA?3:-3))));
- return {ga:scoreA,gb:scoreB,events,stats,xiA,xiB,chanceList,attackA,attackB,defenseA,defenseB};
+ events.push(...substitutionEvents,...chanceList.filter(e=>e.type==='goal'));stats.possessionA=clamp(Math.round(50+(attackA-attackB)*.6+(homeA?3:-3)),30,70);
+ return {ga:scoreA,gb:scoreB,events,stats,xiA,xiB,initialXiA,initialXiB,playerMinutesA,playerMinutesB,substitutionEvents,chanceList,attackA,attackB,defenseA,defenseB};
 }
 function ensureActiveLeagueTableRows(){
  // Saved careers can contain a table from an older club list. Keep all matching
@@ -9015,12 +9007,15 @@ function advanceLiveEngine(engine,minute){
 function recordSimulatedPlayerStats(clubA,clubB,playersA,playersB,sim,competition='Premier League'){
  const update=(clubIndex,players,side)=>{
   const roster=appState.worldSquads?.[clubIndex];if(!roster)return;
-  const chosen=players.filter(p=>sim.xiA.concat(sim.xiB).some(x=>String(x.id)===String(p.id)));
-  chosen.forEach(p=>{const target=roster.find(x=>x.name===p.name);if(!target)return;target.apps=(target.apps||0)+1;target.minutes=(target.minutes||0)+90;addCompetitionStat(target,competition,'apps');addCompetitionStat(target,competition,'minutes',90);applyPlayerMatchExperienceDevelopment(target,90,`LEAGUE-${Number(appState.seasonYear)||2026}-${Number(appState.week)||1}-${clubA}-${clubB}`);});
-  (sim.chanceList||[]).filter(e=>e.side===side).forEach(e=>{if(e.type==='goal'){const scorer=roster.find(p=>p.name===e.scorer);if(scorer){scorer.goals=(scorer.goals||0)+1;addCompetitionStat(scorer,competition,'goals');}if(e.assist){const assister=roster.find(p=>p.name===e.assist);if(assister){assister.assists=(assister.assists||0)+1;addCompetitionStat(assister,competition,'assists');}}}else{const creator=roster.find(p=>p.name===e.player);if(creator){creator.chancesCreated=(creator.chancesCreated||0)+1;addCompetitionStat(creator,competition,'chancesCreated');}}});
-  // Cards and availability are applied to the actual player listed on each event below.
- };
- update(clubA,playersA,'A');update(clubB,playersB,'B');
+  const minutes=side==='A'?(sim.playerMinutesA||{}):(sim.playerMinutesB||{});
+  players.filter(p=>Object.prototype.hasOwnProperty.call(minutes,String(p.id))).forEach(p=>{
+   const target=roster.find(x=>String(x.id)===String(p.sourcePlayerId??p.id))||roster.find(x=>x.name===p.name);if(!target)return;
+   const mins=clamp(Number(minutes[String(p.id)]??0),0,90);if(!mins)return;
+   target.apps=(target.apps||0)+1;target.minutes=(target.minutes||0)+mins;addCompetitionStat(target,competition,'apps');addCompetitionStat(target,competition,'minutes',mins);
+   applyPlayerMatchExperienceDevelopment(target,mins,`LEAGUE-${Number(appState.seasonYear)||2026}-${Number(appState.week)||1}-${clubA}-${clubB}`);
+  });
+  (sim.chanceList||[]).filter(e=>e.side===side).forEach(e=>{if(e.type==='goal'){const scorer=roster.find(p=>p.name===e.scorer);if(scorer){scorer.goals=(scorer.goals||0)+1;addCompetitionStat(scorer,competition,'goals');}if(e.assist){const assister=roster.find(p=>p.name===e.assist);if(assister){assister.assists=(assister.assists||0)+1;addCompetitionStat(assister,competition,'assists');}}}else if(e.player){const creator=roster.find(p=>p.name===e.player);if(creator){creator.chancesCreated=(creator.chancesCreated||0)+1;addCompetitionStat(creator,competition,'chancesCreated');}}});
+ };update(clubA,playersA,'A');update(clubB,playersB,'B');
 }
 function fixtureTeamIndex(team){return Number.isInteger(team)?team:Number.isInteger(team?.clubIndex)?team.clubIndex:-1;}
 function playerFromFixtureEvent(players, event){

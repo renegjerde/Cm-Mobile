@@ -34,3 +34,20 @@ Automated syntax and feature regression checks do not replace full manual browse
 - Real football news and existing career data are retained. Diagnostic log entries are not deleted.
 - No database changes. Do not rerun `supabase_cm_mobile.sql`.
 - See `NOTIFICATION_CLEANUP_REPORT_v4.0.2.md` and `notification_cleanup_tests_v4.0.2.js`.
+
+
+## CM Mobile 4.0.3 – Realism Stabilization
+
+- Continental European player squads now receive the annual ageing, development/decline and retirement pass.
+- European player season statistics are archived before rollover and reset for the new season. Career totals/history are synchronized to secondary roster mirrors.
+- European AI clubs now use the same contract-renewal planner as domestic AI clubs.
+- EFL clubs already represented in the canonical `CLUBS` registry are no longer processed a second time by the lower-league mirror during weekly economy or annual finance review.
+- Background matches now remove dismissed and injured players from the active XI, support second-yellow dismissals, use up to three same-position injury replacements when available, and record actual player minutes rather than giving every starter 90 minutes. Team strength is recalculated as the active XI changes.
+- No database/schema migration. Do not rerun `supabase_cm_mobile.sql`.
+- See `REALISM_FIXES_REPORT_v4.0.3.md` and the new targeted test harnesses.
+
+## Validation status
+- 22 active legacy regression harnesses pass. The v3.77 transfer-market test is retained as historical and excluded because its wage-budget assertion predates the v3.78 negotiation model.
+- New player-lifecycle/match-minute and EFL finance de-duplication tests pass.
+- All inline JavaScript blocks pass `node --check`.
+- Full live-browser/mobile acceptance and Supabase round-trip remain outstanding.

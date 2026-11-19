@@ -21,7 +21,7 @@ function developYouthAcademyProspect(p,clubName,season){
  const gain=rng()<.08&&gap>=2?2:1;cm70SetPlayerRating(p,Math.min(potential,rating+gain));p.academyDevelopmentSeasons=[...(Array.isArray(p.academyDevelopmentSeasons)?p.academyDevelopmentSeasons:[]),Number(season)].slice(-8);return Number(p.rating)>rating;
 }
 // Verify that all game simulation pathways use the common development system.
-for(const [name,pattern] of Object.entries({live:/applyPlayerMatchExperienceDevelopment\(p,playedMinutes,engine\.matchKey/,aiPremier:/applyPlayerMatchExperienceDevelopment\(target,90,`LEAGUE-/,lowerLeagues:/applyPlayerMatchExperienceDevelopment\(p,90,matchKey\)/,cupAndEurope:/applyPlayerMatchExperienceDevelopment\(target,90,sim\?\.cmMatchKey\)/,youth:/developYouthAcademyProspect\(p,c\.name,season-1\)/}))assert(pattern.test(source),`Missing integration: ${name}`);
+for(const [name,pattern] of Object.entries({live:/applyPlayerMatchExperienceDevelopment\(p,playedMinutes,engine\.matchKey/,aiPremier:/applyPlayerMatchExperienceDevelopment\(target,mins,`LEAGUE-/,lowerLeagues:/applyPlayerMatchExperienceDevelopment\(p,90,matchKey\)/,cupAndEurope:/applyPlayerMatchExperienceDevelopment\(target,90,sim\?\.cmMatchKey\)/,youth:/developYouthAcademyProspect\(p,c\.name,season-1\)/}))assert(pattern.test(source),`Missing integration: ${name}`);
 assert(source.includes('sim.cmMatchKey=`EUROPE-'),'European league phase missing match key');
 // 10-season player progression cohorts: manager, Premier League AI, EFL AI.
 const cohorts={manager:[],premierLeagueAI:[],eflAI:[]};

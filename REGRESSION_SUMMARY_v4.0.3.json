@@ -1,0 +1,22 @@
+{
+  "version": "4.0.3",
+  "activeLegacyTests": 22,
+  "activeLegacyFailures": 0,
+  "historicalExcluded": [
+    "ai_european_market_tests_v377.js"
+  ],
+  "newTargetedTests": {
+    "critical_fixes_tests.js": "passed",
+    "finance_dedupe_tests.js": "passed"
+  },
+  "inlineJavaScriptBlocks": 3,
+  "syntax": "passed",
+  "databaseSchemaChanged": false,
+  "browserAcceptance": "not run",
+  "supabaseRoundTrip": "not run",
+  "remainingAuditItems": [
+    "live/background goal-distribution calibration",
+    "global economic calendar independent of manager division",
+    "non-English national league simulation and performance-based UEFA qualification"
+  ]
+}
