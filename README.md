@@ -1,53 +1,33 @@
 # CM Mobile 4.0 – Classic Edition
 
-Final visual edition based on the v3.82 application.
+## Version 4.0.4 – Cup Format Repair
 
-## Design
-The interface has been restyled as a compact, information-dense football management game with a restrained late-1990s blue/grey palette, square panels, clear table hierarchy and compact navigation. The presentation is inspired by the usability and visual language of Championship Manager 97/98; it does not reproduce proprietary artwork or screen assets.
+This maintenance release corrects the domestic cup participant pools and progression counts, and fixes low-contrast text in cup screens.
 
-## Included
-- `index.html` – complete game application.
-- `VERSION.txt` – internal release version.
-- `CHANGELOG_v4.0.md` – design and cleanup notes.
-- Previous player-profile, squad UI, progression, transfer, economy and competition reports/tests retained for reference.
-- `supabase_cm_mobile.sql` – unchanged database script.
+## Correct cup formats
+- EFL / Carabao Cup: 20 Premier League clubs + 72 clubs from the Championship, League One and League Two = 92 unique entrants. National League clubs are not automatically added to the EFL Cup.
+- FA Cup: the same 92 professional entrants plus 32 selected non-league entrants = 124 unique entrants.
+- The Carabao Cup has exactly four semi-finalists across the two-legged semi-final; the FA Cup has 32 clubs after the third round.
+
+## Saved-career compatibility
+- Existing player identities, attributes, contracts, statistics and career history are retained.
+- Played cup results and saved semi-final tie records are preserved.
+- Unstarted cups are rebuilt with the corrected entrant list.
+- Progressed cups are repaired only where the saved results/ties provide enough evidence to identify the correct field. Otherwise the previous field is preserved and a data-integrity warning is recorded rather than guessing.
+- No save schema or Supabase schema change.
 
 ## Publishing
-1. Back up the current GitHub repository and existing career data.
-2. Replace the repository's `index.html` with this release's `index.html`.
-3. Keep the existing Supabase project and schema.
-4. Do **not** rerun `supabase_cm_mobile.sql`; this release makes no database changes.
-5. Test an existing saved career on desktop and mobile before making it the public default.
+1. Back up the GitHub repository and the current career save.
+2. Replace the repository `index.html` with the file in this package.
+3. Keep the existing Supabase project and database schema.
+4. Do not rerun `supabase_cm_mobile.sql`; it is unchanged.
+5. Open a copy of an existing career and verify FA Cup, Carabao Cup, the saved match history and mobile cup screens.
 
-## Compatibility and safety
-- No save-schema or database migration.
-- No changes to player identities, player attributes, squads, contracts, transfer history, match simulation or competition logic.
-- Existing v3.82 player profiles, clickable club squads and opponent starting XI are retained.
-- The game UI no longer displays build/version information. Version 4.0 remains in the release files for maintenance and support.
+## Validation
+- 24 retained legacy JavaScript regression harnesses passed.
+- 2 new cup-format / save-migration harnesses passed.
+- All 3 inline JavaScript blocks passed `node --check`.
+- Package ZIP integrity checked.
+- Full live browser/device acceptance test and Supabase round-trip have not been performed here.
 
-## Validation limitations
-Automated syntax and feature regression checks do not replace full manual browser testing on real mobile and desktop devices or a Supabase round-trip. Complete that acceptance test before describing the release as production-certified.
-
-
-## v4.0.2 – Notification cleanup
-- Internal technical audit/migration messages are hidden from the manager-facing alert inbox and home news feed.
-- Real football news and existing career data are retained. Diagnostic log entries are not deleted.
-- No database changes. Do not rerun `supabase_cm_mobile.sql`.
-- See `NOTIFICATION_CLEANUP_REPORT_v4.0.2.md` and `notification_cleanup_tests_v4.0.2.js`.
-
-
-## CM Mobile 4.0.3 – Realism Stabilization
-
-- Continental European player squads now receive the annual ageing, development/decline and retirement pass.
-- European player season statistics are archived before rollover and reset for the new season. Career totals/history are synchronized to secondary roster mirrors.
-- European AI clubs now use the same contract-renewal planner as domestic AI clubs.
-- EFL clubs already represented in the canonical `CLUBS` registry are no longer processed a second time by the lower-league mirror during weekly economy or annual finance review.
-- Background matches now remove dismissed and injured players from the active XI, support second-yellow dismissals, use up to three same-position injury replacements when available, and record actual player minutes rather than giving every starter 90 minutes. Team strength is recalculated as the active XI changes.
-- No database/schema migration. Do not rerun `supabase_cm_mobile.sql`.
-- See `REALISM_FIXES_REPORT_v4.0.3.md` and the new targeted test harnesses.
-
-## Validation status
-- 22 active legacy regression harnesses pass. The v3.77 transfer-market test is retained as historical and excluded because its wage-budget assertion predates the v3.78 negotiation model.
-- New player-lifecycle/match-minute and EFL finance de-duplication tests pass.
-- All inline JavaScript blocks pass `node --check`.
-- Full live-browser/mobile acceptance and Supabase round-trip remain outstanding.
+See `CUP_COMPETITION_REPAIR_REPORT_v4.0.4.md` and `CHANGELOG_v4.0.4.md` for detail.

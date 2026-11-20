@@ -701,6 +701,29 @@ button.primary:disabled{background:#c7d5bf;color:#40533b;border-color:#8a9e7c}
 /* Strong keyboard focus and visible interaction state. */
 button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #f0c85b;outline-offset:2px}
 
+
+/* v4.0.4 Classic cup contrast: dark surfaces always use light text; light pills use dark text. */
+.domestic-cup-card{background:#142338;color:#f4f7fb;border-color:#40556c}
+.domestic-cup-head{background:#1c3d5d;border-bottom-color:#40556c}
+.domestic-cup-title h2,.cup-progress-info strong,.cup-results-details>summary,.cup-result-team strong,.cup-result-center>b,.cup-pending-copy strong,.cup-pending-vs>div{color:#f4f7fb!important}
+.domestic-cup-title .eyebrow,.domestic-cup-title p,.cup-progress-info small,.cup-result-center>small,.cup-pending-copy small,.cup-pending-vs>b,.cup-accordion>p.muted,.cup-accordion .player-meta{color:#c4d2df!important}
+.cup-progress-percent{color:#e1edfa!important}
+.cup-result-row{background:#172a40;color:#f4f7fb;border-top-color:#40556c;border-bottom-color:#40556c}
+.cup-result-row.user-cup-result{background:#1b3550}
+.cup-winner-line{color:#bdebd0!important}
+.cup-winner-line.pending{color:#c4d2df!important}
+.domestic-cup-head>.pill,.cup-accordion .pill,.cup-progress-info .pill,.cup-results-details .pill{background:#dce5ec!important;color:#193650!important;border:1px solid #9bafbf!important}
+.domestic-cup-head>.pill.green,.cup-champion{background:#1b372b;color:#f1fff5}
+.cup-results-details{border-color:#40556c}
+.cup-results-details>summary{background:#1a3048;color:#f4f7fb}
+.cup-results-details>summary:after,.cup-accordion>summary:after{color:#d5e2ee!important}
+.cup-pending-match{background:#1a3048;color:#f4f7fb;border-color:#607f9d}
+.cup-pending-copy small{color:#d2deea!important}
+.cup-format-warning{background:#fff1d1!important;color:#4b3513!important;border:1px solid #d8b86c!important}
+.cup-format-warning *{color:#4b3513!important}
+.cup-accordion>summary{color:#fff}
+.cup-accordion>summary h2{color:#fff!important}
+.cup-accordion>summary .pill{background:#dce5ec!important;color:#193650!important}
 </style></head>
 <body>
 <header><div class="top"><div><div class="brand">CM <span>MOBILE</span></div><div class="season" id="topSeason">2026/27 · Premier League</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="cloudAccountBtn" title="Koble til skylagring">☁ Konto</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
@@ -5427,7 +5450,7 @@ function eflClubStrengthEstimate(division,clubName){
  return Math.max(base-5,Math.min(base+5,base+(stableSeed(clubName+'|strength-fallback-v245')%11)-5));
 }
 function applyEFLClubStrengthEstimates(rows,division){(rows||[]).forEach(club=>{club.strength=eflClubStrengthEstimate(division,club.name);club.strengthSource='curated club-specific 2026/27 estimate v2.45; squad-based match power v2.46';});}
-const DOMESTIC_CUP_FORMAT_VERSION=2;
+const DOMESTIC_CUP_FORMAT_VERSION=3;
 const EFL_CUP_PRELIMINARY_TEAMS_2026_27=['Tranmere Rovers','Rochdale','York City','Crawley Town'];
 const FA_CUP_NON_LEAGUE_CANDIDATES_2026_27=[
  'Southend United','Hartlepool United','Eastleigh','Solihull Moors','Aldershot Town','Gateshead','Wealdstone','Dagenham & Redbridge','Barrow','Carlisle United','Harrogate Town','Worthing','Hornchurch','AFC Fylde','FC Halifax Town','Forest Green Rovers','Scunthorpe United',
@@ -5448,21 +5471,33 @@ const EFL_CUP_NORTH_CLUBS=new Set([
 function cupRegionForTeam(team){return EFL_CUP_NORTH_CLUBS.has(String(team?.name||team||''))?'North':'South';}
 function buildDomesticCupData(){
  const uniqueByName=list=>[...new Map((list||[]).filter(t=>t&&t.name).map(t=>[String(t.name).trim().toLowerCase(),t])).values()];
- const premier=CLUBS.map((c,i)=>({name:c.name,strength:Number(c.strength)||65,clubIndex:i,division:clubDivision(c),europeanQualified:clubDivision(c)==='Premier League'&&isEuropeanQualifiedClub(c.name),cupRegion:cupRegionForTeam(c)}));
+ const clubIndexByName=new Map(CLUBS.map((c,i)=>[String(c.name).trim().toLowerCase(),i]));
+ // The domestic registry also contains 24 National League clubs. They are NOT EFL Cup entrants.
+ // The EFL Cup consists of 20 Premier League clubs plus the 72 clubs in the three EFL divisions.
+ const premier=CLUBS.map((c,i)=>({name:c.name,strength:Number(c.strength)||65,clubIndex:i,division:clubDivision(c),europeanQualified:clubDivision(c)==='Premier League'&&isEuropeanQualifiedClub(c.name),cupRegion:cupRegionForTeam(c)})).filter(t=>t.division==='Premier League');
  const efl=[];
- Object.entries(EFL_DIVISIONS||{}).forEach(([division,names])=>{if(division==='National League')return;(names||[]).forEach(name=>{
-  if(premier.some(t=>t.name===name))return;
-  const row=appState.lowerLeagues?.[division]?.rows?.find(r=>r.name===name);
-  efl.push({name,strength:Number(row?.strength)||eflClubStrengthEstimate(division,name),clubIndex:null,division,europeanQualified:false,cupRegion:cupRegionForTeam(name)});
- });});
+ for(const division of ['Championship','League One','League Two']){
+  for(const name of EFL_DIVISIONS?.[division]||[]){
+   const index=clubIndexByName.get(String(name).trim().toLowerCase());
+   const club=index===undefined?null:CLUBS[index];
+   const row=appState.lowerLeagues?.[division]?.rows?.find(r=>r.name===name);
+   efl.push({name,strength:Number(row?.strength)||Number(club?.strength)||eflClubStrengthEstimate(division,name),clubIndex:index===undefined?null:index,division,europeanQualified:false,cupRegion:cupRegionForTeam(name)});
+  }
+ }
  const leagueTeams=uniqueByName([...premier,...efl]);
  const leagueNames=new Set(leagueTeams.map(t=>String(t.name).trim().toLowerCase()));
+ // Use 32 unique non-league entrants. National League clubs are eligible here, not as EFL clubs.
  const nonLeagueNames=[];
- for(const name of FA_CUP_NON_LEAGUE_CANDIDATES_2026_27){const key=String(name).trim().toLowerCase();if(leagueNames.has(key)||nonLeagueNames.some(n=>n.toLowerCase()===key))continue;nonLeagueNames.push(name);if(nonLeagueNames.length===32)break;}
+ for(const name of FA_CUP_NON_LEAGUE_CANDIDATES_2026_27){
+  const key=String(name).trim().toLowerCase();
+  if(!key||leagueNames.has(key)||nonLeagueNames.some(n=>n.toLowerCase()===key))continue;
+  nonLeagueNames.push(name);
+  if(nonLeagueNames.length===32)break;
+ }
  const nonLeague=nonLeagueNames.map(name=>({name,strength:42+(stableSeed(name+'|fa-cup-strength-2026')%12),clubIndex:null,division:'Non-league',europeanQualified:false,cupRegion:cupRegionForTeam(name)}));
  const prelim=new Set(EFL_CUP_PRELIMINARY_TEAMS_2026_27);
  const eflCupTeams=leagueTeams.map(team=>({...team,entryStage:team.division==='Premier League'?(team.europeanQualified?4:3):(prelim.has(team.name)?1:2)}));
- const faCupTeams=[...leagueTeams,...nonLeague].map(team=>({...team,entryStage:['Premier League','Championship'].includes(team.division)?3:1}));
+ const faCupTeams=uniqueByName([...leagueTeams,...nonLeague]).map(team=>({...team,entryStage:['Premier League','Championship'].includes(team.division)?3:1}));
  return {
   'EFL Cup':{formatVersion:DOMESTIC_CUP_FORMAT_VERSION,teams:eflCupTeams,round:0,results:[],champion:null,scheduled:[...CUP_CALENDAR['EFL Cup']],semiFinalTies:[],started:false},
   'FA Cup':{formatVersion:DOMESTIC_CUP_FORMAT_VERSION,teams:faCupTeams,round:0,results:[],champion:null,scheduled:[...CUP_CALENDAR['FA Cup']],started:false}
@@ -5493,52 +5528,77 @@ function domesticCupPlayedMatchCount(cup){
  return seen.size;
 }
 // v3.24: Repair two safe 2026/27 saved-cup registration defects without touching results.
+function domesticCupExpectedRemainingCount(name,roundNo){
+ const round=Math.max(0,Math.floor(Number(roundNo)||0));
+ const counts=name==='EFL Cup'?[92,90,55,32,16,8,4,4,2,1]:[124,84,64,32,16,8,4,2,1];
+ return counts[Math.min(round,counts.length-1)];
+}
 function repairSavedDomesticCupRegistrations(){
- if(Number(appState.seasonYear||2026)!==2026||!appState.cupCompetitions)return;
- const fresh=buildDomesticCupData();
- const fa=appState.cupCompetitions['FA Cup'];
- if(fa&&Number(fa.round||0)===0&&!(fa.results||[]).length&&appState.pendingCupMatch?.competition!=='FA Cup'&&
-    (fa.teams||[]).length!==fresh['FA Cup'].teams.length){
-  const oldCount=(fa.teams||[]).length;
-  appState.cupCompetitions['FA Cup']={...fresh['FA Cup'],scheduled:[...CUP_CALENDAR['FA Cup']]};
-  appState.log=appState.log||[];
-  appState.log.push(`FA Cup-registrering reparert ved sesongstart: ${oldCount} lag erstattet med ${fresh['FA Cup'].teams.length} korrekte deltakere. Ingen spilte resultater ble endret.`);
- }
- const efl=appState.cupCompetitions['EFL Cup'],pending=appState.pendingCupMatch;
- // The official 2026/27 stage model leaves 32 clubs after stage 3: 23 winners plus nine later-entry European clubs.
- if(efl&&Number(efl.round||0)===3&&
-    Number(pending?.roundNo)===4&&pending?.competition==='EFL Cup'&&
-    domesticCupPlayedMatchCount(efl)===60&&(efl.teams||[]).length!==32){
-  const baseline=fresh['EFL Cup'].teams||[];
-  const byKey=new Map(baseline.map(t=>[normalizedClubKey(t.name),t]));
-  const oldByKey=new Map((efl.teams||[]).map(t=>[normalizedClubKey(t.name),t]));
-  const stageWinners=[...new Set((efl.results||[]).filter(r=>Number(r.round)===3&&r.winner&&r.winner!=='Uavgjort før returoppgjøret').map(r=>normalizedClubKey(r.winner)).filter(Boolean))];
-  const lateEntrants=baseline.filter(t=>Number(t.entryStage)>3);
-  const repaired=[];const used=new Set();
-  const addTeam=key=>{
-   if(!key||used.has(key))return;
-   const canonical=byKey.get(key);if(!canonical)return;
-   used.add(key);
-   const old=oldByKey.get(key);
-   repaired.push(old?{...canonical,...old,name:canonical.name,division:canonical.division,entryStage:canonical.entryStage,clubIndex:canonical.clubIndex}:{...canonical});
-  };
-  stageWinners.forEach(addTeam);
-  lateEntrants.forEach(t=>addTeam(normalizedClubKey(t.name)));
-  const pendingKeys=[normalizedClubKey(pending.homeTeam?.name),normalizedClubKey(pending.awayTeam?.name)];
-  if(stageWinners.length===23&&lateEntrants.length===9&&repaired.length===32&&pendingKeys.every(k=>used.has(k))){
-   const oldCount=(efl.teams||[]).length;
-   efl.teams=repaired;
-   // Switch the saved cup to the current, validated stage model and regenerate the not-yet-played draw.
-   // The pending tie and its AI pairings are not results yet, so this does not overwrite played matches.
-   efl.formatVersion=DOMESTIC_CUP_FORMAT_VERSION;
-   appState.pendingCupMatch=null;
-   simulateCupRound('EFL Cup',4);
-   if(appState.pendingCupMatch?.competition==='EFL Cup'&&Number(appState.pendingCupMatch.roundNo)===4){
-    appState.log=appState.log||[];
-    appState.log.push(`Carabao Cup-registrering reparert før tredje runde: ${oldCount} lag korrigert til 32. Trekningen ble laget på nytt for å inkludere alle deltakere; de 60 tidligere kampresultatene er bevart.`);
+ if(!appState.cupCompetitions)return {repaired:[],warnings:[]};
+ const fresh=buildDomesticCupData(),repaired=[],warnings=[],redraw=[];
+ const key=name=>typeof normalizedClubKey==='function'?normalizedClubKey(name):String(name||'').trim().toLowerCase();
+ const mergeCanonical=(name,oldTeam)=>{
+  const canonical=fresh[name].teams.find(t=>key(t.name)===key(oldTeam?.name));
+  return canonical?{...canonical,...oldTeam,name:canonical.name,division:canonical.division,clubIndex:canonical.clubIndex,entryStage:canonical.entryStage}:{...oldTeam};
+ };
+ for(const name of ['EFL Cup','FA Cup']){
+  const cup=appState.cupCompetitions[name];if(!cup)continue;
+  const round=Math.max(0,Math.floor(Number(cup.round)||0));
+  const pending=appState.pendingCupMatch?.competition===name?appState.pendingCupMatch:null;
+  const oldTeams=[...(cup.teams||[])];
+  const seenOld=new Set();
+  const uniqueOld=oldTeams.filter(t=>t&&t.name&&!seenOld.has(key(t.name))&&seenOld.add(key(t.name)));
+  const canonicalMap=new Map(fresh[name].teams.map(t=>[key(t.name),t]));
+  const hasProgress=round>0||(cup.results||[]).length>0||!!pending;
+  if(!hasProgress){
+   if(Number(cup.formatVersion)!==DOMESTIC_CUP_FORMAT_VERSION||uniqueOld.length!==fresh[name].teams.length){
+    appState.cupCompetitions[name]={...fresh[name],scheduled:[...(CUP_CALENDAR[name]||[])]};
+    repaired.push({competition:name,from:uniqueOld.length,to:fresh[name].teams.length,reason:'unstarted-pool'});
+   }
+   continue;
+  }
+  let nextTeams=null,reason='';
+  // The two-legged EFL semi-final has an exact, authoritative four-team field in its tie records.
+  // Older saves accidentally carried an extra bye team into stage 7; it is not a semi-finalist.
+  if(name==='EFL Cup'&&round===7&&Array.isArray(cup.semiFinalTies)&&cup.semiFinalTies.length===2){
+   const tieTeams=[];const seen=new Set();
+   for(const tie of cup.semiFinalTies){
+    for(const t of [tie?.team1,tie?.team2]){
+     const k=key(t?.name);if(k&&!seen.has(k)){seen.add(k);tieTeams.push(t);}
+    }
+   }
+   if(tieTeams.length===4){nextTeams=tieTeams.map(t=>mergeCanonical(name,t));reason='two-legged-semi-final-field';}
+  }
+  if(!nextTeams){
+   const expected=domesticCupExpectedRemainingCount(name,round);
+   const valid=uniqueOld.filter(t=>canonicalMap.has(key(t.name)));
+   if(valid.length===expected&&expected>0){nextTeams=valid.map(t=>mergeCanonical(name,t));reason='canonical-survivors';}
+  }
+  if(nextTeams){
+   const before=uniqueOld.length,after=nextTeams.length;
+   const dropped=uniqueOld.filter(t=>!nextTeams.some(n=>key(n.name)===key(t.name))).map(t=>t.name);
+   cup.teams=nextTeams;
+   cup.formatVersion=DOMESTIC_CUP_FORMAT_VERSION;
+   cup.formatIntegrityWarning=null;
+   cup.formatRepair={version:DOMESTIC_CUP_FORMAT_VERSION,reason,from:before,to:after,dropped,seasonYear:Number(appState.seasonYear)||2026};
+   repaired.push({competition:name,from:before,to:after,reason,dropped});
+   // An unplayed ordinary user tie was drawn from the old oversized field. Recreate that draw
+   // from the corrected field; already completed results remain untouched.
+   if(pending&&Number(pending.roundNo)===round+1&&!pending.isDomesticCupSemiFinal&&!(pending.isEuropean||pending.isEuropeanKnockout||pending.isEuropeanLeague)){
+    appState.pendingCupMatch=null;
+    redraw.push({name,stage:Number(pending.roundNo)});
+   }
+  }else{
+   const expected=domesticCupExpectedRemainingCount(name,round);
+   if(Number(cup.formatVersion)!==DOMESTIC_CUP_FORMAT_VERSION||uniqueOld.length!==expected){
+    cup.formatIntegrityWarning=`Turneringen har et eldre oppsett (${uniqueOld.length} lag registrert; forventet ${expected}). Spilte resultater er bevart, men feltet kunne ikke korrigeres automatisk uten å endre hvem som har gått videre.`;
+    warnings.push({competition:name,round,registered:uniqueOld.length,expected,reason:'unsafe-to-rebuild-from-existing-results'});
    }
   }
  }
+ appState.cupFormatAudit={version:DOMESTIC_CUP_FORMAT_VERSION,seasonYear:Number(appState.seasonYear)||2026,entrants:{'EFL Cup':fresh['EFL Cup'].teams.length,'FA Cup':fresh['FA Cup'].teams.length},expectedAfterStage:{'EFL Cup':[90,55,32,16,8,4,4,2,1],'FA Cup':[84,64,32,16,8,4,2,1]},lastRepairs:repaired,lastWarnings:warnings};
+ for(const item of redraw)simulateCupRound(item.name,item.stage);
+ return {repaired,warnings};
 }
 function cupDrawPairings(entrants,name,stageNo){
  const seedSort=list=>[...list].sort((a,b)=>stableSeed(`${seasonLabel()}|${name}|draw|${stageNo}|${a.name}`)-stableSeed(`${seasonLabel()}|${name}|draw|${stageNo}|${b.name}`));
@@ -5658,7 +5718,7 @@ function initDomesticCompetitions(){
    if(!old||(!hasProgress&&Number(old.formatVersion||0)!==DOMESTIC_CUP_FORMAT_VERSION))appState.cupCompetitions[name]=fresh;
   });
  }
- if(appState.cupCompetitions){Object.entries(CUP_CALENDAR).forEach(([name,weeks])=>{const cup=appState.cupCompetitions[name];if(!cup)return;cup.scheduled=[...weeks];if(cup.formatVersion===DOMESTIC_CUP_FORMAT_VERSION)(cup.teams||[]).forEach(t=>{if(t.division==='Premier League')t.europeanQualified=isEuropeanQualifiedClub(t.name);});});}
+ if(appState.cupCompetitions){Object.entries(CUP_CALENDAR).forEach(([name,weeks])=>{const cup=appState.cupCompetitions[name];if(!cup)return;cup.scheduled=[...weeks];if(cup.formatVersion===DOMESTIC_CUP_FORMAT_VERSION&&Number(cup.round||0)===0&&!(cup.results||[]).length&&appState.pendingCupMatch?.competition!==name){const prelim=new Set(EFL_CUP_PRELIMINARY_TEAMS_2026_27);(cup.teams||[]).forEach(t=>{if(t.division==='Premier League'){t.europeanQualified=isEuropeanQualifiedClub(t.name);if(name==='EFL Cup')t.entryStage=t.europeanQualified?4:3;}else if(name==='EFL Cup')t.entryStage=prelim.has(t.name)?1:2;else t.entryStage=['Championship'].includes(t.division)?3:1;});}}); }
  repairSavedDomesticCupRegistrations();
  appState.cupCalendarVersion=3;
  if(!appState.eflPlayerDatabase){appState.eflPlayerDatabase=mergeEFLPlayerDBByClubName(previousEflPlayerDatabase,buildEFLPlayerDB());appState.eflPlayerDatabaseVersion=EFL_DB_VERSION;}
@@ -7457,7 +7517,7 @@ function renderDomesticCupCard(name,cup){
  const entrants=isEfl?92:124,remaining=(cup.teams||[]).length,matchCount=domesticCupPlayedMatchCount(cup),progress=Math.round(completed/total*100),recent=[...(cup.results||[])].slice(-6).reverse();
  const milestones=Array.from({length:total},(_,i)=>{const stage=i+1,done=stage<=completed,active=stage===current&&!cup.champion;return `<span class="cup-stage-dot ${done?'done':''} ${active?'active':''}" title="${esc(cupRoundLabel(name,stage))}">${done?'✓':stage}</span>`}).join('');
  const pending=appState.pendingCupMatch?.competition===name?appState.pendingCupMatch:null;
- const legacyNote=Number(cup.formatVersion)!==DOMESTIC_CUP_FORMAT_VERSION?`<div class="notice">Denne cupen startet med eldre turneringsdata. Tidligere resultater er bevart; den nye strukturen brukes fra neste sesong.</div>`:'';
+ const legacyNote=cup.formatIntegrityWarning?`<div class="notice cup-format-warning">${esc(cup.formatIntegrityWarning)}</div>`:(Number(cup.formatVersion)!==DOMESTIC_CUP_FORMAT_VERSION?`<div class="notice">Denne cupen startet med eldre turneringsdata. Tidligere resultater er bevart; nytt oppsett brukes fra neste sesong.</div>`:'');
  const resultRows=recent.map(r=>{
   const home=typeof clubBadgeMarkup==='function'?clubBadgeMarkup({name:r.home},28):esc(r.home.slice(0,3)),away=typeof clubBadgeMarkup==='function'?clubBadgeMarkup({name:r.away},28):esc(r.away.slice(0,3));
   const legText=r.leg===1?' · Første kamp':r.leg===2?' · Returoppgjør':'';
@@ -7466,7 +7526,7 @@ function renderDomesticCupCard(name,cup){
  }).join('');
  const pendingMarkup=pending?`<div class="cup-pending-match"><div class="cup-pending-copy"><span class="eyebrow">Din neste cupkamp</span><strong>${esc(pending.roundLabel||cupRoundLabel(name,pending.roundNo))}</strong><small>${pending.knockoutLeg===1?'Semifinale · første kamp':pending.knockoutLeg===2?'Semifinale · returoppgjør':'Vinneren går videre'}</small></div><div class="cup-pending-vs"><div>${clubBadgeMarkup(pending.homeTeam,32)}<strong>${esc(pending.homeTeam.name)}</strong></div><b>VS</b><div>${clubBadgeMarkup(pending.awayTeam,32)}<strong>${esc(pending.awayTeam.name)}</strong></div></div><button class="primary" onclick="startPendingCupMatch()">Forbered kampen →</button></div>`:'';
  const championMarkup=cup.champion?`<div class="cup-champion"><span>🏆</span><div><small>Vinnere av ${esc(title)}</small><strong>${esc(cup.champion)}</strong></div></div>`:'';
- const description=isEfl?'Alle 72 EFL-klubbene deltar. De fire utvalgte lagene spiller innledende runde; 11 PL-klubber kommer inn i runde to, mens de ni PL-klubbene i Europa kommer inn i runde tre. Semifinalene spilles over to kamper.':'124 klubber i denne spillversjonen: 48 fra League One/Two og 32 ikke-ligaklubber starter i første runde. Championship og Premier League kommer inn i tredje runde.';
+ const description=isEfl?'Alle 20 Premier League-klubbene og 72 EFL-klubbene deltar. Fire EFL-klubber starter i innledende runde, 68 EFL-klubber i første runde, 11 PL-klubber i andre runde og ni PL-klubber med europacupdeltakelse i tredje runde. Semifinalene spilles over to kamper.':'124 klubber deltar: 48 fra League One og League Two samt 32 ikke-ligaklubber starter i første runde. Championship og Premier League kommer inn i tredje runde.';
  return `<section class="card domestic-cup-card ${isEfl?'efl-cup-card':'fa-cup-card'}"><div class="domestic-cup-head"><div class="domestic-cup-emblem">🏆</div><div class="domestic-cup-title"><span class="eyebrow">${esc(tag)} · ${seasonLabel()}</span><h2>${esc(title)}</h2><p>${esc(description)}</p></div><span class="pill ${cup.champion?'green':''}">${cup.champion?'Ferdig':esc(cupRoundLabel(name,current))}</span></div><div class="cup-progress-info"><div><strong>${esc(cupProgressText(cup,name))}</strong><small>${remaining} klubber i feltet · ${matchCount} kamper spilt</small></div><strong class="cup-progress-percent">${progress}%</strong></div><div class="cup-progress-track"><span style="width:${progress}%"></span></div><div class="cup-stage-track">${milestones}</div>${legacyNote}${pendingMarkup}${championMarkup}<details class="cup-results-details" ${recent.length?'open':''}><summary><span>Siste resultater</span><span class="pill">${matchCount} kamper</span></summary>${resultRows||'<p class="muted">Ingen resultater ennå. Trekningen kommer fram når den første runden er behandlet.</p>'}</details></section>`;
 }
 function competitions(){initDomesticCompetitions();processScheduledDomesticCups(Number(appState.week)||1);const cups=appState.cupCompetitions;const divisions=Object.entries(appState.lowerLeagues).map(([name,d])=>{const rows=[...d.rows].sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga));const complete=rows.length>0&&rows.every(r=>(Number(r.p)||0)>=46);return `<section class="card"><div class="section-title"><h2>${name}</h2><span class="pill">${d.playedRounds}/46 runder</span></div>${d.activeManagerOwned?'<p class="muted">Denne divisjonen styres av hovedkampmotoren i aktiv karriere.</p>':''}<div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${tableZoneClass(name,i+1,rows.length)}">${rankCellMarkup(i+1,tableMovementBadge(name,r,rows,46,complete))}<td><button type="button" class="table-club-link" data-club="${esc(r.name)}" data-division="${esc(name)}" onclick="openClubRoster(this.dataset.club,this.dataset.division)" aria-label="Vis spillerstallen til ${esc(r.name)}">${esc(r.name)}</button></td><td>${r.p}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td></tr>`).join('')}</tbody></table></div>${tableZoneLegend(name)}</section>`});const calendar=(appState.domesticCalendar||[]).slice(-12).reverse();return `<div class="hero"><div class="eyebrow">NASJONALE CUPER · ${seasonLabel()}</div><h1>FA Cup og Carabao Cup</h1><div class="grid"><div class="stat"><small>FA Cup</small><strong>${cups['FA Cup'].teams.length||1} lag igjen</strong></div><div class="stat"><small>Carabao Cup</small><strong>${cups['EFL Cup'].teams.length||1} lag igjen</strong></div><div class="stat"><small>FA Cup-trinn</small><strong>${cups['FA Cup'].round}/${cupTotalStages('FA Cup')}</strong></div><div class="stat"><small>Carabao-trinn</small><strong>${cups['EFL Cup'].round}/${cupTotalStages('EFL Cup')}</strong></div></div></div>${renderDomesticCupCard('EFL Cup',cups['EFL Cup'])}${renderDomesticCupCard('FA Cup',cups['FA Cup'])}${Object.values(appState.europeanCompetitions||{}).map(comp=>renderEuropeanCompetitionCard(comp)).join('')}<section class="card"><div class="section-title"><h2>Midtukekalender og belastning</h2><span class="pill">${calendar.length} siste</span></div>${calendar.length?calendar.map(r=>`<div class="player"><div style="flex:1"><strong>Runde ${r.week} · ${esc(r.competition)}</strong><div class="player-meta">${esc(r.home)} ${esc(r.score)} ${esc(r.away)} · Vinner: ${esc(r.winner)}</div></div><span class="pill">${esc(r.roundLabel||'Cupkamp')}</span></div>`).join(''):''}</section>${divisions.join('')}`}
