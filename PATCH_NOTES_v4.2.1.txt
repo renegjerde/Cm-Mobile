@@ -1,0 +1,21 @@
+CM Mobile 4.2.1 – europeiske turneringer: parallell progresjon
+
+Base: CM Mobile 4.2.0 (inkluderer iOS-toppmenyrettelsen og catch-up/arkiv-reparasjonen).
+
+Berørt fil:
+- index.html
+
+Feil funnet under femsesongers simulering:
+- Når managerens kamp ventet i én europacup, hindret en global pendingCupMatch-kontroll de andre europacupene i å opprette neste utslagsrunde.
+- Dette kunne etterlate Europa League og Conference League uten activeStage etter at playoff var fullført.
+
+Rettelser:
+1. Opprettelse av neste utslagsrunde blokkeres nå bare av en ventende kamp i samme konkurranse.
+2. Når en ligafase er ferdig, kan andre europacuper opprette sin utslagsrunde selv om managerens kamp venter i en annen konkurranse.
+3. Eksisterende catch-up-sekvens, sesongkontroll, arkivering og toppmeny er beholdt.
+
+Teststatus:
+- Fem sesonger med tre europacuper testet med isolert turneringssimulator etter rettelsen.
+- Managerstyrt Champions League-kamp ble pauset og fullført, mens Europa League og Conference League fortsatte parallelt.
+- Alle fem utslagsfaser, finalevinnere og arkivering kontrollert.
+- Dette er en automatisert logikktest av turneringsfunksjonene, ikke en full manuell iPhone-gjennomspilling.

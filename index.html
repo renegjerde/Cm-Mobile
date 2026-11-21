@@ -7392,7 +7392,7 @@ function processEuropeanCompetitions(round){
    return;
   }
   if(appState.pendingCupMatch?.competition===comp.name&&(appState.pendingCupMatch.isEuropeanLeague||appState.pendingCupMatch.isEuropeanKnockout))return;
-  if(comp.leagueRound>=comp.matchdays){if(!comp.finished&&(!comp.knockout?.activeStage||comp.knockout.activeStage.complete)&&!appState.pendingCupMatch)startEuropeanKnockout(comp.name);return;}
+  if(comp.leagueRound>=comp.matchdays){if(!comp.finished&&(!comp.knockout?.activeStage||comp.knockout.activeStage.complete)&&appState.pendingCupMatch?.competition!==comp.name)startEuropeanKnockout(comp.name);return;}
   const matchdayIndex=comp.scheduledWeeks.indexOf(round);
   if(matchdayIndex<0||matchdayIndex!==comp.leagueRound)return;
   const fixtures=comp.leagueSchedule[matchdayIndex]||[];
@@ -7562,7 +7562,7 @@ function finishEuropeanKnockoutStage(comp){
  if(stage.key!=='final'){state.stageIndex=stage.stageIndex+1;state.activeStage=null;comp.phase='knockout';}
  else{state.stageIndex=5;state.activeStage=null;}
  appState.log.push(comp.finished?`${comp.name}: ${comp.champion} vant turneringen.`:`${comp.name}: ${stage.name} ferdigspilt. ${stage.ties.length} oppgjør avgjort.`);
- if(!comp.finished&&!appState.pendingCupMatch){startEuropeanKnockout(comp.name);}
+ if(!comp.finished&&appState.pendingCupMatch?.competition!==comp.name){startEuropeanKnockout(comp.name);}
 }
 function startEuropeanKnockout(name){
  ensureEuropeanCompetitions();const comp=appState.europeanCompetitions?.[name];if(!comp||comp.format!=='league')return;
