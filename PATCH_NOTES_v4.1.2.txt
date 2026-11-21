@@ -1,0 +1,18 @@
+CM Mobile 4.1.2 – iOS-toppmeny
+
+ZIP-innhold:
+- index.html
+- PATCH_NOTES_v4.1.2.txt
+
+Begge filene ligger direkte i ZIP-arkivets rot. Ingen undermapper.
+
+Endringer:
+- Fikser kun body > header (appens øverste navigasjonsmeny) til viewport-toppen.
+- Karrierer, Konto og Lagre holdes tilgjengelige under scrolling.
+- Tar hensyn til iPhone safe area / Dynamic Island.
+- Sikrer at knappegruppen ikke krymper eller legger seg utenfor skjermen på smale mobiler.
+- Setter innholdets toppavstand eksplisitt.
+- Viktig: modal- og dialog-headere påvirkes ikke lenger av en generell header-regel.
+
+Teststatus:
+CSS og HTML-struktur kontrollert. Faktisk scroll- og trykktest må bekreftes på iPhone.

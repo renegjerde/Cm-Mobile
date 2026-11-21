@@ -895,6 +895,73 @@ button:disabled,select:disabled,input:disabled{opacity:1!important;color:#465b70
 }
 </style>
 
+
+
+
+
+<style id="cm-mobile-v4-1-2-top-menu-ios">
+/* Only the app's top-level navigation header is fixed.
+   Do not affect headers inside dialogs, cards, or player panels. */
+body > header {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  z-index: 15 !important;
+  margin: 0 !important;
+  padding: calc(env(safe-area-inset-top) + 7px) 12px 7px !important;
+  background: #244b70 !important;
+  border-bottom: 1px solid #173a5d !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  transform: none !important;
+}
+body {
+  padding-top: calc(58px + env(safe-area-inset-top)) !important;
+}
+body > main#app {
+  padding-top: 10px !important;
+}
+body > header .top {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+}
+body > header .top > div:first-child {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+body > header .header-actions {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 4px !important;
+  position: relative !important;
+  z-index: 16 !important;
+  pointer-events: auto !important;
+}
+body > header .header-action {
+  flex: 0 0 auto !important;
+  min-height: 36px !important;
+  padding: 7px 7px !important;
+  font-size: 10px !important;
+  line-height: 1.15 !important;
+  white-space: nowrap !important;
+  touch-action: manipulation !important;
+  pointer-events: auto !important;
+}
+@media (max-width: 380px) {
+  body > header { padding-right: 7px !important; padding-left: 7px !important; }
+  body > header .header-action { padding-right: 5px !important; padding-left: 5px !important; font-size: 9px !important; }
+  body > header .top { gap: 4px !important; }
+}
+</style>
+
 </head>
 <body>
 <header><div class="top"><div><div class="brand">CM <span>MOBILE</span></div><div class="season" id="topSeason">2026/27 · Premier League</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="cloudAccountBtn" title="Koble til skylagring">☁ Konto</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
