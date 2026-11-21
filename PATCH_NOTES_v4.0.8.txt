@@ -1,0 +1,16 @@
+CM Mobile 4.0.8 – målrettet kontrastrettelse
+
+Innhold i ZIP:
+- index.html
+- PATCH_NOTES_v4.0.8.txt
+
+Begge filene ligger direkte i ZIP-arkivets rot. Ingen undermapper.
+
+Endringer:
+- Vanlige kamphendelser (.match-event:not(.sub-event)) får mørk tekst på lys bakgrunn.
+- Bytter og taktiske hendelser (.match-event.sub-event) beholder hvit tekst på mørkegrønn bakgrunn.
+- Selektorene er avgrenset til direkte hendelsesrader i #liveEvents og bruker høy spesifisitet.
+- Skadeikonet .injury-cross vises som rødt kors på hvit bakgrunn.
+
+Teststatus:
+Koden er kontrollert mot klassene som brukes når kampmotoren oppretter hendelser. Visuell bekreftelse på iPhone gjenstår.

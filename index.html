@@ -777,44 +777,51 @@ button:disabled,select:disabled,input:disabled{opacity:1!important;color:#465b70
 /* Dark hero panels have light secondary text, unlike pale cards. */
 .hero .muted,.hero small,.hero .season{color:#d1deea!important}
 
-
-/* v4.0.7: final-match event list is rendered on a LIGHT surface.
-   Keep live score on its dark live header, but use dark text for event rows. */
-#liveEvents,
-#liveEvents .match-event,
-#liveEvents .event-min,
-#liveEvents .event-detail,
-#liveEvents .event-detail strong,
-#liveEvents .event-detail small,
-#liveEvents .event-score {
+</style>
+<style id="cm-mobile-v4-0-8-event-row-contrast">
+/* Normal match events sit on a LIGHT surface: dark text is required. */
+#liveEvents > .match-event:not(.sub-event),
+#liveEvents > .match-event:not(.sub-event) .event-min,
+#liveEvents > .match-event:not(.sub-event) .event-detail,
+#liveEvents > .match-event:not(.sub-event) .event-detail *,
+#liveEvents > .match-event:not(.sub-event) .event-score {
   color: #172b40 !important;
   -webkit-text-fill-color: #172b40 !important;
   opacity: 1 !important;
 }
-#liveEvents .event-detail small {
+#liveEvents > .match-event:not(.sub-event) .event-detail small {
   color: #52677d !important;
   -webkit-text-fill-color: #52677d !important;
 }
-#liveEvents .match-event {
-  border-bottom-color: #bdcbd7 !important;
+#liveEvents > .match-event:not(.sub-event) {
+  background: #e7edf2 !important;
+  border-bottom-color: #aebdca !important;
 }
-#liveEvents .muted {
-  color: #52677d !important;
-  -webkit-text-fill-color: #52677d !important;
-}
-#liveFinalSection .other-match-detail {
-  color: #f1f5f9;
-}
-#liveFinalSection .other-match-detail .other-match-event-copy,
-#liveFinalSection .other-match-detail .event-minute,
-#liveFinalSection .other-match-detail .other-match-event-copy strong,
-#liveFinalSection .other-match-detail .other-match-event-copy span:not(.event-team-tag) {
+/* Substitutions and tactical rows are DARK GREEN: preserve white text. */
+#liveEvents > .match-event.sub-event,
+#liveEvents > .match-event.sub-event .event-min,
+#liveEvents > .match-event.sub-event .event-detail,
+#liveEvents > .match-event.sub-event .event-detail *,
+#liveEvents > .match-event.sub-event .event-score {
   color: #f1f5f9 !important;
   -webkit-text-fill-color: #f1f5f9 !important;
   opacity: 1 !important;
 }
-/* Injury mark: red medical cross on a white tile. */
+#liveEvents > .match-event.sub-event .event-detail small {
+  color: #c5d2df !important;
+  -webkit-text-fill-color: #c5d2df !important;
+}
+#liveEvents > .match-event.sub-event {
+  background: #182e28 !important;
+  border-bottom-color: #42634b !important;
+}
+/* Medical cross: red on white, wherever an injury is shown. */
 .injury-cross {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 17px !important;
+  height: 17px !important;
   background: #ffffff !important;
   color: #dc2626 !important;
   -webkit-text-fill-color: #dc2626 !important;
@@ -822,9 +829,11 @@ button:disabled,select:disabled,input:disabled{opacity:1!important;color:#465b70
   border-radius: 4px !important;
   font-size: 15px !important;
   font-weight: 950 !important;
+  line-height: 1 !important;
 }
+</style>
 
-</style></head>
+</head>
 <body>
 <header><div class="top"><div><div class="brand">CM <span>MOBILE</span></div><div class="season" id="topSeason">2026/27 · Premier League</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="cloudAccountBtn" title="Koble til skylagring">☁ Konto</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
 <main id="app"></main>
