@@ -777,6 +777,56 @@ button:disabled,select:disabled,input:disabled{opacity:1!important;color:#465b70
 /* Dark hero panels have light secondary text, unlike pale cards. */
 .hero .muted,.hero small,.hero .season{color:#d1deea!important}
 
+
+/* v4.0.6: targeted match-screen contrast repair */
+.live-score,
+#liveScore.live-score {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0,0,0,.55);
+  opacity: 1 !important;
+}
+.score-center .score-divider {
+  color: #c7d7e8 !important;
+  -webkit-text-fill-color: #c7d7e8 !important;
+}
+#liveEvents .match-event,
+#liveEvents .match-event .event-min,
+#liveEvents .match-event .event-detail,
+#liveEvents .match-event .event-detail strong,
+#liveEvents .match-event .event-detail small,
+#liveEvents .match-event .event-score {
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+  opacity: 1 !important;
+}
+#liveEvents .match-event .event-detail small {
+  color: #c5d2df !important;
+  -webkit-text-fill-color: #c5d2df !important;
+}
+.other-match-detail .other-match-event,
+.other-match-detail .other-match-event-copy,
+.other-match-detail .other-match-event-copy strong,
+.other-match-detail .other-match-event-copy span:not(.event-team-tag),
+.other-match-detail .event-minute {
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+  opacity: 1 !important;
+}
+.other-match-detail .other-match-event-copy {
+  color: #f1f5f9 !important;
+}
+.injury-cross {
+  background: #ffffff !important;
+  color: #dc2626 !important;
+  -webkit-text-fill-color: #dc2626 !important;
+  border: 1px solid #dc2626 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.25);
+  font-size: 15px !important;
+  font-weight: 950 !important;
+}
+
 </style></head>
 <body>
 <header><div class="top"><div><div class="brand">CM <span>MOBILE</span></div><div class="season" id="topSeason">2026/27 · Premier League</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="cloudAccountBtn" title="Koble til skylagring">☁ Konto</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
