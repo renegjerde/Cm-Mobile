@@ -1,0 +1,13 @@
+CM Mobile 4.0.6 – målrettet skjermretting
+
+Berørt fil:
+- CM_Mobile_4.0.5/index.html
+
+Endringer:
+- Kampresultatet (#liveScore) får eksplisitt hvit tekst, synlig skygge og full opasitet.
+- Hendelseslisten i live-kampen får lyse tekstfarger med tydeligere sekundærtekst.
+- Hendelsesdetaljer i andre kamper får samme kontrastforbedring.
+- Skadeikonet endres fra hvitt kors på rød flate til rødt kors på hvit flate.
+
+Installer ved å erstatte eksisterende index.html med filen i pakken.
+Ingen av de øvrige 109 filene er endret.
