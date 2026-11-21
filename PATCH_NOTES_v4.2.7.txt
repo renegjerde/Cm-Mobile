@@ -1,0 +1,27 @@
+CM Mobile 4.2.7 – karrierelagring: synkronisering før oppstart
+
+Base: CM Mobile 4.2.6.
+
+Berørt fil:
+- index.html
+
+Feilårsak:
+- Oppstarten startet skylagring asynkront, men forsøkte samtidig å lese aktiv karriere lokalt.
+- Hvis aktiv karriere manglet lokalt mens skyen fremdeles synkroniserte, kunne appen velge en annen tilgjengelig lagring.
+- Karrieremanageren kunne dermed vise Salford-slotten før payload var hentet.
+
+Rettet:
+1. Oppstart venter nå på autentisert skylagring før aktiv karriere velges.
+2. Skyimport ved oppstart bruker silentRender for å unngå UI-rendering før bootstrap er ferdig.
+3. Hvis aktiv slot finnes i indeks men mangler lokal payload etter skyforsøket, starter ikke appen en ny karriere og overskriver ikke slotten.
+4. Karriereskifte prøver sky-gjenoppretting én gang før den melder at lagringen mangler.
+5. Feilmeldingen ber brukeren kontrollere samme skylagringskonto. Ingen annen karriere endres dersom payload ikke kan finnes.
+
+Begrensning:
+- Hvis Salford-lagringen ikke finnes verken lokalt eller i skylagringen, kan den ikke rekonstrueres fra slot-metadata alene. Denne versjonen hindrer at appen skjuler problemet ved å stille bytte til en annen karriere.
+
+ZIP inneholder kun index.html og PATCH_NOTES_v4.2.7.txt direkte i arkivroten.
+Teststatus:
+- Endringene kontrollert mot 4.2.6-kildens faktiske lagrings- og oppstartskode.
+- ZIP-integritet kontrollert.
+- Reell gjenoppretting krever at skylagringen inneholder Salford-payloaden og at brukeren er logget inn på riktig konto.
