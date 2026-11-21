@@ -833,6 +833,35 @@ button:disabled,select:disabled,input:disabled{opacity:1!important;color:#465b70
 }
 </style>
 
+
+<style id="cm-mobile-v4-0-9-live-header-contrast">
+/* Live match score sits on the dark navy scoreboard: force high-contrast white. */
+#liveScore,
+.live-score-crest-layout #liveScore {
+  color: #f8fbff !important;
+  -webkit-text-fill-color: #f8fbff !important;
+  opacity: 1 !important;
+  text-shadow: 0 2px 10px rgba(0,0,0,.55) !important;
+}
+/* The lineup/tactics control is also on the dark blue match panel. */
+#openLineupBtn.lineup-open,
+.live-match-context ~ #openLineupBtn,
+.lineup-open {
+  color: #f1f6fc !important;
+  -webkit-text-fill-color: #f1f6fc !important;
+  background: #172b40 !important;
+  border: 1px solid #6b8298 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+#openLineupBtn.lineup-open:disabled,
+.lineup-open:disabled {
+  color: #e5edf5 !important;
+  -webkit-text-fill-color: #e5edf5 !important;
+  opacity: 1 !important;
+}
+</style>
+
 </head>
 <body>
 <header><div class="top"><div><div class="brand">CM <span>MOBILE</span></div><div class="season" id="topSeason">2026/27 · Premier League</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="cloudAccountBtn" title="Koble til skylagring">☁ Konto</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>

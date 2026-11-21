@@ -1,0 +1,15 @@
+CM Mobile 4.0.9 – kontrast i øvre kampområde
+
+ZIP-innhold:
+- index.html
+- PATCH_NOTES_v4.0.9.txt
+
+Begge filene ligger direkte i ZIP-arkivets rot. Ingen undermapper.
+
+Rettet:
+- Resultattallene i #liveScore tvinges til hvit tekst på den mørke resultattavlen.
+- Knappen «Bytter / taktikk · Lagoppstilling» får lys tekst og tydelig kant på mørk bakgrunn.
+- Reglene er avgrenset til kampens resultattavle og lagoppstillingsknapp. Hendelsesradene fra 4.0.8 beholder sine separate kontrastregler.
+
+Teststatus:
+CSS- og HTML-struktur kontrollert. Krever visuell testing på iPhone.
