@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#183b60"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>CM Mobile — Classic Edition</title>
+<title>CM Mobile — Classic Edition 4.0.5</title>
 <style>
 :root{--bg:#0b1220;--panel:#121e30;--panel2:#18273b;--line:#293a50;--text:#edf4fb;--muted:#9eb0c4;--green:#8edb77;--gold:#f3ca72;--red:#f08080;--blue:#72b7f4}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#101b2b,#09111e 65%);color:var(--text);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
@@ -724,6 +724,59 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{ou
 .cup-accordion>summary{color:#fff}
 .cup-accordion>summary h2{color:#fff!important}
 .cup-accordion>summary .pill{background:#dce5ec!important;color:#193650!important}
+
+
+/* CM Mobile 4.0.5 – global contrast correction.
+   Muted text is surface-specific: dark text on pale Classic panels,
+   light text on intentionally navy cards. Never dim text via parent opacity. */
+:root{--muted:#526579;--muted-on-dark:#c7d5e2;--text-on-light:#1b2e40;--text-on-dark:#f4f7fb}
+/* Light Classic Edition work surfaces */
+.card,.stat{color:#1b2e40}
+.card .muted,.card .player-meta,.card small:not(.pill),.stat .muted,.stat small{color:#526579}
+/* Dark cards embedded inside the light work surface */
+.transfer-report-section,
+.transfer-report-section *{opacity:1}
+.transfer-report-section{color:#f4f7fb!important}
+.transfer-report-section .transfer-report-kicker{color:#d3e1ee!important}
+.transfer-report-section--club .transfer-report-kicker{color:#a9ee98!important}
+.transfer-report-section--market .transfer-report-kicker{color:#b8d5ff!important}
+.transfer-report-section .transfer-report-heading h2,
+.transfer-report-section .transfer-report-player,
+.transfer-report-section .transfer-report-fee{color:#f7f9fc!important}
+.transfer-report-section .transfer-report-subtitle,
+.transfer-report-section .transfer-report-route{color:#c7d5e2!important}
+.transfer-report-section .transfer-report-count{color:#f0f5fa!important}
+.transfer-report-section--club .transfer-report-count{background:#244b30!important;color:#c4f2b8!important}
+.transfer-report-section--market .transfer-report-count{background:#263f60!important;color:#d3e4ff!important}
+/* Domestic cup cards and every nested result row */
+.domestic-cup-card{color:#f4f7fb!important}
+.domestic-cup-card .muted,
+.domestic-cup-card .player-meta,
+.domestic-cup-card .cup-progress-info small,
+.domestic-cup-card .domestic-cup-title p,
+.domestic-cup-card .cup-result-center small,
+.domestic-cup-card .cup-pending-copy small{color:#c7d5e2!important}
+.domestic-cup-card .cup-result-row,
+.domestic-cup-card .cup-result-row *{opacity:1!important}
+.domestic-cup-card .cup-result-row{color:#f4f7fb!important;background:#172a40!important}
+.domestic-cup-card .cup-result-row.user-cup-result{background:#1b3550!important}
+.domestic-cup-card .cup-result-team,
+.domestic-cup-card .cup-result-team strong,
+.domestic-cup-card .cup-result-center>b{color:#f7f9fc!important}
+.domestic-cup-card .cup-result-center>small{color:#c7d5e2!important}
+.domestic-cup-card .cup-winner-line{color:#bdebd0!important}
+.domestic-cup-card .cup-winner-line.pending{color:#c7d5e2!important}
+.domestic-cup-card .cup-results-details>summary{color:#f7f9fc!important}
+/* Light badges on blue section headers must use dark ink. */
+.section-title .pill,
+.section-title>span.pill,
+.domestic-cup-head>.pill,
+.cup-accordion>summary .pill{background:#dce5ec!important;color:#193650!important;border-color:#9bafbf!important}
+/* Disabled labels remain legible; disabled state is conveyed by fill/border, not opacity. */
+button:disabled,select:disabled,input:disabled{opacity:1!important;color:#465b70!important}
+/* Dark hero panels have light secondary text, unlike pale cards. */
+.hero .muted,.hero small,.hero .season{color:#d1deea!important}
+
 </style></head>
 <body>
 <header><div class="top"><div><div class="brand">CM <span>MOBILE</span></div><div class="season" id="topSeason">2026/27 · Premier League</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="cloudAccountBtn" title="Koble til skylagring">☁ Konto</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>

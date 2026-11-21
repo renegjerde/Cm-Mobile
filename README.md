@@ -1,6 +1,19 @@
 # CM Mobile 4.0 – Classic Edition
 
-## Version 4.0.4 – Cup Format Repair
+## Version 4.0.5 – Global Contrast Correction
+
+This maintenance release corrects low-contrast text across nested dark and light surfaces. It preserves the 4.0.4 cup-format repair and all career data.
+
+### Contrast corrections
+- Transfer report text, routes, section labels and fees are readable on dark report cards.
+- Cup result team names, scores, round labels and progress text use high-contrast colors.
+- Light status badges on blue section headers use dark text.
+- Disabled controls remain legible without opacity dimming.
+- Text colors are explicitly selected by surface rather than relying on one global muted color.
+
+No game logic, cup formats, save schema or Supabase schema is changed.
+
+## Previous version details: 4.0.4 – Cup Format Repair
 
 This maintenance release corrects the domestic cup participant pools and progression counts, and fixes low-contrast text in cup screens.
 
@@ -31,3 +44,10 @@ This maintenance release corrects the domestic cup participant pools and progres
 - Full live browser/device acceptance test and Supabase round-trip have not been performed here.
 
 See `CUP_COMPETITION_REPAIR_REPORT_v4.0.4.md` and `CHANGELOG_v4.0.4.md` for detail.
+
+
+## CM Mobile 4.0.5 – Global Contrast Correction
+
+This release separates muted text colors by surface. Dark transfer-report and cup-result panels now use explicit light text; light Classic panels retain dark text. Light pills on blue section headers use dark text. Disabled controls no longer rely on opacity to communicate state.
+
+No game logic, player data, cup format, save schema, or SQL migration is changed in this release. Replace the app files with this release; do not rerun SQL.
