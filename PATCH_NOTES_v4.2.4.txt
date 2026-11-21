@@ -1,0 +1,16 @@
+CM Mobile 4.2.4 – lesbarhet i karrieremanager
+
+Base: CM Mobile 4.2.3.
+
+Berørt fil:
+- index.html
+
+Rettet:
+- Lagrede karrierer vises på mørke kort. Teksten i disse kortene er nå eksplisitt lys.
+- Klubb-/karrierenavn får hvit tekst med full opasitet.
+- Divisjon, sesong, status, kamptall og sist lagret får lys grå tekst med høy kontrast.
+- Noten om lokal lagring får tydelig mørk tekst på modalens lyse bakgrunn.
+- Endringene er avgrenset til #careerManagerModal.
+
+ZIP inneholder kun index.html og denne endringsloggen, direkte i arkivroten.
+Teststatus: CSS- og ZIP-struktur kontrollert. Faktisk iPhone-visning må bekreftes.
