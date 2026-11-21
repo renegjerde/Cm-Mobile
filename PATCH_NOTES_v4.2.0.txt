@@ -1,0 +1,23 @@
+CM Mobile 4.2.0 – European Competition Repair
+
+Base: CM Mobile 4.1.2 (includes iOS fixed top navigation).
+
+Changed file:
+- index.html
+
+Repairs:
+1. European knockout scheduling now catches up overdue legs and stages instead of requiring an exact week match.
+2. Catch-up is sequential and bounded; a manager-controlled European fixture pauses only that competition until played.
+3. Repeated processing of an already-processed domestic week still retries overdue European knockout fixtures.
+4. Season transition now checks all three league-phase European competitions (Champions League, Europa League, Conference League), including completed league phase, completed knockout history, and a recorded final winner.
+5. If any European competition remains incomplete, season transition is blocked before season data is reset, and the missing competition/stage is identified.
+6. Full European competition data (league table, match results, knockout ties/legs, winners) is archived in appState.europeanSeasonHistory before the active season data is cleared. Up to 30 seasons are retained.
+
+Important limitation:
+- The previous 2026/27 competition data cannot be reconstructed if it was already cleared when the career advanced to 2027/28. This patch prevents recurrence and archives future completed seasons; it does not invent missing historical results.
+
+Validation performed:
+- Exact targeted source replacements verified.
+- JavaScript syntax check performed separately.
+- ZIP contains only index.html and this patch note, both at archive root.
+- Actual gameplay/season simulation still requires in-game testing.

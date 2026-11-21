@@ -7437,13 +7437,26 @@ function europeanKnockoutWeekFor(stageKey,leg=1){
  return weeks[Math.max(0,Math.min(weeks.length-1,Number(leg)-1))]??null;
 }
 function processScheduledEuropeanKnockouts(week){
+ const throughWeek=Math.max(0,Number(week)||0);
  Object.values(appState.europeanCompetitions||{}).forEach(comp=>{
-  if(!comp||comp.format!=='league'||comp.finished||appState.pendingCupMatch?.competition===comp.name)return;
-  const stage=comp.knockout?.activeStage;if(!stage||stage.complete)return;
-  const leg=stage.key==='final'?1:(Number(stage.leg)||1);
-  const dueWeek=europeanKnockoutWeekFor(stage.key,leg);
-  if(dueWeek===null||Number(week)!==Number(dueWeek))return;
-  processEuropeanKnockoutLeg(comp,leg);
+  if(!comp||comp.format!=='league'||comp.finished)return;
+  // Catch up every overdue leg/stage in sequence. A user-controlled tie pauses
+  // only its own competition until the manager plays it; other competitions continue.
+  let guard=0;
+  while(!comp.finished&&guard++<12){
+   if(appState.pendingCupMatch?.competition===comp.name)break;
+   const stage=comp.knockout?.activeStage;
+   if(!stage||stage.complete)break;
+   const leg=stage.key==='final'?1:(Number(stage.leg)||1);
+   const dueWeek=europeanKnockoutWeekFor(stage.key,leg);
+   if(dueWeek===null||throughWeek<Number(dueWeek))break;
+   const before=`${stage.key}|${stage.stageIndex}|${stage.leg}|${(stage.ties||[]).filter(t=>t?.winner).length}|${comp.finished}`;
+   processEuropeanKnockoutLeg(comp,leg);
+   if(appState.pendingCupMatch?.competition===comp.name)break;
+   const next=comp.knockout?.activeStage;
+   const after=next?`${next.key}|${next.stageIndex}|${next.leg}|${(next.ties||[]).filter(t=>t?.winner).length}|${comp.finished}`:`finished|${comp.finished}`;
+   if(before===after)break;
+  }
  });
 }
 
@@ -7734,7 +7747,7 @@ function processMidweekCompetitions(round){
  if(String(appState.activeDivision||clubDivision(currentClub()))!=='Premier League')simulatePremierLeagueBackgroundThroughRound(round);
  // A cup match may finish after the calendar hook for this league round has already run.
  // Always retry due domestic cup stages, even when league processing is already recorded.
- if(appState.lastDomesticRound===round){processScheduledDomesticCups(round);return;}
+ if(appState.lastDomesticRound===round){processScheduledEuropeanKnockouts(round);processScheduledDomesticCups(round);return;}
  simulateLowerLeaguesThroughRound(round);
  processEuropeanCompetitions(round);
  processScheduledDomesticCups(round);
@@ -8278,11 +8291,47 @@ Avbryt: Slipp på fri transfer`);
   cohort.splice(ix,1);
  }
 }
+function europeanSeasonCompletionStatus(){
+ const expected=['Champions League','Europa League','Conference League'];
+ const comps=appState.europeanCompetitions||{};
+ const missing=[];
+ expected.forEach(name=>{
+  const comp=comps[name];
+  if(!comp){missing.push(`${name}: turneringsdata mangler`);return;}
+  if(comp.format!=='league'){missing.push(`${name}: ukjent/eldre turneringsformat`);return;}
+  if(Number(comp.leagueRound||0)<Number(comp.matchdays||8)||!comp.leaguePhaseComplete){missing.push(`${name}: ligafasen er ikke ferdig`);return;}
+  const state=comp.knockout||{};
+  const finalArchived=(state.history||[]).some(s=>s?.key==='final'&&(s.ties||[]).length===1&&!!s.ties[0]?.winner);
+  if(!comp.finished||!comp.champion||state.activeStage||Number(state.stageIndex||0)<5||!finalArchived){
+   const active=state.activeStage;
+   missing.push(`${name}: ${active?.name||'utslagsrunder'} gjenstår${active?.leg===2?' (returoppgjør)':''}`);
+  }
+ });
+ return {complete:missing.length===0,missing};
+}
+function archiveEuropeanSeason(){
+ const clone=value=>JSON.parse(JSON.stringify(value??null));
+ const competitions=clone(appState.europeanCompetitions||{});
+ const entry={season:seasonLabel(),club:currentClub().name,competitions,archivedAt:new Date().toISOString()};
+ appState.europeanSeasonHistory=Array.isArray(appState.europeanSeasonHistory)?appState.europeanSeasonHistory:[];
+ const existing=appState.europeanSeasonHistory.findIndex(x=>x?.season===entry.season);
+ if(existing>=0)appState.europeanSeasonHistory[existing]=entry;else appState.europeanSeasonHistory.push(entry);
+ // Retain a long career history without allowing unbounded save growth.
+ appState.europeanSeasonHistory=appState.europeanSeasonHistory.slice(-30);
+ appState.lastSeasonSummary=appState.lastSeasonSummary||{};
+ appState.lastSeasonSummary.europeanArchiveSeason=entry.season;
+ appState.lastSeasonSummary.europeanArchiveCompetitions=Object.fromEntries(Object.entries(competitions).map(([name,c])=>[name,{champion:c?.champion||null,results:(c?.results||[]).length,knockoutStages:(c?.knockout?.history||[]).map(s=>s.name)}]));
+ return entry;
+}
 function startNewSeason(){
  if(!seasonCompleted()){alert("Spill ferdig sesongen før du starter en ny.");return}
  initDomesticCompetitions();processScheduledDomesticCups(Math.max(Number(appState.week)||1,38));
+ // Final-week catch-up: resolve all overdue AI ties and expose any remaining manager fixture.
+ ensureEuropeanCompetitions();processScheduledEuropeanKnockouts(Math.max(Number(appState.week)||1,38,Number(activeLeagueRoundCount?.())||38));
  if(appState.pendingCupMatch&&["FA Cup","EFL Cup"].includes(appState.pendingCupMatch.competition)){alert("En nasjonal cupkamp gjenstår. Spill cupkampen før du starter neste sesong.");startPendingCupMatch();return}
- if(appState.pendingCupMatch?.isEuropean){alert("En europeisk cupkamp gjenstår. Spill den siste europacupkampen før du starter neste sesong, slik at turneringspremiene kan fordeles korrekt.");startPendingCupMatch();return}
+ if(appState.pendingCupMatch?.isEuropean){alert("En europeisk cupkamp gjenstår. Spill europacupkampen før du starter neste sesong.");startPendingCupMatch();return}
+ const europeanStatus=europeanSeasonCompletionStatus();
+ if(!europeanStatus.complete){alert("Sesongskiftet er stoppet. Følgende europacuper er ikke ferdigspilt:\n\n"+europeanStatus.missing.join("\n")+"\n\nFortsett kampukene til alle turneringene er avgjort. Ingen sesongdata er nullstilt.");return}
  if(!confirm(`Starte sesongen ${Number(appState.seasonYear)+1}/${String(Number(appState.seasonYear)+2).slice(-2)}? Klubben og troppen beholdes, mens tabell og sesongstatistikk nullstilles.`))return;
  const finalTable=sortedTable();
  const previousDivision=clubDivision(currentClub());
@@ -8297,6 +8346,7 @@ function startNewSeason(){
  resolveUserYouthGraduatesAtSeasonEnd();
  // Commit end-of-season rewards and career archives only after membership validation succeeds.
  appState.lastSeasonSummary=summaryDraft;
+ archiveEuropeanSeason();
  awardLeaguePositionPrize(finalTable,previousDivision);
  const europeanPrizePayments=distributeEuropeanCompetitionPrizesAtSeasonEnd();appState.lastSeasonSummary.europeanPrizePayments=europeanPrizePayments.length;
  appState.lastSeasonSummary.careerArchive=archivePlayerSeasonStats();
