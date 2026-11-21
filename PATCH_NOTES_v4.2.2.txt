@@ -1,0 +1,25 @@
+CM Mobile 4.2.2 – ny karriere: komplett startregister
+
+Base: CM Mobile 4.2.1 (inkluderer europacuprettelsene og iOS-toppmenyen).
+
+Berørt fil:
+- index.html
+
+Årsak:
+- Ny-karrierevelgeren telte klubber fra det aktive, muterte klubbregisteret.
+- Etter opprykk/nedrykk kunne dette registeret vise 17 Premier League-klubber i stedet for 20.
+- Valget ble lagret som en numerisk array-indeks. Når registeret senere ble nullstilt til 2026/27, kunne samme indeks peke på en annen klubb.
+
+Rettet:
+1. Ny-karrierevelgeren henter divisjonslister fra de uforanderlige 2026/27-baselistene.
+2. Forventede antall vises fra baseline: Premier League 20; Championship, League One, League Two og National League 24 hver.
+3. Klubbvalg lagres som kanonisk klubbnavn, ikke som indeks i et register som kan endres.
+4. Før ny karriere opprettes, lagres eksisterende karriere. Deretter bygges 2026/27-registeret, og valgt klubbindeks slås opp på nytt etter reset.
+5. Eksisterende karriere og dens opprykk/nedrykk endres ikke før brukeren faktisk bekrefter ny karriere.
+
+Teststatus:
+- Kildeendringer kontrollert mot de faktiske picker-funksjonene.
+- Kontrollerte at alle fem divisjonslister kommer fra BASE_*_2026_27.
+- Kontrollerte at selectedClubName brukes til oppslag etter reset.
+- ZIP-integritet kontrollert.
+- Faktisk iPhone-testing gjenstår.
