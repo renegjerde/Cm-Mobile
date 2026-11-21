@@ -1,0 +1,18 @@
+CM Mobile 4.0.7 – kontrastreparasjon for kamphendelser
+
+Berørt fil:
+- CM_Mobile_4.0.5/index.html
+
+Rettet:
+- Kamphendelser i #liveEvents vises med mørk tekst på den lyse resultatflaten.
+- Minutter, spillernavn, hendelsesdetaljer og resultatlinjer får lesbare farger.
+- Skillelinjene i hendelseslisten er tilpasset lys bakgrunn.
+- Skadeikonet vises som rødt kors på hvit bakgrunn, også i kampens hendelsesliste.
+- Live-resultatfeltet i den mørke live-headeren beholder sin lyse kontrast.
+
+Installasjon:
+Erstatt index.html fra forrige pakke/base med denne filen. De øvrige prosjektfilene er uendret.
+
+Merk:
+Dette er en målrettet CSS-/visningsrettelse basert på skjermbildet og HTML-strukturen.
+Test i iPhone Safari er fortsatt nødvendig.
