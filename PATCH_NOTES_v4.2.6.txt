@@ -1,0 +1,20 @@
+CM Mobile 4.2.6 – tabellplassering i kampkort
+
+Base: CM Mobile 4.2.5.
+
+Berørt fil:
+- index.html
+
+Rettet:
+- Begge lags plassering i aktuell konkurranse får mørk, tydelig tekst på lys bakgrunn.
+- Plasseringen får et diskret kontrastfelt slik at «3. plass» og «9. plass» er lett å lese.
+- Form-etiketten og «Ingen kamper» får også mørkere tekst.
+- Eksisterende beregning av plassering beholdes: nasjonal tabell for ligakamper og riktig europeisk konkurransetabell for europacupkamper.
+- Endringen er avgrenset til lagradene i kampkortet (.home-team).
+
+ZIP inneholder kun index.html og denne endringsloggen, direkte i arkivroten.
+
+Teststatus:
+- Kildeendring kontrollert.
+- ZIP-integritet kontrollert.
+- Faktisk iPhone-visning må bekreftes.
