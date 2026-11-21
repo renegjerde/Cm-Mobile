@@ -1,0 +1,28 @@
+CM Mobile 4.2.8 – automatisk lagring og lokal sikkerhetskopi
+
+Base: CM Mobile 4.2.7 (inkluderer oppstarts-/skysynkroniseringsrettelsen).
+
+Berørt fil:
+- index.html
+
+Lagringsendringer:
+1. Automatisk lokal lagring hvert 60. sekund mens en karriere er aktiv.
+2. Ekstra lagring ved pagehide og når appen går i bakgrunnen.
+3. Eksisterende lagring etter fullførte kamper og viktige handlinger beholdes.
+4. Før en lagring erstatter forrige payload, forsøker appen å bevare forrige gyldige payload som siste lokale sikkerhetskopi per karriere.
+5. Ved manglende eller ugyldig hovedlagring prøver oppstart og manuell karriereinnlasting å hente siste lokale sikkerhetskopi.
+6. Sesongskifte krever en vellykket lagring før sesongdata endres.
+7. Lagre-knappen viser kort «Lagret» eller «Lagring feilet».
+
+Viktig:
+- Lokal lagring skjer synkront i nettleseren.
+- Skylagring er fortsatt avhengig av at brukeren er tilkoblet og innlogget; den planlegges etter lokal lagring.
+- En sikkerhetskopi kan ikke beskytte mot at nettleserdata slettes manuelt, eller mot at nettleseren nekter all lagring på grunn av full lagringskvote.
+- Pagehide/visibilitychange lagrer lokalt; nettleseren kan stenge nettverkstilkoblinger før en siste skyopplasting fullføres.
+
+ZIP inneholder kun index.html og PATCH_NOTES_v4.2.8.txt direkte i arkivroten.
+
+Teststatus:
+- Endringene er kontrollert mot den faktiske save/load- og skylagringskoden i 4.2.7.
+- ZIP-integritet kontrollert.
+- Full kjøring i mobilnettleser og reell Supabase-konto er ikke simulert her.

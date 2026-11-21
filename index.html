@@ -2183,6 +2183,7 @@ let activeCareerSlotId=null;
 const APP_STATE_DEFAULTS=JSON.parse(JSON.stringify(appState));
 function newCareerSlotId(){return `career-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;}
 function careerSaveKey(id){return String(id||'')==='career-legacy'?LEGACY_SAVE_KEY:CAREER_SAVE_PREFIX+String(id||'');}
+function careerBackupKey(id){return careerSaveKey(id)+'::last-good-backup';}
 function readCareerSlots(){try{const rows=JSON.parse(localStorage.getItem(CAREER_SLOT_INDEX_KEY)||'[]');return Array.isArray(rows)?rows.filter(x=>x&&typeof x.id==='string'):[]}catch(e){return []}}
 function writeCareerSlots(rows){localStorage.setItem(CAREER_SLOT_INDEX_KEY,JSON.stringify(rows));}
 function careerSlotDetails(id){
@@ -2859,17 +2860,30 @@ function decodeSaveState(payload){
  if(!value.startsWith("CMZ1:"))return JSON.parse(value);
  return JSON.parse(inflateLegacy(value.slice(5)));
 }
+let cmSaveFeedbackTimer=null;
+function cmShowLocalSaveFeedback(ok){
+ const button=document.getElementById('saveBtn');
+ if(!button)return;
+ button.textContent=ok?'✓ Lagret':'⚠ Lagring feilet';
+ button.title=ok?'Karrieren er lagret lokalt'+(window.__cmLastSaveAt?' · '+new Date(window.__cmLastSaveAt).toLocaleTimeString('nb-NO',{hour:'2-digit',minute:'2-digit'}):''):'Kunne ikke lagre lokalt. Kontroller ledig lagringsplass.';
+ if(cmSaveFeedbackTimer)clearTimeout(cmSaveFeedbackTimer);
+ cmSaveFeedbackTimer=setTimeout(()=>{if(button.isConnected)button.textContent='▣ Lagre';},2600);
+}
 function save(){try{
  if(!activeCareerSlotId){activeCareerSlotId=newCareerSlotId();localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,activeCareerSlotId);}
- const id=activeCareerSlotId,payload=encodeSaveState(appState);
- const previousPayload=localStorage.getItem(careerSaveKey(id));
- localStorage.setItem(careerSaveKey(id),payload);
+ const id=activeCareerSlotId,payload=encodeSaveState(appState),mainKey=careerSaveKey(id);
+ const previousPayload=localStorage.getItem(mainKey);
+ if(previousPayload&&previousPayload!==payload){
+  try{const previousState=decodeSaveState(previousPayload);if(previousState&&previousState.started)localStorage.setItem(careerBackupKey(id),previousPayload);}catch(backupError){}
+ }
+ localStorage.setItem(mainKey,payload);
  if(previousPayload!==payload||!readCareerSlots().some(row=>row.id===id))registerCareerSlot(id);
  localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,id);
  window.__cmLastSaveAt=Date.now();
+ cmShowLocalSaveFeedback(true);
  try{scheduleCMCloudSave(id,payload);}catch(e){}
  return true;
- }catch(e){return false;}}
+ }catch(e){cmShowLocalSaveFeedback(false);return false;}}
 function loadFromPayload(payload){try{let s=decodeSaveState(payload);if(s&&s.started){const hadPreseasonFlag=Object.prototype.hasOwnProperty.call(s,"preseasonActive");Object.assign(appState,s);if(!Object.prototype.hasOwnProperty.call(s,"leagueSystemSchemaVersion"))appState.leagueSystemSchemaVersion=0;if(Number(appState.availabilityModelVersion||0)<2){
   const migrateAvailability=(players)=>{(players||[]).forEach(p=>{if(Number(p.injured)>0&&!Number.isFinite(Number(p.injuryDaysRemaining)))p.injuryDaysRemaining=Math.max(4,Number(p.injured)*8);if(Number(p.suspended)>0){const d=appState.discipline?.[String(p.id)];if(d&&!Number.isFinite(Number(d.ban)))d.ban=Number(p.suspended)||0;}});};
   migrateAvailability(appState.squad);(appState.worldSquads||[]).forEach(migrateAvailability);
@@ -2894,12 +2908,20 @@ function load(){
   const rows=readCareerSlots();
   let id=localStorage.getItem(ACTIVE_CAREER_SLOT_KEY)||'';
   let payload=id?localStorage.getItem(careerSaveKey(id)):null;
+  let usingBackup=false;
+  if(!payload&&id){payload=localStorage.getItem(careerBackupKey(id));usingBackup=!!payload;}
   if(!payload&&id&&rows.some(row=>row.id===id)){
    window.__cmMissingActiveCareer={id,meta:rows.find(row=>row.id===id)||null};
    return false;
   }
-  if(!payload&&rows.length){const newest=rows.find(row=>localStorage.getItem(careerSaveKey(row.id)));if(newest){id=newest.id;payload=localStorage.getItem(careerSaveKey(id));}}
-  if(payload){window.__cmMissingActiveCareer=null;activeCareerSlotId=id;localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,id);return loadFromPayload(payload);}
+  if(!payload&&rows.length){const newest=rows.find(row=>localStorage.getItem(careerSaveKey(row.id))||localStorage.getItem(careerBackupKey(row.id)));if(newest){id=newest.id;payload=localStorage.getItem(careerSaveKey(id));if(!payload){payload=localStorage.getItem(careerBackupKey(id));usingBackup=!!payload;}}}
+  if(payload){
+   window.__cmMissingActiveCareer=null;activeCareerSlotId=id;localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,id);
+   if(loadFromPayload(payload)){if(usingBackup){localStorage.setItem(careerSaveKey(id),payload);window.__cmRecoveredFromLocalBackup=true;}return true;}
+   const backup=localStorage.getItem(careerBackupKey(id));
+   if(backup&&backup!==payload){resetAppStateForCareerLoad();if(loadFromPayload(backup)){localStorage.setItem(careerSaveKey(id),backup);window.__cmRecoveredFromLocalBackup=true;return true;}}
+   return false;
+  }
   // One-time compatibility: import the user's previous single career without deleting its original copy.
   const legacy=localStorage.getItem(LEGACY_SAVE_KEY);
   if(legacy){activeCareerSlotId='career-legacy';const ok=loadFromPayload(legacy);if(ok){localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,activeCareerSlotId);save();return true;}activeCareerSlotId=null;}
@@ -2925,14 +2947,17 @@ function deleteCareerSlot(id){
 async function switchCareerSlot(id){
  if(!id||id===activeCareerSlotId){document.getElementById('careerManagerModal')?.remove();return;}
  let payload=localStorage.getItem(careerSaveKey(id));
+ let usingBackup=false;
+ if(!payload){payload=localStorage.getItem(careerBackupKey(id));usingBackup=!!payload;}
  if(!payload){
   try{await cmCloudSyncAll({silentRender:true});}catch(e){cmCloudSetStatus('⚠ Skylagring: '+(e.message||'gjenoppretting feilet'));}
   payload=localStorage.getItem(careerSaveKey(id));
+  if(!payload){payload=localStorage.getItem(careerBackupKey(id));usingBackup=!!payload;}
  }
- if(!payload){alert('Fant ikke den lokale lagringen. Jeg har også forsøkt å hente den fra skyen. Kontroller at du er logget inn på samme konto under Tilkoblet, og prøv igjen. Ingen annen karriere er endret.');return;}
+ if(!payload){alert('Fant ikke lokal lagring eller sikkerhetskopi. Jeg har også forsøkt å hente karrieren fra skyen. Kontroller at du er logget inn på samme konto under Tilkoblet. Ingen annen karriere er endret.');return;}
  if(!save()){alert('Den aktive karrieren kunne ikke lagres. Kontroller ledig lagringsplass før du bytter.');return;}
  const previousId=activeCareerSlotId;
- try{localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,id);activeCareerSlotId=id;resetAppStateForCareerLoad();const ok=loadFromPayload(payload);if(!ok)throw new Error('Lagringen kunne ikke leses');
+ try{localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,id);activeCareerSlotId=id;resetAppStateForCareerLoad();let ok=loadFromPayload(payload);if(!ok){const backup=localStorage.getItem(careerBackupKey(id));if(backup&&backup!==payload){resetAppStateForCareerLoad();ok=loadFromPayload(backup);if(ok){payload=backup;usingBackup=true;}}}if(!ok)throw new Error('Lagringen kunne ikke leses');if(usingBackup)localStorage.setItem(careerSaveKey(id),payload);
   marketSearch='';marketPosition='ALL';marketSort='recommended';marketScope='all';marketAgeMin='';marketAgeMax='';marketExactRole='ALL';marketMaxPrice='';marketMinPotential='';window.marketAdvancedOpen=false;
   window.transferListAccordionOpen=false;normalizeAllPlayerAges(Number(appState.seasonYear)||2026);ensureTransferPool();save();document.getElementById('careerManagerModal')?.remove();document.getElementById('careerClubPicker')?.remove();lastRenderedPage=null;render();
  }catch(e){activeCareerSlotId=previousId;localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,previousId||'');resetAppStateForCareerLoad();const previousPayload=previousId?localStorage.getItem(careerSaveKey(previousId)):null;if(previousPayload)loadFromPayload(previousPayload);alert('Kunne ikke bytte karriere. Den forrige karrieren er beholdt.');render();}
@@ -8450,6 +8475,7 @@ function startNewSeason(){
  const europeanStatus=europeanSeasonCompletionStatus();
  if(!europeanStatus.complete){alert("Sesongskiftet er stoppet. Følgende europacuper er ikke ferdigspilt:\n\n"+europeanStatus.missing.join("\n")+"\n\nFortsett kampukene til alle turneringene er avgjort. Ingen sesongdata er nullstilt.");return}
  if(!confirm(`Starte sesongen ${Number(appState.seasonYear)+1}/${String(Number(appState.seasonYear)+2).slice(-2)}? Klubben og troppen beholdes, mens tabell og sesongstatistikk nullstilles.`))return;
+ if(!save()){alert('Sesongskiftet ble stoppet fordi den aktive karrieren ikke kunne sikkerhetslagres. Ingen sesongdata er nullstilt.');return;}
  const finalTable=sortedTable();
  const previousDivision=clubDivision(currentClub());
  // Build the end-of-season summary without committing rewards or player archives yet.
@@ -11734,6 +11760,17 @@ function openCMCloudModal(){
  cmCloudClient().auth.getSession().then(({data,error})=>{if(error)set("⚠ "+error.message);else if(data.session)set("Innlogget som "+data.session.user.email);}).catch(e=>set("⚠ "+e.message));
 }
 document.getElementById("cloudAccountBtn")?.addEventListener("click",openCMCloudModal);
+// v4.2.8: periodic local autosave, lifecycle checkpoint and per-career last-good backup.
+const CM_AUTOSAVE_INTERVAL_MS=60000;
+let cmAutoSaveInterval=null;
+function startCMAutoSave(){
+ if(cmAutoSaveInterval)return;
+ cmAutoSaveInterval=setInterval(()=>{if(appState?.started)save();},CM_AUTOSAVE_INTERVAL_MS);
+}
+window.addEventListener('pagehide',()=>{if(appState?.started)save();});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&appState?.started)save();});
+startCMAutoSave();
+
 // Cloud recovery is awaited by bootstrap below before selecting the active local career.
 
 // Bootstrap from the embedded offline profile snapshot only. No player-data network requests.
