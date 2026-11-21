@@ -960,6 +960,41 @@ body > header .header-action {
   body > header .header-action { padding-right: 5px !important; padding-left: 5px !important; font-size: 9px !important; }
   body > header .top { gap: 4px !important; }
 }
+
+
+/* v4.2.3: restore readable contrast in the squad transfer list on light cards */
+.transfer-list-accordion .transfer-list-player-info,
+.transfer-list-accordion .transfer-list-player-info .player-name,
+.transfer-list-accordion .transfer-list-player-info .player-name strong {
+  color: #172b40 !important;
+  opacity: 1 !important;
+}
+.transfer-list-accordion .transfer-list-player-info .player-meta {
+  color: #52677d !important;
+  opacity: 1 !important;
+  font-weight: 500 !important;
+}
+.transfer-list-accordion .transfer-list-player-info .pill {
+  color: #243b52 !important;
+  opacity: 1 !important;
+}
+.transfer-list-accordion .transfer-list-player-info .pill.green {
+  color: #174b2d !important;
+}
+.transfer-list-accordion .transfer-list-player {
+  background: transparent !important;
+}
+@media(max-width:430px) {
+  .transfer-list-accordion .transfer-list-player-info .player-name {
+    color: #172b40 !important;
+    font-size: 14px !important;
+  }
+  .transfer-list-accordion .transfer-list-player-info .player-meta {
+    color: #52677d !important;
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+  }
+}
 </style>
 
 </head>

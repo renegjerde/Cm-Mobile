@@ -1,0 +1,15 @@
+CM Mobile 4.2.3 – kontrast i overgangslisten
+
+Base: CM Mobile 4.2.2.
+
+Berørt fil:
+- index.html
+
+Rettet:
+- Spillernavn i «Din overgangsliste» får mørk, tydelig tekst.
+- Ferdighet, potensial og markedsverdi får mørkere metadatafarge og høyere lesbarhet.
+- Piller for posisjon og markedsstatus får tydelig kontrast.
+- Mobiltekst er litt større for metadata.
+- Endringen er avgrenset til overgangslisten og påvirker ikke øvrige spillersider eller kampvisninger.
+
+ZIP inneholder ingen undermapper.
