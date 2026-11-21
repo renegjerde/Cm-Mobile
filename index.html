@@ -778,51 +778,48 @@ button:disabled,select:disabled,input:disabled{opacity:1!important;color:#465b70
 .hero .muted,.hero small,.hero .season{color:#d1deea!important}
 
 
-/* v4.0.6: targeted match-screen contrast repair */
-.live-score,
-#liveScore.live-score {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-  text-shadow: 0 2px 8px rgba(0,0,0,.55);
-  opacity: 1 !important;
-}
-.score-center .score-divider {
-  color: #c7d7e8 !important;
-  -webkit-text-fill-color: #c7d7e8 !important;
-}
+/* v4.0.7: final-match event list is rendered on a LIGHT surface.
+   Keep live score on its dark live header, but use dark text for event rows. */
+#liveEvents,
 #liveEvents .match-event,
-#liveEvents .match-event .event-min,
-#liveEvents .match-event .event-detail,
-#liveEvents .match-event .event-detail strong,
-#liveEvents .match-event .event-detail small,
-#liveEvents .match-event .event-score {
+#liveEvents .event-min,
+#liveEvents .event-detail,
+#liveEvents .event-detail strong,
+#liveEvents .event-detail small,
+#liveEvents .event-score {
+  color: #172b40 !important;
+  -webkit-text-fill-color: #172b40 !important;
+  opacity: 1 !important;
+}
+#liveEvents .event-detail small {
+  color: #52677d !important;
+  -webkit-text-fill-color: #52677d !important;
+}
+#liveEvents .match-event {
+  border-bottom-color: #bdcbd7 !important;
+}
+#liveEvents .muted {
+  color: #52677d !important;
+  -webkit-text-fill-color: #52677d !important;
+}
+#liveFinalSection .other-match-detail {
+  color: #f1f5f9;
+}
+#liveFinalSection .other-match-detail .other-match-event-copy,
+#liveFinalSection .other-match-detail .event-minute,
+#liveFinalSection .other-match-detail .other-match-event-copy strong,
+#liveFinalSection .other-match-detail .other-match-event-copy span:not(.event-team-tag) {
   color: #f1f5f9 !important;
   -webkit-text-fill-color: #f1f5f9 !important;
   opacity: 1 !important;
 }
-#liveEvents .match-event .event-detail small {
-  color: #c5d2df !important;
-  -webkit-text-fill-color: #c5d2df !important;
-}
-.other-match-detail .other-match-event,
-.other-match-detail .other-match-event-copy,
-.other-match-detail .other-match-event-copy strong,
-.other-match-detail .other-match-event-copy span:not(.event-team-tag),
-.other-match-detail .event-minute {
-  color: #f1f5f9 !important;
-  -webkit-text-fill-color: #f1f5f9 !important;
-  opacity: 1 !important;
-}
-.other-match-detail .other-match-event-copy {
-  color: #f1f5f9 !important;
-}
+/* Injury mark: red medical cross on a white tile. */
 .injury-cross {
   background: #ffffff !important;
   color: #dc2626 !important;
   -webkit-text-fill-color: #dc2626 !important;
   border: 1px solid #dc2626 !important;
   border-radius: 4px !important;
-  box-shadow: 0 0 0 1px rgba(255,255,255,.25);
   font-size: 15px !important;
   font-weight: 950 !important;
 }
