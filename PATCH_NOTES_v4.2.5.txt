@@ -1,0 +1,22 @@
+CM Mobile 4.2.5 – beskyttelse av spillere på aktive lån
+
+Base: CM Mobile 4.2.4.
+
+Berørt fil:
+- index.html
+
+Problem:
+Spillerprofilen kunne vise «Lån ut» for en spiller som allerede var på lån. Eksisterende UI-kontroll stolte utelukkende på p.loanStatus, og var derfor sårbar dersom eldre/importerte spillerobjekter manglet eller hadde ufullstendig lånestatus.
+
+Rettet:
+1. Ny felles funksjon playerHasActiveLoan(p) kontrollerer loanStatus in/out, loanSpell, aiManagedLoan, registeredLoan og aktive lånemetadata som reservekontroll.
+2. «Lån ut» deaktiveres i spillerprofil og overgangsliste for spillere på aktive lån.
+3. openOutgoingLoan() har en separat server-/handlingsnær kontroll og avviser videreutlån.
+4. «Frigi på fri transfer» og «Forny kontrakt» deaktiveres også for aktive lånespillere.
+5. Meldingen forklarer at spilleren må returnere eller lånet tilbakekalles først.
+
+ZIP inneholder kun index.html og PATCH_NOTES_v4.2.5.txt direkte i arkivroten.
+
+Teststatus:
+- Kildeendringer kontrollert og ZIP-integritet verifisert.
+- Faktisk iPhone-testing gjenstår.
