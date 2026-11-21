@@ -1,0 +1,16 @@
+CM Mobile 4.1.0 – skadesymbol på oversikten
+
+ZIP-innhold:
+- index.html
+- PATCH_NOTES_v4.1.0.txt
+
+Begge filene ligger direkte i ZIP-arkivets rot. Ingen undermapper.
+
+Endring:
+- Skadevarselet på oversiktssiden har fått eget injury-alert-icon-klassenavn.
+- Ikonet vises som et tydelig rødt medisinsk kors på hvit bakgrunn.
+- Bakgrunn, kant, størrelse og symbolfarge er eksplisitt definert, også når varselet har urgent-status.
+- Andre varselikoner påvirkes ikke.
+
+Teststatus:
+Markup og CSS kontrollert. Visuell bekreftelse på iPhone gjenstår.

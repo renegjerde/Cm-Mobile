@@ -862,6 +862,39 @@ button:disabled,select:disabled,input:disabled{opacity:1!important;color:#465b70
 }
 </style>
 
+
+<style id="cm-mobile-v4-1-0-home-injury-icon">
+/* Dashboard injury notification: unmistakable red medical cross on white tile. */
+.home-alert-icon.injury-alert-icon,
+.home-alert.urgent .home-alert-icon.injury-alert-icon {
+  flex: 0 0 42px !important;
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 0 !important;
+  background: #ffffff !important;
+  border: 2px solid #dc2626 !important;
+  border-radius: 9px !important;
+  color: #dc2626 !important;
+  -webkit-text-fill-color: #dc2626 !important;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.22) !important;
+  font-size: 0 !important;
+  opacity: 1 !important;
+}
+.home-alert-icon.injury-alert-icon span {
+  display: block !important;
+  color: #dc2626 !important;
+  -webkit-text-fill-color: #dc2626 !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 29px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  opacity: 1 !important;
+}
+</style>
+
 </head>
 <body>
 <header><div class="top"><div><div class="brand">CM <span>MOBILE</span></div><div class="season" id="topSeason">2026/27 · Premier League</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="cloudAccountBtn" title="Koble til skylagring">☁ Konto</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
@@ -3024,7 +3057,7 @@ function importantDashboardAlerts(){
  if(!activeCount&&!notices.length)return '';
  const rows=[];
  pendingOffers.forEach(o=>rows.push(`<article class="home-alert urgent"><div class="home-alert-icon">📩</div><div class="home-alert-copy"><span class="home-alert-label">Bud mottatt · Handling kreves</span><strong>${esc(o.buyerName||'En klubb')} byr ${money(o.amount)} på ${esc(o.playerName||'en spiller')}</strong><p>${o.isYouth?'Bud på juniortalent.':'Vurder budet opp mot spillerens verdi, rolle og troppsbehov.'}${o.star?' Nøkkelspiller.':''}</p></div><div class="home-alert-actions"><button class="primary" onclick="setPage('transfers')">Vurder bud →</button></div></article>`));
- if(injured.length){const names=injured.slice(0,4).map(p=>p.name).join(', ');rows.push(`<article class="home-alert ${injured.length>=3?'urgent':''}"><div class="home-alert-icon">✚</div><div class="home-alert-copy"><strong>${injured.length} skadet${injured.length===1?' spiller':'e'}</strong><p>${esc(names)}${injured.length>4?` og ${injured.length-4} til`:''}. Kontroller tilgjengeligheten før neste laguttak.</p></div><div class="home-alert-actions"><button onclick="setPage('squad')">Se tropp →</button></div></article>`)}
+ if(injured.length){const names=injured.slice(0,4).map(p=>p.name).join(', ');rows.push(`<article class="home-alert ${injured.length>=3?'urgent':''}"><div class="home-alert-icon injury-alert-icon" role="img" aria-label="Skade"><span aria-hidden="true">✚</span></div><div class="home-alert-copy"><strong>${injured.length} skadet${injured.length===1?' spiller':'e'}</strong><p>${esc(names)}${injured.length>4?` og ${injured.length-4} til`:''}. Kontroller tilgjengeligheten før neste laguttak.</p></div><div class="home-alert-actions"><button onclick="setPage('squad')">Se tropp →</button></div></article>`)}
  if(suspended.length){const names=suspended.slice(0,4).map(p=>p.name).join(', ');rows.push(`<article class="home-alert urgent"><div class="home-alert-icon">🟥</div><div class="home-alert-copy"><strong>${suspended.length} suspendert${suspended.length===1?' spiller':'e'}</strong><p>${esc(names)}${suspended.length>4?` og ${suspended.length-4} til`:''}. Disse spillerne er ikke tilgjengelige for laguttak.</p></div><div class="home-alert-actions"><button onclick="setPage('squad')">Se tropp →</button></div></article>`)}
  // Competition matches use the same main next-match action as league fixtures; avoid a duplicate alert row.
  expiringContracts.forEach(p=>rows.push(`<article class="home-alert urgent"><div class="home-alert-icon">📝</div><div class="home-alert-copy"><span class="home-alert-label">Kontrakt krever oppmerksomhet</span><strong>${esc(p.name)} · ${contractExpiryStatus(p).label}</strong><p>Forny kontrakten, legg spilleren på transferlisten eller vurder fri transfer før sesongslutt.</p></div><div class="home-alert-actions"><button class="primary" onclick="setPage('squad');expandedSquadPlayer='${String(p.id).replace(/'/g,'')}';render()">Se spiller →</button><button onclick="renewPlayerContract('${String(p.id).replace(/'/g,'')}')">Forny</button></div></article>`));
