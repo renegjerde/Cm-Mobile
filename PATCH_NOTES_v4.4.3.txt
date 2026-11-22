@@ -1,0 +1,38 @@
+CM Mobile 4.4.3 – final stability pass: cloud queue drain
+
+Base: CM Mobile 4.4.2.
+
+Rettet:
+1. Cloud write-flush er nå single-flight: samtidige kall deler samme ventende flush.
+2. Køen tømmes i en løkke til alle payloads er bekreftet. En nyere lagring som kommer mens en eldre upload pågår, blir tatt i neste iterasjon før flush returnerer suksess.
+3. save() returnerer nå false hvis roster-integritetskontrollen avviser payloaden, i stedet for å rapportere at lagringen ble lagt i kø.
+4. Alle endringene og testene fra 4.4.2 beholdes:
+   - nøyaktig 4/4 hjemme-/bortekamper i CL/EL og 3/3 i Conference League;
+   - gyldige 20- og 24-klubbers ligaplaner;
+   - 92 EFL Cup- og 124 FA Cup-deltakere;
+   - cupenes AI-progresjon til registrert vinner;
+   - alle tre europacuper fullfører alle fem utslagsfaser;
+   - managerstyrt CL-kamp pauser bare CL, ikke EL/Conference;
+   - sesongskifte kontrollerer nasjonale cuper og alle europacuper;
+   - sesongskifte og karrierebytte venter på bekreftet skylagring;
+   - utlån bekreftes på nytt mot aktiv lånestatus.
+
+Automatisert testing:
+- Node.js syntakskontroll.
+- Kildetestene for ligakampprogram, cupformat, UEFA-kalender og europacup-progresjon.
+- ZIP-integritet og arkivstruktur.
+
+Ikke testet:
+- Live Supabase-konto/RLS og reell nettverkssynkronisering.
+- Fysisk iPhone Safari, trykk/scroll og faktisk managerstyrt full sesong.
+- Spillerutvikling og match-engine-balanse gjennom flere komplette sesonger.
+
+ZIP:
+- index.html
+- PATCH_NOTES_v4.4.3.txt
+Begge filer direkte i arkivroten, ingen undermapper.
+
+Additional targeted logic tests:
+- A pending old cloud save was held open while a newer save arrived; the single-flight flush wrote old then new in order, both concurrent callers received success, and the pending queue ended empty.
+- Domestic rollover gate: both cups with champions/expected rounds pass; removing an FA Cup champion blocks rollover.
+- Loan guard: incoming/outgoing loans and valid legacy loan metadata are blocked; an ordinary player remains eligible.

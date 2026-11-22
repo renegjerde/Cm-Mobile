@@ -2892,6 +2892,46 @@ function encodeSaveState(state){
  }
  return "CMZ2:"+parts.join(".");
 }
+function cmCareerPayloadRosterInfo(payload){
+ try{
+  const s=decodeSaveState(payload);
+  if(!s||!s.started)return {valid:false,squadCount:0,worldCount:0,clubName:"",season:""};
+  const club=CLUBS[Number(s.club)]||null;
+  const world=Array.isArray(s.worldSquads?.[Number(s.club)])?s.worldSquads[Number(s.club)]:[];
+  return {valid:true,squadCount:Array.isArray(s.squad)?s.squad.length:0,worldCount:world.length,clubName:club?.name||String(s.clubName||""),season:`${Number(s.seasonYear)||2026}/${String((Number(s.seasonYear)||2026)+1).slice(-2)}`,state:s};
+ }catch(e){return {valid:false,squadCount:0,worldCount:0,clubName:"",season:"",error:String(e.message||e)};}
+}
+function cmRecoverManagedSquad(state){
+ if(!state||Array.isArray(state.squad)&&state.squad.length>0)return {recovered:false,count:state?.squad?.length||0};
+ const clubIndex=Number(state.club),clubName=String(CLUBS[clubIndex]?.name||"").trim().toLowerCase();
+ const candidates=[];
+ const add=(source,roster)=>{
+  if(!Array.isArray(roster)||!roster.length)return;
+  const players=roster.filter(p=>p&&typeof p==="object"&&p.name);
+  if(!players.length)return;
+  const exact=players.filter(p=>String(p.clubName||"").trim().toLowerCase()===clubName||Number(p.clubIndex)===clubIndex);
+  candidates.push({source,players,exact:exact.length});
+ };
+ add("worldSquads[club]",state.worldSquads?.[clubIndex]);
+ for(let i=0;i<(state.worldSquads||[]).length;i++){
+  if(i===clubIndex)continue;
+  add(`worldSquads[${i}]`,state.worldSquads[i]);
+ }
+ const division=String(state.activeDivision||"");
+ const efl=state.eflPlayerDatabase?.[division]?.[CLUBS[clubIndex]?.name];
+ add("eflPlayerDatabase",efl);
+ candidates.sort((a,b)=>b.exact-a.exact||b.players.length-a.players.length);
+ const best=candidates[0];
+ if(best&&best.players.length>=11&&(best.exact>=Math.min(8,best.players.length)||best.source==="worldSquads[club]"||best.source==="eflPlayerDatabase")){
+  state.squad=best.players.map(p=>({...p,attributes:{...(p.attributes||{})}}));
+  if(!Array.isArray(state.worldSquads))state.worldSquads=[];
+  state.worldSquads[clubIndex]=state.squad.map(p=>({...p,attributes:{...(p.attributes||{})}}));
+  state.log=Array.isArray(state.log)?state.log:[];
+  state.log.push(`SPILLERSTALL GJENOPPRETTET: ${state.squad.length} spillere ble hentet fra ${best.source}. Kontroller stallen før videre spill.`);
+  return {recovered:true,count:state.squad.length,source:best.source};
+ }
+ return {recovered:false,count:0,candidates:candidates.map(c=>({source:c.source,count:c.players.length,matching:c.exact}))};
+}
 function decodeSaveState(payload){
  if(!payload)return null;
  const value=String(payload);
@@ -2915,10 +2955,15 @@ function save(){
  try{
   if(!cmCloudAuthenticated){cmCloudSetStatus("Logg inn for å lagre i skyen");window.__cmLastSaveError={message:"Ikke innlogget"};return false;}
   if(!activeCareerSlotId)activeCareerSlotId=newCareerSlotId();
+  if(!Array.isArray(appState.squad)||appState.squad.length===0){
+   window.__cmCloudSaveBlocked={id:String(activeCareerSlotId||""),reason:"Aktiv spillerstall er tom",at:Date.now(),worldCount:Array.isArray(appState.worldSquads?.[Number(appState.club)])?appState.worldSquads[Number(appState.club)].length:0};
+   cmCloudSetStatus("⚠ Lagring stoppet · spillerstall mangler");
+   return false;
+  }
   const id=String(activeCareerSlotId),payload=encodeSaveState(appState);
   registerCareerSlot(id);
   try{localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,id);}catch(e){}
-  cmCloudScheduleSync(id,payload);
+  if(cmCloudScheduleSync(id,payload)===false)return false;
   window.__cmLastSaveAt=Date.now();
   window.__cmLastSaveError=null;
   return true; // queued; UI status changes to Skylagret only after Supabase confirms.
@@ -2928,7 +2973,13 @@ function save(){
   return false;
  }
 }
-function loadFromPayload(payload){try{let s=decodeSaveState(payload);if(s&&s.started){const hadPreseasonFlag=Object.prototype.hasOwnProperty.call(s,"preseasonActive");Object.assign(appState,s);if(!Object.prototype.hasOwnProperty.call(s,"leagueSystemSchemaVersion"))appState.leagueSystemSchemaVersion=0;if(Number(appState.availabilityModelVersion||0)<2){
+function loadFromPayload(payload){try{let s=decodeSaveState(payload);if(s&&s.started){const hadPreseasonFlag=Object.prototype.hasOwnProperty.call(s,"preseasonActive");Object.assign(appState,s);
+ const squadRecovery=cmRecoverManagedSquad(appState);
+ if(!Array.isArray(appState.squad))appState.squad=[];
+ if(appState.squad.length===0){
+  window.__cmCareerIntegrityIssue={clubName:CLUBS[Number(appState.club)]?.name||"Ukjent klubb",season:Number(appState.seasonYear)||2026,worldCount:squadRecovery.count||0,candidates:squadRecovery.candidates||[]};
+ }else window.__cmCareerIntegrityIssue=null;
+ if(!Object.prototype.hasOwnProperty.call(s,"leagueSystemSchemaVersion"))appState.leagueSystemSchemaVersion=0;if(Number(appState.availabilityModelVersion||0)<2){
   const migrateAvailability=(players)=>{(players||[]).forEach(p=>{if(Number(p.injured)>0&&!Number.isFinite(Number(p.injuryDaysRemaining)))p.injuryDaysRemaining=Math.max(4,Number(p.injured)*8);if(Number(p.suspended)>0){const d=appState.discipline?.[String(p.id)];if(d&&!Number.isFinite(Number(d.ban)))d.ban=Number(p.suspended)||0;}});};
   migrateAvailability(appState.squad);(appState.worldSquads||[]).forEach(migrateAvailability);
   appState.availabilityModelVersion=2;
@@ -3008,7 +3059,8 @@ async function switchCareerSlot(id){
   try{localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,id);}catch(e){}
   marketSearch='';marketPosition='ALL';marketSort='recommended';marketScope='all';marketAgeMin='';marketAgeMax='';marketExactRole='ALL';marketMaxPrice='';marketMinPotential='';window.marketAdvancedOpen=false;
   window.transferListAccordionOpen=false;normalizeAllPlayerAges(Number(appState.seasonYear)||2026);ensureTransferPool();
-  save();
+  if(!save())throw new Error('Den valgte karrieren kunne ikke legges i skylagringskøen.');
+  await cmCloudFlushPending();
   document.getElementById('careerManagerModal')?.remove();document.getElementById('careerClubPicker')?.remove();lastRenderedPage=null;render();
  }catch(e){
   alert("Kunne ikke bytte karriere: "+(e.message||"ukjent feil"));
@@ -3541,7 +3593,7 @@ function openOutgoingLoan(id){
 function confirmOutgoingLoan(id){
  if(!transferWindowOpen()){alert(`Overgangsvinduet er stengt. ${transferWindowCalendarText()}`);return;}
  const p=(appState.squad||[]).find(x=>String(x.id)===String(id));
- const modal=document.getElementById('outgoingLoanModal');if(!p||p.loanStatus||!modal)return;
+ const modal=document.getElementById('outgoingLoanModal');if(!p||playerHasActiveLoan(p)||!modal){if(p&&playerHasActiveLoan(p))alert('Spilleren er allerede på lån og kan ikke lånes videre.');return;}
  const targetKey=String(document.getElementById('outLoanClub')?.value||''),duration=String(document.getElementById('outLoanDuration')?.value||'12'),share=Number(document.getElementById('outLoanWageShare')?.value),fee=Math.max(0,Number(document.getElementById('outLoanFee')?.value)||0);
  let targetType='pl',targetIndex=-1,targetDivision='',targetName='';
  if(targetKey.startsWith('PL:')){targetIndex=Number(targetKey.slice(3));targetName=CLUBS[targetIndex]?.name||'';}
@@ -7488,11 +7540,30 @@ function buildEuropeanLeagueSchedule(teams,matchdays,seedKey){
  }
  if(schedule.length!==matchdays)throw new Error(`Could not create UEFA-compliant league schedule for ${seedKey}; check club association data`);
  const edges=schedule.flat();
- // Orient fixtures to balance home/away matches as evenly as possible.
- const homeCount=new Map(unique.map(t=>[t.name,0]));
+ // Orient the fixture graph along Euler circuits. Every club has degree 6 or 8,
+ // so each component is Eulerian; this gives every club exactly half its matches at home.
+ const adjacency=new Map(unique.map(t=>[t.name,[]]));
+ edges.forEach((fixture,id)=>{
+  adjacency.get(fixture.home).push({id,to:fixture.away});
+  adjacency.get(fixture.away).push({id,to:fixture.home});
+ });
+ const used=new Uint8Array(edges.length),orientation=new Map();
+ for(const start of adjacency.keys()){
+  if(!adjacency.get(start).some(edge=>!used[edge.id]))continue;
+  const vertexStack=[start],edgeStack=[],vertexCircuit=[],edgeCircuit=[];
+  while(vertexStack.length){
+   const current=vertexStack[vertexStack.length-1],edge=adjacency.get(current).find(candidate=>!used[candidate.id]);
+   if(edge){used[edge.id]=1;vertexStack.push(edge.to);edgeStack.push(edge.id);}
+   else{vertexCircuit.push(vertexStack.pop());if(edgeStack.length)edgeCircuit.push(edgeStack.pop());}
+  }
+  vertexCircuit.reverse();edgeCircuit.reverse();
+  for(let i=0;i<edgeCircuit.length;i++)orientation.set(edgeCircuit[i],{home:vertexCircuit[i],away:vertexCircuit[i+1]});
+ }
+ const edgeIdByFixture=new Map(edges.map((fixture,id)=>[fixture,id]));
  const oriented=schedule.map(round=>round.map(f=>{
-  const homeFirst=homeCount.get(f.home)<=homeCount.get(f.away);
-  const home=homeFirst?f.home:f.away,away=homeFirst?f.away:f.home;homeCount.set(home,homeCount.get(home)+1);return {round:f.round,home,away};
+  const direction=orientation.get(edgeIdByFixture.get(f));
+  if(!direction)throw new Error(`Could not orient UEFA fixture ${f.home} – ${f.away}`);
+  return {round:f.round,home:direction.home,away:direction.away};
  }));
  return oriented;
 }
@@ -8504,6 +8575,17 @@ function europeanSeasonCompletionStatus(){
  });
  return {complete:missing.length===0,missing};
 }
+
+function domesticSeasonCompletionStatus(){
+ const expected=['EFL Cup','FA Cup'],cups=appState.cupCompetitions||{},missing=[];
+ for(const name of expected){
+  const cup=cups[name];
+  if(!cup){missing.push(`${name}: turneringsdata mangler`);continue;}
+  if(!cup.champion||Number(cup.round||0)<cupTotalStages(name))missing.push(`${name}: turneringen har ingen registrert vinner`);
+ }
+ return {complete:missing.length===0,missing};
+}
+
 function archiveEuropeanSeason(){
  const clone=value=>JSON.parse(JSON.stringify(value??null));
  const competitions=clone(appState.europeanCompetitions||{});
@@ -8518,9 +8600,11 @@ function archiveEuropeanSeason(){
  appState.lastSeasonSummary.europeanArchiveCompetitions=Object.fromEntries(Object.entries(competitions).map(([name,c])=>[name,{champion:c?.champion||null,results:(c?.results||[]).length,knockoutStages:(c?.knockout?.history||[]).map(s=>s.name)}]));
  return entry;
 }
-function startNewSeason(){
+async function startNewSeason(){
  if(!seasonCompleted()){alert("Spill ferdig sesongen før du starter en ny.");return}
  initDomesticCompetitions();processScheduledDomesticCups(Math.max(Number(appState.week)||1,38));
+ const domesticStatus=domesticSeasonCompletionStatus();
+ if(!domesticStatus.complete){alert('Sesongskiftet er stoppet. Følgende nasjonale cuper er ikke ferdigspilt:\n\n'+domesticStatus.missing.join('\n')+'\n\nIngen sesongdata er nullstilt.');return;}
  // Final-week catch-up: resolve all overdue AI ties and expose any remaining manager fixture.
  ensureEuropeanCompetitions();processScheduledEuropeanKnockouts(Math.max(Number(appState.week)||1,38,Number(activeLeagueRoundCount?.())||38));
  if(appState.pendingCupMatch&&["FA Cup","EFL Cup"].includes(appState.pendingCupMatch.competition)){alert("En nasjonal cupkamp gjenstår. Spill cupkampen før du starter neste sesong.");startPendingCupMatch();return}
@@ -8528,7 +8612,8 @@ function startNewSeason(){
  const europeanStatus=europeanSeasonCompletionStatus();
  if(!europeanStatus.complete){alert("Sesongskiftet er stoppet. Følgende europacuper er ikke ferdigspilt:\n\n"+europeanStatus.missing.join("\n")+"\n\nFortsett kampukene til alle turneringene er avgjort. Ingen sesongdata er nullstilt.");return}
  if(!confirm(`Starte sesongen ${Number(appState.seasonYear)+1}/${String(Number(appState.seasonYear)+2).slice(-2)}? Klubben og troppen beholdes, mens tabell og sesongstatistikk nullstilles.`))return;
- if(!save()){alert('Sesongskiftet ble stoppet fordi den aktive karrieren ikke kunne sikkerhetslagres. Ingen sesongdata er nullstilt.');return;}
+ if(!save()){alert('Sesongskiftet ble stoppet fordi karrieren ikke kunne sendes til skyen. Ingen sesongdata er nullstilt.');return;}
+ try{await cmCloudFlushPending();}catch(e){alert('Sesongskiftet ble stoppet fordi den gamle sesongen ikke ble bekreftet lagret i skyen: '+(e.message||'ukjent feil')+'. Ingen sesongdata er nullstilt.');return;}
  const finalTable=sortedTable();
  const previousDivision=clubDivision(currentClub());
  // Build the end-of-season summary without committing rewards or player archives yet.
@@ -8561,7 +8646,10 @@ function startNewSeason(){
  appState.squad.forEach(p=>{p.goals=0;p.assists=0;p.apps=0;p.minutes=0;p.yellowCards=0;p.redCards=0;p.chancesCreated=0;p.competitionStats={};p.injured=0;p.suspended=0;p.fitness=Math.max(85,p.fitness||90);p.form=6.5;p.morale=Math.max(60,Math.min(95,(p.morale||75)+Math.round(Math.random()*6-3)))});
  ensureAllPlayerContracts();if(Array.isArray(appState.worldSquads))appState.worldSquads[appState.club]=(appState.squad||[]).map(p=>({...p,attributes:{...(p.attributes||{})}}));
  appState.activeDivision=clubDivision(CLUBS[appState.club]);appState.table=activeLeagueClubs().map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
- appState.fixtures=[];ensureFixtures();appState.domesticVersion=0;appState.europeanCompetitions=null;appState.europeanSeason=null;appState.cupCompetitions=null;appState.domesticCalendar=[];appState.lastDomesticRound=0;initDomesticCompetitions();reviewAllClubFinancesForNewSeason(financeRankings,Number(appState.seasonYear)-1,movement);adjustWageBudgetsForNewSeason(finalTable,Number(appState.seasonYear)-1);ensureYouthAcademies(true);const aiLoans=processAIAutonomousLoans();appState.lastSeasonSummary.aiLoans=aiLoans.length;save();render();
+ appState.fixtures=[];ensureFixtures();appState.domesticVersion=0;appState.europeanCompetitions=null;appState.europeanSeason=null;appState.cupCompetitions=null;appState.domesticCalendar=[];appState.lastDomesticRound=0;initDomesticCompetitions();reviewAllClubFinancesForNewSeason(financeRankings,Number(appState.seasonYear)-1,movement);adjustWageBudgetsForNewSeason(finalTable,Number(appState.seasonYear)-1);ensureYouthAcademies(true);const aiLoans=processAIAutonomousLoans();appState.lastSeasonSummary.aiLoans=aiLoans.length;
+ if(!save()){alert('Den nye sesongen er opprettet, men lagringen ble ikke lagt i kø. Ikke lukk spillet før du har kontrollert skylagringen.');render();return;}
+ try{await cmCloudFlushPending();}catch(e){alert('Den nye sesongen er startet, men skyen har ikke bekreftet lagringen: '+(e.message||'ukjent feil')+'. Hold spillet åpent og trykk Lagre på nytt.');render();return;}
+ render();
 }
 
 function baseCareerClubNamesForDivision(division){
@@ -8587,7 +8675,7 @@ function updateCareerClubOptions(){
  select.innerHTML=names.map(name=>`<option value="${esc(name)}">${esc(name)}</option>`).join('');
  select.selectedIndex=0;
 }
-function startSelectedCareer(){
+async function startSelectedCareer(){
  const select=document.getElementById('careerClub');if(!select||select.value==='')return;
  const selectedClubName=String(select.value||'').trim();if(!selectedClubName)return;
  const division=document.getElementById('careerDivision')?.value;
@@ -8596,6 +8684,7 @@ function startSelectedCareer(){
  if(readCareerSlots().length>=MAX_CAREER_SLOTS){alert(`Maks ${MAX_CAREER_SLOTS} samtidige karrierer. Den aktive karrieren blir ikke overskrevet.`);document.getElementById('careerClubPicker')?.remove();openCareerManager();return;}
  if(!confirm(`Opprette en NY, separat karriere med ${selectedClubName} fra sesongstart 2026/27? Den nåværende karrieren lagres og blir tilgjengelig under «Karrierer».`))return;
  if(!save()){alert('Den nåværende karrieren kunne ikke lagres. Ny karriere ble ikke startet.');return;}
+ try{await cmCloudFlushPending();}catch(e){alert('Den nåværende karrieren ble ikke bekreftet lagret i skyen. Ny karriere ble ikke startet: '+(e.message||'ukjent feil'));return;}
  // Save the selected club by canonical name, not a mutable array index.
  // The domestic registry is rebuilt for a fresh 2026/27 career below.
  resetBaseDomesticRegistry2026_27();
@@ -8626,7 +8715,8 @@ function startSelectedCareer(){
  appState.budget=CLUBS[idx].budget;
  appState.table=activeLeagueClubs().map(c=>({...c,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}));
  appState.fixtures=[];ensureFixtures();initClubFinances(true);ensureYouthAcademies();normalizeAllPlayerAges(Number(appState.seasonYear)||2026);
- save();
+ if(!save()){alert('Karrieren ble opprettet, men skylagringen kunne ikke startes. Kontroller kontotilkoblingen før du fortsetter.');render();return;}
+ try{await cmCloudFlushPending();}catch(e){alert('Karrieren ble opprettet, men ikke bekreftet lagret i skyen: '+(e.message||'ukjent feil')+'. Hold spillet åpent og prøv Lagre igjen.');render();return;}
  render();
 }
 function chooseClub(){startNewCareer()}
@@ -11714,8 +11804,10 @@ const CM_SUPABASE_PUBLISHABLE_KEY="sb_publishable_SHpVB28p0wKiWYg4HGt8eg_F_WZigN
 let cmSupabase=null,cmCloudSyncTimer=null,cmCloudBusy=false,cmCloudStatus="Ikke tilkoblet";
 let cmCloudAuthenticated=false,cmCloudPayloadCache=new Map(),cmCloudPendingPayloads=new Map(),cmCloudWriteChain=Promise.resolve();
 function cmRemoveLocalCareerPayload(id){
- try{localStorage.removeItem(careerSaveKey(id));localStorage.removeItem(careerBackupKey(id));}catch(e){}
- try{cmDeleteCareerBackup(id).catch(()=>{});}catch(e){}
+ // v4.4.1 recovery hold: keep any old local payload/IndexedDB copy until
+ // every cloud career has passed roster-integrity checks. Never purge during recovery.
+ window.__cmLocalRecoveryCopiesPreserved=true;
+ return false;
 }
 async function cmDeleteCareerBackup(id){
  try{
@@ -11724,6 +11816,12 @@ async function cmDeleteCareerBackup(id){
  }catch(e){}
 }
 function cmCloudScheduleSync(id,payload){
+ const integrity=cmCareerPayloadRosterInfo(payload);
+ if(!integrity.valid||integrity.squadCount===0){
+  window.__cmCloudSaveBlocked={id:String(id),reason:"Spillerstall mangler",at:Date.now(),worldCount:integrity.worldCount};
+  cmCloudSetStatus("⚠ Lagring stoppet · spillerstall mangler");
+  return false;
+ }
  cmCloudPayloadCache.set(String(id),String(payload));
  cmCloudPendingPayloads.set(String(id),String(payload));
  cmCloudSetStatus("Synker til skyen…");
@@ -11731,19 +11829,27 @@ function cmCloudScheduleSync(id,payload){
  cmCloudSyncTimer=setTimeout(()=>cmCloudFlushPending().catch(e=>cmCloudSetStatus("⚠ Skylagring feilet: "+(e.message||"ukjent feil"))),700);
 }
 function scheduleCMCloudSave(id,payload){cmCloudScheduleSync(id,payload);}
-async function cmCloudFlushPending(){
- if(!cmCloudPendingPayloads.size)return true;
- const client=cmCloudClient(),{data:{session},error:sessionError}=await client.auth.getSession();
- if(sessionError)throw sessionError;
- if(!session?.user){cmCloudAuthenticated=false;cmCloudSetStatus("Logg inn for å lagre i skyen");throw new Error("Ikke innlogget. Karrieren er ikke bekreftet lagret i skyen.");}
- cmCloudAuthenticated=true;
- const entries=Array.from(cmCloudPendingPayloads.entries());
- for(const [id,payload] of entries){
-  cmCloudWriteChain=cmCloudWriteChain.catch(()=>{}).then(()=>cmCloudUpsert(id,payload));
-  await cmCloudWriteChain;
-  if(cmCloudPendingPayloads.get(id)===payload)cmCloudPendingPayloads.delete(id);
- }
- return cmCloudPendingPayloads.size===0;
+let cmCloudFlushInFlight=null;
+function cmCloudFlushPending(){
+ if(cmCloudFlushInFlight)return cmCloudFlushInFlight;
+ cmCloudFlushInFlight=(async()=>{
+  const client=cmCloudClient(),{data:{session},error:sessionError}=await client.auth.getSession();
+  if(sessionError)throw sessionError;
+  if(!session?.user){cmCloudAuthenticated=false;cmCloudSetStatus("Logg inn for å lagre i skyen");throw new Error("Ikke innlogget. Karrieren er ikke bekreftet lagret i skyen.");}
+  cmCloudAuthenticated=true;
+  // Drain until empty. If a newer save arrives during an upload, it is
+  // picked up by the next loop before this function reports success.
+  while(cmCloudPendingPayloads.size){
+   const entries=Array.from(cmCloudPendingPayloads.entries());
+   for(const [id,payload] of entries){
+    cmCloudWriteChain=cmCloudWriteChain.catch(()=>{}).then(()=>cmCloudUpsert(id,payload));
+    await cmCloudWriteChain;
+    if(cmCloudPendingPayloads.get(id)===payload)cmCloudPendingPayloads.delete(id);
+   }
+  }
+  return true;
+ })().finally(()=>{cmCloudFlushInFlight=null;});
+ return cmCloudFlushInFlight;
 }
 function cmCloudClient(){
  if(cmSupabase)return cmSupabase;
@@ -11758,16 +11864,13 @@ function cmCloudSetStatus(message){
  const status=document.getElementById("cmCloudStatus");
  if(status)status.textContent=message;
 }
-function cmCloudScheduleSync(id,payload){
- if(!cmSupabase)return;
- clearTimeout(cmCloudSyncTimer);
- cmCloudSyncTimer=setTimeout(()=>cmCloudUpsert(id,payload).catch(e=>cmCloudSetStatus("⚠ Skylagring feilet: "+(e.message||"ukjent feil"))),1200);
-}
-function scheduleCMCloudSave(id,payload){cmCloudScheduleSync(id,payload);}
+/* v4.4.2: the single cloud save scheduler above owns the serialized pending-write queue. */
 async function cmCloudUpsert(id,payload){
  const client=cmCloudClient(),{data:{session},error:sessionError}=await client.auth.getSession();
  if(sessionError)throw sessionError;
  if(!session?.user)throw new Error("Ikke innlogget. Logg inn før du lagrer karrieren.");
+ const integrity=cmCareerPayloadRosterInfo(payload);
+ if(!integrity.valid||integrity.squadCount===0)throw new Error(`Sikkerhetsstopp: ${integrity.clubName||"Karrieren"} har tom spillerstall. Skylagringen ble ikke overskrevet. Intern klubbkopi: ${integrity.worldCount} spillere.`);
  const meta=readCareerSlots().find(x=>x.id===id)||careerSlotDetails(id);
  const row={user_id:session.user.id,career_slot_id:String(id),career_name:String(meta.name||`${meta.clubName||"Karriere"} · ${meta.season||""}`),club_name:String(meta.clubName||""),season:String(meta.season||""),season_year:Number(meta.seasonYear)||2026,week:Number(meta.week)||1,payload:String(payload),updated_at:new Date().toISOString()};
  const {error}=await client.from("cm_careers").upsert(row,{onConflict:"user_id,career_slot_id"});
@@ -11820,7 +11923,8 @@ function cmCloudSyncAll(options={}){
    try{localPayload=localStorage.getItem(careerSaveKey(id))||localStorage.getItem(careerBackupKey(id));}catch(e){}
    if(!localPayload)localPayload=await cmReadCareerBackup(id);
    const remoteRow=remoteById.get(id);
-   if(localPayload&&(!remoteRow||(Number(local.updatedAt)||0)>(Date.parse(remoteRow.updated_at)||0))){
+   const localIntegrity=localPayload?cmCareerPayloadRosterInfo(localPayload):null;
+   if(localPayload&&localIntegrity?.valid&&localIntegrity.squadCount>0&&(!remoteRow||(Number(local.updatedAt)||0)>(Date.parse(remoteRow.updated_at)||0))){
     cmCloudPayloadCache.set(id,localPayload);
     await cmCloudUpsert(id,localPayload);
     remoteById.set(id,{...(remoteRow||{}),career_slot_id:id,payload:localPayload,career_name:local.name||remoteRow?.career_name||"Karriere",club_name:local.clubName||remoteRow?.club_name||"",season:local.season||remoteRow?.season||"",season_year:Number(local.seasonYear)||Number(remoteRow?.season_year)||2026,week:Number(local.week)||Number(remoteRow?.week)||1,updated_at:new Date().toISOString()});
@@ -11850,6 +11954,26 @@ function cmCloudSyncAll(options={}){
    cmRemoveLocalCareerPayload(id);
    imported++;
   }
+  // Recovery pass: if a cloud record has an empty squad, look for one unique
+  // older/duplicate save for the exact same club and season with a complete squad.
+  const rosterDiagnostics=[];
+  for(const row of finalRemote){
+   const id=String(row.career_slot_id),info=cmCareerPayloadRosterInfo(row.payload);
+   rosterDiagnostics.push({id,name:row.career_name||row.club_name||id,clubName:info.clubName||row.club_name||"",season:info.season||row.season||"",squadCount:info.squadCount,worldCount:info.worldCount,valid:info.valid});
+   if(info.valid&&info.squadCount===0){
+    let candidates=finalRemote.filter(other=>{
+     if(String(other.career_slot_id)===id)return false;
+     const oi=cmCareerPayloadRosterInfo(other.payload);
+     return oi.valid&&oi.squadCount>0&&String(other.club_name||oi.clubName).trim().toLowerCase()===String(row.club_name||info.clubName).trim().toLowerCase()&&String(other.season||oi.season).trim().toLowerCase()===String(row.season||info.season).trim().toLowerCase();
+    });
+    if(candidates.length===1){
+     const replacement=candidates[0],replacementInfo=cmCareerPayloadRosterInfo(replacement.payload);
+     cmCloudPayloadCache.set(id,replacement.payload);
+     window.__cmCloudSquadRecoveryCandidate={targetId:id,sourceId:String(replacement.career_slot_id),clubName:info.clubName,season:info.season,squadCount:replacementInfo.squadCount};
+    }
+   }
+  }
+  window.__cmCloudRosterDiagnostics=rosterDiagnostics;
   let activeId=localStorage.getItem(ACTIVE_CAREER_SLOT_KEY)||activeCareerSlotId||"";
   if(activeId&&!cmCloudPayloadCache.has(activeId)){
    const meta=readCareerSlots().find(x=>x.id===activeId);
@@ -11880,6 +12004,22 @@ function cmCloudSyncAll(options={}){
  }).finally(()=>{cmCloudBusy=false;cmCloudSyncInFlight=null;});
  return cmCloudSyncInFlight;
 }
+async function cmDiagnoseCloudCareerRosters(){
+ try{
+  cmCloudSetStatus("Kontrollerer spillerstaller i skyen…");
+  const {data,error}=await cmCloudClient().from("cm_careers").select("career_slot_id,career_name,club_name,season,season_year,updated_at,payload").order("updated_at",{ascending:false});
+  if(error)throw error;
+  const rows=(data||[]).map(row=>{
+   const info=cmCareerPayloadRosterInfo(row.payload);
+   return {name:row.career_name||row.club_name||row.career_slot_id,club:row.club_name||info.clubName,season:row.season||info.season,squad:info.squadCount,world:info.worldCount,id:row.career_slot_id};
+  });
+  window.__cmCloudRosterDiagnostics=rows;
+  const report=rows.map(r=>`${r.name} (${r.season}) · spillerstall: ${r.squad} · intern klubbkopi: ${r.world} · ID: ${r.id}`).join("\n");
+  alert(rows.length?`SPILLERSTALLKONTROLL I SKYEN\n\n${report}`:"Fant ingen karrierer i skyen.");
+  cmCloudSetStatus(`✓ Kontrollert ${rows.length} karrierer`);
+  return rows;
+ }catch(e){cmCloudSetStatus("⚠ Kontroll feilet: "+(e.message||e));alert("Kunne ikke kontrollere skykarrierene: "+(e.message||e));return [];}
+}
 function openCMCloudModal(){
  document.getElementById("cmCloudModal")?.remove();
  const overlay=document.createElement("div");overlay.id="cmCloudModal";
@@ -11891,7 +12031,7 @@ function openCMCloudModal(){
  <label style="display:block;color:#aebed0;font-size:11px;margin:10px 0 5px">E-post</label><input id="cmCloudEmail" type="email" autocomplete="email" style="width:100%;padding:12px;border-radius:9px;border:1px solid #405670;background:#0d1a2a;color:#fff">
  <label style="display:block;color:#aebed0;font-size:11px;margin:10px 0 5px">Passord</label><input id="cmCloudPassword" type="password" autocomplete="current-password" style="width:100%;padding:12px;border-radius:9px;border:1px solid #405670;background:#0d1a2a;color:#fff">
  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px"><button id="cmCloudSignIn" class="primary">Logg inn</button><button id="cmCloudSignUp">Opprett konto</button></div>
- <button id="cmCloudSync" style="width:100%;margin-top:8px">Synkroniser nå</button><button id="cmCloudSignOut" class="ghost" style="width:100%;margin-top:8px">Logg ut</button>
+ <button id="cmCloudSync" style="width:100%;margin-top:8px">Synkroniser nå</button><button id="cmCloudRosterCheck" class="ghost" style="width:100%;margin-top:8px">Kontroller spillerstaller i skyen</button><button id="cmCloudSignOut" class="ghost" style="width:100%;margin-top:8px">Logg ut</button>
  <p style="color:#8196ac;font-size:10px;line-height:1.45;margin:12px 0 0">Karrieredata lagres i skyen på kontoen din. Denne nettleseren beholder bare innlogging og en liten indeks over karrierene. Ingen karrieredata deles med Familiemat-tabellene.</p>
  </section>`;
  document.body.appendChild(overlay);
@@ -11913,6 +12053,7 @@ function openCMCloudModal(){
   try{const {data,error}=await cmCloudClient().auth.signUp({email,password});if(error)throw error;if(data.session){await cmCloudSyncAll({silentRender:true});set("✓ Konto opprettet og tilkoblet.");overlay.remove();if(!load()){render();openCareerManager();}else render();}else set("Konto opprettet. Bekreft e-postadressen før du logger inn.");}catch(e){set("⚠ "+(e.message||"Kunne ikke opprette konto."));}
  };
  overlay.querySelector("#cmCloudSync").onclick=async()=>{set("Synkroniserer…");try{await cmCloudSyncAll();set(cmCloudStatus);}catch(e){set("⚠ "+(e.message||"Synkronisering feilet."));}};
+ overlay.querySelector("#cmCloudRosterCheck").onclick=()=>cmDiagnoseCloudCareerRosters();
  overlay.querySelector("#cmCloudSignOut").onclick=async()=>{try{const {error}=await cmCloudClient().auth.signOut();if(error)throw error;cmCloudAuthenticated=false;cmCloudPayloadCache.clear();cmCloudPendingPayloads.clear();set("Logget ut. Logg inn igjen for å åpne karrierene dine.");}catch(e){set("⚠ "+(e.message||"Kunne ikke logge ut."));}};
  cmCloudClient().auth.getSession().then(({data,error})=>{if(error)set("⚠ "+error.message);else if(data.session)set("Innlogget som "+data.session.user.email);}).catch(e=>set("⚠ "+e.message));
 }
@@ -11922,7 +12063,7 @@ const CM_AUTOSAVE_INTERVAL_MS=60000;
 let cmAutoSaveInterval=null;
 function startCMAutoSave(){
  if(cmAutoSaveInterval)return;
- cmAutoSaveInterval=setInterval(()=>{if(appState?.started)save();},CM_AUTOSAVE_INTERVAL_MS);
+ cmAutoSaveInterval=setInterval(()=>{if(appState?.started&&!window.__cmCareerIntegrityIssue)save();},CM_AUTOSAVE_INTERVAL_MS);
 }
 window.addEventListener('pagehide',()=>{if(appState?.started){save();cmCloudFlushPending().catch(()=>{});}});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&appState?.started){save();cmCloudFlushPending().catch(()=>{});}});
@@ -11976,7 +12117,14 @@ startCMAutoSave();
   init();normalizeAllPlayerAges(Number(appState.seasonYear)||2026);save();render();
  }else{
   normalizeAllPlayerAges(Number(appState.seasonYear)||2026);
-  ensureTransferPool();save();render();
+  ensureTransferPool();
+  if(window.__cmCareerIntegrityIssue){
+   render();
+   const issue=window.__cmCareerIntegrityIssue;
+   alert(`SIKKERHETSSTOPP: Spillerstallen til ${issue.clubName} mangler. Intern klubbkopi: ${issue.worldCount} spillere. Ingen automatisk skylagring er utført. Åpne Tilkoblet → «Kontroller spillerstaller i skyen» og del resultatet før du fortsetter.`);
+   return;
+  }
+  save();render();
  }
 })();
 </script>
