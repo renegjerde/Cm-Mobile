@@ -8454,7 +8454,7 @@ function seasonReviewPromotionMarkup(){
  return `<section class="card"><div class="section-title"><h2>Opprykks- og nedrykksoversikt</h2><span class="pill">EFL + National League</span></div>${section}</section>`;
 }
 function seasonSummary(){
- initDomesticCompetitions();processScheduledDomesticCups(Math.max(Number(appState.week)||1,seasonCompleted()?38:1));
+ initDomesticCompetitions();processScheduledDomesticCups(Math.max(Number(appState.week)||1,seasonCompleted()?(Number(activeLeagueRoundCount?.())||38):1));
  if(!seasonCompleted())return `<div class="hero"><div class="eyebrow">SESONG</div><h1>Sesongen pågår</h1><button class="primary" onclick="setPage('home')">Tilbake til oversikten</button></div>`;
  const table=sortedTable(),record=currentClubRecord(),division=clubDivision(currentClub()),rank=table.findIndex(t=>t.name===currentClub().name)+1;
  const leaders=[...(appState.squad||[])].sort((a,b)=>(Number(b.goals)||0)-(Number(a.goals)||0)||(Number(b.assists)||0)-(Number(a.assists)||0));
@@ -8642,12 +8642,12 @@ function archiveEuropeanSeason(){
 }
 async function startNewSeason(){
  if(!seasonCompleted()){alert("Spill ferdig sesongen før du starter en ny.");return}
- initDomesticCompetitions();processScheduledDomesticCups(Math.max(Number(appState.week)||1,38));
+ initDomesticCompetitions();processScheduledDomesticCups(Math.max(Number(appState.week)||1,38,Number(activeLeagueRoundCount?.())||38));
  const domesticStatus=domesticSeasonCompletionStatus();
  if(!domesticStatus.complete){alert('Sesongskiftet er stoppet. Følgende nasjonale cuper er ikke ferdigspilt:\n\n'+domesticStatus.missing.join('\n')+'\n\nIngen sesongdata er nullstilt.');return;}
  // Final-week catch-up: resolve all overdue AI ties and expose any remaining manager fixture.
  ensureEuropeanCompetitions();processScheduledEuropeanKnockouts(Math.max(Number(appState.week)||1,38,Number(activeLeagueRoundCount?.())||38));
- if(appState.pendingCupMatch&&["FA Cup","EFL Cup"].includes(appState.pendingCupMatch.competition)){alert("En nasjonal cupkamp gjenstår. Spill cupkampen før du starter neste sesong.");startPendingCupMatch();return}
+ if(appState.pendingCupMatch&&["FA Cup","EFL Cup","Copa del Rey","Supercopa de España"].includes(appState.pendingCupMatch.competition)){alert("En nasjonal cupkamp gjenstår. Spill cupkampen før du starter neste sesong.");startPendingCupMatch();return}
  if(appState.pendingCupMatch?.isEuropean){alert("En europeisk cupkamp gjenstår. Spill europacupkampen før du starter neste sesong.");startPendingCupMatch();return}
  const europeanStatus=europeanSeasonCompletionStatus();
  if(!europeanStatus.complete){alert("Sesongskiftet er stoppet. Følgende europacuper er ikke ferdigspilt:\n\n"+europeanStatus.missing.join("\n")+"\n\nFortsett kampukene til alle turneringene er avgjort. Ingen sesongdata er nullstilt.");return}
@@ -8785,7 +8785,7 @@ function ensureFixtures(){
   resetBaseDomesticRegistry2026_27();
   // Keep the selected table view separate from the manager's actual league.
   // Do not silently force the active career back to the Premier League on each render.
-  const validTableDivisions=['Premier League','Championship','League One','League Two','National League'];
+  const validTableDivisions=['Premier League','Championship','League One','League Two','National League','LaLiga EA SPORTS','LaLiga HYPERMOTION','Primera Federación · Grupo 1','Primera Federación · Grupo 2'];
   if(!validTableDivisions.includes(String(appState.leagueTableDivision||'')))appState.leagueTableDivision=appState.activeDivision||'Premier League';
  }
  const teams=activeLeagueClubIndices(),n=teams.length,roundCount=(n-1)*2;
@@ -12167,5 +12167,505 @@ startCMAutoSave();
   save();render();
  }
 })();
+
+
+/* CM Mobile 4.5.0 — Spain domestic system */
+const CM450_SPAIN_DIVISIONS = {
+ 'LaLiga EA SPORTS': [
+  'Athletic Club','Atlético de Madrid','CA Osasuna','Celta de Vigo','Deportivo Alavés','Elche CF','FC Barcelona','Getafe CF','Levante UD','Málaga CF','Racing de Santander','Rayo Vallecano','RC Deportivo','RCD Espanyol de Barcelona','Real Betis','Real Madrid','Real Sociedad','Sevilla FC','Valencia CF','Villarreal CF'
+ ],
+ 'LaLiga HYPERMOTION': [
+  'AD Ceuta FC','Albacete Balompié','Burgos CF','Cádiz CF','CD Castellón','CD Eldense','CD Leganés','CD Tenerife','CE Sabadell','Celta Fortuna','Córdoba CF','FC Andorra','Girona FC','Granada CF','R. Sociedad B','RCD Mallorca','Real Oviedo','Real Sporting','Real Valladolid CF','SD Eibar','UD Almería','UD Las Palmas'
+ ],
+ 'Primera Federación · Grupo 1': [
+  'AD Mérida','Arenas Club','Athletic Club B','Barakaldo CF','CD Coria','CD Extremadura','CD Lugo','CD Mirandés','CP Cacereño','CyD Leonesa','Pontevedra CF','Racing Club Ferrol','RC Deportivo Fabril','Real Avilés Industrial','Real Unión Club','SD Ponferradina','UD Logroñés','UD Ourense','Unionistas de Salamanca CF','Zamora CF'
+ ],
+ 'Primera Federación · Grupo 2': [
+  'AD Alcorcón','Águilas FC','Algeciras CF','Antequera CCF','Atlético Madrileño','CD Teruel','CE Europa','CF Rayo Majadahonda','FC Cartagena','Gimnàstic de Tarragona','Hércules de Alicante CF','Juventud de Torremolinos CF','Real Jaén CF','Real Madrid Castilla','Real Murcia CF','Real Zaragoza','SD Huesca','UD Ibiza','UE Sant Andreu','Villarreal CF B'
+ ]
+};
+const CM450_SPAIN_DIVISION_ORDER = Object.keys(CM450_SPAIN_DIVISIONS);
+const CM450_SPAIN_STRENGTH = {
+ 'LaLiga EA SPORTS': [
+  ['Real Madrid',91],['FC Barcelona',90],['Atlético de Madrid',87],['Real Sociedad',81],['Villarreal CF',81],['Real Betis',79],['Athletic Club',79],['Sevilla FC',77],['Celta de Vigo',75],['Valencia CF',74],['Getafe CF',72],['CA Osasuna',72],['Rayo Vallecano',71],['Girona FC',71],['RCD Espanyol de Barcelona',69],['Elche CF',68],['Deportivo Alavés',68],['Levante UD',67],['Málaga CF',66],['Racing de Santander',66]
+ ],
+ 'LaLiga HYPERMOTION': [
+  ['UD Almería',69],['UD Las Palmas',68],['Real Valladolid CF',67],['Girona FC',66],['CD Leganés',65],['SD Eibar',65],['Granada CF',64],['Real Oviedo',64],['Cádiz CF',63],['RCD Mallorca',63],['Real Sporting',62],['CD Tenerife',62],['Burgos CF',61],['Córdoba CF',60],['Albacete Balompié',60],['CD Castellón',60],['AD Ceuta FC',59],['FC Andorra',58],['CE Sabadell',58],['CD Eldense',57],['Celta Fortuna',56],['R. Sociedad B',56]
+ ],
+ 'Primera Federación · Grupo 1': [
+  ['CyD Leonesa',59],['SD Ponferradina',58],['Racing Club Ferrol',57],['CD Lugo',56],['CD Mirandés',56],['Athletic Club B',55],['Barakaldo CF',54],['UD Logroñés',54],['Unionistas de Salamanca CF',53],['Zamora CF',52],['AD Mérida',52],['Pontevedra CF',52],['Arenas Club',51],['Real Unión Club',51],['CD Extremadura',50],['CP Cacereño',50],['Real Avilés Industrial',49],['UD Ourense',49],['CD Coria',48],['RC Deportivo Fabril',48]
+ ],
+ 'Primera Federación · Grupo 2': [
+  ['Real Zaragoza',64],['SD Huesca',62],['Hércules de Alicante CF',60],['Real Murcia CF',60],['FC Cartagena',59],['Gimnàstic de Tarragona',58],['AD Alcorcón',57],['Real Madrid Castilla',56],['Villarreal CF B',56],['Atlético Madrileño',55],['CE Europa',54],['UD Ibiza',54],['Algeciras CF',53],['Antequera CCF',53],['CD Teruel',52],['Águilas FC',51],['CF Rayo Majadahonda',51],['Juventud de Torremolinos CF',50],['Real Jaén CF',50],['UE Sant Andreu',49]
+ ]
+};
+const CM450_SPAIN_REGIONAL_GROUPS = {
+ 'Primera Federación · Grupo 1': ['CD Numancia','Sestao River Club','Gimnástica Segoviana','Coruxo FC','UD Llanera','CD Tudelano','CD Guijuelo','CD Laredo','CD Varea','CD Náxara','CD Izarra','SD Gernika Club','CD Tropezón','Bergantiños FC','Ourense CF','CD Arenteiro','CD Marino','CD Mensajero','CD Atlético Paso','CD Don Benito'],
+ 'Primera Federación · Grupo 2': ['Atlético Sanluqueño','Yeclano Deportivo','CD Estepona','Orihuela CF','Lleida CF','Terrassa FC','CE Andratx','CF Badalona Futur','CF Talavera de la Reina','UCAM Murcia CF','CD Utrera','CD Manchego Ciudad Real','Xerez CD','UD Alzira','CD Ebro','Utebo FC','Atzeneta UE','CD Illescas','CD Badajoz','Recreativo de Huelva']
+};
+const CM450_COPA_FIRST_ROUND = {
+ top: ['Athletic Club','CA Osasuna','Celta de Vigo','Deportivo Alavés','Elche CF','Getafe CF','Levante UD','Málaga CF','Racing de Santander','Rayo Vallecano','RC Deportivo','RCD Espanyol de Barcelona','Real Betis','Sevilla FC','Valencia CF','Villarreal CF'],
+ second: ['Girona FC','UD Almería','UD Las Palmas','AD Ceuta FC','CD Eldense','Granada CF','Real Valladolid CF','Real Sporting','CD Castellón','Burgos CF','FC Andorra','Cádiz CF','SD Eibar','CD Leganés','Albacete Balompié','CE Sabadell','RCD Mallorca','CD Tenerife'],
+ federation: ['CE Europa','UE Sant Andreu','CD Mirandés','CyD Leonesa','SD Ponferradina','CF Rayo Majadahonda','CD Extremadura','Real Zaragoza','SD Huesca','Zamora CF','CD Coria','Antequera CCF','Real Jaén CF','FC Cartagena']
+};
+const CM450_COPA_EXTRA = [
+ 'CD Numancia','Sestao River Club','Gimnástica Segoviana','Coruxo FC','UD Llanera','CD Tudelano','CD Guijuelo','CD Laredo','CD Varea','CD Náxara','CD Izarra','SD Gernika Club','CD Tropezón','Bergantiños FC','Ourense CF','CD Arenteiro','CD Marino','CD Mensajero','CD Atlético Paso','CD Don Benito','Atlético Sanluqueño','Yeclano Deportivo','CD Estepona','Orihuela CF','Lleida CF','Terrassa FC','CE Andratx','CF Badalona Futur','CF Talavera de la Reina','UCAM Murcia CF','CD Utrera','CD Manchego Ciudad Real','Xerez CD','Recreativo de Huelva','Arosa SC','Gimnástica de Torrelavega','Portugalete','SD Amorebieta','Reus FC Reddis','CE Manresa','Peña Sport FC','Calamocha CF','Atlético Baleares','UD Poblense','CD Alcoyano','Deportivo Minera','UB Conquense','CD Castellonense','CP Mijas-Las Lagunas','CD Cieza','Calvo Sotelo Puertollano','CD Alcalá','CD Lucena','Trival Valderas','CD Covadonga','CD Laredo','CD Guijuelo','CD Varea','CD Pamplona','CD Cuarte','CE Manacor','CD Tarancón','Ribadesella CF','Auriense CA','Salamanca UDS','Atlético Tordesillas','Real Ávila',
+ 'Atlético Calatayud','Anaitasuna','AE Prat','CD San Rafael','Sporting de Hortaleza','Atlético Unión Güímar','Tavernes de la Valldigna','Pinatar CF','Sporting de Alcázar','Lebrijana CF','Navalcarnero','San Sebastián de los Reyes','CD Badajoz','Atlético Paso','Arosa SC B','CD Utrera','Orihuela CF','CF Badalona Futur','UD Poblense','CD Estepona','CD Illescas','Utebo FC','Atlético Astorga','CD Ebro','CD Ejea','UD Barbastro','CD Don Álvaro','CD Móstoles URJC','CD Guadalajara','CD Quintanar del Rey','CD Azuaga','CD Gerena','CD San Roque de Lepe','CD Coria B','UD Socuéllamos','CD Villanovense'
+];
+const CM450_SPAIN_SEEDS = {
+ 'Deportivo Alavés': 'GK:Antonio Sivera|GK:Adrián Rodríguez|DEF:Facundo Garcés|DEF:Nahuel Tenaglia|DEF:Nicolás Valentini|DEF:Jonny|DEF:Youssef Lekhedim|MID:Ander Guevara|MID:Antonio Blanco|MID:Carles Aleñá|MID:Denis Suárez|MID:Carlos Protesoni|ATT:Abde Rebbach|ATT:Lucas Boyé|ATT:Mariano Díaz|ATT:Toni Martínez',
+ 'Athletic Club': 'GK:Unai Simón|GK:Álex Padilla|DEF:Aitor Paredes|DEF:Aymeric Laporte|DEF:Dani Vivian|DEF:Jesús Areso|DEF:Yuri Berchiche|MID:Beñat Prados|MID:Oihan Sancet|MID:Mikel Jauregizar|MID:Alejandro Rego|ATT:Iñaki Williams|ATT:Nico Williams|ATT:Gorka Guruzeta|ATT:Álex Berenguer',
+ 'Atlético de Madrid': 'GK:Jan Oblak|GK:Juan Musso|DEF:Robin Le Normand|DEF:Dávid Hancko|DEF:Cristian Romero|DEF:Marc Pubill|MID:Koke|MID:Pablo Barrios|MID:Marcos Llorente|MID:Johnny Cardoso|MID:Álex Baena|ATT:Julián Álvarez|ATT:Alexander Sørloth|ATT:Ademola Lookman|ATT:Giuliano Simeone',
+ 'CA Osasuna': 'GK:Sergio Herrera|GK:Aitor Fernández|DEF:Alejandro Catena|DEF:Abel Bretones|DEF:Enzo Boyomo|DEF:Jorge Herrando|DEF:Diego Rico|MID:Lucas Torró|MID:Aimar Oroz|MID:Jon Moncayola|MID:Rubén García|ATT:Ante Budimir|ATT:Raúl García|ATT:Moi Gómez',
+ 'Celta de Vigo': 'GK:Andrei Radu|GK:Iván Villar|DEF:Carl Starfelt|DEF:Marcos Alonso|DEF:Javi Galán|DEF:Javi Rodríguez|DEF:Sergio Carreira|MID:Ilaix Moriba|MID:Aleix Febas|MID:Miguel Román|MID:Hugo Álvarez|ATT:Iago Aspas|ATT:Borja Iglesias|ATT:Ferran Jutglà|ATT:Williot Swedberg|ATT:Pablo Durán',
+ 'Elche CF': 'GK:Matías Dituro|GK:Alejandro Iturbe|DEF:Bambo Diaby|DEF:Buba Sangaré|DEF:Pedro Bigas|DEF:Víctor Chust|DEF:Roy Revivo|MID:Facundo Buonanotte|MID:Federico Redondo|MID:Gonzalo Villar|MID:Marc Aguado|MID:Thomas Lemar|ATT:Abiel Osorio|ATT:Ezequiel Ponce|ATT:Fer Niño|ATT:Lucas Cepeda',
+ 'FC Barcelona': 'GK:Joan García|GK:Wojciech Szczesny|DEF:Jules Koundé|DEF:Pau Cubarsí|DEF:Alejandro Balde|DEF:Eric García|DEF:João Cancelo|MID:Pedri|MID:Gavi|MID:Frenkie de Jong|MID:Dani Olmo|MID:Marc Bernal|ATT:Lamine Yamal|ATT:Raphinha|ATT:Anthony Gordon|ATT:Gabriel Jesus',
+ 'Getafe CF': 'GK:David Soria|GK:Jirí Letácek|DEF:Abdel Abqar|DEF:Djené|DEF:Johan Mojica|DEF:Saba Sazonov|DEF:Sebastián Boselli|MID:Christantus Uche|MID:Francho Serrano|MID:Mario Martín|MID:Orel Mangala|ATT:Borja Mayoral|ATT:Enes Ünal|ATT:Juanmi|ATT:Martín Satriano',
+ 'Levante UD': 'GK:Mathew Ryan|GK:Pablo Cuñat|DEF:Adrián de la Fuente|DEF:Aïssa Mandi|DEF:Jeremy Toljan|DEF:Manu Sánchez|MID:Hugo Sotelo|MID:Jon Ander Olasagasti|MID:Roger Brugué|MID:Enzo Bardeli|ATT:Etta Eyong|ATT:Iván Romero|ATT:Petar Ratkov|ATT:Paco Cortés',
+ 'Málaga CF': 'GK:Alfonso Herrero|GK:Carlos López|DEF:Álex Pastor|DEF:Carlos Puga|DEF:Diego Murillo|DEF:Einar Galilea|DEF:José Salinas|MID:Carlos Dotor|MID:Daniel Lorenzo|MID:David Larrubia|MID:Ramón Enríquez|ATT:Adrián Niño|ATT:Chupete|ATT:Eneko Jauregui|ATT:Julen Lobete',
+ 'Racing de Santander': 'GK:Julen Agirrezabala|GK:Simon Eriksson|DEF:Aarón Martín|DEF:Alvaro Mantilla|DEF:Facundo González|DEF:Jeanuël Belocian|DEF:Pablo Ramon|MID:André Almeida|MID:Iván Martín|MID:Maguette Gueye|MID:Matteo Prati|ATT:Andrés Martín|ATT:Asier Villalibre|ATT:Giorgi Guliashvili|ATT:Iñigo Vicente|ATT:Juan Carlos Arana',
+ 'Rayo Vallecano': 'GK:Augusto Batalla|GK:Daniel Cárdenas|DEF:Andrei Ratiu|DEF:Florian Lejeune|DEF:Luiz Felipe|DEF:Marash Kumbulla|DEF:Adrià Pedrosa|MID:Óscar Valentín|MID:Pathé Ciss|MID:Pedro Díaz|MID:Unai López|MID:Isi Palazón|ATT:Alexandre Alemão|ATT:Jorge de Frutos|ATT:Sergio Camello|ATT:Raúl de Tomás',
+ 'RC Deportivo': 'GK:Germán Parreño|GK:Álvaro Fernández|DEF:Angeliño|DEF:Arnau Comas|DEF:Dani Barcia|DEF:Lucas Noubi|DEF:Miguel Loureiro|MID:Diego Villares|MID:Marc Casadó|MID:Mario Soriano Carreno|MID:Riki Rodríguez|MID:Jonathan Asp Jensen|ATT:David Mella|ATT:Adama Traoré|ATT:Kevin Sánchez|ATT:Yeremay Hernández|ATT:Zakaria Eddahchouri',
+ 'RCD Espanyol de Barcelona': 'GK:Marko Dmitrovic|GK:Ángel Fortuño|DEF:Leandro Cabrera|DEF:Omar El Hilali|DEF:Clemens Riedel|DEF:Quilindschy Hartman|DEF:Unai Núñez|MID:Edu Expósito|MID:Gabriel Moscardo|MID:Pol Lozano|MID:Rafael Bauza|ATT:Javier Puado|ATT:Jofre Carreras|ATT:Bryan Zaragoza|ATT:Roberto Fernández|ATT:Tyrhys Dolan',
+ 'Real Betis': 'GK:Álvaro Valles|GK:Diego Conde|DEF:Marc Bartra|DEF:Diego Llorente|DEF:Héctor Bellerín|DEF:Junior Firpo|DEF:Natan|MID:Isco|MID:Giovani Lo Celso|MID:Pablo Fornals|MID:Marc Roca|MID:Álvaro Fidalgo|ATT:Abde Ezzalzouli|ATT:Antony|ATT:Cucho Hernández|ATT:Troy Parrott',
+ 'Real Madrid': 'GK:Thibaut Courtois|GK:Andriy Lunin|DEF:Antonio Rüdiger|DEF:Dean Huijsen|DEF:Éder Militão|DEF:Álvaro Carreras|DEF:Trent Alexander-Arnold|MID:Jude Bellingham|MID:Arda Güler|MID:Aurélien Tchouaméni|MID:Eduardo Camavinga|MID:Federico Valverde|MID:Bernardo Silva|ATT:Kylian Mbappé|ATT:Vinícius Júnior|ATT:Rodrygo|ATT:Brahim Díaz|ATT:Endrick',
+ 'Real Sociedad': 'GK:Álex Remiro|GK:Unai Marrero|DEF:Aihen Muñoz|DEF:Igor Zubeldia|DEF:Jon Aramburu|DEF:Jon Martín|DEF:Héctor Fort|MID:Beñat Turrientes|MID:Carlos Soler|MID:Luka Sucic|MID:Jon Gorrotxategi|MID:Yangel Herrera|ATT:Mikel Oyarzabal|ATT:Takefusa Kubo|ATT:Gonçalo Guedes|ATT:Ander Barrenetxea|ATT:Orri Óskarsson',
+ 'Sevilla FC': 'GK:Odisseas Vlachodimos|GK:Fran González|DEF:Andrés Castrín|DEF:Arouna Sangante|DEF:Fábio Cardoso|DEF:Gabriel Suazo|DEF:José Ángel Carmona|MID:Lucien Agoumé|MID:Manu Bueno|MID:Youssouf Fofana|MID:Giorgi Kochorashvili|ATT:Chidera Ejuke|ATT:Isaac Romero|ATT:Lucas Stassin|ATT:Rubén Vargas|ATT:Felix Correia',
+ 'Valencia CF': 'GK:Stole Dimitrievski|GK:Cristian Rivero|DEF:César Tárrega|DEF:Copete|DEF:Dimitri Foulquier|DEF:José Gayà|DEF:Justin de Haas|MID:Filip Ugrinic|MID:Guido Rodríguez|MID:Javi Guerra|MID:Pepelu|MID:Harvey Elliott|ATT:Arnaut Danjuma|ATT:Dani Raba|ATT:Diego López|ATT:Hugo Duro|ATT:Luis Rioja|ATT:Umar Sadiq',
+ 'Villarreal CF': 'GK:Luiz Júnior|GK:Péter Gulácsi|DEF:Juan Foyth|DEF:Logan Costa|DEF:Carlos Romero|DEF:Renato Veiga|DEF:Santiago Mouriño|MID:Alberto Moleiro|MID:Pape Gueye|MID:Santi Comesaña|MID:Nathan Saliba|MID:Alassane Diatta|ATT:Ayoze Pérez|ATT:Georges Mikautadze|ATT:Gerard Moreno|ATT:Ilias Akhomach|ATT:Nicolas Pépé|ATT:Tani Oluwaseyi',
+ 'AD Ceuta FC': 'GK:Pedro López|GK:Guillermo Vallejo|DEF:Álex Petxarroman|DEF:Toni Abad|DEF:Albert Caparrós|DEF:Carlos Hernández|DEF:Adrián Lapeña|DEF:José Matos|MID:Yann Bodiger|MID:Victor Corral|MID:Alejandro Meléndez|MID:Mawuli Mensah|MID:Joaquín González|ATT:Marino Illescas|ATT:Kuki Zalazar|ATT:Kenneth Mamah|ATT:Salvi Sánchez|ATT:Cedric Teguia|ATT:Jordi Escobar',
+ 'Albacete Balompié': 'GK:Diego Mariño|GK:Carlos Marín|DEF:Lorenzo Aguado|DEF:Fran Gámez|DEF:Javi Moreno|DEF:Pepe Sánchez|DEF:Jesús Vallejo|DEF:Lluís López|MID:Agus Medina|MID:Sergio Ortuño|MID:Antonio Pacheco|MID:Javi Villar|MID:Antonio Puertas|ATT:José Corpas|ATT:Rober González|ATT:Munir El Haddadi|ATT:Higinio Marín|ATT:Mario Soberón|ATT:Samuel Obeng',
+ 'Burgos CF': 'GK:Ander Cantero|GK:Bruno Iribarne|DEF:Álex Lizancos|DEF:Grego Sierra|DEF:Oier Luengo|DEF:Sergio González|DEF:Brais Martínez|DEF:Ignasi Vilarrasa|MID:Kévin Appin|MID:Pablo Galdames|MID:José Gragera|MID:Unai Vencedor|ATT:Víctor Mollejo|ATT:Curro Sánchez|ATT:Javi Llabrés|ATT:Álex Forés|ATT:Jon Karrikaburu',
+ 'Cádiz CF': 'GK:David Gil|GK:Jokin Ezkieta|DEF:Giorgi Gocholeishvili|DEF:Bojan Kovacevic|DEF:Javi Castro|DEF:Kenan Toibibou|DEF:Manu Fernández|DEF:Cristian Gutiérrez|MID:Damián Rodríguez|MID:Jandro Orellana|MID:Aïmen Moueffek|MID:Marc-Olivier Doué|MID:Ibon Sánchez|ATT:Javi Ontiveros|ATT:Efe Aghama|ATT:Antoñito Cordero|ATT:Francisco Mwepu|ATT:Urko Izeta|ATT:Gonzalo Petit',
+ 'CE Sabadell': 'GK:Diego Fuoli|GK:José Ortega|GK:Marc Vidal|DEF:Pipa|DEF:Arthur Bonaldo|DEF:Kaiser|DEF:Miki Codina|DEF:José Luis Català|MID:Edgar González|MID:Genar Fornés|MID:Yussif Owusu|MID:Quadri Liameed|MID:Eneko Aguilar|ATT:Ángel Baena|ATT:Yanis Rahmani|ATT:Patrick Nuamah|ATT:Gastón Valles|ATT:Nikolay Obolskiy',
+ 'CD Castellón': 'GK:Romain Matthys|GK:Sergi Torner|GK:Amir Saipi|DEF:Jérémy Mellot|DEF:Juanjo Nieto|DEF:Agustín Sienra|DEF:Alberto Jiménez|DEF:Fabrizio Brignani|DEF:Ilias Kostis|MID:Fran Castillo|MID:Diego Barri|MID:Jari Vlak|MID:Antonio Gala|MID:Álvaro Martín|MID:Israel Suero|ATT:Iñigo Córdoba|ATT:Raúl Sánchez|ATT:Ousmane Camara|ATT:Adam Jakobsen',
+ 'CD Eldense': 'GK:Ramón Vila|GK:Juan Palomares|DEF:Jesús Clemente|DEF:Alejandro Ibarrondo|DEF:Floris Smand|DEF:Álex Serradell|DEF:Javier Olaizola|DEF:Iker Recio|MID:Jordi Martín|MID:Juan Larios|MID:Carlos Guirao|MID:Justin Smith|MID:Borja Calvo|ATT:Aingeru Olabarrieta|ATT:Marcos Bustillo|ATT:Roberto López|ATT:Javi Martínez|ATT:Fidel',
+ 'Córdoba CF': 'GK:Dani Martín|GK:Gabriel De Vuyst|DEF:David Rodríguez|DEF:César Álvarez|DEF:Anthony Landázuri|DEF:José León|DEF:Jorge Moreno|DEF:Neal Viereck|MID:Theo Zidane|MID:Christian Carracedo|MID:Álex Sala|MID:Jacobo González|ATT:Adrián Fuentes|ATT:Antonio Casas|ATT:Andrés Ferrari|ATT:Jacobo González',
+ 'FC Andorra': 'GK:Iker Álvarez|GK:Guilherme Fernandes|DEF:Carlos Albarrán|DEF:Egoitz Muñoz|DEF:Jacobo Martí|DEF:Daniel Budesca|MID:Álex Calvo|MID:Marc Domènech|MID:Sergio Molina|MID:Álvaro Martín|ATT:Álex Petxarroman|ATT:Manu Nieto|ATT:Gael Alonso|ATT:Josep Cerdà',
+ 'Girona FC': 'GK:Nico Ratti|GK:Pau López|GK:Jesús Owono|DEF:Thomas Carrique|DEF:Juan Sebastián|DEF:Marc Bombardó|DEF:Diego Alende|MID:Aleix García|MID:Oriol Romeu|MID:Iván Martín|MID:Yáser Asprilla|ATT:Portu|ATT:Carles Pérez|ATT:Bryan Gil|ATT:Abel Ruiz|ATT:Vladyslav Vanat|ATT:Cristhian Stuani',
+ 'Granada CF': 'GK:Raúl Lizoain|GK:Alberto Flores|DEF:Sergio López|DEF:Pau Casadesús|DEF:Juanjo Flores|DEF:Manu Lama|DEF:Benedikt Gimber|DEF:Diego Hormigo|MID:Gerard Gumbau|MID:Rubén Alcaraz|MID:Pedro Alemañ|MID:Pedro Alemañ|ATT:José Manuel Arnáiz|ATT:Abdoul Kader Bamba|ATT:Jorge Pascual|ATT:Alejandro Marqués|ATT:Chinaza Onouha',
+ 'Real Valladolid CF': 'GK:Álvaro Aceves|GK:Lucas Lavagnino|GK:Dani Martín|DEF:Trilli|DEF:David Torres|DEF:Pablo Tomeo|DEF:Ramón Martínez|DEF:Miguel Rubio|DEF:Guille Bueno|DEF:Carlos Clerc|MID:Stanko Jurić|MID:Mathis Lachuer|MID:Julien Ponceau|MID:Álex Balboa|ATT:Antonio Casas',
+ 'SD Eibar': 'GK:Anaitz Arbilla|DEF:Anaitz Arbilla|DEF:Álex Garro|DEF:Álvaro Tejero|MID:Aleix Garrido|MID:Jon Bautista|MID:Sergio Álvarez|ATT:Jon Magunazelaia',
+ 'CD Tenerife': 'GK:Salvi Carrasco|GK:Ángel Galván|DEF:David Rodríguez|DEF:José León|DEF:Juande Rivas|MID:Álex Corredera|MID:Aitor Sanz|MID:Maikel Mesa|ATT:Enric Gallego|ATT:Ángel Rodríguez',
+ 'UD Almería': 'GK:Andrés Fernández|GK:Fernando Martínez|DEF:Alejandro Pozo|DEF:Chumi|DEF:Kaiky|DEF:Álex Centelles|MID:Lucas Robertone|MID:Melero|MID:Sergio Arribas|ATT:Luis Suárez|ATT:Leo Baptistao|ATT:Adri Embarba',
+ 'UD Las Palmas': 'GK:Álvaro Vallés|GK:Dinko Horkas|DEF:Álex Suárez|DEF:Mika Mármol|DEF:Juanma Herzog|MID:Kirian Rodríguez|MID:Alberto Moleiro|MID:Enzo Loiodice|MID:Javi Muñoz|ATT:Sandro Ramírez|ATT:Marc Cardona|ATT:Pejiño',
+ 'SD Ponferradina': 'MID:David Castro|MID:Jesús Bernal|ATT:Dani Ojeda',
+ 'Racing Club Ferrol': 'MID:David Castro|MID:Jesús Bernal|ATT:Dani Ojeda',
+ 'Unionistas de Salamanca CF': 'ATT:Ale Marcelo|ATT:Pau Ferrer|MID:Mikel Serrano',
+ 'Athletic Club B': 'MID:Selton Sánchez|DEF:Jonaneko|DEF:Monreal|ATT:Gift|DEF:Hierro|DEF:Vizcay|ATT:Manex Lozano',
+ 'Real Avilés Industrial': 'MID:Samu Mayo|ATT:Cris Montes|ATT:Natalio',
+ 'UD Ourense': 'ATT:David Ferreiro|GK:Manu Vizoso',
+ 'CD Extremadura': 'MID:Kike Márquez|MID:David Rocha',
+ 'Real Zaragoza': 'MID:Ander Herrera|MID:Jorge Cestero',
+ 'SD Huesca': 'MID:Sielva|ATT:Sergi Enrich|DEF:Fornos|DEF:Djetei|MID:Pascu|MID:Jimmy|ATT:Tresaco',
+ 'Juventud de Torremolinos CF': 'ATT:Dioni Villalba|MID:Manu Sánchez|MID:Cristian Rodríguez|MID:Kaptoum',
+ 'CF Rayo Majadahonda': 'ATT:Óscar Mesa|MID:Jeremy|MID:Ismael Álvarez',
+ 'Real Madrid Castilla': 'MID:Jorge Cestero',
+ 'Real Sporting': 'GK:Rubén Yáñez|GK:Christian Joel|DEF:Diego Sánchez|DEF:Pablo García|DEF:Mamadou Loum|DEF:Hugo Guillamón|MID:Nacho Martín|MID:Àlex Corredera|MID:Manu Rodríguez|MID:César Gelabert|ATT:Gaspar Campos|ATT:Nikita Iosifov|ATT:Konrad de la Fuente|ATT:Juan Otero|ATT:Alejo Sarco|ATT:Andrés Ferrari',
+ 'Celta Fortuna': 'GK:Coke Carrillo|GK:Caio Barone|DEF:Marcos González|DEF:Pablo Gavián|DEF:Anxo Rodríguez|DEF:Pablo Meixús|DEF:Kike Ribes|MID:Seyni Mbaye Ndiaye|MID:David Sueiro|MID:Álex Comparada|ATT:Jones El-Abdellaoui|ATT:Hugo Álvarez'
+};
+
+function CM450_rosterPositionToken(token,idx){
+ const p=String(token||'').trim();
+ if(/^GK:/i.test(p))return {name:p.slice(3).trim(),pos:'GK'};
+ if(/^DEF:/i.test(p))return {name:p.slice(4).trim(),pos:'DEF'};
+ if(/^MID:/i.test(p))return {name:p.slice(4).trim(),pos:'MID'};
+ if(/^ATT:/i.test(p))return {name:p.slice(4).trim(),pos:'ATT'};
+ const fallback=['GK','DEF','DEF','DEF','MID','MID','MID','MID','ATT','ATT','ATT'];
+ return {name:p,pos:fallback[idx]||'MID'};
+}
+function CM450_strengthFor(name,div){
+ const hit=(CM450_SPAIN_STRENGTH[div]||[]).find(x=>x[0]===name);
+ if(hit)return hit[1];
+ const seed=stableSeed(`${name}|spain-strength`);
+ return div==='LaLiga EA SPORTS'?62+seed%11:div==='LaLiga HYPERMOTION'?53+seed%11:43+seed%12;
+}
+function CM450_ensureSpainRegistry(){
+ const all=[...CM450_SPAIN_DIVISION_ORDER.flatMap(div=>CM450_SPAIN_DIVISIONS[div]),...Object.values(CM450_SPAIN_REGIONAL_GROUPS).flat()];
+ const unique=[...new Set(all)];
+ unique.forEach(name=>{
+  let club=CLUBS.find(c=>c.name===name);
+  if(!club){
+   const div=CM450_SPAIN_DIVISION_ORDER.find(d=>CM450_SPAIN_DIVISIONS[d].includes(name))||'Spanish Regional';
+   club={name,division:div,country:'Spain',strength:CM450_strengthFor(name,div),budget:div==='LaLiga EA SPORTS'?8:div==='LaLiga HYPERMOTION'?2.5:div.startsWith('Primera Federación')?.6:.18,canonicalDomesticClub:true};
+   CLUBS.push(club);
+  }else{club.country='Spain'; if(Number(appState?.seasonYear||2026)===2026||window.cmPendingCareerCountry==='Spain')club.division=CM450_SPAIN_DIVISION_ORDER.find(d=>CM450_SPAIN_DIVISIONS[d].includes(name))||'Spanish Regional'; else if(!club.division)club.division='Spanish Regional';}
+ });
+ const map=appState?.currentSpanishClubNames;
+ if(map&&Number(appState.seasonYear)>2026&&window.cmPendingCareerCountry!=='Spain'){
+  for(const div of CM450_SPAIN_DIVISION_ORDER){
+   for(const name of map[div]||[]){const c=CLUBS.find(x=>x.name===name);if(c){c.division=div;c.country='Spain';}}
+  }
+ }
+}
+const CM450_ORIG_RESET_REGISTRY=resetBaseDomesticRegistry2026_27;
+resetBaseDomesticRegistry2026_27=function(){const changed=CM450_ORIG_RESET_REGISTRY();CM450_ensureSpainRegistry();return changed;};
+const CM450_ORIG_AUDIT_REGISTRY=auditBaseDomesticRegistry2026_27;
+auditBaseDomesticRegistry2026_27=function(){const full=[...CLUBS],english=CLUBS.filter(c=>c.country!=='Spain');CLUBS.splice(0,CLUBS.length,...english);let result;try{result=CM450_ORIG_AUDIT_REGISTRY();}finally{CLUBS.splice(0,CLUBS.length,...full);}return result;};
+const CM450_ORIG_BASE_NAMES=baseCareerClubNamesForDivision;
+baseCareerClubNamesForDivision=function(division){if(CM450_SPAIN_DIVISIONS[division])return [...CM450_SPAIN_DIVISIONS[division]];return CM450_ORIG_BASE_NAMES(division);};
+if(typeof LEAGUE_TABLE_DIVISIONS!=='undefined'){
+ for(const d of CM450_SPAIN_DIVISION_ORDER)if(!LEAGUE_TABLE_DIVISIONS.includes(d))LEAGUE_TABLE_DIVISIONS.push(d);
+}
+
+function CM450_buildSpanishSquad(clubIndex){
+ const club=CLUBS[clubIndex];if(!club||club.country!=='Spain'||!CM450_SPAIN_DIVISION_ORDER.includes(club.division))return [];
+ const sourceDiv=club.division;
+ let seedText=CM450_SPAIN_SEEDS[club.name]||'';
+ if(!seedText&&sourceDiv.startsWith('Primera Federación'))seedText=CM450_SPAIN_SEEDS[sourceDiv]||'';
+ const raw=seedText.split('|').map(CM450_rosterPositionToken).filter(x=>x.name);
+ const real=[],used=new Set();
+ for(const item of raw){
+  const key=normalisePlayerName(item.name);if(!key||used.has(key)||window.CM450_SPAIN_USED_NAMES?.has(key))continue;used.add(key);if(window.CM450_SPAIN_USED_NAMES)window.CM450_SPAIN_USED_NAMES.add(key);
+  const player=makeRealPlayer(item.name,item.pos,clubIndex,real.length,{source:'2026/27 Spanish squad source seed; player name and club affiliation from current-season roster reference',clubVerified:true,clubName:club.name});
+  player.clubName=club.name;player.division=club.division;player.clubCountry='Spain';player.squadMembershipSource='2026/27 Spanish squad reference (LaLiga/SportCells/Sportball; selected profiles)';player.squadMembershipVerified=true;player.dataQuality={...(player.dataQuality||{}),clubVerified:true,squadMembershipVerified:true};
+  real.push(player);
+ }
+ const positions=['GK','GK','GK','DEF','DEF','DEF','DEF','DEF','DEF','DEF','DEF','MID','MID','MID','MID','MID','MID','MID','MID','ATT','ATT','ATT','ATT','ATT','ATT'];
+ const first=['Álvaro','Adrián','Pablo','Sergio','Javier','Mario','Daniel','Hugo','Iker','Diego','Marcos','Andrés','Lucas','Jorge','Rubén','Carlos','Miguel','Aitor','Raúl','Iván','Mateo','David','Unai','Álex','Víctor'];
+ const last=['García','López','Martínez','Sánchez','Pérez','Gómez','Fernández','Ruiz','Díaz','Torres','Romero','Navarro','Gil','Molina','Castro','Ortega','Moreno','Vega','Serrano','Herrera','Alonso','Iglesias','Cabrera','Domínguez','Vidal'];
+ const secondLast=['Soler','Ramos','Cortés','Reyes','Méndez','Cano','Herrero','Santos','Márquez','Peña','Calvo','Ibarra','Medina','Pastor','Soto','Cruz','Vázquez','Pardo','Rico','Aguado','Blanco','Navas','Marín','Sáez','Roldán','Ferrer','Moya','Vila','León','Nieto'];
+ let attempt=0;
+ while(real.length<25&&attempt<3000){
+  const slot=real.length,seed=stableSeed(`${club.name}|spanish-fictional-v450|${attempt}`),name=`${first[seed%first.length]} ${last[stableSeed(`${club.name}|surname|${attempt}`)%last.length]} ${secondLast[stableSeed(`${club.name}|second-surname|${attempt}`)%secondLast.length]}`;attempt++;
+  const key=normalisePlayerName(name);if(used.has(key)||window.CM450_SPAIN_USED_NAMES?.has(key))continue;used.add(key);if(window.CM450_SPAIN_USED_NAMES)window.CM450_SPAIN_USED_NAMES.add(key);
+  const pos=positions[slot]||'MID';
+  const player=makeRealPlayer(name,pos,clubIndex,slot,{source:'Generated Spanish reserve; fictional identity',clubVerified:false,clubName:club.name});
+  player.source='Generated Spanish reserve; fictional identity';player.clubVerified=false;player.squadMembershipVerified=false;player.squadMembershipSource='Fictional generated reserve';player.clubCountry='Spain';player.nationality=player.nationality||'Spanish';player.division=club.division;player.dob=null;player.ageSource='Fiktiv spillalder (alternativ virkelighet)';player.dataQuality={...(player.dataQuality||{}),clubVerified:false,squadMembershipVerified:false,ageFictional:true};
+  real.push(player);
+ }
+ return real.slice(0,25);
+}
+const CM450_ORIG_BUILD_REAL_SQUAD=buildRealSquad;
+buildRealSquad=function(clubIndex){const club=CLUBS[clubIndex];if(club?.country==='Spain')return CM450_SPAIN_DIVISION_ORDER.includes(club.division)?CM450_buildSpanishSquad(clubIndex):[];return CM450_ORIG_BUILD_REAL_SQUAD(clubIndex);};
+const CM450_ORIG_BUILD_WORLD=buildWorldDatabase;
+buildWorldDatabase=function(){CM450_ensureSpainRegistry();window.CM450_SPAIN_USED_NAMES=new Set();const world=CM450_ORIG_BUILD_WORLD();if(world.length<CLUBS.length)world.length=CLUBS.length;CLUBS.forEach((c,i)=>{if(c.country==='Spain'&&CM450_SPAIN_DIVISION_ORDER.includes(c.division)&&(!Array.isArray(world[i])||!world[i].length))world[i]=CM450_buildSpanishSquad(i);});return world;};
+
+function CM450_defaultSpanishRow(name,div,old=null){
+ const club=CLUBS.find(c=>c.name===name),strength=Number(old?.strength)||Number(club?.strength)||CM450_strengthFor(name,div);
+ const preserve=old&&old.name===name;
+ return {...(preserve?old:{}),name,division:div,strength,strengthSource:old?.strengthSource||'Spain 2026/27 club estimate; real-player roster seeds + marked generated reserves',country:'Spain',budget:Number(old?.budget)||Number(club?.budget)||.4,p:Number(old?.p)||0,w:Number(old?.w)||0,d:Number(old?.d)||0,l:Number(old?.l)||0,gf:Number(old?.gf)||0,ga:Number(old?.ga)||0,pts:Number(old?.pts)||0};
+}
+function CM450_sortRows(rows){return [...(rows||[])].sort((a,b)=>(Number(b.pts)||0)-(Number(a.pts)||0)||((Number(b.gf)||0)-(Number(b.ga)||0))-((Number(a.gf)||0)-(Number(a.ga)||0))||(Number(b.gf)||0)-(Number(a.gf)||0)||String(a.name).localeCompare(String(b.name),'nb'));}
+function CM450_isSpanishBTeam(name){return /(?:\sB$|Fortuna$|Castilla$|Fabril$|Atlético Madrileño$)/i.test(String(name||'').trim());}
+function CM450_initSpanishCups(){
+ const defaultSeeds=['FC Barcelona','Real Sociedad','Real Madrid','Atlético de Madrid'];
+ const savedSeeds=appState.lastSeasonSummary?.movement?.supercopaTeams;
+ const seedNames=Array.isArray(savedSeeds)&&savedSeeds.length===4?[...new Set(savedSeeds)].slice(0,4):defaultSeeds;
+ const current=appState.currentSpanishClubNames||CM450_SPAIN_DIVISIONS;
+ const stageOne=Number(appState.seasonYear||2026)===2026?[...CM450_COPA_FIRST_ROUND.top,...CM450_COPA_FIRST_ROUND.second,...CM450_COPA_FIRST_ROUND.federation]:[...(current['LaLiga EA SPORTS']||[]).filter(n=>!seedNames.includes(n)),...(current['LaLiga HYPERMOTION']||[]).filter(n=>!CM450_isSpanishBTeam(n)).slice(0,18),...(current['Primera Federación · Grupo 1']||[]).filter(n=>!CM450_isSpanishBTeam(n)).slice(0,7),...(current['Primera Federación · Grupo 2']||[]).filter(n=>!CM450_isSpanishBTeam(n)).slice(0,7)];
+ const playableSet=new Set(CM450_SPAIN_DIVISION_ORDER.flatMap(d=>current[d]||[]));
+ const lowerCup=[...new Set(CM450_COPA_EXTRA)].filter(n=>!playableSet.has(n)&&!stageOne.includes(n)).slice(0,64);
+ const clubTeam=name=>{const i=clubIndexByName(name),c=CLUBS[i];return {name,strength:Number(c?.strength)||48,clubIndex:i>=0?i:null,division:c?.division||'Spanish Regional',country:'Spain',entryStage:seedNames.includes(name)?3:1,europeanQualified:false,cupRegion:cupRegionForTeam(name)};};
+ if(stageOne.length!==48||lowerCup.length!==64)throw new Error(`Copa del Rey 2026/27: feil startfelt (${stageOne.length}+${lowerCup.length}, forventet 48+64).`);
+ const copa=[...stageOne.map(clubTeam),...lowerCup.map(name=>({name,strength:42+(stableSeed(name+'|copa-strength')%12),clubIndex:null,division:'Spanish Regional',country:'Spain',entryStage:1,europeanQualified:false,cupRegion:cupRegionForTeam(name)})),...seedNames.map(clubTeam)];
+ const superTeams=seedNames.map(name=>({...clubTeam(name),entryStage:1}));
+ return {
+  'Copa del Rey':{formatVersion:DOMESTIC_CUP_FORMAT_VERSION,teams:copa,round:0,results:[],champion:null,scheduled:[8,13,19,25,30,35,38],started:false},
+  'Supercopa de España':{formatVersion:DOMESTIC_CUP_FORMAT_VERSION,teams:superTeams,round:0,results:[],champion:null,scheduled:[20,21],started:false}
+ };
+}
+function CM450_initSpain(){
+ CM450_ensureSpainRegistry();
+ appState.country='Spain';
+ let membership=appState.currentSpanishClubNames;
+ if(!membership||typeof membership!=='object'||CM450_SPAIN_DIVISION_ORDER.some(d=>!Array.isArray(membership[d])||membership[d].length!==CM450_SPAIN_DIVISIONS[d].length)||new Set(CM450_SPAIN_DIVISION_ORDER.flatMap(d=>membership[d]||[]).map(domesticClubKey)).size!==82){
+  membership=Object.fromEntries(CM450_SPAIN_DIVISION_ORDER.map(d=>[d,[...CM450_SPAIN_DIVISIONS[d]]]));
+  appState.currentSpanishClubNames=membership;
+ }
+ const active=String(appState.activeDivision||clubDivision(CLUBS[appState.club]));
+ if(!CM450_SPAIN_DIVISION_ORDER.includes(active))appState.activeDivision=clubDivision(CLUBS[appState.club]);
+ for(const div of CM450_SPAIN_DIVISION_ORDER){
+  const names=membership[div],old=appState.lowerLeagues?.[div]||{},oldBy=new Map((old.rows||[]).map(r=>[domesticClubKey(r.name),r]));
+  const rows=names.map(name=>CM450_defaultSpanishRow(name,div,oldBy.get(domesticClubKey(name))));
+  const validFixtures=Array.isArray(old.fixtures)&&old.fixtures.length===rows.length*2-2;
+  appState.lowerLeagues=appState.lowerLeagues||{};
+  appState.lowerLeagues[div]={...old,rows,fixtures:validFixtures?old.fixtures:makeLowerFixtures(rows),playedRounds:Math.min(Number(old.playedRounds)||0,rows.length*2-2),playerStats:old.playerStats||{},matchLog:Array.isArray(old.matchLog)?old.matchLog:[],country:'Spain'};
+  rows.forEach(r=>{const c=CLUBS.find(x=>x.name===r.name);if(c){c.division=div;c.country='Spain';}});
+ }
+ const activeRows=appState.lowerLeagues[appState.activeDivision].rows;
+ if(!Array.isArray(appState.table)||!appState.table.length||!appState.table.some(r=>r.name===currentClub()?.name))appState.table=activeRows.map(r=>({...r}));
+ else {
+  const oldBy=new Map(appState.table.map(r=>[domesticClubKey(r.name),r]));
+  appState.table=activeRows.map(r=>({...r,...(oldBy.get(domesticClubKey(r.name))||{}),name:r.name,division:appState.activeDivision}));
+  appState.lowerLeagues[appState.activeDivision].rows=appState.table.map(r=>({...r}));
+ }
+ appState.domesticVersion=450;appState.spanishLeagueVersion=1;appState.domesticCalendar=Array.isArray(appState.domesticCalendar)?appState.domesticCalendar:[];appState.lastDomesticRound=Number(appState.lastDomesticRound)||0;
+ const hasProgress=Object.values(appState.cupCompetitions||{}).some(c=>Number(c?.round)>0||(c?.results||[]).length);
+ if(!appState.cupCompetitions||(!hasProgress&&(!appState.cupCompetitions['Copa del Rey']||!appState.cupCompetitions['Supercopa de España'])))appState.cupCompetitions=CM450_initSpanishCups();
+ else{
+  if(!appState.cupCompetitions['Copa del Rey'])appState.cupCompetitions['Copa del Rey']=CM450_initSpanishCups()['Copa del Rey'];
+  if(!appState.cupCompetitions['Supercopa de España'])appState.cupCompetitions['Supercopa de España']=CM450_initSpanishCups()['Supercopa de España'];
+ }
+ if(Array.isArray(appState.worldSquads)&&appState.worldSquads.length<CLUBS.length)appState.worldSquads.length=CLUBS.length;
+ if(!window.CM450_SPAIN_USED_NAMES)window.CM450_SPAIN_USED_NAMES=new Set((appState.worldSquads||[]).flat().filter(p=>p?.clubCountry==='Spain'&&p?.squadMembershipVerified).map(p=>normalisePlayerName(p.name)));
+ if(Array.isArray(appState.worldSquads))CLUBS.forEach((c,i)=>{if(c.country==='Spain'&&CM450_SPAIN_DIVISION_ORDER.includes(c.division)&&(!Array.isArray(appState.worldSquads[i])||appState.worldSquads[i].length<18))appState.worldSquads[i]=CM450_buildSpanishSquad(i);});
+ if(Array.isArray(appState.squad)&&appState.squad.length&&CLUBS[appState.club]?.country==='Spain')appState.worldSquads[appState.club]=appState.squad.map(p=>({...p,attributes:{...(p.attributes||{})}}));
+ appState.leagueTableDivision=CM450_SPAIN_DIVISION_ORDER.includes(appState.leagueTableDivision)?appState.leagueTableDivision:appState.activeDivision;
+ ensureEuropeanCompetitions();
+ syncActiveDivisionToLowerLeague();
+}
+const CM450_ORIG_INIT_DOMESTIC=initDomesticCompetitions;
+initDomesticCompetitions=function(){if(appState?.country==='Spain'||window.cmPendingCareerCountry==='Spain'){CM450_initSpain();return;}return CM450_ORIG_INIT_DOMESTIC();};
+const CM450_ORIG_NORMALIZE=normalizeClubRegistryAndSavedDivisions;
+normalizeClubRegistryAndSavedDivisions=function(){if(appState?.country==='Spain'){CM450_ensureSpainRegistry();CM450_initSpain();return {changed:false,corrections:[]};}return CM450_ORIG_NORMALIZE();};
+
+const CM450_ORIG_SYNC_ACTIVE=syncActiveDivisionToLowerLeague;
+syncActiveDivisionToLowerLeague=function(){
+ const div=String(appState.activeDivision||clubDivision(currentClub()));
+ if(CM450_SPAIN_DIVISIONS[div]&&appState.lowerLeagues?.[div]&&Array.isArray(appState.table)){
+  const oldBy=new Map((appState.lowerLeagues[div].rows||[]).map(r=>[domesticClubKey(r.name),r]));
+  appState.lowerLeagues[div].rows=appState.table.map(r=>({...oldBy.get(domesticClubKey(r.name)),...r,division:div,country:'Spain'}));
+  const played=appState.table.length?Math.min(...appState.table.map(r=>Number(r.p)||0)):0;
+  appState.lowerLeagues[div].playedRounds=Math.max(0,Math.min(appState.lowerLeagues[div].fixtures?.length||0,played));
+  appState.lowerLeagues[div].activeManagerOwned=true;return true;
+ }
+ return CM450_ORIG_SYNC_ACTIVE();
+};
+
+const CM450_ORIG_SIM_LOWER=simulateLowerLeaguesThroughRound;
+simulateLowerLeaguesThroughRound=function(round){
+ if(appState.country!=='Spain')return CM450_ORIG_SIM_LOWER(round);
+ const active=String(appState.activeDivision||clubDivision(currentClub()));
+ const activeRounds=Math.max(1,Number(appState.fixtures?.length)||38);
+ Object.entries(appState.lowerLeagues||{}).forEach(([div,data])=>{
+  data.playerStats=data.playerStats||{};data.matchLog=Array.isArray(data.matchLog)?data.matchLog:[];
+  if(div===active){syncActiveDivisionToLowerLeague();return;}
+  const total=Array.isArray(data.fixtures)?data.fixtures.length:0;
+  const target=Math.min(total,Math.floor(Math.max(0,Number(round)||0)*total/activeRounds));
+  while(Number(data.playedRounds||0)<target){
+   const roundIndex=Number(data.playedRounds)||0,games=data.fixtures[roundIndex]||[];
+   games.forEach(([a,b])=>{const rowA=data.rows[a],rowB=data.rows[b];if(!rowA||!rowB)return;const powerA=lowerLeagueTeamPower(rowA,div),powerB=lowerLeagueTeamPower(rowB,div),seed=stableSeed(`${seasonLabel()}|${div}|${roundIndex}|${a}|${b}`),[ga,gb]=seededScore(powerA,powerB,seed);addGenericResult(data.rows,a,b,ga,gb);recordLowerLeagueMatch(data,div,rowA,rowB,ga,gb,seed,roundIndex+1);});
+   data.playedRounds++;
+  }
+  data.activeManagerOwned=false;data.statsAudit=lowerLeagueStatsAudit(data);
+ });
+ syncActiveDivisionToLowerLeague();
+};
+const CM450_ORIG_LOWER_POWER=lowerLeagueTeamPower;
+lowerLeagueTeamPower=function(row,division){
+ if(CM450_SPAIN_DIVISIONS[division]){const idx=clubIndexByName(row?.name),roster=idx>=0?appState.worldSquads?.[idx]:null;if(Array.isArray(roster)&&roster.length)return calculateRosterPower(roster,Number(row?.strength)||55);}
+ return CM450_ORIG_LOWER_POWER(row,division);
+};
+const CM450_ORIG_LOWER_XI=lowerLeagueMatchXI;
+lowerLeagueMatchXI=function(row,division){
+ if(CM450_SPAIN_DIVISIONS[division]){
+  const idx=clubIndexByName(row?.name),roster=idx>=0?(appState.worldSquads?.[idx]||[]):[];
+  if(!roster.length)return [];
+  const available=roster.filter(p=>!(Number(p?.injured)>0)&&!(Number(p?.suspended)>0));
+  const byPos={GK:[],DEF:[],MID:[],ATT:[]};available.forEach(p=>{const pos=['GK','DEF','MID','ATT'].includes(p.pos)?p.pos:'MID';byPos[pos].push(p);});
+  Object.values(byPos).forEach(list=>list.sort((a,b)=>rosterPlayerPower(b)-rosterPlayerPower(a)));
+  const xi=[],take=(pos,n)=>{for(let i=0;i<n&&byPos[pos][i];i++)xi.push(byPos[pos][i]);};take('GK',1);take('DEF',4);take('MID',4);take('ATT',2);
+  if(xi.length<11){const used=new Set(xi.map(p=>p.id||p.name));available.filter(p=>!used.has(p.id||p.name)).sort((a,b)=>rosterPlayerPower(b)-rosterPlayerPower(a)).slice(0,11-xi.length).forEach(p=>xi.push(p));}
+  const defenders=xi.filter(p=>p.pos==='DEF');defenders.forEach((p,i)=>{if(!['LCB','RCB','CB','LB','RB','LWB','RWB'].includes(matchRoleOf(p)))p.matchRole=['LCB','RCB','LB','RB'][i]||'CB';});return xi;
+ }
+ return CM450_ORIG_LOWER_XI(row,division);
+};
+
+function CM450_playoffWinner(rowA,rowB,context){
+ const a=String(rowA?.name||''),b=String(rowB?.name||'');
+ const ca=CLUBS.find(c=>c.name===a),cb=CLUBS.find(c=>c.name===b);
+ const sa=Number(rowA?.strength)||Number(ca?.strength)||50,sb=Number(rowB?.strength)||Number(cb?.strength)||50;
+ const seed=stableSeed(`${seasonLabel()}|Spain-promotion-playoff|${context}|${a}|${b}`),[ga,gb]=seededScore(sa,sb,seed);
+ const winner=ga===gb?((sa-sb)*10+(seed%101-50)>=0?a:b):(ga>gb?a:b);
+ return {winner,loser:winner===a?b:a,score:`${ga}–${gb}${ga===gb?' (avgjort, avgjort på seedet styrke)':''}`,home:a,away:b};
+}
+function CM450_moveSpainClubs(){
+ const divs=CM450_SPAIN_DIVISION_ORDER,active=String(appState.activeDivision||clubDivision(currentClub()));
+ const tableFor=div=>CM450_sortRows(div===active?appState.table:appState.lowerLeagues?.[div]?.rows);
+ const tables=Object.fromEntries(divs.map(d=>[d,tableFor(d)]));
+ const errors=[];
+ for(const d of divs){const expected=CM450_SPAIN_DIVISIONS[d].length,rows=tables[d]||[];if(rows.length!==expected)errors.push(`${d}: ${rows.length}/${expected} lag`);if(new Set(rows.map(r=>domesticClubKey(r.name))).size!==rows.length)errors.push(`${d}: dupliserte lag`);}
+ const currentAll=divs.flatMap(d=>tables[d]||[]).map(r=>domesticClubKey(r.name));
+ if(new Set(currentAll).size!==currentAll.length)errors.push('Klubber finnes i flere spanske divisjoner');
+ if(errors.length){appState.log.push(`Spansk sesongskifte stoppet: ${errors.join('; ')}`);return {ok:false,errors,promoted:{},relegated:{}};}
+ const top=(d,n)=>tables[d].slice(0,n),bottom=(d,n)=>tables[d].slice(-n),names=rows=>(rows||[]).map(r=>r.name);
+ // Segunda: two automatic places and one place from the 3rd–6th place playoff.
+ const segundaSemis=[CM450_playoffWinner(tables['LaLiga HYPERMOTION'][2],tables['LaLiga HYPERMOTION'][5],'Segunda-semi-1'),CM450_playoffWinner(tables['LaLiga HYPERMOTION'][3],tables['LaLiga HYPERMOTION'][4],'Segunda-semi-2')];
+ const segundaFinal=CM450_playoffWinner({name:segundaSemis[0].winner,strength:CLUBS[clubIndexByName(segundaSemis[0].winner)]?.strength},{name:segundaSemis[1].winner,strength:CLUBS[clubIndexByName(segundaSemis[1].winner)]?.strength},'Segunda-final');
+ const segundaPromoted=[...names(top('LaLiga HYPERMOTION',2)),segundaFinal.winner];
+ // Primera Federación: group champions go up directly. Ranks 2–5 in each group play a two-stage playoff for two further places.
+ const groupSemis={};
+ for(const group of ['Primera Federación · Grupo 1','Primera Federación · Grupo 2']){
+  const t=tables[group];groupSemis[group]=[
+   CM450_playoffWinner(t[1],t[4],`${group}|semi-1`),
+   CM450_playoffWinner(t[2],t[3],`${group}|semi-2`)
+  ];
+ }
+ const fedFinals=[
+  CM450_playoffWinner({name:groupSemis['Primera Federación · Grupo 1'][0].winner,strength:CLUBS[clubIndexByName(groupSemis['Primera Federación · Grupo 1'][0].winner)]?.strength},{name:groupSemis['Primera Federación · Grupo 2'][1].winner,strength:CLUBS[clubIndexByName(groupSemis['Primera Federación · Grupo 2'][1].winner)]?.strength},'Primera-Fed-final-1'),
+  CM450_playoffWinner({name:groupSemis['Primera Federación · Grupo 1'][1].winner,strength:CLUBS[clubIndexByName(groupSemis['Primera Federación · Grupo 1'][1].winner)]?.strength},{name:groupSemis['Primera Federación · Grupo 2'][0].winner,strength:CLUBS[clubIndexByName(groupSemis['Primera Federación · Grupo 2'][0].winner)]?.strength},'Primera-Fed-final-2')
+ ];
+ const fedPlayoffPromoted=fedFinals.map(x=>x.winner),fedDirect=[tables['Primera Federación · Grupo 1'][0].name,tables['Primera Federación · Grupo 2'][0].name];
+ const fedPromotedByGroup={ 'Primera Federación · Grupo 1':[], 'Primera Federación · Grupo 2':[] };
+ for(const winner of fedPlayoffPromoted){const from=['Primera Federación · Grupo 1','Primera Federación · Grupo 2'].find(g=>groupSemis[g].some(s=>s.winner===winner));if(from)fedPromotedByGroup[from].push(winner);}
+ const promoted={
+  'LaLiga HYPERMOTION':segundaPromoted,
+  'Primera Federación · Grupo 1':[fedDirect[0],...fedPromotedByGroup['Primera Federación · Grupo 1']],
+  'Primera Federación · Grupo 2':[fedDirect[1],...fedPromotedByGroup['Primera Federación · Grupo 2']]
+ };
+ const relegated={
+  'LaLiga EA SPORTS':names(bottom('LaLiga EA SPORTS',3)),
+  'LaLiga HYPERMOTION':names(bottom('LaLiga HYPERMOTION',4)),
+  'Primera Federación · Grupo 1':names(bottom('Primera Federación · Grupo 1',5)),
+  'Primera Federación · Grupo 2':names(bottom('Primera Federación · Grupo 2',5))
+ };
+ const copa=appState.cupCompetitions?.['Copa del Rey'];
+ const copaFinal=[...(copa?.results||[])].filter(r=>Number(r.round)===7).slice(-1)[0];
+ const copaRunnerUp=copaFinal?(copaFinal.winner===copaFinal.home?copaFinal.away:copaFinal.home):null;
+ const supercopaCandidates=[tables['LaLiga EA SPORTS'][0]?.name,tables['LaLiga EA SPORTS'][1]?.name,copa?.champion,copaRunnerUp,...names(tables['LaLiga EA SPORTS'])];
+ const supercopaTeams=[...new Set(supercopaCandidates.filter(Boolean))].slice(0,4);
+ while(supercopaTeams.length<4){const fallback=names(tables['LaLiga EA SPORTS']).find(n=>!supercopaTeams.includes(n));if(!fallback)break;supercopaTeams.push(fallback);}
+ const plRelegated=new Set(relegated['LaLiga EA SPORTS']),segRelegated=new Set(relegated['LaLiga HYPERMOTION']);
+ const nextPL=[...names(tables['LaLiga EA SPORTS']).filter(n=>!plRelegated.has(n)),...segundaPromoted];
+ const secondStay=names(tables['LaLiga HYPERMOTION']).filter(n=>!segundaPromoted.includes(n)&&!segRelegated.has(n));
+ const nextSecond=[...secondStay,...relegated['LaLiga EA SPORTS'],...fedDirect,...fedPlayoffPromoted];
+ const nextGroups={};
+ for(const group of ['Primera Federación · Grupo 1','Primera Federación · Grupo 2']){
+  const removed=new Set([tables[group][0].name,...relegated[group],...fedPromotedByGroup[group]]);
+  const stay=names(tables[group]).filter(n=>!removed.has(n));
+  const segDrops=group.endsWith('1')?relegated['LaLiga HYPERMOTION'].slice(0,2):relegated['LaLiga HYPERMOTION'].slice(2,4);
+  appState.spaRegionalPoolByGroup=appState.spaRegionalPoolByGroup||{};
+  const pool=[...(appState.spaRegionalPoolByGroup[group]||CM450_SPAIN_REGIONAL_GROUPS[group]||[])];
+  const excluded=new Set([...nextPL,...nextSecond,...stay,...segDrops]);
+  const available=[...new Set(pool)].filter(n=>!excluded.has(n));
+  const needed=20-stay.length-segDrops.length;
+  if(needed<0||available.length<needed){errors.push(`${group}: mangler ${Math.max(0,needed-available.length)} regionale erstatningslag`);continue;}
+  const filler=available.slice(0,needed);
+  appState.spaRegionalPoolByGroup[group]=[...available.slice(needed),...relegated[group]];
+  nextGroups[group]=[...stay,...segDrops,...filler];
+ }
+ const next={ 'LaLiga EA SPORTS':nextPL,'LaLiga HYPERMOTION':nextSecond,...nextGroups };
+ for(const d of divs){if(!Array.isArray(next[d])||next[d].length!==CM450_SPAIN_DIVISIONS[d].length)errors.push(`${d} ville fått ${next[d]?.length||0} lag`);if(next[d]&&new Set(next[d].map(domesticClubKey)).size!==next[d].length)errors.push(`${d} ville fått duplikater`);}
+ const all=divs.flatMap(d=>next[d]||[]);if(new Set(all.map(domesticClubKey)).size!==all.length)errors.push('Et lag ville vært i flere spanske divisjoner');
+ if(errors.length){appState.log.push(`Spansk opprykk/nedrykk stoppet av medlemskontroll: ${errors.join('; ')}`);return {ok:false,errors,promoted,relegated};}
+ for(const d of divs){
+  appState.currentSpanishClubNames[d]=[...next[d]];
+  for(const name of next[d]){const c=CLUBS.find(x=>x.name===name);if(c){c.division=d;c.country='Spain';}}
+ }
+ for(const name of [...relegated['Primera Federación · Grupo 1'],...relegated['Primera Federación · Grupo 2']]){const c=CLUBS.find(x=>x.name===name);if(c)c.division='Spanish Regional';}
+ appState.activeDivision=clubDivision(CLUBS[appState.club]);
+ appState.log.push(`Spansk opprykk/nedrykk: ${segundaPromoted.join(', ')} rykker opp til LaLiga. ${fedDirect.join(', ')} rykker direkte opp; ${fedPlayoffPromoted.join(', ')} vinner playoff og rykker opp.`);
+ return {ok:true,promoted,relegated,regionalPromoted:['Primera Federación · Grupo 1','Primera Federación · Grupo 2'].flatMap(g=>nextGroups[g].filter(n=>!(tables[g]||[]).some(r=>r.name===n)&&!relegated['LaLiga HYPERMOTION'].includes(n))),playoffWinners:{segunda:segundaFinal.winner,primeraFederacion:fedPlayoffPromoted},playoffResults:{segunda:{semis:segundaSemis,final:segundaFinal},primeraFederacion:{semis:groupSemis,finals:fedFinals}},supercopaTeams,country:'Spain'};
+}
+const CM450_ORIG_MOVE=moveClubsBetweenDivisions;
+moveClubsBetweenDivisions=function(){if(appState.country==='Spain')return CM450_moveSpainClubs();return CM450_ORIG_MOVE();};
+
+const CM450_ORIG_CUP_STAGES=cupTotalStages;
+cupTotalStages=function(name){if(name==='Copa del Rey')return 7;if(name==='Supercopa de España')return 2;return CM450_ORIG_CUP_STAGES(name);};
+const CM450_ORIG_CUP_LABEL=cupRoundLabel;
+cupRoundLabel=function(name,stage){if(name==='Copa del Rey')return ({1:'Første utslagsrunde · 112 lag',2:'Andre utslagsrunde',3:'Sekstendelsfinale · Supercopa-lagene går inn',4:'Åttedelsfinale',5:'Kvartfinale',6:'Semifinale',7:'Finale'})[Number(stage)]||`Runde ${stage}`;if(name==='Supercopa de España')return ({1:'Semifinale',2:'Finale'})[Number(stage)]||`Runde ${stage}`;return CM450_ORIG_CUP_LABEL(name,stage);};
+const CM450_ORIG_SEASON_COMPLETE=domesticSeasonCompletionStatus;
+domesticSeasonCompletionStatus=function(){if(appState.country!=='Spain')return CM450_ORIG_SEASON_COMPLETE();const cups=appState.cupCompetitions||{},missing=[];for(const n of ['Copa del Rey','Supercopa de España']){const c=cups[n];if(!c)missing.push(`${n}: turneringsdata mangler`);else if(!c.champion||Number(c.round||0)<cupTotalStages(n))missing.push(`${n}: ingen registrert vinner`);}return {complete:missing.length===0,missing};};
+const CM450_ORIG_PROCESS_CUPS=processScheduledDomesticCups;
+processScheduledDomesticCups=function(round){
+ if(appState.country!=='Spain')return CM450_ORIG_PROCESS_CUPS(round);
+ const through=Math.max(0,Number(round)||0),maxRounds=Math.max(38,Number(appState.fixtures?.length)||38);
+ const calendar={ 'Copa del Rey':[5,10,15,20,26,32,maxRounds], 'Supercopa de España':[3,4] };
+ for(const [name,weeks] of Object.entries(calendar)){
+  const cup=appState.cupCompetitions?.[name];if(!cup||cup.champion)continue;
+  for(let idx=0;idx<weeks.length;idx++){
+   const due=weeks[idx],stage=idx+1;if(due>through)break;if(Number(cup.round||0)>=stage)continue;
+   simulateCupRound(name,stage);
+   if(appState.pendingCupMatch?.competition===name)break;
+   if(Number(cup.round||0)<stage&&!cup.champion)break;
+   const newResults=(cup.results||[]).filter(r=>Number(r.round)===stage);
+   const result=newResults.find(r=>r.home===currentClub().name||r.away===currentClub().name);
+   if(result){appState.domesticCalendar=appState.domesticCalendar||[];appState.domesticCalendar.push({week:due,competition:name,...result});}
+  }
+ }
+};
+const CM450_ORIG_MIDWEEK=processMidweekCompetitions;
+processMidweekCompetitions=function(round){
+ if(appState.country!=='Spain')return CM450_ORIG_MIDWEEK(round);
+ initDomesticCompetitions();
+ if(appState.lastDomesticRound===round){processScheduledEuropeanKnockouts(round);processScheduledDomesticCups(round);return;}
+ simulateLowerLeaguesThroughRound(round);processEuropeanCompetitions(round);processScheduledDomesticCups(round);appState.lastDomesticRound=round;
+};
+
+const CM450_ORIG_SEASON_PLACES=seasonReviewEuropeanPlaces;
+seasonReviewEuropeanPlaces=function(table=sortedTable()){
+ if(appState.country!=='Spain')return CM450_ORIG_SEASON_PLACES(table);
+ const spanish=CM450_sortRows(appState.activeDivision==='LaLiga EA SPORTS'?table:appState.lowerLeagues?.['LaLiga EA SPORTS']?.rows);
+ const top=spanish.map(r=>r.name),copaWinner=appState.cupCompetitions?.['Copa del Rey']?.champion||null;
+ const pick=(ranked,indices)=>indices.map(i=>ranked[i-1]).filter(Boolean);
+ return {championsLeague:pick(top,[1,2,3,4]),europaLeague:[...pick(top,[5,6]),...(copaWinner?[copaWinner]:[])].filter((n,i,a)=>a.indexOf(n)===i).slice(0,3),conferenceLeague:pick(top,[7]),faWinner:copaWinner,eflWinner:null,source:'spansk LaLiga-tabell og Copa del Rey'};
+};
+
+function CM450_updateCareerDivisions(){
+ const country=document.getElementById('careerCountry')?.value||'England',divisionSelect=document.getElementById('careerDivision');if(!divisionSelect)return;
+ const divisions=country==='Spain'?CM450_SPAIN_DIVISION_ORDER:['Premier League','Championship','League One','League Two','National League'];
+ const selected=divisionSelect.value;
+ divisionSelect.innerHTML=divisions.map(d=>`<option value="${esc(d)}">${esc(d)} (${baseCareerClubNamesForDivision(d).length} klubber)</option>`).join('');
+ divisionSelect.value=divisions.includes(selected)?selected:divisions[0];
+ updateCareerClubOptions();
+}
+startNewCareer=function(){
+ if(!cmCloudAuthenticated){alert('Logg inn på CM Mobile-sky før du starter en karriere.');openCMCloudModal();return;}
+ if(readCareerSlots().length>=MAX_CAREER_SLOTS){alert(`Du har nådd grensen på ${MAX_CAREER_SLOTS} samtidige karrierer. Åpne Karrierer og bytt til eller arkiver en lagring før du oppretter en ny.`);openCareerManager();return;}
+ const overlay=document.createElement('div');overlay.id='careerClubPicker';overlay.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(4,10,20,.86);display:flex;align-items:center;justify-content:center;padding:16px;';
+ overlay.innerHTML=`<div style="width:min(540px,100%);max-height:90vh;overflow:auto;background:var(--panel,#142033);color:var(--text,#fff);border:1px solid #33445d;border-radius:16px;padding:22px;box-shadow:0 20px 70px #0009">
+ <h2 style="margin:0 0 8px">Ny karriere · 2026/27</h2><p style="margin:0 0 18px;color:var(--muted,#9fb0c7)">Velg land, deretter divisjon og klubb.</p>
+ <label for="careerCountry" style="display:block;margin:0 0 6px;font-weight:700">Land</label><select id="careerCountry" onchange="CM450_updateCareerDivisions()" style="width:100%;padding:12px;margin-bottom:16px;border-radius:9px;background:#0c1728;color:#fff;border:1px solid #52647e;font:inherit"><option value="England">England</option><option value="Spain">Spania</option></select>
+ <label for="careerDivision" style="display:block;margin:0 0 6px;font-weight:700">Liga / divisjon</label><select id="careerDivision" onchange="updateCareerClubOptions()" style="width:100%;padding:12px;margin-bottom:16px;border-radius:9px;background:#0c1728;color:#fff;border:1px solid #52647e;font:inherit"></select>
+ <label for="careerClub" style="display:block;margin:0 0 6px;font-weight:700">Klubb</label><select id="careerClub" size="8" style="width:100%;padding:8px;border-radius:9px;background:#0c1728;color:#fff;border:1px solid #52647e;font:inherit"></select>
+ <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button onclick="document.getElementById('careerClubPicker')?.remove()" style="padding:10px 18px;border-radius:9px;border:1px solid #52647e;background:transparent;color:inherit;font:inherit">Avbryt</button><button onclick="startSelectedCareer()" style="padding:10px 18px;border-radius:9px;border:0;background:#ffbd66;color:#172033;font-weight:700;font:inherit">Start karriere</button></div></div>`;
+ document.body.appendChild(overlay);CM450_updateCareerDivisions();
+};
+updateCareerClubOptions=function(){const division=document.getElementById('careerDivision')?.value,select=document.getElementById('careerClub');if(!select)return;const names=baseCareerClubNamesForDivision(division);select.innerHTML=names.map(name=>`<option value="${esc(name)}">${esc(name)}</option>`).join('');select.selectedIndex=0;};
+const CM450_ORIG_START_SELECTED=startSelectedCareer;
+startSelectedCareer=async function(){
+ const country=document.getElementById('careerCountry')?.value||'England',previousSlot=activeCareerSlotId;window.cmPendingCareerCountry=country;
+ try{await CM450_ORIG_START_SELECTED();if(activeCareerSlotId!==previousSlot&&appState.started){appState.country=country;if(country==='Spain'){CM450_initSpain();}else{delete appState.currentSpanishClubNames;}save();}}
+ finally{window.cmPendingCareerCountry=null;}
+};
+
+
+
+// Spain-specific table zones, round counts, and competitions screen.
+const CM450_ORIG_TABLE_ZONE=tableZoneClass;
+tableZoneClass=function(division,rank,total){
+ if(division==='LaLiga EA SPORTS')return rank>total-3?'table-zone-relegation':'';
+ if(division==='LaLiga HYPERMOTION')return rank<=2?'table-zone-promotion':rank<=6?'table-zone-playoff':rank>total-4?'table-zone-relegation':'';
+ if(String(division).startsWith('Primera Federación'))return rank===1?'table-zone-promotion':rank<=5?'table-zone-playoff':rank>total-5?'table-zone-relegation':'';
+ return CM450_ORIG_TABLE_ZONE(division,rank,total);
+};
+const CM450_ORIG_MOVEMENT_RULES=divisionMovementRules;
+divisionMovementRules=function(division){
+ if(division==='LaLiga EA SPORTS')return {automatic:0,playoffStart:0,playoffEnd:0,relegation:3};
+ if(division==='LaLiga HYPERMOTION')return {automatic:2,playoffStart:3,playoffEnd:6,relegation:4};
+ if(String(division).startsWith('Primera Federación'))return {automatic:1,playoffStart:2,playoffEnd:5,relegation:5};
+ return CM450_ORIG_MOVEMENT_RULES(division);
+};
+const CM450_ORIG_TABLE_LEGEND=tableZoneLegend;
+tableZoneLegend=function(division){
+ if(division==='LaLiga EA SPORTS')return '<div class="table-zone-legend"><span><i class="relegation"></i>Nedrykkssone</span></div>';
+ if(division==='LaLiga HYPERMOTION')return '<div class="table-zone-legend"><span><i class="promo"></i>Direkte opprykk</span><span><i class="playoff"></i>Playoff</span><span><i class="relegation"></i>Nedrykkssone</span></div>';
+ if(String(division).startsWith('Primera Federación'))return '<div class="table-zone-legend"><span><i class="promo"></i>Direkte opprykk</span><span><i class="playoff"></i>Playoff</span><span><i class="relegation"></i>Nedrykkssone</span></div>';
+ return CM450_ORIG_TABLE_LEGEND(division);
+};
+
+function CM450_renderSpainCup(name,cup){
+ if(!cup)return '';
+ const total=cupTotalStages(name),done=Math.min(total,Number(cup.round)||0),pct=Math.round(done/total*100),recent=[...(cup.results||[])].slice(-5).reverse();
+ const pending=appState.pendingCupMatch?.competition===name?appState.pendingCupMatch:null;
+ const resultRows=recent.map(r=>`<div class="player"><div style="flex:1"><strong>${esc(r.home)} ${esc(r.score||'')} ${esc(r.away||'')}</strong><div class="player-meta">${esc(r.roundLabel||cupRoundLabel(name,r.round))} · Vinner: ${esc(r.winner||'—')}</div></div></div>`).join('');
+ const pendingMarkup=pending?`<div class="notice"><strong>Din kamp:</strong> ${esc(pending.homeTeam?.name||'')} – ${esc(pending.awayTeam?.name||'')} · ${esc(pending.roundLabel||cupRoundLabel(name,pending.roundNo))}<button class="primary" style="margin-left:12px" onclick="startPendingCupMatch()">Forbered kamp →</button></div>`:'';
+ return `<section class="card domestic-cup-card"><div class="domestic-cup-head"><div class="domestic-cup-emblem">🏆</div><div class="domestic-cup-title"><span class="eyebrow">SPANSK CUP · ${seasonLabel()}</span><h2>${esc(name)}</h2><p>${name==='Copa del Rey'?'116 lag. Fire Supercopa-lag går inn i sekstendelsfinalen.':'Fire lag · semifinaler og finale.'}</p></div><span class="pill ${cup.champion?'green':''}">${cup.champion?'Ferdig':esc(cupRoundLabel(name,Math.min(total,done+1)))}</span></div><div class="cup-progress-info"><div><strong>${done} av ${total} trinn fullført</strong><small>${(cup.teams||[]).length} lag igjen · ${domesticCupPlayedMatchCount(cup)} kamper spilt</small></div><strong class="cup-progress-percent">${pct}%</strong></div><div class="cup-progress-track"><span style="width:${pct}%"></span></div>${pendingMarkup}${cup.champion?`<div class="cup-champion"><span>🏆</span><div><small>Vinnere</small><strong>${esc(cup.champion)}</strong></div></div>`:''}<details class="cup-results-details" ${recent.length?'open':''}><summary>Siste resultater (${domesticCupPlayedMatchCount(cup)} kamper)</summary>${resultRows||'<p class="muted">Ingen kamper spilt ennå.</p>'}</details></section>`;
+}
+const CM450_ORIG_COMPETITIONS=competitions;
+competitions=function(){
+ if(appState.country!=='Spain')return CM450_ORIG_COMPETITIONS();
+ initDomesticCompetitions();processScheduledDomesticCups(Number(appState.week)||1);
+ const divisions=Object.entries(appState.lowerLeagues||{}).map(([name,d])=>{
+  const rounds=Array.isArray(d.fixtures)?d.fixtures.length:0,rows=CM450_sortRows(d.rows||[]),complete=rounds>0&&rows.length>0&&rows.every(r=>(Number(r.p)||0)>=rounds);
+  return `<section class="card"><div class="section-title"><h2>${esc(name)}</h2><span class="pill">${Number(d.playedRounds)||0}/${rounds} runder</span></div>${d.activeManagerOwned?'<p class="muted">Din aktive divisjon styres av kampmotoren.</p>':''}<div class="table-wrap"><table><thead><tr><th>#</th><th>Klubb</th><th>K</th><th>V</th><th>U</th><th>T</th><th>MF</th><th>P</th></tr></thead><tbody>${rows.map((r,i)=>`<tr class="${tableZoneClass(name,i+1,rows.length)}">${rankCellMarkup(i+1,tableMovementBadge(name,r,rows,rounds,complete))}<td><button type="button" class="table-club-link" data-club="${esc(r.name)}" data-division="${esc(name)}" onclick="openClubRoster(this.dataset.club,this.dataset.division)">${esc(r.name)}</button></td><td>${Number(r.p)||0}</td><td>${Number(r.w)||0}</td><td>${Number(r.d)||0}</td><td>${Number(r.l)||0}</td><td>${(Number(r.gf)||0)-(Number(r.ga)||0)}</td><td><b>${Number(r.pts)||0}</b></td></tr>`).join('')}</tbody></table></div>${tableZoneLegend(name)}</section>`;
+ }).join('');
+ const cups=appState.cupCompetitions||{},calendar=(appState.domesticCalendar||[]).slice(-12).reverse();
+ return `<div class="hero"><div class="eyebrow">SPANSK FOTBALL · ${seasonLabel()}</div><h1>Ligaturneringer og cuper</h1><p>Fire divisjoner, to gruppetabeller i Primera Federación og nasjonale cuper.</p><div class="grid"><div class="stat"><small>LaLiga</small><strong>20 lag</strong></div><div class="stat"><small>Segunda</small><strong>22 lag</strong></div><div class="stat"><small>Primera Federación</small><strong>2 × 20 lag</strong></div><div class="stat"><small>Copa del Rey</small><strong>${(cups['Copa del Rey']?.teams||[]).length||116} lag igjen</strong></div></div></div>${CM450_renderSpainCup('Copa del Rey',cups['Copa del Rey'])}${CM450_renderSpainCup('Supercopa de España',cups['Supercopa de España'])}${Object.values(appState.europeanCompetitions||{}).map(comp=>renderEuropeanCompetitionCard(comp)).join('')}<section class="card"><div class="section-title"><h2>Midtukekalender</h2><span class="pill">${calendar.length} siste</span></div>${calendar.length?calendar.map(r=>`<div class="player"><div style="flex:1"><strong>Runde ${r.week} · ${esc(r.competition)}</strong><div class="player-meta">${esc(r.home)} ${esc(r.score)} ${esc(r.away)} · ${esc(r.winner||'')}</div></div></div>`).join(''):'<p class="muted">Ingen cupresultater registrert ennå.</p>'}</section>${divisions}`;
+};
+
+// Spanish divisions use their own schedule length (38 for 20 teams, 42 for 22 teams).
+
 </script>
 </body></html>

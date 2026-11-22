@@ -1,0 +1,19 @@
+CM Mobile 4.5.0 – Spain domestic league expansion
+
+Added a separate Spain career path alongside England. New-career selection is now Country → Division → Club.
+
+Spain 2026/27 structure:
+- LaLiga EA SPORTS: 20 clubs, 38 rounds
+- LaLiga HYPERMOTION: 22 clubs, 42 rounds
+- Primera Federación Group 1: 20 clubs, 38 rounds
+- Primera Federación Group 2: 20 clubs, 38 rounds
+- Copa del Rey: 116 entrants (112 in the first round; four Supercopa clubs enter at the Round of 32 stage)
+- Supercopa de España: four clubs, semi-finals and final
+
+Includes independent Spanish tables and schedules, AI match simulation for the other Spanish divisions, Spain-specific league table zones, promotion/relegation and the Spanish cup competitions. The 4.4.4 UEFA duplicate-participant repair is preserved.
+
+Squad data note:
+The build contains 618 distinct player names with source-based 2026/27 club assignments across the Spanish clubs. It fills 2,050 first-team roster places in total; the remaining 1,432 places are generated fictional reserves and are explicitly marked as such in player data. Coverage is uneven: some clubs have no source-seeded player names and the maximum per club is 19. This is a partial real-player first pass, not complete verified 25-player real squads for all 82 clubs. Player ages are modelled when no verified date of birth is present.
+
+Validation scope:
+JavaScript syntax, 20/22-team double round-robin schedules (all home/away pairings exactly once), 116 unique Copa del Rey entrants and stage composition, four Supercopa entrants, 25-player roster capacity without duplicate names, and three synthetic promotion/relegation season transitions with 82 unique clubs. Not tested against live Supabase, another device, or physical iPhone Safari.
