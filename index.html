@@ -11687,29 +11687,40 @@ async function cmCloudUpsert(id,payload){
  if(error)throw error;
  cmCloudSetStatus("✓ Skylagret "+new Date().toLocaleTimeString("nb-NO",{hour:"2-digit",minute:"2-digit"}));
 }
-async function cmCloudSyncAll(options={}){
- if(cmCloudBusy)return;
- cmCloudBusy=true;cmCloudSetStatus("Synkroniserer karrierer…");
- try{
+let cmCloudSyncInFlight=null;
+function cmCloudSyncAll(options={}){
+ if(cmCloudSyncInFlight)return cmCloudSyncInFlight;
+ cmCloudBusy=true;
+ cmCloudSetStatus("Synkroniserer karrierer…");
+ cmCloudSyncInFlight=(async()=>{
   const client=cmCloudClient(),{data:{session},error:sessionError}=await client.auth.getSession();
   if(sessionError)throw sessionError;
-  if(!session?.user){cmCloudSetStatus("Ikke tilkoblet");return;}
+  if(!session?.user){cmCloudSetStatus("Ikke tilkoblet");return {imported:0,uploaded:0,total:0,authenticated:false};}
   const {data:remoteRows,error}=await client.from("cm_careers").select("*").order("updated_at",{ascending:false});
   if(error)throw error;
   const remote=Array.isArray(remoteRows)?remoteRows:[];
   const localRows=readCareerSlots();
   let imported=0,uploaded=0,restoredActive=false;
-  for(const row of remote){
-   if(!row?.career_slot_id||typeof row.payload!=="string")continue;
-   const id=String(row.career_slot_id),local=localRows.find(x=>x.id===id),localPayload=localStorage.getItem(careerSaveKey(id));
+  const validRemote=remote.filter(row=>row&&row.career_slot_id&&typeof row.payload==="string");
+  for(const row of validRemote){
+   const id=String(row.career_slot_id),local=localRows.find(x=>x.id===id);
+   const mainKey=careerSaveKey(id),localPayload=localStorage.getItem(mainKey);
+   const remoteTime=Date.parse(row.updated_at)||0;
    if(!localPayload){
-    localStorage.setItem(careerSaveKey(id),row.payload);
-    registerCareerSlot(id,{name:row.career_name||"Karriere",clubName:row.club_name||"",season:row.season||"",seasonYear:Number(row.season_year)||2026,week:Number(row.week)||1,updatedAt:Date.parse(row.updated_at)||Date.now()});
-    imported++;continue;
+    // Preserve an existing local recovery copy; cloud data must not erase it.
+    if(!localStorage.getItem(careerBackupKey(id)))localStorage.setItem(mainKey,row.payload);
+    else {
+     localStorage.setItem(mainKey,row.payload);
+    }
+    registerCareerSlot(id,{name:row.career_name||local?.name||"Karriere",clubName:row.club_name||local?.clubName||"",season:row.season||local?.season||"",seasonYear:Number(row.season_year)||Number(local?.seasonYear)||2026,week:Number(row.week)||1,updatedAt:remoteTime||Date.now()});
+    if(id===activeCareerSlotId)restoredActive=true;
+    imported++;
+    continue;
    }
-   const localTime=Number(local?.updatedAt)||0,remoteTime=Date.parse(row.updated_at)||0;
+   const localTime=Number(local?.updatedAt)||0;
    if(remoteTime>localTime){
-    localStorage.setItem(careerSaveKey(id),row.payload);
+    try{const decoded=decodeSaveState(localPayload);if(decoded?.started&&!localStorage.getItem(careerBackupKey(id)))localStorage.setItem(careerBackupKey(id),localPayload);}catch(e){}
+    localStorage.setItem(mainKey,row.payload);
     registerCareerSlot(id,{name:row.career_name||local?.name||"Karriere",clubName:row.club_name||local?.clubName||"",season:row.season||local?.season||"",seasonYear:Number(row.season_year)||Number(local?.seasonYear)||2026,week:Number(row.week)||1,updatedAt:remoteTime});
     if(id===activeCareerSlotId)restoredActive=true;
     imported++;
@@ -11717,11 +11728,43 @@ async function cmCloudSyncAll(options={}){
     await cmCloudUpsert(id,localPayload);uploaded++;
    }
   }
-  if(restoredActive){const p=localStorage.getItem(careerSaveKey(activeCareerSlotId));if(p)loadFromPayload(p);}
+  // Recovery for older saves whose cloud slot ID differs from the local metadata ID.
+  // Only use an exact club + season match, and only when it identifies one cloud row.
+  const activeId=localStorage.getItem(ACTIVE_CAREER_SLOT_KEY)||activeCareerSlotId||"";
+  const activeMeta=readCareerSlots().find(x=>x.id===activeId);
+  if(activeId&&activeMeta&&!localStorage.getItem(careerSaveKey(activeId))&&!localStorage.getItem(careerBackupKey(activeId))){
+   const club=String(activeMeta.clubName||"").trim().toLowerCase();
+   const season=String(activeMeta.season||"").trim().toLowerCase();
+   let candidates=validRemote.filter(row=>String(row.club_name||"").trim().toLowerCase()===club&&String(row.season||"").trim().toLowerCase()===season);
+   if(candidates.length>1){
+    const nm=String(activeMeta.name||"").trim().toLowerCase();
+    const exact=candidates.filter(row=>String(row.career_name||"").trim().toLowerCase()===nm);
+    if(exact.length===1)candidates=exact;
+   }
+   if(candidates.length===1){
+    const row=candidates[0];
+    localStorage.setItem(careerSaveKey(activeId),row.payload);
+    registerCareerSlot(activeId,{name:activeMeta.name||row.career_name||"Karriere",clubName:activeMeta.clubName||row.club_name||"",season:activeMeta.season||row.season||"",seasonYear:Number(row.season_year)||Number(activeMeta.seasonYear)||2026,week:Number(row.week)||Number(activeMeta.week)||1,updatedAt:Date.parse(row.updated_at)||Date.now()});
+    if(activeId===activeCareerSlotId)restoredActive=true;
+    imported++;
+   }
+  }
+  if(restoredActive){
+   const id=localStorage.getItem(ACTIVE_CAREER_SLOT_KEY)||activeCareerSlotId;
+   const p=id?localStorage.getItem(careerSaveKey(id)):null;
+   if(p){activeCareerSlotId=id;loadFromPayload(p);}
+  }
   if((imported||restoredActive)&&!options.silentRender)render();
-  cmCloudSetStatus(`✓ Tilkoblet · ${remote.length+uploaded} karrierer i skyen`);
-  return {imported,uploaded,total:remote.length};
- }finally{cmCloudBusy=false;}
+  cmCloudSetStatus(`✓ Tilkoblet · ${validRemote.length+uploaded} karrierer i skyen`);
+  return {imported,uploaded,total:validRemote.length,authenticated:true};
+ })().catch(e=>{
+  cmCloudSetStatus("⚠ Skylagring feilet: "+(e.message||"ukjent feil"));
+  throw e;
+ }).finally(()=>{
+  cmCloudBusy=false;
+  cmCloudSyncInFlight=null;
+ });
+ return cmCloudSyncInFlight;
 }
 function openCMCloudModal(){
  document.getElementById("cmCloudModal")?.remove();

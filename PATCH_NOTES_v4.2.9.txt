@@ -1,0 +1,32 @@
+CM Mobile 4.2.9 – pålitelig skyinnlasting og karrieregjenoppretting
+
+Base: CM Mobile 4.2.8.
+
+Berørt fil:
+- index.html
+
+Viktig feilretting:
+1. Skylagring bruker nå én delt in-flight Promise. Hvis oppstart og en annen synkronisering starter samtidig, venter begge på samme faktiske operasjon. Ingen kall returnerer lenger «ferdig» bare fordi en synkronisering allerede pågår.
+2. Oppstart får dermed et reelt resultat fra skyinnlastingen før den avgjør om aktiv karriere mangler.
+3. Synkronisering markerer aktiv karriere som gjenopprettet også når den importeres til en tom lokal lagringsplass.
+4. Før en nyere skyversjon erstatter en gyldig lokal versjon, forsøkes den lokale versjonen bevart som siste lokale sikkerhetskopi.
+5. Hvis lokal karriere-ID ikke samsvarer med eldre sky-ID, kan appen gjenopprette fra skyen ved et entydig treff på både klubbnavn og sesong. Hvis det finnes flere kandidater, velges ingen automatisk.
+6. Status viser antall faktiske skykarrierer etter fullført synkronisering, og feil blir synlige.
+
+Beholdt fra 4.2.8:
+- Lokal autosave hvert 60. sekund.
+- Lagring ved bakgrunn/pagehide.
+- Per-karriere lokal sikkerhetskopi.
+- Lagringsstatus.
+
+Viktig:
+- Denne rettelsen kan hente Salford hvis det finnes en gyldig skyoppføring på samme konto.
+- Den kan ikke gjenskape data som aldri ble lagret lokalt eller i skyen.
+- Ikke slett nettleserdata eller Salford-oppføringen før gjenoppretting er testet.
+
+ZIP inneholder kun index.html og PATCH_NOTES_v4.2.9.txt direkte i arkivroten.
+
+Teststatus:
+- Endringene er kontrollert mot den faktiske sky- og oppstartskoden i 4.2.8.
+- ZIP-integritet kontrolleres ved pakking.
+- Reell Supabase-konto og iPhone-testing er ikke tilgjengelig i dette miljøet.
