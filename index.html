@@ -1061,7 +1061,7 @@ body > header .header-action {
 
 </head>
 <body>
-<header><div class="top"><div><div class="brand">CM <span>MOBILE</span></div><div class="season" id="topSeason">2026/27 · Premier League</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="cloudAccountBtn" title="Koble til skylagring">☁ Konto</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere">▣ Lagre</button></div></div></header>
+<header><div class="top"><div><div class="brand">CM <span>MOBILE</span></div><div class="season" id="topSeason">2026/27 · Premier League</div></div><div class="header-actions"><button class="ghost header-action" id="careersBtn" title="Bytt eller administrer karrierer">☷ Karrierer</button><button class="ghost header-action" id="cloudAccountBtn" title="Koble til skylagring">☁ Konto</button><button class="ghost header-action" id="saveBtn" title="Lagre aktiv karriere i skyen">☁ Lagre</button></div></div></header>
 <main id="app"></main>
 <nav class="nav" id="nav">
 <button data-page="home" class="active"><b>⌂</b>Oversikt</button><button data-page="squad"><b>♟</b>Tropp</button><button data-page="tactics"><b>▦</b>Taktikk</button><button data-page="transfers"><b>⇄</b>Overganger</button><button data-page="finance"><b>£</b>Økonomi</button><button data-page="academy"><b>♙</b>Juniorstall</button><button data-page="league"><b>♜</b>Tabell</button><button data-page="competitions"><b>🏆</b>Cuper</button>
@@ -2912,41 +2912,18 @@ function cmShowLocalSaveFeedback(ok,error){
  cmSaveFeedbackTimer=setTimeout(()=>{if(button.isConnected)button.textContent='▣ Lagre';},3200);
 }
 function save(){
- let id=activeCareerSlotId||null,payload=null,previousPayload=null,mainKey=null;
  try{
-  if(!id){id=newCareerSlotId();activeCareerSlotId=id;}
-  payload=encodeSaveState(appState);
-  mainKey=careerSaveKey(id);
-  previousPayload=localStorage.getItem(mainKey);
-  try{
-   // localStorage.setItem is atomic: on quota failure the old main save remains intact.
-   localStorage.setItem(mainKey,payload);
-  }catch(firstError){
-   // Remove only redundant backup copies; never delete another career's primary save.
-   try{localStorage.removeItem(careerBackupKey(id));}catch(e){}
-   try{
-    const redundant=[];
-    for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key&&key.endsWith('::last-good-backup'))redundant.push(key);}
-    redundant.forEach(key=>{try{localStorage.removeItem(key);}catch(e){}});
-   }catch(e){}
-   // Retry once after freeing space used by legacy localStorage backups.
-   localStorage.setItem(mainKey,payload);
-  }
-  // The primary save is now safe. Keep the old good version in IndexedDB asynchronously.
-  if(previousPayload&&previousPayload!==payload){
-   cmStoreCareerBackup(id,previousPayload).catch(e=>{window.__cmBackupWarning=String(e.message||e);});
-  }
-  try{
-   if(previousPayload!==payload||!readCareerSlots().some(row=>row.id===id))registerCareerSlot(id);
-  }catch(metaError){window.__cmSaveMetadataWarning=String(metaError.message||metaError);}
-  try{localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,id);}catch(pointerError){window.__cmSavePointerWarning=String(pointerError.message||pointerError);}
+  if(!cmCloudAuthenticated){cmCloudSetStatus("Logg inn for å lagre i skyen");window.__cmLastSaveError={message:"Ikke innlogget"};return false;}
+  if(!activeCareerSlotId)activeCareerSlotId=newCareerSlotId();
+  const id=String(activeCareerSlotId),payload=encodeSaveState(appState);
+  registerCareerSlot(id);
+  try{localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,id);}catch(e){}
+  cmCloudScheduleSync(id,payload);
   window.__cmLastSaveAt=Date.now();
   window.__cmLastSaveError=null;
-  cmShowLocalSaveFeedback(true);
-  try{scheduleCMCloudSave(id,payload);}catch(e){window.__cmCloudQueueError=String(e.message||e);}
-  return true;
+  return true; // queued; UI status changes to Skylagret only after Supabase confirms.
  }catch(e){
-  window.__cmLastSaveError={name:e?.name||'Error',message:e?.message||String(e),at:Date.now(),careerId:id};
+  window.__cmLastSaveError={name:e?.name||"Error",message:e?.message||String(e),at:Date.now(),careerId:activeCareerSlotId};
   cmShowLocalSaveFeedback(false,e);
   return false;
  }
@@ -2973,26 +2950,20 @@ function loadFromPayload(payload){try{let s=decodeSaveState(payload);if(s&&s.sta
 function load(){
  try{
   const rows=readCareerSlots();
-  let id=localStorage.getItem(ACTIVE_CAREER_SLOT_KEY)||'';
-  let payload=id?localStorage.getItem(careerSaveKey(id)):null;
-  let usingBackup=false;
-  if(!payload&&id){payload=localStorage.getItem(careerBackupKey(id));usingBackup=!!payload;}
-  if(!payload&&id&&rows.some(row=>row.id===id)){
-   window.__cmMissingActiveCareer={id,meta:rows.find(row=>row.id===id)||null};
+  let id=localStorage.getItem(ACTIVE_CAREER_SLOT_KEY)||"";
+  if(!id||!cmCloudPayloadCache.has(id)){
+   const newest=rows.find(row=>cmCloudPayloadCache.has(String(row.id)));
+   if(newest)id=String(newest.id);
+  }
+  const payload=id?cmCloudPayloadCache.get(id):null;
+  if(!payload){
+   if(id){window.__cmMissingActiveCareer={id,meta:rows.find(row=>row.id===id)||null};return false;}
    return false;
   }
-  if(!payload&&rows.length){const newest=rows.find(row=>localStorage.getItem(careerSaveKey(row.id))||localStorage.getItem(careerBackupKey(row.id)));if(newest){id=newest.id;payload=localStorage.getItem(careerSaveKey(id));if(!payload){payload=localStorage.getItem(careerBackupKey(id));usingBackup=!!payload;}}}
-  if(payload){
-   window.__cmMissingActiveCareer=null;activeCareerSlotId=id;localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,id);
-   if(loadFromPayload(payload)){if(usingBackup){localStorage.setItem(careerSaveKey(id),payload);window.__cmRecoveredFromLocalBackup=true;}return true;}
-   const backup=localStorage.getItem(careerBackupKey(id));
-   if(backup&&backup!==payload){resetAppStateForCareerLoad();if(loadFromPayload(backup)){localStorage.setItem(careerSaveKey(id),backup);window.__cmRecoveredFromLocalBackup=true;return true;}}
-   return false;
-  }
-  // One-time compatibility: import the user's previous single career without deleting its original copy.
-  const legacy=localStorage.getItem(LEGACY_SAVE_KEY);
-  if(legacy){activeCareerSlotId='career-legacy';const ok=loadFromPayload(legacy);if(ok){localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,activeCareerSlotId);save();return true;}activeCareerSlotId=null;}
-  return false;
+  window.__cmMissingActiveCareer=null;
+  activeCareerSlotId=id;
+  try{localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,id);}catch(e){}
+  return loadFromPayload(payload);
  }catch(e){return false;}
 }
 function openCareerManager(){
@@ -3002,34 +2973,47 @@ function openCareerManager(){
  const overlay=document.createElement('div');overlay.id='careerManagerModal';
  overlay.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(4,10,20,.84);display:flex;align-items:center;justify-content:center;padding:14px;';
  const list=rows.length?rows.map(row=>{const isActive=row.id===active;const summary=`${esc(row.division||'Divisjon ukjent')} · ${esc(row.season||'Sesong ukjent')} · ${row.preseason?`Pre-season ${Number(row.preseasonWeek)||1}/4`:`Runde ${Number(row.week)||1}`} · ${Number(row.played)||0} kamper spilt`;return `<div class="career-slot-row"><div class="career-slot-copy"><strong>${esc(row.name||row.clubName||'Karriere')}</strong><small>${summary}</small><small>Sist lagret: ${esc(careerSavedAt(row.updatedAt))}</small></div>${isActive?'<span class="pill green">Aktiv</span>':`<div class="career-slot-actions"><button type="button" onclick="switchCareerSlot('${esc(row.id)}')">Last inn</button><button type="button" class="danger-muted" onclick="deleteCareerSlot('${esc(row.id)}')">Slett</button></div>`}</div>`}).join(''):'<div class="empty">Ingen lagrede karrierer ennå. Start en ny karriere, så blir den lagret her.</div>';
- overlay.innerHTML=`<div class="career-manager-panel"><div class="career-manager-head"><div><div class="eyebrow">CM Mobile · lagringer</div><h2>Karrierer</h2></div><button type="button" class="ghost" onclick="document.getElementById('careerManagerModal')?.remove()">✕</button></div><div class="career-slot-list">${list}</div><div class="career-manager-actions"><button type="button" class="primary" onclick="document.getElementById('careerManagerModal')?.remove();startNewCareer()" ${rows.length>=MAX_CAREER_SLOTS?'disabled':''}>＋ Start ny karriere</button><button type="button" onclick="document.getElementById('careerManagerModal')?.remove()">Lukk</button></div><p class="career-manager-note">Lagringene ligger lokalt i denne nettleseren.</p></div>`;
+ overlay.innerHTML=`<div class="career-manager-panel"><div class="career-manager-head"><div><div class="eyebrow">CM Mobile · lagringer</div><h2>Karrierer</h2></div><button type="button" class="ghost" onclick="document.getElementById('careerManagerModal')?.remove()">✕</button></div><div class="career-slot-list">${list}</div><div class="career-manager-actions"><button type="button" class="primary" onclick="document.getElementById('careerManagerModal')?.remove();startNewCareer()" ${rows.length>=MAX_CAREER_SLOTS?'disabled':''}>＋ Start ny karriere</button><button type="button" onclick="document.getElementById('careerManagerModal')?.remove()">Lukk</button></div><p class="career-manager-note">Karrieredataene ligger i skyen. Logg inn med samme konto på alle enhetene.</p></div>`;
  document.body.appendChild(overlay);
 }
-function deleteCareerSlot(id){
- if(!id||id===activeCareerSlotId){alert('Bytt til en annen karriere før du sletter denne lagringen. Den aktive karrieren kan ikke slettes fra dette vinduet.');return;}
+async function deleteCareerSlot(id){
+ if(!id||id===activeCareerSlotId){alert('Bytt til en annen karriere før du sletter denne. Den aktive karrieren kan ikke slettes her.');return;}
  const slot=readCareerSlots().find(x=>x.id===id);if(!slot)return;
- if(!confirm(`Slette karrieren «${slot.name||slot.clubName||'Karriere'}» permanent fra denne nettleseren? Dette kan ikke angres.`))return;
- try{localStorage.removeItem(careerSaveKey(id));writeCareerSlots(readCareerSlots().filter(x=>x.id!==id));openCareerManager();}catch(e){alert('Karrieren kunne ikke slettes fra nettleseren.');}
+ if(!confirm(`Slette karrieren «${slot.name||slot.clubName||'Karriere'}» permanent fra CM Mobile-skyen? Dette kan ikke angres.`))return;
+ try{
+  const client=cmCloudClient(),{data:{session},error:sessionError}=await client.auth.getSession();
+  if(sessionError)throw sessionError;
+  if(!session?.user)throw new Error('Logg inn før du sletter en skykarriere.');
+  const {error}=await client.from('cm_careers').delete().eq('user_id',session.user.id).eq('career_slot_id',String(id));
+  if(error)throw error;
+  cmCloudPayloadCache.delete(String(id));cmCloudPendingPayloads.delete(String(id));
+  cmRemoveLocalCareerPayload(id);
+  writeCareerSlots(readCareerSlots().filter(x=>x.id!==id));
+  openCareerManager();
+ }catch(e){alert('Karrieren kunne ikke slettes fra skyen: '+(e.message||'ukjent feil'));}
 }
 async function switchCareerSlot(id){
+ id=String(id||"");
  if(!id||id===activeCareerSlotId){document.getElementById('careerManagerModal')?.remove();return;}
- let payload=localStorage.getItem(careerSaveKey(id));
- if(!payload)await cmRestoreCareerBackupToLocal(id);
- payload=localStorage.getItem(careerSaveKey(id));
- let usingBackup=false;
- if(!payload){payload=localStorage.getItem(careerBackupKey(id));usingBackup=!!payload;}
- if(!payload){
-  try{await cmCloudSyncAll({silentRender:true});}catch(e){cmCloudSetStatus('⚠ Skylagring: '+(e.message||'gjenoppretting feilet'));}
-  payload=localStorage.getItem(careerSaveKey(id));
-  if(!payload){payload=localStorage.getItem(careerBackupKey(id));usingBackup=!!payload;}
- }
- if(!payload){alert('Fant ikke lokal lagring eller sikkerhetskopi. Jeg har også forsøkt å hente karrieren fra skyen. Kontroller at du er logget inn på samme konto under Tilkoblet. Ingen annen karriere er endret.');return;}
- if(!save()){alert('Den aktive karrieren kunne ikke lagres. Kontroller ledig lagringsplass før du bytter.');return;}
- const previousId=activeCareerSlotId;
- try{localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,id);activeCareerSlotId=id;resetAppStateForCareerLoad();let ok=loadFromPayload(payload);if(!ok){const backup=localStorage.getItem(careerBackupKey(id));if(backup&&backup!==payload){resetAppStateForCareerLoad();ok=loadFromPayload(backup);if(ok){payload=backup;usingBackup=true;}}}if(!ok)throw new Error('Lagringen kunne ikke leses');if(usingBackup)localStorage.setItem(careerSaveKey(id),payload);
+ if(!cmCloudAuthenticated){alert("Logg inn på CM Mobile-sky før du bytter karriere.");openCMCloudModal();return;}
+ try{
+  if(!await cmCloudFlushPending())throw new Error("Den aktive karrieren er ikke bekreftet lagret i skyen.");
+  if(!cmCloudPayloadCache.has(id))await cmCloudSyncAll({silentRender:true});
+  const payload=cmCloudPayloadCache.get(id);
+  if(!payload)throw new Error("Fant ikke karrieren i skyen. Ingen karriere ble endret.");
+  const previousId=activeCareerSlotId,previousPayload=previousId?cmCloudPayloadCache.get(previousId):null;
+  activeCareerSlotId=id;
+  resetAppStateForCareerLoad();
+  if(!loadFromPayload(payload))throw new Error("Karrieredataene kunne ikke leses.");
+  try{localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,id);}catch(e){}
   marketSearch='';marketPosition='ALL';marketSort='recommended';marketScope='all';marketAgeMin='';marketAgeMax='';marketExactRole='ALL';marketMaxPrice='';marketMinPotential='';window.marketAdvancedOpen=false;
-  window.transferListAccordionOpen=false;normalizeAllPlayerAges(Number(appState.seasonYear)||2026);ensureTransferPool();save();document.getElementById('careerManagerModal')?.remove();document.getElementById('careerClubPicker')?.remove();lastRenderedPage=null;render();
- }catch(e){activeCareerSlotId=previousId;localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,previousId||'');resetAppStateForCareerLoad();const previousPayload=previousId?localStorage.getItem(careerSaveKey(previousId)):null;if(previousPayload)loadFromPayload(previousPayload);alert('Kunne ikke bytte karriere. Den forrige karrieren er beholdt.');render();}
+  window.transferListAccordionOpen=false;normalizeAllPlayerAges(Number(appState.seasonYear)||2026);ensureTransferPool();
+  save();
+  document.getElementById('careerManagerModal')?.remove();document.getElementById('careerClubPicker')?.remove();lastRenderedPage=null;render();
+ }catch(e){
+  alert("Kunne ikke bytte karriere: "+(e.message||"ukjent feil"));
+  render();
+ }
 }
 function money(n){const v=Number(n)||0;const a=Math.abs(v);return (v<0?"£-":"£")+(a<1?Math.round(a*1000)+"k":a.toFixed(1)+"m")}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
@@ -8585,6 +8569,7 @@ function baseCareerClubNamesForDivision(division){
  return [...(BASE_EFL_DIVISIONS_2026_27?.[division]||[])];
 }
 function startNewCareer(){
+ if(!cmCloudAuthenticated){alert('Logg inn på CM Mobile-sky før du starter en karriere.');openCMCloudModal();return;}
  if(readCareerSlots().length>=MAX_CAREER_SLOTS){alert(`Du har nådd grensen på ${MAX_CAREER_SLOTS} samtidige karrierer. Åpne Karrierer og bytt til eller arkiver en lagring før du oppretter en ny.`);openCareerManager();return;}
  const divisions=['Premier League','Championship','League One','League Two','National League'];
  const overlay=document.createElement('div');overlay.id='careerClubPicker';
@@ -11727,6 +11712,39 @@ document.getElementById("saveBtn").addEventListener("click",()=>{const ok=save()
 const CM_SUPABASE_URL="https://bukqjuyedqzyribzkcui.supabase.co";
 const CM_SUPABASE_PUBLISHABLE_KEY="sb_publishable_SHpVB28p0wKiWYg4HGt8eg_F_WZigNC";
 let cmSupabase=null,cmCloudSyncTimer=null,cmCloudBusy=false,cmCloudStatus="Ikke tilkoblet";
+let cmCloudAuthenticated=false,cmCloudPayloadCache=new Map(),cmCloudPendingPayloads=new Map(),cmCloudWriteChain=Promise.resolve();
+function cmRemoveLocalCareerPayload(id){
+ try{localStorage.removeItem(careerSaveKey(id));localStorage.removeItem(careerBackupKey(id));}catch(e){}
+ try{cmDeleteCareerBackup(id).catch(()=>{});}catch(e){}
+}
+async function cmDeleteCareerBackup(id){
+ try{
+  const db=await cmOpenBackupDB();
+  await new Promise((resolve,reject)=>{const tx=db.transaction('careers','readwrite');tx.objectStore('careers').delete(String(id));tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});
+ }catch(e){}
+}
+function cmCloudScheduleSync(id,payload){
+ cmCloudPayloadCache.set(String(id),String(payload));
+ cmCloudPendingPayloads.set(String(id),String(payload));
+ cmCloudSetStatus("Synker til skyen…");
+ clearTimeout(cmCloudSyncTimer);
+ cmCloudSyncTimer=setTimeout(()=>cmCloudFlushPending().catch(e=>cmCloudSetStatus("⚠ Skylagring feilet: "+(e.message||"ukjent feil"))),700);
+}
+function scheduleCMCloudSave(id,payload){cmCloudScheduleSync(id,payload);}
+async function cmCloudFlushPending(){
+ if(!cmCloudPendingPayloads.size)return true;
+ const client=cmCloudClient(),{data:{session},error:sessionError}=await client.auth.getSession();
+ if(sessionError)throw sessionError;
+ if(!session?.user){cmCloudAuthenticated=false;cmCloudSetStatus("Logg inn for å lagre i skyen");throw new Error("Ikke innlogget. Karrieren er ikke bekreftet lagret i skyen.");}
+ cmCloudAuthenticated=true;
+ const entries=Array.from(cmCloudPendingPayloads.entries());
+ for(const [id,payload] of entries){
+  cmCloudWriteChain=cmCloudWriteChain.catch(()=>{}).then(()=>cmCloudUpsert(id,payload));
+  await cmCloudWriteChain;
+  if(cmCloudPendingPayloads.get(id)===payload)cmCloudPendingPayloads.delete(id);
+ }
+ return cmCloudPendingPayloads.size===0;
+}
 function cmCloudClient(){
  if(cmSupabase)return cmSupabase;
  if(!window.supabase?.createClient)throw new Error("Supabase-biblioteket ble ikke lastet. Kontroller internettilkoblingen.");
@@ -11749,90 +11767,117 @@ function scheduleCMCloudSave(id,payload){cmCloudScheduleSync(id,payload);}
 async function cmCloudUpsert(id,payload){
  const client=cmCloudClient(),{data:{session},error:sessionError}=await client.auth.getSession();
  if(sessionError)throw sessionError;
- if(!session?.user)return;
+ if(!session?.user)throw new Error("Ikke innlogget. Logg inn før du lagrer karrieren.");
  const meta=readCareerSlots().find(x=>x.id===id)||careerSlotDetails(id);
  const row={user_id:session.user.id,career_slot_id:String(id),career_name:String(meta.name||`${meta.clubName||"Karriere"} · ${meta.season||""}`),club_name:String(meta.clubName||""),season:String(meta.season||""),season_year:Number(meta.seasonYear)||2026,week:Number(meta.week)||1,payload:String(payload),updated_at:new Date().toISOString()};
  const {error}=await client.from("cm_careers").upsert(row,{onConflict:"user_id,career_slot_id"});
  if(error)throw error;
+ cmCloudPayloadCache.set(String(id),String(payload));
+ // Remove any old local full-save copies only after Supabase confirms the upsert.
+ cmRemoveLocalCareerPayload(id);
+ window.__cmLastCloudSaveAt=Date.now();
  cmCloudSetStatus("✓ Skylagret "+new Date().toLocaleTimeString("nb-NO",{hour:"2-digit",minute:"2-digit"}));
+ return true;
 }
 let cmCloudSyncInFlight=null;
 function cmCloudSyncAll(options={}){
  if(cmCloudSyncInFlight)return cmCloudSyncInFlight;
  cmCloudBusy=true;
- cmCloudSetStatus("Synkroniserer karrierer…");
+ cmCloudSetStatus("Henter karrierer fra skyen…");
  cmCloudSyncInFlight=(async()=>{
   const client=cmCloudClient(),{data:{session},error:sessionError}=await client.auth.getSession();
   if(sessionError)throw sessionError;
-  if(!session?.user){cmCloudSetStatus("Ikke tilkoblet");return {imported:0,uploaded:0,total:0,authenticated:false};}
+  if(!session?.user){cmCloudAuthenticated=false;cmCloudSetStatus("Ikke tilkoblet");return {imported:0,uploaded:0,total:0,authenticated:false};}
+  cmCloudAuthenticated=true;
+  if(cmCloudPendingPayloads.size)await cmCloudFlushPending();
   const {data:remoteRows,error}=await client.from("cm_careers").select("*").order("updated_at",{ascending:false});
   if(error)throw error;
-  const remote=Array.isArray(remoteRows)?remoteRows:[];
-  const localRows=readCareerSlots();
-  let imported=0,uploaded=0,restoredActive=false;
-  const validRemote=remote.filter(row=>row&&row.career_slot_id&&typeof row.payload==="string");
-  for(const row of validRemote){
-   const id=String(row.career_slot_id),local=localRows.find(x=>x.id===id);
-   const mainKey=careerSaveKey(id),localPayload=localStorage.getItem(mainKey);
-   const remoteTime=Date.parse(row.updated_at)||0;
-   if(!localPayload){
-    // Preserve an existing local recovery copy; cloud data must not erase it.
-    if(!localStorage.getItem(careerBackupKey(id)))localStorage.setItem(mainKey,row.payload);
-    else {
-     localStorage.setItem(mainKey,row.payload);
-    }
-    registerCareerSlot(id,{name:row.career_name||local?.name||"Karriere",clubName:row.club_name||local?.clubName||"",season:row.season||local?.season||"",seasonYear:Number(row.season_year)||Number(local?.seasonYear)||2026,week:Number(row.week)||1,updatedAt:remoteTime||Date.now()});
-    if(id===activeCareerSlotId)restoredActive=true;
-    imported++;
+  const remote=Array.isArray(remoteRows)?remoteRows.filter(row=>row&&row.career_slot_id&&typeof row.payload==="string"):[];
+  const remoteById=new Map(remote.map(row=>[String(row.career_slot_id),row]));
+  let localRows=readCareerSlots();
+  // One-time migration of the pre-slot legacy save, if present.
+  if(!localRows.some(row=>row.id==="career-legacy")){
+   let legacyPayload=null;
+   try{legacyPayload=localStorage.getItem(LEGACY_SAVE_KEY);}catch(e){}
+   if(legacyPayload){
+    try{
+     const legacyState=decodeSaveState(legacyPayload);
+     if(legacyState?.started){
+      const club=CLUBS[Number(legacyState.club)]||CLUBS[3],year=Number(legacyState.seasonYear)||2026;
+      const season=`${year}/${String(year+1).slice(-2)}`;
+      const legacyMeta={id:"career-legacy",name:`${club.name} · ${season}`,clubName:club.name,division:legacyState.activeDivision||clubDivision(club),season,seasonYear:year,week:Number(legacyState.week)||1,preseason:!!legacyState.preseasonActive,preseasonWeek:Number(legacyState.preseasonWeek)||1,played:Number(legacyState.played)||0,updatedAt:1};
+      writeCareerSlots([legacyMeta,...localRows]);
+      localRows=readCareerSlots();
+     }
+    }catch(e){}
+   }
+  }
+  let imported=0,uploaded=0;
+  // First migrate any old local-only saves. Keep them intact until the cloud confirms the upload.
+  for(const local of localRows){
+   const id=String(local.id);
+   let localPayload=null;
+   try{localPayload=localStorage.getItem(careerSaveKey(id))||localStorage.getItem(careerBackupKey(id));}catch(e){}
+   if(!localPayload)localPayload=await cmReadCareerBackup(id);
+   const remoteRow=remoteById.get(id);
+   if(localPayload&&(!remoteRow||(Number(local.updatedAt)||0)>(Date.parse(remoteRow.updated_at)||0))){
+    cmCloudPayloadCache.set(id,localPayload);
+    await cmCloudUpsert(id,localPayload);
+    remoteById.set(id,{...(remoteRow||{}),career_slot_id:id,payload:localPayload,career_name:local.name||remoteRow?.career_name||"Karriere",club_name:local.clubName||remoteRow?.club_name||"",season:local.season||remoteRow?.season||"",season_year:Number(local.seasonYear)||Number(remoteRow?.season_year)||2026,week:Number(local.week)||Number(remoteRow?.week)||1,updated_at:new Date().toISOString()});
+    uploaded++;
+   }else if(remoteRow){
+    cmCloudPayloadCache.set(id,remoteRow.payload);
+    cmRemoveLocalCareerPayload(id);
+   }else if(!localPayload){
+    // Metadata without a recoverable save is not treated as a playable career.
     continue;
    }
-   const localTime=Number(local?.updatedAt)||0;
-   if(remoteTime>localTime){
-    try{const decoded=decodeSaveState(localPayload);if(decoded?.started&&!localStorage.getItem(careerBackupKey(id)))localStorage.setItem(careerBackupKey(id),localPayload);}catch(e){}
-    localStorage.setItem(mainKey,row.payload);
-    registerCareerSlot(id,{name:row.career_name||local?.name||"Karriere",clubName:row.club_name||local?.clubName||"",season:row.season||local?.season||"",seasonYear:Number(row.season_year)||Number(local?.seasonYear)||2026,week:Number(row.week)||1,updatedAt:remoteTime});
-    if(id===activeCareerSlotId)restoredActive=true;
-    imported++;
-   }else if(localTime>remoteTime){
-    await cmCloudUpsert(id,localPayload);uploaded++;
+  }
+  // Add every cloud career to the small local metadata index and keep its payload in memory only.
+  const finalRemote=Array.from(remoteById.values());
+  for(const row of finalRemote){
+   const id=String(row.career_slot_id),existing=readCareerSlots().find(x=>x.id===id);
+   cmCloudPayloadCache.set(id,row.payload);
+   registerCareerSlot(id,{
+    name:row.career_name||existing?.name||"Karriere",
+    clubName:row.club_name||existing?.clubName||"",
+    season:row.season||existing?.season||"",
+    seasonYear:Number(row.season_year)||Number(existing?.seasonYear)||2026,
+    week:Number(row.week)||Number(existing?.week)||1,
+    updatedAt:Date.parse(row.updated_at)||Number(existing?.updatedAt)||Date.now()
+   });
+   // A cloud row is now authoritative; remove stale local full-save copies.
+   cmRemoveLocalCareerPayload(id);
+   imported++;
+  }
+  let activeId=localStorage.getItem(ACTIVE_CAREER_SLOT_KEY)||activeCareerSlotId||"";
+  if(activeId&&!cmCloudPayloadCache.has(activeId)){
+   const meta=readCareerSlots().find(x=>x.id===activeId);
+   if(meta){
+    const club=String(meta.clubName||"").trim().toLowerCase();
+    const season=String(meta.season||"").trim().toLowerCase();
+    let matches=finalRemote.filter(row=>String(row.club_name||"").trim().toLowerCase()===club&&String(row.season||"").trim().toLowerCase()===season);
+    if(matches.length>1){
+     const exact=matches.filter(row=>String(row.career_name||"").trim().toLowerCase()===String(meta.name||"").trim().toLowerCase());
+     if(exact.length===1)matches=exact;
+    }
+    if(matches.length===1){
+     const recoveredId=String(matches[0].career_slot_id);
+     try{localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,recoveredId);}catch(e){}
+     activeCareerSlotId=recoveredId;
+     writeCareerSlots(readCareerSlots().filter(x=>x.id!==activeId));
+     activeId=recoveredId;
+    }else window.__cmMissingActiveCareer={id:activeId,meta};
    }
   }
-  // Recovery for older saves whose cloud slot ID differs from the local metadata ID.
-  // Only use an exact club + season match, and only when it identifies one cloud row.
-  const activeId=localStorage.getItem(ACTIVE_CAREER_SLOT_KEY)||activeCareerSlotId||"";
-  const activeMeta=readCareerSlots().find(x=>x.id===activeId);
-  if(activeId&&activeMeta&&!localStorage.getItem(careerSaveKey(activeId))&&!localStorage.getItem(careerBackupKey(activeId))){
-   const club=String(activeMeta.clubName||"").trim().toLowerCase();
-   const season=String(activeMeta.season||"").trim().toLowerCase();
-   let candidates=validRemote.filter(row=>String(row.club_name||"").trim().toLowerCase()===club&&String(row.season||"").trim().toLowerCase()===season);
-   if(candidates.length>1){
-    const nm=String(activeMeta.name||"").trim().toLowerCase();
-    const exact=candidates.filter(row=>String(row.career_name||"").trim().toLowerCase()===nm);
-    if(exact.length===1)candidates=exact;
-   }
-   if(candidates.length===1){
-    const row=candidates[0];
-    localStorage.setItem(careerSaveKey(activeId),row.payload);
-    registerCareerSlot(activeId,{name:activeMeta.name||row.career_name||"Karriere",clubName:activeMeta.clubName||row.club_name||"",season:activeMeta.season||row.season||"",seasonYear:Number(row.season_year)||Number(activeMeta.seasonYear)||2026,week:Number(row.week)||Number(activeMeta.week)||1,updatedAt:Date.parse(row.updated_at)||Date.now()});
-    if(activeId===activeCareerSlotId)restoredActive=true;
-    imported++;
-   }
-  }
-  if(restoredActive){
-   const id=localStorage.getItem(ACTIVE_CAREER_SLOT_KEY)||activeCareerSlotId;
-   const p=id?localStorage.getItem(careerSaveKey(id)):null;
-   if(p){activeCareerSlotId=id;loadFromPayload(p);}
-  }
-  if((imported||restoredActive)&&!options.silentRender)render();
-  cmCloudSetStatus(`✓ Tilkoblet · ${validRemote.length+uploaded} karrierer i skyen`);
-  return {imported,uploaded,total:validRemote.length,authenticated:true};
+  if(!activeId||cmCloudPayloadCache.has(activeId))window.__cmMissingActiveCareer=null;
+  cmCloudSetStatus(`✓ Tilkoblet · ${finalRemote.length} karrierer i skyen`);
+  if(!options.silentRender&&appState?.started)render();
+  return {imported,uploaded,total:finalRemote.length,authenticated:true};
  })().catch(e=>{
   cmCloudSetStatus("⚠ Skylagring feilet: "+(e.message||"ukjent feil"));
   throw e;
- }).finally(()=>{
-  cmCloudBusy=false;
-  cmCloudSyncInFlight=null;
- });
+ }).finally(()=>{cmCloudBusy=false;cmCloudSyncInFlight=null;});
  return cmCloudSyncInFlight;
 }
 function openCMCloudModal(){
@@ -11847,7 +11892,7 @@ function openCMCloudModal(){
  <label style="display:block;color:#aebed0;font-size:11px;margin:10px 0 5px">Passord</label><input id="cmCloudPassword" type="password" autocomplete="current-password" style="width:100%;padding:12px;border-radius:9px;border:1px solid #405670;background:#0d1a2a;color:#fff">
  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px"><button id="cmCloudSignIn" class="primary">Logg inn</button><button id="cmCloudSignUp">Opprett konto</button></div>
  <button id="cmCloudSync" style="width:100%;margin-top:8px">Synkroniser nå</button><button id="cmCloudSignOut" class="ghost" style="width:100%;margin-top:8px">Logg ut</button>
- <p style="color:#8196ac;font-size:10px;line-height:1.45;margin:12px 0 0">Lokal lagring beholdes som reserve. Ingen karrieredata deles med Familiemat-tabellene.</p>
+ <p style="color:#8196ac;font-size:10px;line-height:1.45;margin:12px 0 0">Karrieredata lagres i skyen på kontoen din. Denne nettleseren beholder bare innlogging og en liten indeks over karrierene. Ingen karrieredata deles med Familiemat-tabellene.</p>
  </section>`;
  document.body.appendChild(overlay);
  const status=overlay.querySelector("#cmCloudStatus");
@@ -11858,17 +11903,17 @@ function openCMCloudModal(){
   const email=overlay.querySelector("#cmCloudEmail").value.trim(),password=overlay.querySelector("#cmCloudPassword").value;
   if(!email||!password){set("Fyll inn e-post og passord.");return;}
   set("Logger inn…");
-  try{const {error}=await cmCloudClient().auth.signInWithPassword({email,password});if(error)throw error;await cmCloudSyncAll();set(cmCloudStatus); }catch(e){set("⚠ "+(e.message||"Innlogging feilet."));}
+  try{const {error}=await cmCloudClient().auth.signInWithPassword({email,password});if(error)throw error;await cmCloudSyncAll({silentRender:true});set(cmCloudStatus);overlay.remove();if(!load()){render();openCareerManager();}else render();}catch(e){set("⚠ "+(e.message||"Innlogging feilet."));}
  };
  overlay.querySelector("#cmCloudSignUp").onclick=async()=>{
   const email=overlay.querySelector("#cmCloudEmail").value.trim(),password=overlay.querySelector("#cmCloudPassword").value;
   if(!email||!password){set("Fyll inn e-post og passord.");return;}
   if(password.length<8){set("Passordet må være minst 8 tegn.");return;}
   set("Oppretter konto…");
-  try{const {data,error}=await cmCloudClient().auth.signUp({email,password});if(error)throw error;if(data.session){await cmCloudSyncAll();set("✓ Konto opprettet og tilkoblet.");}else set("Konto opprettet. Bekreft e-postadressen før du logger inn.");}catch(e){set("⚠ "+(e.message||"Kunne ikke opprette konto."));}
+  try{const {data,error}=await cmCloudClient().auth.signUp({email,password});if(error)throw error;if(data.session){await cmCloudSyncAll({silentRender:true});set("✓ Konto opprettet og tilkoblet.");overlay.remove();if(!load()){render();openCareerManager();}else render();}else set("Konto opprettet. Bekreft e-postadressen før du logger inn.");}catch(e){set("⚠ "+(e.message||"Kunne ikke opprette konto."));}
  };
  overlay.querySelector("#cmCloudSync").onclick=async()=>{set("Synkroniserer…");try{await cmCloudSyncAll();set(cmCloudStatus);}catch(e){set("⚠ "+(e.message||"Synkronisering feilet."));}};
- overlay.querySelector("#cmCloudSignOut").onclick=async()=>{try{const {error}=await cmCloudClient().auth.signOut();if(error)throw error;set("Logget ut. Lokale karrierer er beholdt.");}catch(e){set("⚠ "+(e.message||"Kunne ikke logge ut."));}};
+ overlay.querySelector("#cmCloudSignOut").onclick=async()=>{try{const {error}=await cmCloudClient().auth.signOut();if(error)throw error;cmCloudAuthenticated=false;cmCloudPayloadCache.clear();cmCloudPendingPayloads.clear();set("Logget ut. Logg inn igjen for å åpne karrierene dine.");}catch(e){set("⚠ "+(e.message||"Kunne ikke logge ut."));}};
  cmCloudClient().auth.getSession().then(({data,error})=>{if(error)set("⚠ "+error.message);else if(data.session)set("Innlogget som "+data.session.user.email);}).catch(e=>set("⚠ "+e.message));
 }
 document.getElementById("cloudAccountBtn")?.addEventListener("click",openCMCloudModal);
@@ -11879,8 +11924,9 @@ function startCMAutoSave(){
  if(cmAutoSaveInterval)return;
  cmAutoSaveInterval=setInterval(()=>{if(appState?.started)save();},CM_AUTOSAVE_INTERVAL_MS);
 }
-window.addEventListener('pagehide',()=>{if(appState?.started)save();});
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&appState?.started)save();});
+window.addEventListener('pagehide',()=>{if(appState?.started){save();cmCloudFlushPending().catch(()=>{});}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&appState?.started){save();cmCloudFlushPending().catch(()=>{});}});
+window.addEventListener('online',()=>{if(cmCloudAuthenticated)cmCloudFlushPending().catch(e=>cmCloudSetStatus('⚠ Skylagring feilet: '+(e.message||'ukjent feil')));});
 startCMAutoSave();
 
 // Cloud recovery is awaited by bootstrap below before selecting the active local career.
@@ -11900,8 +11946,20 @@ startCMAutoSave();
  try{
   const {data,error}=await cmCloudClient().auth.getSession();
   if(error)throw error;
-  if(data?.session)await cmCloudSyncAll({silentRender:true});
- }catch(e){cmCloudSetStatus("⚠ Skylagring: "+(e.message||"synkronisering feilet"));}
+  if(data?.session){cmCloudAuthenticated=true;await cmCloudSyncAll({silentRender:true});}
+  else{
+   cmCloudAuthenticated=false;
+   render();
+   openCMCloudModal();
+   return;
+  }
+ }catch(e){
+  cmCloudAuthenticated=false;
+  cmCloudSetStatus("⚠ Skylagring: "+(e.message||"synkronisering feilet"));
+  render();
+  openCMCloudModal();
+  return;
+ }
  if(!load()){
   if(window.__cmMissingActiveCareer){
    // Do not silently substitute another career or overwrite the missing slot.
@@ -11910,7 +11968,11 @@ startCMAutoSave();
    alert(`Karrieren «${missing.name||missing.clubName||'aktiv karriere'}» mangler lokal lagringsfil. Oppstarten har ventet på eventuell skylagring, men fant ingen kopi. Kontroller Tilkoblet og samme konto før du fortsetter. Ingen ny karriere er opprettet.`);
    return;
   }
-  if(!activeCareerSlotId){activeCareerSlotId=newCareerSlotId();localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,activeCareerSlotId);}
+  if(!activeCareerSlotId){
+   render();
+   openCareerManager();
+   return;
+  }
   init();normalizeAllPlayerAges(Number(appState.seasonYear)||2026);save();render();
  }else{
   normalizeAllPlayerAges(Number(appState.seasonYear)||2026);

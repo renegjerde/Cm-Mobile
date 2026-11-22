@@ -1,0 +1,31 @@
+CM Mobile 4.4.0 – Cloud-only career storage
+
+Base: CM Mobile 4.3.0.
+
+Storage model:
+- Full career payloads are stored in the Supabase `cm_careers` table only.
+- The browser keeps the Supabase authentication session plus a small career metadata index and active career ID. It no longer stores full career saves in localStorage or IndexedDB.
+- Career payloads are held in memory while the game is open.
+- Cloud save status changes to "Skylagret" only after Supabase confirms the upsert.
+- Pending cloud saves are serialized to avoid older saves overwriting newer saves.
+- The app requires an authenticated cloud account before starting or continuing a career.
+- The same account can be used from different browsers/devices, provided they have internet access.
+
+Migration:
+- On login/startup, existing local career payloads are uploaded to the cloud if they are newer or missing remotely.
+- Existing local full-save copies are removed only after a confirmed cloud upsert, or after a cloud copy is confirmed authoritative.
+- IndexedDB safety copies are also removed only after cloud confirmation.
+- Local career metadata is retained because it is small and supports the career manager and active-career pointer.
+- Failed migrations do not delete the source local payload.
+
+Reliability notes:
+- A cloud-only design requires internet access and a valid login to play/save.
+- A save is queued after the in-game save action and confirmed asynchronously by Supabase. The interface reports "Synker til skyen…" while pending and "Skylagret" only after confirmation.
+- Browser shutdown/network loss before the confirmation can interrupt the pending upload. Autosave runs every 60 seconds; the app also attempts an immediate flush when the tab is hidden or closed, but browsers cannot guarantee completion of network requests during shutdown.
+- Supabase table `cm_careers`, its unique constraint `(user_id, career_slot_id)`, and Row Level Security policies must remain correctly configured. The app uses the existing project/table and does not change server-side policies.
+- This package was source-patched and ZIP-validated. It has not been tested against the live Supabase project or on physical iPhone Safari.
+
+ZIP contents:
+- index.html
+- PATCH_NOTES_v4.4.0.txt
+Both files are at the ZIP root; no folders.
