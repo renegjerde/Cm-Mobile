@@ -2184,6 +2184,48 @@ const APP_STATE_DEFAULTS=JSON.parse(JSON.stringify(appState));
 function newCareerSlotId(){return `career-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;}
 function careerSaveKey(id){return String(id||'')==='career-legacy'?LEGACY_SAVE_KEY:CAREER_SAVE_PREFIX+String(id||'');}
 function careerBackupKey(id){return careerSaveKey(id)+'::last-good-backup';}
+// Keep last-good backups in IndexedDB, not localStorage: large career saves
+// must not consume the quota needed by the primary save.
+const CM_BACKUP_DB_NAME='cm-mobile-backups-v1';
+let cmBackupDbPromise=null;
+function cmOpenBackupDB(){
+ if(!('indexedDB' in window))return Promise.reject(new Error('IndexedDB er ikke tilgjengelig'));
+ if(cmBackupDbPromise)return cmBackupDbPromise;
+ cmBackupDbPromise=new Promise((resolve,reject)=>{
+  const req=indexedDB.open(CM_BACKUP_DB_NAME,1);
+  req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains('careers'))db.createObjectStore('careers',{keyPath:'id'});};
+  req.onsuccess=()=>resolve(req.result);
+  req.onerror=()=>reject(req.error||new Error('Kunne ikke åpne sikkerhetslageret'));
+ });
+ return cmBackupDbPromise;
+}
+async function cmStoreCareerBackup(id,payload){
+ const db=await cmOpenBackupDB();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction('careers','readwrite');
+  tx.objectStore('careers').put({id:String(id),payload:String(payload),savedAt:Date.now()});
+  tx.oncomplete=()=>resolve(true);tx.onerror=()=>reject(tx.error||new Error('Sikkerhetskopien kunne ikke lagres'));
+ });
+}
+async function cmReadCareerBackup(id){
+ try{
+  const db=await cmOpenBackupDB();
+  return await new Promise((resolve,reject)=>{
+   const tx=db.transaction('careers','readonly'),req=tx.objectStore('careers').get(String(id));
+   req.onsuccess=()=>resolve(req.result?.payload||null);
+   req.onerror=()=>reject(req.error||new Error('Sikkerhetskopien kunne ikke leses'));
+  });
+ }catch(e){return null;}
+}
+async function cmRestoreCareerBackupToLocal(id){
+ const mainKey=careerSaveKey(id);
+ if(localStorage.getItem(mainKey))return true;
+ let backup=localStorage.getItem(careerBackupKey(id));
+ if(!backup)backup=await cmReadCareerBackup(id);
+ if(!backup)return false;
+ try{localStorage.setItem(mainKey,backup);return true;}catch(e){return false;}
+}
+
 function readCareerSlots(){try{const rows=JSON.parse(localStorage.getItem(CAREER_SLOT_INDEX_KEY)||'[]');return Array.isArray(rows)?rows.filter(x=>x&&typeof x.id==='string'):[]}catch(e){return []}}
 function writeCareerSlots(rows){localStorage.setItem(CAREER_SLOT_INDEX_KEY,JSON.stringify(rows));}
 function careerSlotDetails(id){
@@ -2861,29 +2903,54 @@ function decodeSaveState(payload){
  return JSON.parse(inflateLegacy(value.slice(5)));
 }
 let cmSaveFeedbackTimer=null;
-function cmShowLocalSaveFeedback(ok){
+function cmShowLocalSaveFeedback(ok,error){
  const button=document.getElementById('saveBtn');
  if(!button)return;
  button.textContent=ok?'✓ Lagret':'⚠ Lagring feilet';
- button.title=ok?'Karrieren er lagret lokalt'+(window.__cmLastSaveAt?' · '+new Date(window.__cmLastSaveAt).toLocaleTimeString('nb-NO',{hour:'2-digit',minute:'2-digit'}):''):'Kunne ikke lagre lokalt. Kontroller ledig lagringsplass.';
+ button.title=ok?'Karrieren er lagret lokalt'+(window.__cmLastSaveAt?' · '+new Date(window.__cmLastSaveAt).toLocaleTimeString('nb-NO',{hour:'2-digit',minute:'2-digit'}):''):'Lokal lagring feilet: '+String(error?.message||error||'ukjent feil');
  if(cmSaveFeedbackTimer)clearTimeout(cmSaveFeedbackTimer);
- cmSaveFeedbackTimer=setTimeout(()=>{if(button.isConnected)button.textContent='▣ Lagre';},2600);
+ cmSaveFeedbackTimer=setTimeout(()=>{if(button.isConnected)button.textContent='▣ Lagre';},3200);
 }
-function save(){try{
- if(!activeCareerSlotId){activeCareerSlotId=newCareerSlotId();localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,activeCareerSlotId);}
- const id=activeCareerSlotId,payload=encodeSaveState(appState),mainKey=careerSaveKey(id);
- const previousPayload=localStorage.getItem(mainKey);
- if(previousPayload&&previousPayload!==payload){
-  try{const previousState=decodeSaveState(previousPayload);if(previousState&&previousState.started)localStorage.setItem(careerBackupKey(id),previousPayload);}catch(backupError){}
+function save(){
+ let id=activeCareerSlotId||null,payload=null,previousPayload=null,mainKey=null;
+ try{
+  if(!id){id=newCareerSlotId();activeCareerSlotId=id;}
+  payload=encodeSaveState(appState);
+  mainKey=careerSaveKey(id);
+  previousPayload=localStorage.getItem(mainKey);
+  try{
+   // localStorage.setItem is atomic: on quota failure the old main save remains intact.
+   localStorage.setItem(mainKey,payload);
+  }catch(firstError){
+   // Remove only redundant backup copies; never delete another career's primary save.
+   try{localStorage.removeItem(careerBackupKey(id));}catch(e){}
+   try{
+    const redundant=[];
+    for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key&&key.endsWith('::last-good-backup'))redundant.push(key);}
+    redundant.forEach(key=>{try{localStorage.removeItem(key);}catch(e){}});
+   }catch(e){}
+   // Retry once after freeing space used by legacy localStorage backups.
+   localStorage.setItem(mainKey,payload);
+  }
+  // The primary save is now safe. Keep the old good version in IndexedDB asynchronously.
+  if(previousPayload&&previousPayload!==payload){
+   cmStoreCareerBackup(id,previousPayload).catch(e=>{window.__cmBackupWarning=String(e.message||e);});
+  }
+  try{
+   if(previousPayload!==payload||!readCareerSlots().some(row=>row.id===id))registerCareerSlot(id);
+  }catch(metaError){window.__cmSaveMetadataWarning=String(metaError.message||metaError);}
+  try{localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,id);}catch(pointerError){window.__cmSavePointerWarning=String(pointerError.message||pointerError);}
+  window.__cmLastSaveAt=Date.now();
+  window.__cmLastSaveError=null;
+  cmShowLocalSaveFeedback(true);
+  try{scheduleCMCloudSave(id,payload);}catch(e){window.__cmCloudQueueError=String(e.message||e);}
+  return true;
+ }catch(e){
+  window.__cmLastSaveError={name:e?.name||'Error',message:e?.message||String(e),at:Date.now(),careerId:id};
+  cmShowLocalSaveFeedback(false,e);
+  return false;
  }
- localStorage.setItem(mainKey,payload);
- if(previousPayload!==payload||!readCareerSlots().some(row=>row.id===id))registerCareerSlot(id);
- localStorage.setItem(ACTIVE_CAREER_SLOT_KEY,id);
- window.__cmLastSaveAt=Date.now();
- cmShowLocalSaveFeedback(true);
- try{scheduleCMCloudSave(id,payload);}catch(e){}
- return true;
- }catch(e){cmShowLocalSaveFeedback(false);return false;}}
+}
 function loadFromPayload(payload){try{let s=decodeSaveState(payload);if(s&&s.started){const hadPreseasonFlag=Object.prototype.hasOwnProperty.call(s,"preseasonActive");Object.assign(appState,s);if(!Object.prototype.hasOwnProperty.call(s,"leagueSystemSchemaVersion"))appState.leagueSystemSchemaVersion=0;if(Number(appState.availabilityModelVersion||0)<2){
   const migrateAvailability=(players)=>{(players||[]).forEach(p=>{if(Number(p.injured)>0&&!Number.isFinite(Number(p.injuryDaysRemaining)))p.injuryDaysRemaining=Math.max(4,Number(p.injured)*8);if(Number(p.suspended)>0){const d=appState.discipline?.[String(p.id)];if(d&&!Number.isFinite(Number(d.ban)))d.ban=Number(p.suspended)||0;}});};
   migrateAvailability(appState.squad);(appState.worldSquads||[]).forEach(migrateAvailability);
@@ -2947,6 +3014,8 @@ function deleteCareerSlot(id){
 async function switchCareerSlot(id){
  if(!id||id===activeCareerSlotId){document.getElementById('careerManagerModal')?.remove();return;}
  let payload=localStorage.getItem(careerSaveKey(id));
+ if(!payload)await cmRestoreCareerBackupToLocal(id);
+ payload=localStorage.getItem(careerSaveKey(id));
  let usingBackup=false;
  if(!payload){payload=localStorage.getItem(careerBackupKey(id));usingBackup=!!payload;}
  if(!payload){
@@ -11822,6 +11891,11 @@ startCMAutoSave();
  const count=names=>names.filter(name=>transfermarktPlayersForClub(name).length>=12).length;
  PLAYER_REFERENCE_STATUS={fplReady:false,fplCount:0,tmPlayers:0,tmTeams:0,globalPlayers:EMBEDDED_TM_PROFILES.length,globalLoaded:true,globalSourceDate:TM_GLOBAL_REFERENCE_CUTOFF,cache:false,fetchedAt:null,source:'embedded offline full Transfermarkt-derived profile archive',eflClubsWithProfiles:count(Object.values(EFL_DIVISIONS).flat()),europeanClubsWithProfiles:count(Object.values(UEFA_2026_27).flat()),error:''};
  try{localStorage.removeItem('cmMobilePlayerReferenceCacheV1')}catch(e){}
+ // Restore the active career's IndexedDB safety copy before contacting the cloud.
+ try{
+  const activeId=localStorage.getItem(ACTIVE_CAREER_SLOT_KEY)||'';
+  if(activeId)await cmRestoreCareerBackupToLocal(activeId);
+ }catch(e){}
  // Wait for an authenticated cloud restore before reading the active career pointer.
  try{
   const {data,error}=await cmCloudClient().auth.getSession();

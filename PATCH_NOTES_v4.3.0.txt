@@ -1,0 +1,34 @@
+CM Mobile 4.3.0 – lagringskvote og sikkerhetskopi
+
+Base: CM Mobile 4.2.9.
+
+Berørt fil:
+- index.html
+
+Viktig funn:
+I 4.2.8/4.2.9 ble forrige karrierepayload kopiert til localStorage før den nye hovedlagringen ble skrevet. For store karrierer kan denne ekstra kopien bruke opp nettleserens lokale lagringskvote og få hovedlagringen til å feile.
+
+Rettet:
+1. Hovedlagringen skrives FØR sikkerhetskopien oppdateres.
+2. Siste gyldige kopi lagres nå i IndexedDB, som har en separat lagringsmekanisme og vanligvis langt større kapasitet enn localStorage.
+3. Hvis hovedlagringen møter kvotefeil, fjernes først redundante sikkerhetskopier i localStorage og hovedlagringen forsøkes én gang til.
+4. Ingen primærlagring for andre karrierer slettes.
+5. Feil i karrierelisten/metadata eller aktiv-peker skal ikke lenger feilrapporteres som om hovedlagringen feilet når payload allerede er skrevet.
+6. Oppstart og manuell karrierebytte forsøker å hente IndexedDB-sikkerhetskopi dersom hovedlagringen mangler.
+7. Lagringsknappen viser nå den konkrete feilmeldingen i title-attributtet ved feil.
+8. Eksisterende skyopplasting etter lokal lagring beholdes.
+
+Begrensninger:
+- IndexedDB-sikkerhetskopien skrives asynkront etter at hovedlagringen er bekreftet. En umiddelbar tvungen lukking akkurat i dette tidsrommet kan avbryte sikkerhetskopien, men ikke den allerede fullførte hovedlagringen.
+- Safari kan fortsatt nekte lagring dersom nettstedets data slettes, privat nettlesing begrenser lagring, eller enhetslagringen er utilgjengelig.
+- Eksisterende lokale hovedlagringer beholdes. Redundante localStorage-backupnøkler kan fjernes ved kvotepress; hovedlagringer slettes ikke.
+
+ZIP:
+- index.html
+- PATCH_NOTES_v4.3.0.txt
+Begge direkte i arkivroten, ingen undermapper.
+
+Teststatus:
+- Kildeendringer kontrollert mot 4.2.9.
+- ZIP-integritet verifisert.
+- Reell iPhone/Safari- og Supabase-testing gjenstår.
