@@ -7583,13 +7583,46 @@ function simulateEuropeanLeagueMatch(homeTeam,awayTeam,compName,matchday,gameNo)
  recordSimulatedCupPlayerStats(homeTeam,awayTeam,pa,pb,sim,compName);
  return {round:matchday,home:homeTeam.name,away:awayTeam.name,score:`${sim.ga}–${sim.gb}`,winner:sim.ga===sim.gb?'Uavgjort':sim.ga>sim.gb?homeTeam.name:awayTeam.name,competition:compName,events:sim.events||[],stats:sim.stats||{},isLeaguePhase:true,gameNo};
 }
+function europeanCompetitionMembershipAudit(comps=appState.europeanCompetitions){
+ const membership=new Map(),duplicates=[],duplicateKeys=new Set();
+ for(const [competition,comp] of Object.entries(comps||{})){
+  // Inspect both authoritative participant arrays. A damaged save can have a clean
+  // standings table but a contaminated team list (or the reverse).
+  const rows=[...(Array.isArray(comp?.table)?comp.table:[]),...(Array.isArray(comp?.teams)?comp.teams:[])];
+  const local=new Set();
+  for(const row of rows){
+   const name=String(row?.name||'').trim();if(!name)continue;
+   const key=normalizedClubKey(name);if(!key)continue;
+   if(local.has(key))continue;local.add(key);
+   const prior=membership.get(key);
+   if(prior&&prior.competition!==competition){
+    const pair=[prior.competition,competition].sort().join('|'),dedupe=`${key}|${pair}`;
+    if(!duplicateKeys.has(dedupe)){duplicateKeys.add(dedupe);duplicates.push({name,first:prior.name,competitions:[prior.competition,competition]});}
+   }else if(!prior)membership.set(key,{name,competition});
+  }
+ }
+ return {ok:duplicates.length===0,duplicates,membership};
+}
 function ensureEuropeanCompetitions(reset=false){
  const hasLeagueData=!reset&&Number(appState.europeanDatabaseVersion)>=9&&appState.europeanCompetitions&&appState.europeanSeason===appState.seasonYear&&Object.values(appState.europeanCompetitions).length===3&&Object.values(appState.europeanCompetitions).every(c=>c?.format==='league'&&Array.isArray(c.leagueSchedule)&&c.leagueSchedule.length===c.matchdays&&Array.isArray(c.table)&&c.table.length===36);
  if(hasLeagueData){
-  Object.values(appState.europeanCompetitions).forEach(c=>{if(!c.knockout)c.knockout={stageIndex:0,activeStage:null,history:[],playoffWinners:[]};});
-  Object.keys(EUROPEAN_LEAGUE_GAMEWEEKS).forEach(name=>alignUpcomingEuropeanWeeks(appState.europeanCompetitions[name],name));
-  appState.europeanDatabaseVersion=10;
-  return;
+  const membershipAudit=europeanCompetitionMembershipAudit(appState.europeanCompetitions);
+  if(!membershipAudit.ok){
+   const archived=JSON.parse(JSON.stringify(appState.europeanCompetitions));
+   const pendingIsEuropean=!!(appState.pendingCupMatch&&(['Champions League','Europa League','Conference League'].includes(appState.pendingCupMatch.competition)||appState.pendingCupMatch.isEuropean||appState.pendingCupMatch.isEuropeanLeague||appState.pendingCupMatch.isEuropeanKnockout));
+   appState.europeanSeasonRepairArchive=Array.isArray(appState.europeanSeasonRepairArchive)?appState.europeanSeasonRepairArchive:[];
+   appState.europeanSeasonRepairArchive.push({season:appState.europeanSeason,reason:'Duplicate club registration across UEFA competitions',duplicates:membershipAudit.duplicates,competitions:archived,pendingMatch:pendingIsEuropean?JSON.parse(JSON.stringify(appState.pendingCupMatch)):null,archivedAt:new Date().toISOString()});
+   appState.europeanSeasonRepairArchive=appState.europeanSeasonRepairArchive.slice(-5);
+   if(pendingIsEuropean)appState.pendingCupMatch=null;
+   appState.log=Array.isArray(appState.log)?appState.log:[];
+   appState.log.push(`EUROPACUP-REPARASJON: Duplikater ble funnet i ${membershipAudit.duplicates.map(d=>d.name).join(', ')}. Den gamle turneringsstatusen${pendingIsEuropean?' og ventende europakamp':''} er arkivert, og alle tre turneringene bygges på nytt med unike deltakere.`);
+   reset=true;
+  }else{
+   Object.values(appState.europeanCompetitions).forEach(c=>{if(!c.knockout)c.knockout={stageIndex:0,activeStage:null,history:[],playoffWinners:[]};});
+   Object.keys(EUROPEAN_LEAGUE_GAMEWEEKS).forEach(name=>alignUpcomingEuropeanWeeks(appState.europeanCompetitions[name],name));
+   appState.europeanDatabaseVersion=11;
+   return;
+  }
  }
  const table=sortedTable();
  const toTeam=(name,division='Premier League')=>{
@@ -7622,13 +7655,18 @@ function ensureEuropeanCompetitions(reset=false){
  const leagueOrder=premierTable.length?premierTable:english;
  const elNames=pickEnglish([...(faWinner?[faWinner]:[]),...leagueOrder.slice(5),...validPLNames(prior.europaLeague)],3);
  const confNames=pickEnglish([...(eflWinner?[eflWinner]:[]),...leagueOrder.slice(5),...validPLNames(prior.conferenceLeague)],1);
+ const globallyUsed=new Set();
+ const allEuropeanCandidates=[...Object.values(UEFA_2026_27||{}).flat(),...INTERNATIONAL_CLUBS,...EUROPA_LEAGUE_POOL,...CONFERENCE_LEAGUE_POOL];
  const makeComp=(name,englishNames,foreignPool,matchdays,weeks)=>{
-  const names=Number(appState.seasonYear)===2026&&UEFA_2026_27[name]?[...UEFA_2026_27[name]]:[...englishNames,...foreignPool.map(t=>t.name)].slice(0,36);
-  const teams=[...new Map(names.map(n=>{const fromForeign=foreignPool.find(t=>t.name===n);return [n,toTeam(n,fromForeign?'Europe':'Premier League')]})).values()];
-  // Defensive fill: keep the competition structurally valid even if a saved season's qualifier list is incomplete.
-  const available=[...INTERNATIONAL_CLUBS,...EUROPEAN_EXTRA_CLUBS];
-  for(const item of available){if(teams.length>=36)break;if(!teams.some(t=>t.name===item.name))teams.push(toTeam(item.name,'Europe'));}
-  if(teams.length!==36)throw new Error(`${name}: could not form 36 unique clubs`);
+  const preferred=Number(appState.seasonYear)===2026&&UEFA_2026_27[name]?[...UEFA_2026_27[name]]:[...englishNames,...foreignPool.map(t=>t.name)];
+  const names=[],local=new Set();
+  const addName=n=>{const value=String(n||'').trim(),key=normalizedClubKey(value);if(!value||!key||local.has(key)||globallyUsed.has(key))return;local.add(key);globallyUsed.add(key);names.push(value);};
+  for(const candidate of preferred){if(names.length>=36)break;addName(candidate);}
+  // Shared global reserve list: a club already assigned to an earlier tournament
+  // cannot be pulled into this competition to fill a missing slot.
+  for(const candidate of allEuropeanCandidates){if(names.length>=36)break;addName(typeof candidate==='string'?candidate:candidate?.name);}
+  if(names.length!==36)throw new Error(`${name}: could not form 36 globally unique clubs (found ${names.length})`);
+  const teams=names.map(n=>{const fromForeign=foreignPool.find(t=>normalizedClubKey(t.name)===normalizedClubKey(n));return toTeam(n,fromForeign?'Europe':'Premier League')});
   const matchdaysSchedule=buildEuropeanLeagueSchedule(teams,matchdays,`${appState.seasonYear}|${name}|league-phase`);
   const seedStrength=new Map(teams.map(t=>[t.name,t.strength]));
   return {name,format:'league',phase:'league',stage:0,leagueRound:0,matchdays,scheduledWeeks:weeks,teams,leagueSchedule:matchdaysSchedule,table:teams.map(t=>({name:t.name,country:t.country,strength:seedStrength.get(t.name)||60,played:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0})),results:[],champion:null,finished:false,leaguePhaseComplete:false,knockout:{stageIndex:0,activeStage:null,history:[],playoffWinners:[]}};
@@ -7638,7 +7676,9 @@ function ensureEuropeanCompetitions(reset=false){
   'Europa League':makeComp('Europa League',elNames,EUROPA_LEAGUE_POOL,8,EUROPEAN_LEAGUE_GAMEWEEKS['Europa League']),
   'Conference League':makeComp('Conference League',confNames,CONFERENCE_LEAGUE_POOL,6,EUROPEAN_LEAGUE_GAMEWEEKS['Conference League'])
  };
- appState.europeanSeason=appState.seasonYear;appState.europeanDatabaseVersion=10;
+ const finalMembershipAudit=europeanCompetitionMembershipAudit(appState.europeanCompetitions);
+ if(!finalMembershipAudit.ok)throw new Error('UEFA participant collision after global allocation: '+finalMembershipAudit.duplicates.map(d=>d.name).join(', '));
+ appState.europeanSeason=appState.seasonYear;appState.europeanDatabaseVersion=11;
 }
 
 function simulateEuropeanStage(comp,week){

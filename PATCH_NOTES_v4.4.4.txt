@@ -1,0 +1,23 @@
+CM MOBILE 4.4.4 — UEFA DUPLICATE PARTICIPANT FIX
+
+This release is a targeted European competition stability hotfix based on CM Mobile 4.4.3.
+
+FIXES
+- Prevents the same club from being allocated to more than one of the Champions League, Europa League, and Conference League in the same season.
+- Uses one shared global participant set while building the three competitions, including when reserve clubs are needed to fill a 36-team league phase.
+- Audits saved European competition data across both the team lists and league tables.
+- If a saved career already contains a club duplicated across UEFA competitions, the old competition state is preserved in the in-career repair archive (up to five snapshots), then all three UEFA participant lists are rebuilt with globally unique clubs.
+- If a European match is pending during such a repair, that pending match is preserved in the same archive and cleared before the competitions are rebuilt.
+
+VALIDATION PERFORMED
+- JavaScript syntax check passed.
+- UEFA league-phase allocation tested for seasons 2026, 2027, and 2028: 36 clubs in each competition and no cross-competition duplicates.
+- Corrupted saved-career test: Real Madrid deliberately inserted into all three competitions; duplicate audit detected the issue, archived the old state and pending European match, and rebuilt three unique 36-club participant lists.
+- Existing regression checks passed for UEFA league schedules, domestic schedules, FA Cup and EFL Cup progression, European knockout progression, parallel competition catch-up, and cloud-save queue logic.
+
+SCOPE NOTE
+- This is the UEFA hotfix only. The Spanish league expansion (Primera División, Segunda División, Primera Federación, Spanish cups, real player rosters, and country > league > club career selection) is not included in this ZIP. That work needs its own complete integration and regression pass; it should not be represented as finished in this release.
+
+FILES
+- index.html
+- PATCH_NOTES_v4.4.4.txt
